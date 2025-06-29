@@ -1221,7 +1221,7 @@ void CS_ErrorOnNonDefinition (CodeSeg* S, unsigned First, unsigned Last)
         ** against a signature.  this is rare.  if the
         ** compiler does this with a different signature
         ** in the future, an error will be produced, but
-        ** we still won't produce bad code.
+        ** at least we still won't produce bad code.
         */
         if (E->OPC == OP65_PHA) {
             unsigned long J;
