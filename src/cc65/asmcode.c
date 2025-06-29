@@ -84,6 +84,20 @@ void RemoveCode (const CodeMark* M)
 
 
 
+void ErrorOnNonDefinition (const CodeMark* Start, const CodeMark* End)
+/* Error on an non definition between the given code markers */
+{
+    /* Nothing to do if the range is empty */
+    if (Start->Pos == End->Pos) {
+        return;
+    }
+
+    /* Delete the range */
+    CS_ErrorOnNonDefinition (CS->Code, Start->Pos, End->Pos-1);
+}
+
+
+
 void MoveCode (const CodeMark* Start, const CodeMark* End, const CodeMark* Target)
 /* Move the code between Start (inclusive) and End (exclusive) to
 ** (before) Target. The code marks aren't updated.

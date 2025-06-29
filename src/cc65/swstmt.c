@@ -92,6 +92,7 @@ void SwitchStatement (void)
     ExprDesc    SwitchExpr;     /* Switch statement expression */
     CodeMark    SwitchCodeStart;/* Start of switch code */
     CodeMark    SwitchCodeEnd;  /* End of switch code */
+    CodeMark    OrigCaseCodeStart;  /* Unmodified beginning of case code */
     unsigned    ExitLabel;      /* Exit label */
     unsigned    SwitchCodeLabel;/* Label for the switch code */
     int         HaveBreak = 0;  /* True if the last statement had a break */
@@ -135,6 +136,7 @@ void SwitchStatement (void)
     */
     GetCodePos (&SwitchData.CaseCodeStart);
     SwitchData.CaseCodeStartFlag = false;
+    OrigCaseCodeStart = SwitchData.CaseCodeStart;
 
     /* Setup the control structure, save the old and activate the new one */
     SwitchData.Nodes        = NewCollection ();
@@ -190,6 +192,19 @@ void SwitchStatement (void)
     /* Move the code to the front */
     GetCodePos (&SwitchCodeEnd);
     MoveCode (&SwitchCodeStart, &SwitchCodeEnd, &SwitchData.CaseCodeStart);
+
+    /* Error on "unreachable" code before the switch code
+    ** (only variable definitions are allowed)
+    **
+    ** originally i wanted to detect and remove/replace the instructions
+    ** related to this unreachable code.
+    ** detection is easy, but it turns out that remove/replace is way too
+    ** complicated in the general case.
+    **
+    ** so instead we'll just detect and produce an error.
+    ** producing an error is better than producing incorrect code.
+    */
+    ErrorOnNonDefinition(&OrigCaseCodeStart, &SwitchData.CaseCodeStart);
 
     /* Define the exit label */
     g_defcodelabel (ExitLabel);

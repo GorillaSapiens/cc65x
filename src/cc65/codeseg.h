@@ -247,6 +247,9 @@ void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last);
 ** violated.
 */
 
+void CS_ErrorOnNonDefinition (CodeSeg* S, unsigned First, unsigned Last);
+/* emit an Error on anything other variable definition. */
+
 void CS_DelCodeAfter (CodeSeg* S, unsigned Last);
 /* Delete all entries including the given one */
 
