@@ -35,6 +35,7 @@
 
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 /* common */
 #include "chartype.h"
@@ -1187,6 +1188,85 @@ void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last)
 
         /* Delete the entry itself */
         FreeCodeEntry (E);
+    }
+}
+
+
+
+void CS_ErrorOnNonDefinition (CodeSeg* S, unsigned First, unsigned Last)
+/* emit an Error on anything other variable definition. */
+{
+    unsigned I;
+    bool WantError;
+
+    for (I = First; I <= Last; ++I) {
+        CodeEntry* E = CS_GetEntry (S, I);
+        WantError = true; /* by default, produce an error  */
+
+        /* calls to decsp* are allowed */
+        if (E->OPC == OP65_JSR && !strncmp(E->Arg, "decsp", 5)) {
+            WantError = false;
+        }
+
+        /* ldy # is allowed, IF followed by jsr subysp */
+        if (E->OPC == OP65_LDY && E->AM == AM65_IMM) {
+            CodeEntry *F = CS_GetEntry (S, I + 1);
+            if (F->OPC == OP65_JSR && !strcmp(F->Arg, "subysp")) {
+                WantError = false;
+                ++I;
+            }
+        }
+
+        /* detect stack decrement > 255 bytes by comparing
+        ** against a signature.  this is rare.  if the
+        ** compiler does this with a different signature
+        ** in the future, an error will be produced, but
+        ** at least we still won't produce bad code.
+        */
+        if (E->OPC == OP65_PHA) {
+            unsigned long J;
+            static struct {
+               opc_t OPC;
+               am_t  AM;
+               bool  CheckForSP;
+            } signature[] = {
+               { OP65_PHA, AM65_IMP, false },
+               { OP65_LDA, AM65_ZP,  true },
+               { OP65_SEC, AM65_IMP, false },
+               { OP65_SBC, AM65_IMM, false },
+               { OP65_STA, AM65_ZP,  true },
+               { OP65_LDA, AM65_ZP,  true },
+               { OP65_SBC, AM65_IMM, false },
+               { OP65_STA, AM65_ZP,  true },
+               { OP65_PLA, AM65_IMP, false },
+            };
+            for (J = 0; J < sizeof(signature) / sizeof(signature[0]); ++J) {
+                if (I + J <= Last) {
+                    CodeEntry *F = CS_GetEntry (S, I + J);
+                    if (F->OPC != signature[J].OPC ||
+                        F->AM  != signature[J].AM ||
+                        (signature[J].CheckForSP && strncmp(F->Arg, "c_sp", 4))) {
+#if 0 /* leaving this here for future debugging */
+                            printf("%s:%d %d %d %d %d\n", __FILE__, __LINE__,
+                               F->OPC, signature[J].OPC,
+                               F->AM, signature[J].AM);
+#endif
+                        /* failure, jump out of here */
+                        goto out;
+                    }
+                }
+            }
+            /* if we made it here, we matched the signature */
+            WantError = false;
+            I += (sizeof(signature) / sizeof(signature[0])) - 1;
+        }
+        out:
+
+        if (WantError) {
+            Error ("unreachable code at %s:%d not supported",
+               E->LI->File->Name, E->LI->ActualLineNum);
+            return;
+        }
     }
 }
 
