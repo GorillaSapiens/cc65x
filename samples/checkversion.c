@@ -1,10 +1,12 @@
-
-/* Until 2.19 the __CC65__ macro was defined as (VER_MAJOR * 0x100) + (VER_MINOR * 0x10),
- * which caused it to contain broken values in compiler releases 2.16 to 2.19. The
- * macro was fixed some time after 2.19 to (VER_MAJOR * 0x100) + VER_MINOR.
+/* Until 2.19 the __CC65__ macro was defined as
+ * (VER_MAJOR * 0x100) + (VER_MINOR * 0x10),
+ * which caused it to contain broken values in compiler releases 2.16 to
+ * 2.19. The macro was fixed some time after 2.19 to
+ * (VER_MAJOR * 0x100) + VER_MINOR.
  *
- * The following strategy can be used to still compare for less or greater versions,
- * should this really be necessary or wanted - it is not recommended afterall.
+ * The following strategy can be used to still compare for less or
+ * greater versions, should this really be necessary or wanted -
+ * it is not recommended afterall.
  */
 
 #include <stdio.h>
