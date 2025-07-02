@@ -93,6 +93,7 @@ void SwitchStatement (void)
     CodeMark    SwitchCodeStart;/* Start of switch code */
     CodeMark    SwitchCodeEnd;  /* End of switch code */
     CodeMark    OrigCaseCodeStart;  /* Unmodified beginning of case code */
+    CodeMark    SaveCodeMark;
     unsigned    ExitLabel;      /* Exit label */
     unsigned    SwitchCodeLabel;/* Label for the switch code */
     int         HaveBreak = 0;  /* True if the last statement had a break */
@@ -129,6 +130,7 @@ void SwitchStatement (void)
     SwitchCodeLabel = GetLocalLabel ();
     /* save state for switch logic */
     g_switchsave (SizeOf (SwitchExpr.Type));
+    GetCodePos (&SaveCodeMark);
 
     /* Remember the current code position. We will move the switch code
     ** to this position later.  This will get overwritten if we actually
@@ -192,6 +194,8 @@ void SwitchStatement (void)
     /* Move the code to the front */
     GetCodePos (&SwitchCodeEnd);
     MoveCode (&SwitchCodeStart, &SwitchCodeEnd, &SwitchData.CaseCodeStart);
+
+    CleanupSwitch(&SaveCodeMark);
 
     /* Error on "unreachable" code before the switch code
     ** (only variable definitions are allowed)

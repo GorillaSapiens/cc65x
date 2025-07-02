@@ -1270,6 +1270,18 @@ void CS_ErrorOnNonDefinition (CodeSeg* S, unsigned First, unsigned Last)
     }
 }
 
+void CS_CleanupSwitch (CodeSeg* S, unsigned location) {
+   CodeEntry* E0 = CS_GetEntry (S, location-1);
+   CodeEntry* E1 = CS_GetEntry (S, location);
+
+   if (E0->OPC == OP65_JSR &&
+       E1->OPC == OP65_JSR &&
+       !strcmp(E0->Arg, "saveeax") &&
+       !strcmp(E1->Arg, "resteax")) {
+      CS_DelEntry (S, location);
+      CS_DelEntry (S, location - 1);
+   }
+}
 
 
 void CS_DelCodeAfter (CodeSeg* S, unsigned Last)

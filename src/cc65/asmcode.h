@@ -77,6 +77,8 @@ void RemoveCode (const CodeMark* M);
 void ErrorOnNonDefinition (const CodeMark* Start, const CodeMark* End);
 /* Error on an non definition between the given code markers */
 
+void CleanupSwitch (const CodeMark* location);
+
 void MoveCode (const CodeMark* Start, const CodeMark* End, const CodeMark* Target);
 /* Move the code between Start (inclusive) and End (exclusive) to
 ** (before) Target. The code marks aren't updated.

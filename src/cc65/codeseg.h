@@ -250,6 +250,8 @@ void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last);
 void CS_ErrorOnNonDefinition (CodeSeg* S, unsigned First, unsigned Last);
 /* emit an Error on anything other variable definition. */
 
+void CS_CleanupSwitch(CodeSeg *S, unsigned loc);
+
 void CS_DelCodeAfter (CodeSeg* S, unsigned Last);
 /* Delete all entries including the given one */
 

@@ -96,6 +96,9 @@ void ErrorOnNonDefinition (const CodeMark* Start, const CodeMark* End)
     CS_ErrorOnNonDefinition (CS->Code, Start->Pos, End->Pos-1);
 }
 
+void CleanupSwitch (const CodeMark* location) {
+    CS_CleanupSwitch(CS->Code, location->Pos);
+}
 
 
 void MoveCode (const CodeMark* Start, const CodeMark* End, const CodeMark* Target)
