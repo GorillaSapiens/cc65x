@@ -6,3 +6,4 @@ BraceWrapping:
   AfterControlStatement: false   # keep `{` on same line as `if`, `while`, etc.
   BeforeElse: true               # put `else` on a new line
 IndentCaseLabels: true
+SortIncludes: false
