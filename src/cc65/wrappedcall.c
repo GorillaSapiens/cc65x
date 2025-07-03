@@ -55,35 +55,38 @@ static IntPtrStack WrappedCalls;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void PushWrappedCall (void *Ptr, unsigned int Val)
+void PushWrappedCall(void *Ptr, unsigned int Val)
 // Push the current WrappedCall
 {
-    if (IPS_IsFull (&WrappedCalls)) {
-        Error ("WrappedCall stack overflow");
-    } else {
-        IPS_Push (&WrappedCalls, Val, Ptr);
-    }
+   if (IPS_IsFull(&WrappedCalls)) {
+      Error("WrappedCall stack overflow");
+   }
+   else {
+      IPS_Push(&WrappedCalls, Val, Ptr);
+   }
 }
 
-void PopWrappedCall (void)
+void PopWrappedCall(void)
 // Remove the current WrappedCall
 {
-    if (IPS_GetCount (&WrappedCalls) < 1) {
-        Error ("WrappedCall stack is empty");
-    } else {
-        IPS_Drop (&WrappedCalls);
-    }
+   if (IPS_GetCount(&WrappedCalls) < 1) {
+      Error("WrappedCall stack is empty");
+   }
+   else {
+      IPS_Drop(&WrappedCalls);
+   }
 }
 
-void GetWrappedCall (void **Ptr, unsigned int *Val)
+void GetWrappedCall(void **Ptr, unsigned int *Val)
 // Get the current WrappedCall
 {
-    if (IPS_GetCount (&WrappedCalls) < 1) {
-        *Ptr = NULL;
-        *Val = 0;
-    } else {
-        long Temp;
-        IPS_Get (&WrappedCalls, &Temp, Ptr);
-        *Val = (unsigned int) Temp;
-    }
+   if (IPS_GetCount(&WrappedCalls) < 1) {
+      *Ptr = NULL;
+      *Val = 0;
+   }
+   else {
+      long Temp;
+      IPS_Get(&WrappedCalls, &Temp, Ptr);
+      *Val = (unsigned int)Temp;
+   }
 }

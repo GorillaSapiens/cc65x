@@ -51,100 +51,103 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void CreateMapFile (int ShortMap)
+void CreateMapFile(int ShortMap)
 // Create a map file. If ShortMap is true, only the segment lists are
 // generated, not the import/export lists.
 {
-    unsigned I;
+   unsigned I;
 
-    // Open the map file
-    FILE* F = fopen (MapFileName, "w");
-    if (F == 0) {
-        Error ("Cannot create map file '%s': %s", MapFileName, strerror (errno));
-    }
+   // Open the map file
+   FILE *F = fopen(MapFileName, "w");
+   if (F == 0) {
+      Error("Cannot create map file '%s': %s", MapFileName, strerror(errno));
+   }
 
-    // Write a modules list
-    fprintf (F, "Modules list:\n"
-                "-------------\n");
-    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+   // Write a modules list
+   fprintf(F, "Modules list:\n"
+              "-------------\n");
+   for (I = 0; I < CollCount(&ObjDataList); ++I) {
 
-        unsigned J;
+      unsigned J;
 
-        // Get the object file
-        const ObjData* O = CollConstAt (&ObjDataList, I);
+      // Get the object file
+      const ObjData *O = CollConstAt(&ObjDataList, I);
 
-        // Output the data
-        if (O->Lib) {
-            // The file is from a library
-            fprintf (F, "%s(%s):\n", GetLibFileName (O->Lib), GetObjFileName (O));
-        } else {
-            fprintf (F, "%s:\n", GetObjFileName (O));
-        }
-        for (J = 0; J < CollCount (&O->Sections); ++J) {
-            const Section* S = CollConstAt (&O->Sections, J);
-            // Don't include zero sized sections if not explicitly
-            // requested
-            if (VerboseMap || S->Size > 0) {
-                fprintf (F,
-                         "    %-17s Offs=%06lX  Size=%06lX  "
-                         "Align=%05lX  Fill=%04lX\n",
-                         GetString (S->Seg->Name), S->Offs, S->Size,
-                         S->Alignment, S->Fill);
-            }
-        }
-    }
+      // Output the data
+      if (O->Lib) {
+         // The file is from a library
+         fprintf(F, "%s(%s):\n", GetLibFileName(O->Lib), GetObjFileName(O));
+      }
+      else {
+         fprintf(F, "%s:\n", GetObjFileName(O));
+      }
+      for (J = 0; J < CollCount(&O->Sections); ++J) {
+         const Section *S = CollConstAt(&O->Sections, J);
+         // Don't include zero sized sections if not explicitly
+         // requested
+         if (VerboseMap || S->Size > 0) {
+            fprintf(F,
+                    "    %-17s Offs=%06lX  Size=%06lX  "
+                    "Align=%05lX  Fill=%04lX\n",
+                    GetString(S->Seg->Name), S->Offs, S->Size, S->Alignment,
+                    S->Fill);
+         }
+      }
+   }
 
-    // Write the segment list
-    fprintf (F, "\n\n"
-                "Segment list:\n"
-                "-------------\n");
-    PrintSegmentMap (F);
+   // Write the segment list
+   fprintf(F, "\n\n"
+              "Segment list:\n"
+              "-------------\n");
+   PrintSegmentMap(F);
 
-    // The remainder is not written for short map files
-    if (!ShortMap) {
+   // The remainder is not written for short map files
+   if (!ShortMap) {
 
-        // Write the exports list by name
-        fprintf (F, "\n\n"
-                    "Exports list by name:\n"
-                    "---------------------\n");
-        PrintExportMapByName (F);
+      // Write the exports list by name
+      fprintf(F, "\n\n"
+                 "Exports list by name:\n"
+                 "---------------------\n");
+      PrintExportMapByName(F);
 
-        // Write the exports list by value
-        fprintf (F, "\n\n"
-                    "Exports list by value:\n"
-                    "----------------------\n");
-        PrintExportMapByValue (F);
+      // Write the exports list by value
+      fprintf(F, "\n\n"
+                 "Exports list by value:\n"
+                 "----------------------\n");
+      PrintExportMapByValue(F);
 
-        // Write the imports list
-        fprintf (F, "\n\n"
-                    "Imports list:\n"
-                    "-------------\n");
-        PrintImportMap (F);
-    }
+      // Write the imports list
+      fprintf(F, "\n\n"
+                 "Imports list:\n"
+                 "-------------\n");
+      PrintImportMap(F);
+   }
 
-    // Close the file
-    if (fclose (F) != 0) {
-        Error ("Error closing map file '%s': %s", MapFileName, strerror (errno));
-    }
+   // Close the file
+   if (fclose(F) != 0) {
+      Error("Error closing map file '%s': %s", MapFileName, strerror(errno));
+   }
 }
 
-void CreateLabelFile (void)
+void CreateLabelFile(void)
 // Create a label file
 {
-    // Open the label file
-    FILE* F = fopen (LabelFileName, "w");
-    if (F == 0) {
-        Error ("Cannot create label file '%s': %s", LabelFileName, strerror (errno));
-    }
+   // Open the label file
+   FILE *F = fopen(LabelFileName, "w");
+   if (F == 0) {
+      Error("Cannot create label file '%s': %s", LabelFileName,
+            strerror(errno));
+   }
 
-    // Print the labels for the export symbols
-    PrintExportLabels (F);
+   // Print the labels for the export symbols
+   PrintExportLabels(F);
 
-    // Output the labels
-    PrintDbgSymLabels (F);
+   // Output the labels
+   PrintDbgSymLabels(F);
 
-    // Close the file
-    if (fclose (F) != 0) {
-        Error ("Error closing label file '%s': %s", LabelFileName, strerror (errno));
-    }
+   // Close the file
+   if (fclose(F) != 0) {
+      Error("Error closing label file '%s': %s", LabelFileName,
+            strerror(errno));
+   }
 }

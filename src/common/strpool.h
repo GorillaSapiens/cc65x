@@ -58,25 +58,25 @@ typedef struct StringPool StringPool;
 //                                     Code
 ////////////////////////////////////////////////////////////////////////////////
 
-StringPool* NewStringPool (unsigned HashSlots);
+StringPool *NewStringPool(unsigned HashSlots);
 // Allocate, initialize and return a new string pool
 
-void FreeStringPool (StringPool* P);
+void FreeStringPool(StringPool *P);
 // Free a string pool
 
-const StrBuf* SP_Get (const StringPool* P, unsigned Index);
+const StrBuf *SP_Get(const StringPool *P, unsigned Index);
 // Return a string from the pool. Index must exist, otherwise FAIL is called.
 
-unsigned SP_Add (StringPool* P, const StrBuf* S);
+unsigned SP_Add(StringPool *P, const StrBuf *S);
 // Add a string buffer to the buffer and return the index. If the string does
 // already exist in the pool, SP_AddBuf will just return the index of the
 // existing string.
 
-unsigned SP_AddStr (StringPool* P, const char* S);
+unsigned SP_AddStr(StringPool *P, const char *S);
 // Add a string to the buffer and return the index. If the string does already
 // exist in the pool, SP_Add will just return the index of the existing string.
 
-unsigned SP_GetCount (const StringPool* P);
+unsigned SP_GetCount(const StringPool *P);
 // Return the number of strings in the pool
 
 // End of strpool.h

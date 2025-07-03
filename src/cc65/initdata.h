@@ -41,7 +41,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned ParseInit (Type* T);
+unsigned ParseInit(Type *T);
 // Parse initialization of variables. Return the number of initialized data
 // bytes.
 

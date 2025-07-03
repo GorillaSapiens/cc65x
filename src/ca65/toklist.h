@@ -48,62 +48,62 @@
 // Struct holding a token
 typedef struct TokNode TokNode;
 struct TokNode {
-    TokNode*    Next;                   // For single linked list
-    Token       T;                      // Token value
+   TokNode *Next; // For single linked list
+   Token T;       // Token value
 };
 
 // Struct holding a token list
 typedef struct TokList TokList;
 struct TokList {
-    TokList*    Next;                   // Single linked list (for replay)
-    TokNode*    Root;                   // First node in list
-    TokNode*    Last;                   // Last node in list or replay
-    unsigned    RepCount;               // Repeat counter (used for replay)
-    unsigned    RepMax;                 // Maximum repeat count for replay
-    unsigned    Count;                  // Token count
-    void        (*Check)(TokList*);     // Token check function
-    void*       Data;                   // Additional data for check
-    LineInfo*   LI;                     // Line info for replay
+   TokList *Next;            // Single linked list (for replay)
+   TokNode *Root;            // First node in list
+   TokNode *Last;            // Last node in list or replay
+   unsigned RepCount;        // Repeat counter (used for replay)
+   unsigned RepMax;          // Maximum repeat count for replay
+   unsigned Count;           // Token count
+   void (*Check)(TokList *); // Token check function
+   void *Data;               // Additional data for check
+   LineInfo *LI;             // Line info for replay
 };
 
 // Return codes for TokCmp - higher numeric code means better match
 enum TC {
-    tcDifferent,                        // Different tokents
-    tcSameToken,                        // Same token, different attribute
-    tcIdentical                         // Identical (token + attribute)
+   tcDifferent, // Different tokents
+   tcSameToken, // Same token, different attribute
+   tcIdentical  // Identical (token + attribute)
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-TokNode* NewTokNode (void);
+TokNode *NewTokNode(void);
 // Create and return a token node with the current token value
 
-void FreeTokNode (TokNode* N);
+void FreeTokNode(TokNode *N);
 // Free the given token node
 
-void TokSet (TokNode* N);
+void TokSet(TokNode *N);
 // Set the scanner token from the given token node.
 
-enum TC TokCmp (const TokNode* N);
+enum TC TokCmp(const TokNode *N);
 // Compare the token given as parameter against the current token
 
-TokList* NewTokList (void);
+TokList *NewTokList(void);
 // Create a new, empty token list
 
-void FreeTokList (TokList* T);
+void FreeTokList(TokList *T);
 // Delete the token list including all token nodes
 
-token_t GetTokListTerm (token_t Term);
+token_t GetTokListTerm(token_t Term);
 // Determine if the following token list is enclosed in curly braces. This is
 // the case if the next token is the opening brace. If so, skip it and return
 // a closing brace, otherwise return Term.
 
-void AddCurTok (TokList* T);
+void AddCurTok(TokList *T);
 // Add the current token to the token list
 
-void PushTokList (TokList* List, const char* Desc);
+void PushTokList(TokList *List, const char *Desc);
 // Push a token list to be used as input for InputFromStack. This includes
 // several initializations needed in the token list structure, so don't use
 // PushInput directly.

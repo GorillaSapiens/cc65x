@@ -42,47 +42,47 @@
 
 typedef struct StrStack StrStack;
 struct StrStack {
-    unsigned    Count;
-    char*       Stack[8];
+   unsigned Count;
+   char *Stack[8];
 };
 
 // Declare an empty string stack
-#define STRSTACK()      { 0 };
+#define STRSTACK() {0};
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 #if defined(HAVE_INLINE)
-INLINE int SS_IsFull (const StrStack* S)
+INLINE int SS_IsFull(const StrStack *S)
 // Return true if there is no space left on the given string stack
 {
-    return (S->Count >= sizeof (S->Stack) / sizeof (S->Stack[0]));
+   return (S->Count >= sizeof(S->Stack) / sizeof(S->Stack[0]));
 }
 #else
-#  define SS_IsFull(S)  ((S)->Count >= sizeof ((S)->Stack) / sizeof ((S)->Stack[0]))
+#define SS_IsFull(S) ((S)->Count >= sizeof((S)->Stack) / sizeof((S)->Stack[0]))
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE unsigned SS_GetCount (const StrStack* S)
+INLINE unsigned SS_GetCount(const StrStack *S)
 // Return the number of elements on the given string stack
 {
-    return S->Count;
+   return S->Count;
 }
 #else
-#  define SS_GetCount(S)        (S)->Count
+#define SS_GetCount(S) (S)->Count
 #endif
 
-const char* SS_Get (const StrStack* S);
+const char *SS_Get(const StrStack *S);
 // Get the value on top of a string stack
 
-void SS_Set (StrStack* S, const char* Val);
+void SS_Set(StrStack *S, const char *Val);
 // Set the value on top of a string stack
 
-void SS_Drop (StrStack* S);
+void SS_Drop(StrStack *S);
 // Drop a value from a string stack
 
-void SS_Push (StrStack* S, const char* Val);
+void SS_Push(StrStack *S, const char *Val);
 // Push a value onto a string stack
 
 // End of strstack.h

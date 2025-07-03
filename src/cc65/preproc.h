@@ -41,13 +41,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Maximum #if depth per file
-#define MAX_PP_IFS      256
+#define MAX_PP_IFS 256
 
 // Data struct used for per-file-directive handling
 typedef struct PPIfStack PPIfStack;
 struct PPIfStack {
-    unsigned char   Stack[MAX_PP_IFS];
-    int             Index;
+   unsigned char Stack[MAX_PP_IFS];
+   int Index;
 };
 
 // Forward
@@ -57,28 +57,28 @@ struct IFile;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void HandleSpecialMacro (Macro* M, const char* Name);
+void HandleSpecialMacro(Macro *M, const char *Name);
 // Handle special "magic" macros that may change
 
-void Preprocess (void);
+void Preprocess(void);
 // Preprocess a line
 
-void InitPreprocess (void);
+void InitPreprocess(void);
 // Init preprocessor
 
-void DonePreprocess (void);
+void DonePreprocess(void);
 // Done with preprocessor
 
-void SetPPIfStack (PPIfStack* Stack);
+void SetPPIfStack(PPIfStack *Stack);
 // Specify which PP #if stack to use
 
-void ContinueLine (void);
+void ContinueLine(void);
 // Continue the current line ended with a '\\'
 
-void PreprocessBegin (struct IFile* Input);
+void PreprocessBegin(struct IFile *Input);
 // Initialize the preprocessor for a new input file
 
-void PreprocessEnd (struct IFile* Input);
+void PreprocessEnd(struct IFile *Input);
 // Preprocessor done with current file. The parameter is the file we're
 // switching back to.
 

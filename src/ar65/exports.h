@@ -44,10 +44,10 @@ struct ObjData;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void ExpInsert (const char* Name, const struct ObjData* Module);
+void ExpInsert(const char *Name, const struct ObjData *Module);
 // Insert an exported identifier and check if it's already in the list
 
-const struct ObjData* ExpFind (const char* Name);
+const struct ObjData *ExpFind(const char *Name);
 // Check for an identifier in the list. Return NULL if not found, otherwise
 // return a pointer to the module, that exports the identifer.
 

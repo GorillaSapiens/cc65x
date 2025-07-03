@@ -45,4 +45,3 @@ extern const OpcDesc OpcTable_6502DTV[256];
 
 // End of opc6502dtv.h
 #endif
-

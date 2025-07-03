@@ -38,7 +38,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void DoEnum (void);
+void DoEnum(void);
 // Handle the .ENUM command
 
 // End of enum.h

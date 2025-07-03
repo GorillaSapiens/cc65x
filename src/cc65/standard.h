@@ -43,24 +43,24 @@
 
 // Supported standards.
 typedef enum standard_t {
-    STD_UNKNOWN = -1,
-    STD_C89,
-    STD_C99,
-    STD_CC65,
+   STD_UNKNOWN = -1,
+   STD_C89,
+   STD_C99,
+   STD_CC65,
 
-    // Special constants
-    STD_COUNT,                  // Number of supported standards
-    STD_DEFAULT = STD_CC65      // Default standard if none given
+   // Special constants
+   STD_COUNT,             // Number of supported standards
+   STD_DEFAULT = STD_CC65 // Default standard if none given
 } standard_t;
 
 // Current language standard
-extern IntStack         Standard;               // Language standard
+extern IntStack Standard; // Language standard
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-standard_t FindStandard (const char* Name);
+standard_t FindStandard(const char *Name);
 // Find a standard by name. Returns one of the constants defined above.
 // STD_UNKNOWN is returned if Name doesn't match a standard.
 

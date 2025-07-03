@@ -37,4 +37,4 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned What   = 0;            // What should get dumped?
+unsigned What = 0; // What should get dumped?

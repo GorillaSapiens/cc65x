@@ -43,19 +43,19 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned Read8 (FILE* F);
+unsigned Read8(FILE *F);
 // Read an 8 bit value from the file
 
-unsigned Read16 (FILE* F);
+unsigned Read16(FILE *F);
 // Read a 16 bit value from the file
 
-unsigned long Read24 (FILE* F);
+unsigned long Read24(FILE *F);
 // Read a 24 bit value from the file
 
-unsigned long Read32 (FILE* F);
+unsigned long Read32(FILE *F);
 // Read a 32 bit value from the file
 
-void* ReadData (FILE* F, void* Data, unsigned Size);
+void *ReadData(FILE *F, void *Data, unsigned Size);
 // Read data from the file
 
 // End of fileio.h

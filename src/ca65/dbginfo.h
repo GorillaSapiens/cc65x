@@ -38,22 +38,22 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void DbgInfoFile (void);
+void DbgInfoFile(void);
 // Parse and handle FILE subcommand of the .dbg pseudo instruction
 
-void DbgInfoFunc (void);
+void DbgInfoFunc(void);
 // Parse and handle FUNC subcommand of the .dbg pseudo instruction
 
-void DbgInfoLine (void);
+void DbgInfoLine(void);
 // Parse and handle LINE subcommand of the .dbg pseudo instruction
 
-void DbgInfoSym (void);
+void DbgInfoSym(void);
 // Parse and handle SYM subcommand of the .dbg pseudo instruction
 
-void DbgInfoCheck (void);
+void DbgInfoCheck(void);
 // Do checks on all hll debug info symbols when assembly is complete
 
-void WriteHLLDbgSyms (void);
+void WriteHLLDbgSyms(void);
 // Write a list of all high level language symbols to the object file.
 
 // End of dbginfo.h

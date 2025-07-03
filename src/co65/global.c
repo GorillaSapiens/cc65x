@@ -42,24 +42,24 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // File names
-const char* InputName       = 0;                // Name of input file
-const char* OutputName      = 0;                // Name of output file
+const char *InputName = 0;  // Name of input file
+const char *OutputName = 0; // Name of output file
 
 // Default extensions
-const char AsmExt[]         = ".s";             // Default assembler extension
+const char AsmExt[] = ".s"; // Default assembler extension
 
 // Segment names
-const char* CodeSeg         = SEGNAME_CODE;     // Name of the code segment
-const char* DataSeg         = SEGNAME_DATA;     // Name of the data segment
-const char* BssSeg          = SEGNAME_BSS;      // Name of the bss segment
-const char* ZeropageSeg     = SEGNAME_ZEROPAGE; // Name of the zeropage segment
+const char *CodeSeg = SEGNAME_CODE;         // Name of the code segment
+const char *DataSeg = SEGNAME_DATA;         // Name of the data segment
+const char *BssSeg = SEGNAME_BSS;           // Name of the bss segment
+const char *ZeropageSeg = SEGNAME_ZEROPAGE; // Name of the zeropage segment
 
 // Labels
-const char* CodeLabel       = 0;                // Label for the code segment
-const char* DataLabel       = 0;                // Label for the data segment
-const char* BssLabel        = 0;                // Label for the bss segment
-const char* ZeropageLabel   = 0;                // Label for the zeropage segment
+const char *CodeLabel = 0;     // Label for the code segment
+const char *DataLabel = 0;     // Label for the data segment
+const char *BssLabel = 0;      // Label for the bss segment
+const char *ZeropageLabel = 0; // Label for the zeropage segment
 
 // Flags
-unsigned char DebugInfo     = 0;                // Enable debug info
-unsigned char NoOutput      = 0;                // Suppress the actual conversion
+unsigned char DebugInfo = 0; // Enable debug info
+unsigned char NoOutput = 0;  // Suppress the actual conversion

@@ -38,7 +38,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void ReadInfoFile (void);
+void ReadInfoFile(void);
 // Read the info file
 
 // End of infofile.h

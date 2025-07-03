@@ -53,10 +53,10 @@ struct ObjData;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Assertion* ReadAssertion (FILE* F, struct ObjData* O);
+Assertion *ReadAssertion(FILE *F, struct ObjData *O);
 // Read an assertion from the given file
 
-void CheckAssertions (void);
+void CheckAssertions(void);
 // Check all assertions
 
 // End of asserts.h

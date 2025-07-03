@@ -38,7 +38,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void ListObjFiles (int argc, char* argv []);
+void ListObjFiles(int argc, char *argv[]);
 // List modules in a library
 
 // End of list.h

@@ -48,109 +48,108 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Option list
-static Option*          OptRoot = 0;
-static Option*          OptLast = 0;
-static unsigned         OptCount = 0;
+static Option *OptRoot = 0;
+static Option *OptLast = 0;
+static unsigned OptCount = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-static Option* NewOption (unsigned char Type, unsigned long Val)
+static Option *NewOption(unsigned char Type, unsigned long Val)
 // Create a new option, insert it into the list and return it
 {
-    Option* Opt;
+   Option *Opt;
 
-    // Allocate memory
-    Opt = xmalloc (sizeof (*Opt));
+   // Allocate memory
+   Opt = xmalloc(sizeof(*Opt));
 
-    // Initialize fields
-    Opt->Next  = 0;
-    Opt->Type  = Type;
-    Opt->Val   = Val;
+   // Initialize fields
+   Opt->Next = 0;
+   Opt->Type = Type;
+   Opt->Val = Val;
 
-    // Insert it into the list
-    if (OptRoot == 0) {
-        OptRoot = Opt;
-    } else {
-        OptLast->Next = Opt;
-    }
-    OptLast = Opt;
+   // Insert it into the list
+   if (OptRoot == 0) {
+      OptRoot = Opt;
+   }
+   else {
+      OptLast->Next = Opt;
+   }
+   OptLast = Opt;
 
-    // One more option now
-    ++OptCount;
+   // One more option now
+   ++OptCount;
 
-    // Return the new struct
-    return Opt;
+   // Return the new struct
+   return Opt;
 }
 
-void OptStr (unsigned char Type, const StrBuf* Text)
+void OptStr(unsigned char Type, const StrBuf *Text)
 // Add a string option
 {
-    NewOption (Type, GetStrBufId (Text));
+   NewOption(Type, GetStrBufId(Text));
 }
 
-void OptComment (const StrBuf* Comment)
+void OptComment(const StrBuf *Comment)
 // Add a comment
 {
-    NewOption (OPT_COMMENT, GetStrBufId (Comment));
+   NewOption(OPT_COMMENT, GetStrBufId(Comment));
 }
 
-void OptAuthor (const StrBuf* Author)
+void OptAuthor(const StrBuf *Author)
 // Add an author statement
 {
-    NewOption (OPT_AUTHOR, GetStrBufId (Author));
+   NewOption(OPT_AUTHOR, GetStrBufId(Author));
 }
 
-void OptTranslator (const StrBuf* Translator)
+void OptTranslator(const StrBuf *Translator)
 // Add a translator option
 {
-    NewOption (OPT_TRANSLATOR, GetStrBufId (Translator));
+   NewOption(OPT_TRANSLATOR, GetStrBufId(Translator));
 }
 
-void OptCompiler (const StrBuf* Compiler)
+void OptCompiler(const StrBuf *Compiler)
 // Add a compiler option
 {
-    NewOption (OPT_COMPILER, GetStrBufId (Compiler));
+   NewOption(OPT_COMPILER, GetStrBufId(Compiler));
 }
 
-void OptOS (const StrBuf* OS)
+void OptOS(const StrBuf *OS)
 // Add an operating system option
 {
-    NewOption (OPT_OS, GetStrBufId (OS));
+   NewOption(OPT_OS, GetStrBufId(OS));
 }
 
-void OptDateTime (unsigned long DateTime)
+void OptDateTime(unsigned long DateTime)
 // Add a date/time option
 {
-    NewOption (OPT_DATETIME, DateTime);
+   NewOption(OPT_DATETIME, DateTime);
 }
 
-void WriteOptions (void)
+void WriteOptions(void)
 // Write the options to the object file
 {
-    Option* O;
+   Option *O;
 
-    // Tell the object file module that we're about to start the options
-    ObjStartOptions ();
+   // Tell the object file module that we're about to start the options
+   ObjStartOptions();
 
-    // Write the option count
-    ObjWriteVar (OptCount);
+   // Write the option count
+   ObjWriteVar(OptCount);
 
-    // Walk through the list and write the options
-    O = OptRoot;
-    while (O) {
+   // Walk through the list and write the options
+   O = OptRoot;
+   while (O) {
 
-        // Write the type of the option, then the value
-        ObjWrite8 (O->Type);
-        ObjWriteVar (O->Val);
+      // Write the type of the option, then the value
+      ObjWrite8(O->Type);
+      ObjWriteVar(O->Val);
 
-        // Next option
-        O = O->Next;
+      // Next option
+      O = O->Next;
+   }
 
-    }
-
-    // Done writing options
-    ObjEndOptions ();
+   // Done writing options
+   ObjEndOptions();
 }
-

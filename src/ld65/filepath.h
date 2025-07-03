@@ -41,19 +41,19 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-extern SearchPaths*     LibSearchPath;          // Library path
-extern SearchPaths*     ObjSearchPath;          // Object file path
-extern SearchPaths*     CfgSearchPath;          // Config file path
+extern SearchPaths *LibSearchPath; // Library path
+extern SearchPaths *ObjSearchPath; // Object file path
+extern SearchPaths *CfgSearchPath; // Config file path
 
-extern SearchPaths*     LibDefaultPath;         // Default Library path
-extern SearchPaths*     ObjDefaultPath;         // Default Object file path
-extern SearchPaths*     CfgDefaultPath;         // Default Config file path
+extern SearchPaths *LibDefaultPath; // Default Library path
+extern SearchPaths *ObjDefaultPath; // Default Object file path
+extern SearchPaths *CfgDefaultPath; // Default Config file path
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void InitSearchPaths (void);
+void InitSearchPaths(void);
 // Initialize the path search list
 
 // End of filepath.h

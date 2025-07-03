@@ -50,84 +50,73 @@
 
 // Different types of output formats
 enum OutputFormat {
-    ofAsm,                      // Output assembler source
-    ofBin,                      // Output raw binary format
-    ofC,                        // Output C code
+   ofAsm, // Output assembler source
+   ofBin, // Output raw binary format
+   ofC,   // Output C code
 
-    ofCount                     // Number of output formats without ofAuto
+   ofCount // Number of output formats without ofAuto
 };
 
 typedef struct OutputFormatDesc OutputFormatDesc;
 struct OutputFormatDesc {
 
-    // Write routine
-    void (*Write) (const StrBuf*, const Collection*, const Bitmap*);
-
+   // Write routine
+   void (*Write)(const StrBuf *, const Collection *, const Bitmap *);
 };
 
 // Table with Output formats
 static OutputFormatDesc OutputFormatTable[ofCount] = {
-    {   WriteAsmFile    },
-    {   WriteBinFile    },
-    {   WriteCFile      },
+    {WriteAsmFile},
+    {WriteBinFile},
+    {WriteCFile},
 };
 
 // Table that maps extensions to Output formats.
 // CAUTION: table must be alphabetically sorted for bsearch
 static const FileId FormatTable[] = {
     // Upper case stuff for obsolete operating systems
-// BEGIN SORTED.SH
-    {   "A",    ofAsm           },
-    {   "ASM",  ofAsm           },
-    {   "BIN",  ofBin           },
-    {   "C",    ofC             },
-    {   "INC",  ofAsm           },
-    {   "S",    ofAsm           },
-    {   "a",    ofAsm           },
-    {   "asm",  ofAsm           },
-    {   "bin",  ofBin           },
-    {   "c",    ofC             },
-    {   "inc",  ofAsm           },
-    {   "s",    ofAsm           },
-// END SORTED.SH
+    // BEGIN SORTED.SH
+    {"A", ofAsm},   {"ASM", ofAsm}, {"BIN", ofBin}, {"C", ofC},
+    {"INC", ofAsm}, {"S", ofAsm},   {"a", ofAsm},   {"asm", ofAsm},
+    {"bin", ofBin}, {"c", ofC},     {"inc", ofAsm}, {"s", ofAsm},
+    // END SORTED.SH
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void WriteOutputFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
+void WriteOutputFile(const StrBuf *Data, const Collection *A, const Bitmap *B)
 // Write the contents of Data to a file. Format, file name etc. must be given
 // as attributes in A. If no format is given, the function tries to autodetect
 // it by using the extension of the file name. The bitmap passed to the
 // function is the bitmap used as source of the conversion. It may be used to
 // determine the bitmap properties for documentation purposes.
 {
-    const FileId* F;
+   const FileId *F;
 
-    // Get the file format from the command line
-    const char* Format = GetAttrVal (A, "format");
-    if (Format != 0) {
-        // Format is given, search for it in the table.
-        F = bsearch (Format,
-                     FormatTable,
-                     sizeof (FormatTable) / sizeof (FormatTable[0]),
-                     sizeof (FormatTable[0]),
-                     CompareFileId);
-        if (F == 0) {
-            Error ("Unknown output format '%s'", Format);
-        }
-    } else {
-        // No format given, use file name extension
-        const char* Name = NeedAttrVal (A, "name", "write");
-        F = GetFileId (Name, FormatTable,
-                       sizeof (FormatTable) / sizeof (FormatTable[0]));
-        // Found?
-        if (F == 0) {
-            Error ("Cannot determine file format of output file '%s'", Name);
-        }
-    }
+   // Get the file format from the command line
+   const char *Format = GetAttrVal(A, "format");
+   if (Format != 0) {
+      // Format is given, search for it in the table.
+      F = bsearch(Format, FormatTable,
+                  sizeof(FormatTable) / sizeof(FormatTable[0]),
+                  sizeof(FormatTable[0]), CompareFileId);
+      if (F == 0) {
+         Error("Unknown output format '%s'", Format);
+      }
+   }
+   else {
+      // No format given, use file name extension
+      const char *Name = NeedAttrVal(A, "name", "write");
+      F = GetFileId(Name, FormatTable,
+                    sizeof(FormatTable) / sizeof(FormatTable[0]));
+      // Found?
+      if (F == 0) {
+         Error("Cannot determine file format of output file '%s'", Name);
+      }
+   }
 
-    // Call the format specific write
-    OutputFormatTable[F->Id].Write (Data, A, B);
+   // Call the format specific write
+   OutputFormatTable[F->Id].Write(Data, A, B);
 }

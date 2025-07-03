@@ -45,45 +45,46 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Fragment* NewFragment (unsigned char Type, unsigned Size, Section* S)
+Fragment *NewFragment(unsigned char Type, unsigned Size, Section *S)
 // Create a new fragment and insert it into the section S
 {
-    Fragment* F;
+   Fragment *F;
 
-    // Calculate the size of the memory block. LitBuf is only needed if the
-    // fragment contains literal data.
-    unsigned FragSize = sizeof (Fragment) - 1;
-    if (Type == FRAG_LITERAL) {
-        FragSize += Size;
-    }
+   // Calculate the size of the memory block. LitBuf is only needed if the
+   // fragment contains literal data.
+   unsigned FragSize = sizeof(Fragment) - 1;
+   if (Type == FRAG_LITERAL) {
+      FragSize += Size;
+   }
 
-    // Allocate memory
-    F = xmalloc (FragSize);
+   // Allocate memory
+   F = xmalloc(FragSize);
 
-    // Initialize the data
-    F->Next      = 0;
-    F->Obj       = 0;
-    F->Sec       = S;
-    F->Size      = Size;
-    F->Expr      = 0;
-    F->LineInfos = EmptyCollection;
-    F->Type      = Type;
+   // Initialize the data
+   F->Next = 0;
+   F->Obj = 0;
+   F->Sec = S;
+   F->Size = Size;
+   F->Expr = 0;
+   F->LineInfos = EmptyCollection;
+   F->Type = Type;
 
-    // Insert the code fragment into the section
-    if (S->FragRoot == 0) {
-        // First fragment
-        S->FragRoot = F;
-    } else {
-        S->FragLast->Next = F;
-    }
-    S->FragLast = F;
+   // Insert the code fragment into the section
+   if (S->FragRoot == 0) {
+      // First fragment
+      S->FragRoot = F;
+   }
+   else {
+      S->FragLast->Next = F;
+   }
+   S->FragLast = F;
 
-    // Increment the size of the section by the size of the fragment
-    S->Size += Size;
+   // Increment the size of the section by the size of the fragment
+   S->Size += Size;
 
-    // Increment the size of the segment that contains the section
-    S->Seg->Size += Size;
+   // Increment the size of the segment that contains the section
+   S->Seg->Size += Size;
 
-    // Return the new fragment
-    return F;
+   // Return the new fragment
+   return F;
 }

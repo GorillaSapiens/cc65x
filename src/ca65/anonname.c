@@ -47,22 +47,22 @@ static const char AnonTag[] = "$anon";
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-StrBuf* AnonName (StrBuf* Buf, const char* Spec)
+StrBuf *AnonName(StrBuf *Buf, const char *Spec)
 // Get a name for an anonymous scope, variable or type. Size is the size of
 // the buffer passed to the function, Spec will be used as part of the
 // identifier if given. A pointer to the buffer is returned.
 {
-    static unsigned ACount = 0;
-    SB_Printf (Buf, "%s-%s-%04X", AnonTag, Spec, ++ACount);
-    return Buf;
+   static unsigned ACount = 0;
+   SB_Printf(Buf, "%s-%s-%04X", AnonTag, Spec, ++ACount);
+   return Buf;
 }
 
-int IsAnonName (const StrBuf* Name)
+int IsAnonName(const StrBuf *Name)
 // Check if the given symbol name is that of an anonymous symbol
 {
-    if (SB_GetLen (Name) < sizeof (AnonTag) - 1) {
-        // Too short
-        return 0;
-    }
-    return (strncmp (SB_GetConstBuf (Name), AnonTag, sizeof (AnonTag) - 1) == 0);
+   if (SB_GetLen(Name) < sizeof(AnonTag) - 1) {
+      // Too short
+      return 0;
+   }
+   return (strncmp(SB_GetConstBuf(Name), AnonTag, sizeof(AnonTag) - 1) == 0);
 }

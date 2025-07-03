@@ -45,43 +45,43 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void FileSetPos (FILE* F, unsigned long Pos);
+void FileSetPos(FILE *F, unsigned long Pos);
 // Seek to the given absolute position, fail on errors
 
-unsigned long FileGetPos (FILE* F);
+unsigned long FileGetPos(FILE *F);
 // Return the current file position, fail on errors
 
-unsigned Read8 (FILE* F);
+unsigned Read8(FILE *F);
 // Read an 8 bit value from the file
 
-unsigned Read16 (FILE* F);
+unsigned Read16(FILE *F);
 // Read a 16 bit value from the file
 
-unsigned long Read24 (FILE* F);
+unsigned long Read24(FILE *F);
 // Read a 24 bit value from the file
 
-unsigned long Read32 (FILE* F);
+unsigned long Read32(FILE *F);
 // Read a 32 bit value from the file
 
-long Read32Signed (FILE* F);
+long Read32Signed(FILE *F);
 // Read a 32 bit value from the file. Sign extend the value.
 
-unsigned long ReadVar (FILE* F);
+unsigned long ReadVar(FILE *F);
 // Read a variable size value from the file
 
-char* ReadStr (FILE* F);
+char *ReadStr(FILE *F);
 // Read a string from the file into a malloced area
 
-FilePos* ReadFilePos (FILE* F, FilePos* Pos);
+FilePos *ReadFilePos(FILE *F, FilePos *Pos);
 // Read a file position from the file
 
-void* ReadData (FILE* F, void* Data, unsigned Size);
+void *ReadData(FILE *F, void *Data, unsigned Size);
 // Read data from the file
 
-void ReadObjHeader (FILE* F, ObjHeader* Header);
+void ReadObjHeader(FILE *F, ObjHeader *Header);
 // Read an object file header from the file
 
-void ReadStrPool (FILE* F, Collection* C);
+void ReadStrPool(FILE *F, Collection *C);
 // Read a string pool from the current position into C.
 
 // End of fileio.h

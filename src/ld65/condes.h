@@ -49,54 +49,54 @@ struct Export;
 
 // Order of the tables
 typedef enum {
-    cdIncreasing,               // Increasing priority - default
-    cdDecreasing                // Decreasing priority
+   cdIncreasing, // Increasing priority - default
+   cdDecreasing  // Decreasing priority
 } ConDesOrder;
 
 // Data for a forced condes import
 typedef struct ConDesImport ConDesImport;
 struct ConDesImport {
-    unsigned    Name;           // Name of the import
-    FilePos     Pos;            // Position of import in the config file
-    unsigned    AddrSize;       // Address size of the symbol
+   unsigned Name;     // Name of the import
+   FilePos Pos;       // Position of import in the config file
+   unsigned AddrSize; // Address size of the symbol
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void ConDesAddExport (struct Export* E);
+void ConDesAddExport(struct Export *E);
 // Add the given export to the list of constructors/destructor
 
-void ConDesSetSegName (unsigned Type, unsigned SegName);
+void ConDesSetSegName(unsigned Type, unsigned SegName);
 // Set the segment name where the table should go
 
-const ConDesImport* ConDesGetImport (unsigned Type);
+const ConDesImport *ConDesGetImport(unsigned Type);
 // Get the forced import for the given ConDes type. Returns NULL if there is
 // no forced import for this type.
 
-void ConDesSetImport (unsigned Type, const ConDesImport* Import);
+void ConDesSetImport(unsigned Type, const ConDesImport *Import);
 // Set the forced import for the given ConDes type
 
-void ConDesSetLabel (unsigned Type, unsigned Name);
+void ConDesSetLabel(unsigned Type, unsigned Name);
 // Set the label for the given ConDes type
 
-void ConDesSetCountSym (unsigned Type, unsigned Name);
+void ConDesSetCountSym(unsigned Type, unsigned Name);
 // Set the name for the given ConDes count symbol
 
-void ConDesSetOrder (unsigned Type, ConDesOrder Order);
+void ConDesSetOrder(unsigned Type, ConDesOrder Order);
 // Set the sorting oder for the given ConDes table
 
-int ConDesHasSegName (unsigned Type);
+int ConDesHasSegName(unsigned Type);
 // Return true if a segment name is already defined for this ConDes type
 
-int ConDesHasLabel (unsigned Type);
+int ConDesHasLabel(unsigned Type);
 // Return true if a label is already defined for this ConDes type
 
-void ConDesCreate (void);
+void ConDesCreate(void);
 // Create the condes tables if requested
 
-void ConDesDump (void);
+void ConDesDump(void);
 // Dump ConDes data to stdout for debugging
 
 // End of condes.h

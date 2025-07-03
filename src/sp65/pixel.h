@@ -44,8 +44,8 @@
 // A pixel is either a color or a palette index, depending on the bitmap
 typedef union Pixel Pixel;
 union Pixel {
-    Color       C;
-    unsigned    Index;
+   Color C;
+   unsigned Index;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

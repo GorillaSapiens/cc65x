@@ -40,16 +40,16 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-#define VER_MAJOR       4U
-#define VER_MINOR       0U
+#define VER_MAJOR 4U
+#define VER_MINOR 0U
 
-// 
+//
 // Note: until 2.19 the __CC65__ macro was defined as
 // (VER_MAJOR * 0x100) + VER_MINOR * 0x10
 // which resulted in broken values starting at version 2.16 of the compiler:
-// 
+//
 // version  __CC65__    identifies as
-// 
+//
 // 2.0      0x0200      2.0
 // 2.1      0x0210      2.16
 // 2.2      0x0220      2.32
@@ -72,29 +72,29 @@
 // 2.19     0x0330      3.48
 // 2.19-git 0x0213      2.19
 // 4.00     0x0400      4.00 // because sanity is awesome
-// 
+//
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-const char* GetVersionAsString (void)
+const char *GetVersionAsString(void)
 // Returns the version number as a string in a static buffer
 {
-    static char Buf[256];
+   static char Buf[256];
 #if defined(BUILD_ID)
-    xsnprintf (Buf, sizeof (Buf), "%u.%u - %s", VER_MAJOR, VER_MINOR, BUILD_ID);
+   xsnprintf(Buf, sizeof(Buf), "%u.%u - %s", VER_MAJOR, VER_MINOR, BUILD_ID);
 #else
-    xsnprintf (Buf, sizeof (Buf), "%u.%u", VER_MAJOR, VER_MINOR);
+   xsnprintf(Buf, sizeof(Buf), "%u.%u", VER_MAJOR, VER_MINOR);
 #endif
-    return Buf;
+   return Buf;
 }
 
-unsigned GetVersionAsNumber (void)
+unsigned GetVersionAsNumber(void)
 // Returns the version number as a combined unsigned for use in a #define
 {
 #if VER_MINOR >= 0x100
 #error "VER_MINOR must be smaller than 0x100 - time to bump the major version!"
 #endif
-    return ((VER_MAJOR * 0x100) + VER_MINOR);
+   return ((VER_MAJOR * 0x100) + VER_MINOR);
 }

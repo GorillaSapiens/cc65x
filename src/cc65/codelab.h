@@ -50,51 +50,51 @@ struct CodeEntry;
 // Label structure
 typedef struct CodeLabel CodeLabel;
 struct CodeLabel {
-    CodeLabel*          Next;           // Next in hash list
-    char*               Name;           // Label name
-    unsigned            Hash;           // Hash over the name
-    struct CodeEntry*   Owner;          // Owner entry
-    Collection          JumpFrom;       // Entries that jump here
+   CodeLabel *Next;         // Next in hash list
+   char *Name;              // Label name
+   unsigned Hash;           // Hash over the name
+   struct CodeEntry *Owner; // Owner entry
+   Collection JumpFrom;     // Entries that jump here
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-CodeLabel* NewCodeLabel (const char* Name, unsigned Hash);
+CodeLabel *NewCodeLabel(const char *Name, unsigned Hash);
 // Create a new code label, initialize and return it
 
-void FreeCodeLabel (CodeLabel* L);
+void FreeCodeLabel(CodeLabel *L);
 // Free the given code label
 
 #if defined(HAVE_INLINE)
-INLINE unsigned CL_GetRefCount (const CodeLabel* L)
+INLINE unsigned CL_GetRefCount(const CodeLabel *L)
 // Get the number of references for this label
 {
-    return CollCount (&L->JumpFrom);
+   return CollCount(&L->JumpFrom);
 }
 #else
-#  define CL_GetRefCount(L)     CollCount (&(L)->JumpFrom)
+#define CL_GetRefCount(L) CollCount(&(L)->JumpFrom)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE struct CodeEntry* CL_GetRef (CodeLabel* L, unsigned Index)
+INLINE struct CodeEntry *CL_GetRef(CodeLabel *L, unsigned Index)
 // Get a code entry referencing this label
 {
-    return CollAt (&L->JumpFrom, Index);
+   return CollAt(&L->JumpFrom, Index);
 }
 #else
-#  define CL_GetRef(L, Index)   CollAt (&(L)->JumpFrom, (Index))
+#define CL_GetRef(L, Index) CollAt(&(L)->JumpFrom, (Index))
 #endif
 
-void CL_AddRef (CodeLabel* L, struct CodeEntry* E);
+void CL_AddRef(CodeLabel *L, struct CodeEntry *E);
 // Let the CodeEntry E reference the label L
 
-void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel);
+void CL_MoveRefs(CodeLabel *OldLabel, CodeLabel *NewLabel);
 // Move all references to OldLabel to point to NewLabel. OldLabel will have no
 // more references on return.
 
-void CL_Output (const CodeLabel* L);
+void CL_Output(const CodeLabel *L);
 // Output the code label to the output file
 
 // End of codelab.h

@@ -48,94 +48,95 @@ struct ExprDesc;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-ExprNode* Expression (void);
+ExprNode *Expression(void);
 // Evaluate an expression, build the expression tree on the heap and return
 // a pointer to the root of the tree.
 
-long ConstExpression (void);
+long ConstExpression(void);
 // Parse an expression. Check if the expression is const, and print an error
 // message if not. Return the value of the expression, or a dummy, if it is
 // not constant.
 
-void FreeExpr (ExprNode* Root);
+void FreeExpr(ExprNode *Root);
 // Free the expression tree, Root is pointing to.
 
-ExprNode* SimplifyExpr (ExprNode* Expr, const struct ExprDesc* D);
+ExprNode *SimplifyExpr(ExprNode *Expr, const struct ExprDesc *D);
 // Try to simplify the given expression tree
 
-ExprNode* GenLiteralExpr (long Val);
+ExprNode *GenLiteralExpr(long Val);
 // Return an expression tree that encodes the given literal value
 
-ExprNode* GenLiteral0 (void);
+ExprNode *GenLiteral0(void);
 // Return an expression tree that encodes the number zero
 
-ExprNode* GenSymExpr (struct SymEntry* Sym);
+ExprNode *GenSymExpr(struct SymEntry *Sym);
 // Return an expression node that encodes the given symbol
 
-ExprNode* GenAddExpr (ExprNode* Left, ExprNode* Right);
+ExprNode *GenAddExpr(ExprNode *Left, ExprNode *Right);
 // Generate an addition from the two operands
 
-ExprNode* GenCurrentPC (void);
+ExprNode *GenCurrentPC(void);
 // Return the current program counter as expression
 
-ExprNode* GenSwapExpr (ExprNode* Expr);
+ExprNode *GenSwapExpr(ExprNode *Expr);
 // Return an extended expression with lo and hi bytes swapped
 
-ExprNode* GenBranchExpr (unsigned Offs);
+ExprNode *GenBranchExpr(unsigned Offs);
 // Return an expression that encodes the difference between current PC plus
 // offset and the target expression (that is, Expression() - (*+Offs) ).
 
-ExprNode* GenULabelExpr (unsigned Num);
+ExprNode *GenULabelExpr(unsigned Num);
 // Return an expression for an unnamed label with the given index
 
-ExprNode* GenByteExpr (ExprNode* Expr);
+ExprNode *GenByteExpr(ExprNode *Expr);
 // Force the given expression into a byte and return the result
 
-ExprNode* GenWordExpr (ExprNode* Expr);
+ExprNode *GenWordExpr(ExprNode *Expr);
 // Force the given expression into a word and return the result.
 
-ExprNode* GenNearAddrExpr (ExprNode* Expr);
-// A word sized expression that will error if given a far expression at assemble time.
+ExprNode *GenNearAddrExpr(ExprNode *Expr);
+// A word sized expression that will error if given a far expression at assemble
+// time.
 
-ExprNode* GenFarAddrExpr (ExprNode* Expr);
+ExprNode *GenFarAddrExpr(ExprNode *Expr);
 // Force the given expression into a far address and return the result.
 
-ExprNode* GenDWordExpr (ExprNode* Expr);
+ExprNode *GenDWordExpr(ExprNode *Expr);
 // Force the given expression into a dword and return the result.
 
-ExprNode* GenNE (ExprNode* Expr, long Val);
+ExprNode *GenNE(ExprNode *Expr, long Val);
 // Generate an expression that compares Expr and Val for inequality
 
-int IsConstExpr (ExprNode* Expr, long* Val);
+int IsConstExpr(ExprNode *Expr, long *Val);
 // Return true if the given expression is a constant expression, that is, one
 // with no references to external symbols. If Val is not NULL and the
 // expression is constant, the constant value is stored here.
 
-int IsByteExpr (ExprNode* Root);
+int IsByteExpr(ExprNode *Root);
 // Return true if this is a byte expression
 
-int IsByteRange (long Val);
+int IsByteRange(long Val);
 // Return true if this is a byte value
 
-int IsWordRange (long Val);
+int IsWordRange(long Val);
 // Return true if this is a word value
 
-int IsFarRange (long Val);
+int IsFarRange(long Val);
 // Return true if this is a far (24 bit) value
 
-int IsEasyConst (const ExprNode* E, long* Val);
+int IsEasyConst(const ExprNode *E, long *Val);
 // Do some light checking if the given node is a constant. Don't care if E is
 // a complex expression. If E is a constant, return true and place its value
 // into Val, provided that Val is not NULL.
 
-ExprNode* CloneExpr (ExprNode* Expr);
+ExprNode *CloneExpr(ExprNode *Expr);
 // Clone the given expression tree. The function will simply clone symbol
 // nodes, it will not resolve them.
 
-void WriteExpr (ExprNode* Expr);
+void WriteExpr(ExprNode *Expr);
 // Write the given expression to the object file
 
-void ExprGuessedAddrSize (const ExprNode* Expr, unsigned char AddrSize);
+void ExprGuessedAddrSize(const ExprNode *Expr, unsigned char AddrSize);
 // Mark the address size of the given expression tree as guessed. The address
 // size passed as argument is the one NOT used, because the actual address
 // size wasn't known. Example: Zero page addressing was not used because symbol
@@ -143,19 +144,19 @@ void ExprGuessedAddrSize (const ExprNode* Expr, unsigned char AddrSize);
 // This function will actually parse the expression tree for undefined symbols,
 // and mark these symbols accordingly.
 
-ExprNode* FuncBankByte (void);
+ExprNode *FuncBankByte(void);
 // Handle the .BANKBYTE builtin function
 
-ExprNode* FuncLoByte (void);
+ExprNode *FuncLoByte(void);
 // Handle the .LOBYTE builtin function
 
-ExprNode* FuncHiByte (void);
+ExprNode *FuncHiByte(void);
 // Handle the .HIBYTE builtin function
 
-ExprNode* MakeBoundedExpr (ExprNode* Expr, unsigned Size);
+ExprNode *MakeBoundedExpr(ExprNode *Expr, unsigned Size);
 // Force the given expression into a specific size if ForceRange is true
 
-ExprNode* BoundedExpr (ExprNode* (*ExprFunc) (void), unsigned Size);
+ExprNode *BoundedExpr(ExprNode *(*ExprFunc)(void), unsigned Size);
 // Parse an expression and force it within a given size if ForceRange is true
 
 // End of expr.h

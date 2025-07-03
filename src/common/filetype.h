@@ -40,20 +40,20 @@
 
 // File types
 typedef enum {
-    FILETYPE_UNKNOWN = -1,      // Unknown file type
-    FILETYPE_C,                 // C source file
-    FILETYPE_ASM,               // Assembler file
-    FILETYPE_OBJ,               // Object file
-    FILETYPE_LIB,               // Library file
-    FILETYPE_GR,                // GEOS resource file
-    FILETYPE_O65                // O65 object file
+   FILETYPE_UNKNOWN = -1, // Unknown file type
+   FILETYPE_C,            // C source file
+   FILETYPE_ASM,          // Assembler file
+   FILETYPE_OBJ,          // Object file
+   FILETYPE_LIB,          // Library file
+   FILETYPE_GR,           // GEOS resource file
+   FILETYPE_O65           // O65 object file
 } FILETYPE;
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-FILETYPE GetTypeOfFile (const char* Name);
+FILETYPE GetTypeOfFile(const char *Name);
 // Determine the type of the given file by looking at the name. If the file
 // type could not be determined, the function returns FILETYPE_UNKOWN.
 

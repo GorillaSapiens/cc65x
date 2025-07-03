@@ -40,145 +40,145 @@
 //                             struct HashTable
 ////////////////////////////////////////////////////////////////////////////////
 
-HashTable* InitHashTable (HashTable* T, unsigned Slots, const HashFunctions* Func)
+HashTable *InitHashTable(HashTable *T, unsigned Slots,
+                         const HashFunctions *Func)
 // Initialize a hash table and return it
 {
-    // Initialize the fields
-    T->Slots    = Slots;
-    T->Count    = 0;
-    T->Table    = 0;
-    T->Func     = Func;
+   // Initialize the fields
+   T->Slots = Slots;
+   T->Count = 0;
+   T->Table = 0;
+   T->Func = Func;
 
-    // Return the initialized table
-    return T;
+   // Return the initialized table
+   return T;
 }
 
-void DoneHashTable (HashTable* T)
+void DoneHashTable(HashTable *T)
 // Destroy the contents of a hash table. Note: This will not free the entries
 // in the table!
 {
-    // Just free the array with the table pointers
-    xfree (T->Table);
+   // Just free the array with the table pointers
+   xfree(T->Table);
 }
 
-void FreeHashTable (HashTable* T)
+void FreeHashTable(HashTable *T)
 // Free a hash table. Note: This will not free the entries in the table!
 {
-    if (T) {
-        // Free the contents
-        DoneHashTable (T);
-        // Free the table structure itself
-        xfree (T);
-    }
+   if (T) {
+      // Free the contents
+      DoneHashTable(T);
+      // Free the table structure itself
+      xfree(T);
+   }
 }
 
-static void HT_Alloc (HashTable* T)
+static void HT_Alloc(HashTable *T)
 // Allocate table memory
 {
-    unsigned I;
+   unsigned I;
 
-    // Allocate memory
-    T->Table = xmalloc (T->Slots * sizeof (T->Table[0]));
+   // Allocate memory
+   T->Table = xmalloc(T->Slots * sizeof(T->Table[0]));
 
-    // Initialize the table
-    for (I = 0; I < T->Slots; ++I) {
-        T->Table[I] = 0;
-    }
+   // Initialize the table
+   for (I = 0; I < T->Slots; ++I) {
+      T->Table[I] = 0;
+   }
 }
 
-HashNode* HT_FindHash (const HashTable* T, const void* Key, unsigned Hash)
+HashNode *HT_FindHash(const HashTable *T, const void *Key, unsigned Hash)
 // Find the node with the given key. Differs from HT_Find in that the hash
 // for the key is precalculated and passed to the function.
 {
-    HashNode* N;
+   HashNode *N;
 
-    // If we don't have a table, there's nothing to find
-    if (T->Table == 0) {
-        return 0;
-    }
+   // If we don't have a table, there's nothing to find
+   if (T->Table == 0) {
+      return 0;
+   }
 
-    // Search for the entry in the given chain
-    N = T->Table[Hash % T->Slots];
-    while (N) {
+   // Search for the entry in the given chain
+   N = T->Table[Hash % T->Slots];
+   while (N) {
 
-        // First compare the full hash, to avoid calling the compare function
-        // if it is not really necessary.
-        if (N->Hash == Hash &&
-            T->Func->Compare (Key, T->Func->GetKey (N)) == 0) {
-            // Found
-            break;
-        }
+      // First compare the full hash, to avoid calling the compare function
+      // if it is not really necessary.
+      if (N->Hash == Hash && T->Func->Compare(Key, T->Func->GetKey(N)) == 0) {
+         // Found
+         break;
+      }
 
-        // Not found, next entry
-        N = N->Next;
-    }
+      // Not found, next entry
+      N = N->Next;
+   }
 
-    // Return what we found
-    return N;
+   // Return what we found
+   return N;
 }
 
-void* HT_Find (const HashTable* T, const void* Key)
+void *HT_Find(const HashTable *T, const void *Key)
 // Find the entry with the given key and return it
 {
-    // Search for the entry
-    return HT_FindHash (T, Key, T->Func->GenHash (Key));
+   // Search for the entry
+   return HT_FindHash(T, Key, T->Func->GenHash(Key));
 }
 
-void HT_Insert (HashTable* T, void* Entry)
+void HT_Insert(HashTable *T, void *Entry)
 // Insert an entry into the given hash table
 {
-    HashNode* N;
-    unsigned RHash;
+   HashNode *N;
+   unsigned RHash;
 
-    // If we don't have a table, we need to allocate it now
-    if (T->Table == 0) {
-        HT_Alloc (T);
-    }
+   // If we don't have a table, we need to allocate it now
+   if (T->Table == 0) {
+      HT_Alloc(T);
+   }
 
-    // The first member of Entry is also the hash node
-    N = Entry;
+   // The first member of Entry is also the hash node
+   N = Entry;
 
-    // Generate the hash over the node key.
-    N->Hash = T->Func->GenHash (T->Func->GetKey (N));
+   // Generate the hash over the node key.
+   N->Hash = T->Func->GenHash(T->Func->GetKey(N));
 
-    // Calculate the reduced hash
-    RHash = N->Hash % T->Slots;
+   // Calculate the reduced hash
+   RHash = N->Hash % T->Slots;
 
-    // Insert the entry into the correct chain
-    N->Next = T->Table[RHash];
-    T->Table[RHash] = N;
+   // Insert the entry into the correct chain
+   N->Next = T->Table[RHash];
+   T->Table[RHash] = N;
 
-    // One more entry
-    ++T->Count;
+   // One more entry
+   ++T->Count;
 }
 
-void HT_Remove (HashTable* T, void* Entry)
+void HT_Remove(HashTable *T, void *Entry)
 // Remove an entry from the given hash table
 {
-    // The first member of Entry is also the hash node
-    HashNode* N = Entry;
+   // The first member of Entry is also the hash node
+   HashNode *N = Entry;
 
-    // Calculate the reduced hash, which is also the slot number
-    unsigned Slot = N->Hash % T->Slots;
+   // Calculate the reduced hash, which is also the slot number
+   unsigned Slot = N->Hash % T->Slots;
 
-    // Remove the entry from the single linked list
-    HashNode** Q = &T->Table[Slot];
-    while (1) {
-        // If the pointer is NULL, the node is not in the table which we will
-        // consider a serious error.
-        CHECK (*Q != 0);
-        if (*Q == N) {
-            // Found - remove it
-            *Q = N->Next;
-            --T->Count;
-            break;
-        }
-        // Next node
-        Q = &(*Q)->Next;
-    }
+   // Remove the entry from the single linked list
+   HashNode **Q = &T->Table[Slot];
+   while (1) {
+      // If the pointer is NULL, the node is not in the table which we will
+      // consider a serious error.
+      CHECK(*Q != 0);
+      if (*Q == N) {
+         // Found - remove it
+         *Q = N->Next;
+         --T->Count;
+         break;
+      }
+      // Next node
+      Q = &(*Q)->Next;
+   }
 }
 
-void HT_Walk (HashTable* T, int (*F) (void* Entry, void* Data), void* Data)
+void HT_Walk(HashTable *T, int (*F)(void *Entry, void *Data), void *Data)
 // Walk over all nodes of a hash table, optionally deleting entries from the
 // table. For each node, the user supplied function F is called, passing a
 // pointer to the entry, and the data pointer passed to HT_Walk by the caller.
@@ -186,33 +186,34 @@ void HT_Walk (HashTable* T, int (*F) (void* Entry, void* Data), void* Data)
 // left in place. While deleting the node, the node is not accessed, so it is
 // safe for F to free the memory associcated with the entry.
 {
-    unsigned I;
+   unsigned I;
 
-    // If we don't have a table there are no entries to walk over
-    if (T->Table == 0) {
-        return;
-    }
+   // If we don't have a table there are no entries to walk over
+   if (T->Table == 0) {
+      return;
+   }
 
-    // Walk over all chains
-    for (I = 0; I < T->Slots; ++I) {
+   // Walk over all chains
+   for (I = 0; I < T->Slots; ++I) {
 
-        // Get the pointer to the first entry of the hash chain
-        HashNode** Cur = &T->Table[I];
+      // Get the pointer to the first entry of the hash chain
+      HashNode **Cur = &T->Table[I];
 
-        // Walk over all entries in this chain
-        while (*Cur) {
-            // Fetch the next node in chain now, because F() may delete it
-            HashNode* Next = (*Cur)->Next;
-            // Call the user function. N is also the pointer to the entry. If
-            // the function returns true, the entry is to be deleted.
-            if (F (*Cur, Data)) {
-                // Delete the node from the chain
-                *Cur = Next;
-                --T->Count;
-            } else {
-                // Next node in chain
-                Cur = &(*Cur)->Next;
-            }
-        }
-    }
+      // Walk over all entries in this chain
+      while (*Cur) {
+         // Fetch the next node in chain now, because F() may delete it
+         HashNode *Next = (*Cur)->Next;
+         // Call the user function. N is also the pointer to the entry. If
+         // the function returns true, the entry is to be deleted.
+         if (F(*Cur, Data)) {
+            // Delete the node from the chain
+            *Cur = Next;
+            --T->Count;
+         }
+         else {
+            // Next node in chain
+            Cur = &(*Cur)->Next;
+         }
+      }
+   }
 }

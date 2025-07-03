@@ -44,7 +44,7 @@ struct EffAddr;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void GetEA (EffAddr* A);
+void GetEA(EffAddr *A);
 // Parse an effective address, return the result in A
 
 // End of ea65.h

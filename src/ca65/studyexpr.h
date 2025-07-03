@@ -42,61 +42,61 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Flags
-#define ED_OK           0x00            // Nothing special
-#define ED_TOO_COMPLEX  0x01            // Expression is too complex
-#define ED_ERROR        0x02            // Error evaluating the expression
+#define ED_OK 0x00          // Nothing special
+#define ED_TOO_COMPLEX 0x01 // Expression is too complex
+#define ED_ERROR 0x02       // Error evaluating the expression
 
 // Symbol reference
 typedef struct ED_SymRef ED_SymRef;
 struct ED_SymRef {
-    long                Count;          // Number of references
-    struct SymEntry*    Ref;            // Actual reference
+   long Count;           // Number of references
+   struct SymEntry *Ref; // Actual reference
 };
 
 // Section reference
 typedef struct ED_SecRef ED_SecRef;
 struct ED_SecRef {
-    long                Count;          // Number of references
-    unsigned            Ref;            // Actual reference
+   long Count;   // Number of references
+   unsigned Ref; // Actual reference
 };
 
 // Structure for parsing expression trees
 typedef struct ExprDesc ExprDesc;
 struct ExprDesc {
-    unsigned short      Flags;          // See ED_xxx
-    unsigned char       AddrSize;       // Address size of the expression
-    long                Val;            // The offset value
-    long                Right;          // Right value for StudyBinaryExpr
+   unsigned short Flags;   // See ED_xxx
+   unsigned char AddrSize; // Address size of the expression
+   long Val;               // The offset value
+   long Right;             // Right value for StudyBinaryExpr
 
-    // Symbol reference management
-    unsigned            SymCount;       // Number of symbols referenced
-    unsigned            SymLimit;       // Memory allocated
-    ED_SymRef*          SymRef;         // Symbol references
+   // Symbol reference management
+   unsigned SymCount; // Number of symbols referenced
+   unsigned SymLimit; // Memory allocated
+   ED_SymRef *SymRef; // Symbol references
 
-    // Section reference management
-    unsigned            SecCount;       // Number of sections referenced
-    unsigned            SecLimit;       // Memory allocated
-    ED_SecRef*          SecRef;         // Section references
+   // Section reference management
+   unsigned SecCount; // Number of sections referenced
+   unsigned SecLimit; // Memory allocated
+   ED_SecRef *SecRef; // Section references
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                              struct ExprDesc
 ////////////////////////////////////////////////////////////////////////////////
 
-ExprDesc* ED_Init (ExprDesc* ED);
+ExprDesc *ED_Init(ExprDesc *ED);
 // Initialize an ExprDesc structure for use with StudyExpr
 
-void ED_Done (ExprDesc* ED);
+void ED_Done(ExprDesc *ED);
 // Delete allocated memory for an ExprDesc.
 
-int ED_IsConst (const ExprDesc* ED);
+int ED_IsConst(const ExprDesc *ED);
 // Return true if the expression is constant
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void StudyExpr (ExprNode* Expr, ExprDesc* D);
+void StudyExpr(ExprNode *Expr, ExprDesc *D);
 // Study an expression tree and place the contents into D
 
 // End of studyexpr.h

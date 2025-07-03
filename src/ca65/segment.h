@@ -50,17 +50,17 @@
 // Segment definition
 typedef struct Segment Segment;
 struct Segment {
-    Fragment*       Root;               // Root of fragment list
-    Fragment*       Last;               // Pointer to last fragment
-    unsigned long   FragCount;          // Number of fragments
-    unsigned        Num;                // Segment number
-    unsigned        Flags;              // Segment flags
-    unsigned long   Align;              // Segment alignment
-    int             RelocMode;          // Relocatable mode if OrgPerSeg
-    unsigned long   PC;                 // PC if in relocatable mode
-    unsigned long   AbsPC;              // PC if in local absolute mode
-                                        // (OrgPerSeg is true)
-    SegDef*         Def;                // Segment definition (name and type)
+   Fragment *Root;          // Root of fragment list
+   Fragment *Last;          // Pointer to last fragment
+   unsigned long FragCount; // Number of fragments
+   unsigned Num;            // Segment number
+   unsigned Flags;          // Segment flags
+   unsigned long Align;     // Segment alignment
+   int RelocMode;           // Relocatable mode if OrgPerSeg
+   unsigned long PC;        // PC if in relocatable mode
+   unsigned long AbsPC;     // PC if in local absolute mode
+                            // (OrgPerSeg is true)
+   SegDef *Def;             // Segment definition (name and type)
 };
 
 // Definitions for predefined segments
@@ -75,83 +75,83 @@ extern SegDef CodeSegDef;
 extern Collection SegmentList;
 
 // Currently active segment
-extern Segment* ActiveSeg;
+extern Segment *ActiveSeg;
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Fragment* GenFragment (unsigned char Type, unsigned short Len);
+Fragment *GenFragment(unsigned char Type, unsigned short Len);
 // Generate a new fragment, add it to the current segment and return it.
 
-void UseSeg (const SegDef* D);
+void UseSeg(const SegDef *D);
 // Use the given segment
 
 #if defined(HAVE_INLINE)
-INLINE const SegDef* GetCurrentSegDef (void)
+INLINE const SegDef *GetCurrentSegDef(void)
 // Get a pointer to the segment defininition of the current segment
 {
-    return ActiveSeg->Def;
+   return ActiveSeg->Def;
 }
 #else
-#  define GetCurrentSegDef()    (ActiveSeg->Def)
+#define GetCurrentSegDef() (ActiveSeg->Def)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE unsigned GetCurrentSegNum (void)
+INLINE unsigned GetCurrentSegNum(void)
 // Get the number of the current segment
 {
-    return ActiveSeg->Num;
+   return ActiveSeg->Num;
 }
 #else
-#  define GetCurrentSegNum()    (ActiveSeg->Num)
+#define GetCurrentSegNum() (ActiveSeg->Num)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE unsigned char GetCurrentSegAddrSize (void)
+INLINE unsigned char GetCurrentSegAddrSize(void)
 // Get the address size of the current segment
 {
-    return ActiveSeg->Def->AddrSize;
+   return ActiveSeg->Def->AddrSize;
 }
 #else
-#  define GetCurrentSegAddrSize()    (ActiveSeg->Def->AddrSize)
+#define GetCurrentSegAddrSize() (ActiveSeg->Def->AddrSize)
 #endif
 
-void SegAlign (unsigned long Alignment, int FillVal);
+void SegAlign(unsigned long Alignment, int FillVal);
 // Align the PC segment to Alignment. If FillVal is -1, emit fill fragments
 // (the actual fill value will be determined by the linker), otherwise use
 // the given value.
 
-unsigned char GetSegAddrSize (unsigned SegNum);
+unsigned char GetSegAddrSize(unsigned SegNum);
 // Return the address size of the segment with the given number
 
-unsigned long GetPC (void);
+unsigned long GetPC(void);
 // Get the program counter of the current segment
 
-int GetRelocMode (void);
+int GetRelocMode(void);
 // Return true if we're currently in relocatable mode
 
-void EnterAbsoluteMode (unsigned long AbsPC);
+void EnterAbsoluteMode(unsigned long AbsPC);
 // Enter absolute (non relocatable mode). Depending on the OrgPerSeg flag,
 // this will either switch the mode globally or for the current segment.
 
-void EnterRelocMode (void);
+void EnterRelocMode(void);
 // Enter relocatable mode. Depending on the OrgPerSeg flag, this will either
 // switch the mode globally or for the current segment.
 
-void SegDone (void);
+void SegDone(void);
 // Check the segments for range and other errors. Do cleanup.
 
-void SegDump (void);
+void SegDump(void);
 // Dump the contents of all segments
 
-void SegInit (void);
+void SegInit(void);
 // Initialize segments
 
-void SetSegmentSizes (void);
+void SetSegmentSizes(void);
 // Set the default segment sizes according to the memory model
 
-void WriteSegments (void);
+void WriteSegments(void);
 // Write the segment data to the object file
 
 // End of segment.h

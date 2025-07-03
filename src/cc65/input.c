@@ -60,29 +60,29 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // The current input line
-StrBuf* Line;
+StrBuf *Line;
 
 // The input line to reuse as the next line
-static StrBuf* CurReusedLine;
+static StrBuf *CurReusedLine;
 
 // Current and next input character
-char CurC  = '\0';
+char CurC = '\0';
 char NextC = '\0';
 
 // Maximum count of nested includes
-#define MAX_INC_NESTING         16
+#define MAX_INC_NESTING 16
 
 // Struct that describes an active input file
 typedef struct AFile AFile;
 struct AFile {
-    unsigned    LineNum;        // Actual line number for this file
-    FILE*       F;              // Input file stream
-    IFile*      Input;          // Points to corresponding IFile
-    int         SearchPath;     // True if we've added a path for this file
-    unsigned    LineOffs;       // Offset to presumed line number for this file
-    char*       PName;          // Presumed name of the file
-    PPIfStack   IfStack;        // PP #if stack
-    int         MissingNL;      // Last input line was missing a newline
+   unsigned LineNum;  // Actual line number for this file
+   FILE *F;           // Input file stream
+   IFile *Input;      // Points to corresponding IFile
+   int SearchPath;    // True if we've added a path for this file
+   unsigned LineOffs; // Offset to presumed line number for this file
+   char *PName;       // Presumed name of the file
+   PPIfStack IfStack; // PP #if stack
+   int MissingNL;     // Last input line was missing a newline
 };
 
 // List of all input files
@@ -92,758 +92,763 @@ static Collection IFiles = STATIC_COLLECTION_INITIALIZER;
 static Collection AFiles = STATIC_COLLECTION_INITIALIZER;
 
 // Input stack used when preprocessing
-static Collection* CurrentInputStack;
+static Collection *CurrentInputStack;
 
 // Counter for the __COUNTER__ macro
 static unsigned MainFileCounter;
-LineInfo* PrevDiagnosticLI;
+LineInfo *PrevDiagnosticLI;
 
 ////////////////////////////////////////////////////////////////////////////////
 //                               struct IFile
 ////////////////////////////////////////////////////////////////////////////////
 
-static IFile* NewIFile (const char* Name, InputType Type)
+static IFile *NewIFile(const char *Name, InputType Type)
 // Create and return a new IFile
 {
-    // Get the length of the name
-    unsigned Len = strlen (Name);
+   // Get the length of the name
+   unsigned Len = strlen(Name);
 
-    // Allocate a IFile structure
-    IFile* IF = (IFile*) xmalloc (sizeof (IFile) + Len);
+   // Allocate a IFile structure
+   IFile *IF = (IFile *)xmalloc(sizeof(IFile) + Len);
 
-    // Initialize the fields
-    IF->Index   = CollCount (&IFiles) + 1;
-    IF->Usage   = 0;
-    IF->Size    = 0;
-    IF->MTime   = 0;
-    IF->Type    = Type;
-    IF->GFlags  = IG_NONE;
-    SB_Init (&IF->GuardMacro);
-    memcpy (IF->Name, Name, Len+1);
+   // Initialize the fields
+   IF->Index = CollCount(&IFiles) + 1;
+   IF->Usage = 0;
+   IF->Size = 0;
+   IF->MTime = 0;
+   IF->Type = Type;
+   IF->GFlags = IG_NONE;
+   SB_Init(&IF->GuardMacro);
+   memcpy(IF->Name, Name, Len + 1);
 
-    // Insert the new structure into the IFile collection
-    CollAppend (&IFiles, IF);
+   // Insert the new structure into the IFile collection
+   CollAppend(&IFiles, IF);
 
-    // Return the new struct
-    return IF;
+   // Return the new struct
+   return IF;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //                               struct AFile
 ////////////////////////////////////////////////////////////////////////////////
 
-static AFile* NewAFile (IFile* IF, FILE* F)
+static AFile *NewAFile(IFile *IF, FILE *F)
 // Create a new AFile, push it onto the stack, add the path of the file to
 // the path search list, and finally return a pointer to the new AFile struct.
 {
-    StrBuf Path = AUTO_STRBUF_INITIALIZER;
+   StrBuf Path = AUTO_STRBUF_INITIALIZER;
 
-    // Allocate a AFile structure
-    AFile* AF = (AFile*) xmalloc (sizeof (AFile));
+   // Allocate a AFile structure
+   AFile *AF = (AFile *)xmalloc(sizeof(AFile));
 
-    // Initialize the fields
-    AF->LineNum   = 0;
-    AF->F         = F;
-    AF->Input     = IF;
-    AF->LineOffs  = 0;
-    AF->PName     = 0;
-    AF->IfStack.Index = -1;
-    AF->MissingNL = 0;
+   // Initialize the fields
+   AF->LineNum = 0;
+   AF->F = F;
+   AF->Input = IF;
+   AF->LineOffs = 0;
+   AF->PName = 0;
+   AF->IfStack.Index = -1;
+   AF->MissingNL = 0;
 
-    // Increment the usage counter of the corresponding IFile. If this
-    // is the first use, set the file data and output debug info if
-    // requested.
-    if (IF->Usage++ == 0) {
+   // Increment the usage counter of the corresponding IFile. If this
+   // is the first use, set the file data and output debug info if
+   // requested.
+   if (IF->Usage++ == 0) {
 
-        // Get file size and modification time. There a race condition here,
-        // since we cannot use fileno() (non standard identifier in standard
-        // header file), and therefore not fstat. When using stat with the
-        // file name, there's a risk that the file was deleted and recreated
-        // while it was open. Since mtime and size are only used to check
-        // if a file has changed in the debugger, we will ignore this problem
-        // here.
-        struct stat Buf;
-        if (FileStat (IF->Name, &Buf) != 0) {
-            // Error
-            Fatal ("Cannot stat '%s': %s", IF->Name, strerror (errno));
-        }
-        IF->Size  = (unsigned long) Buf.st_size;
-        IF->MTime = (unsigned long) Buf.st_mtime;
+      // Get file size and modification time. There a race condition here,
+      // since we cannot use fileno() (non standard identifier in standard
+      // header file), and therefore not fstat. When using stat with the
+      // file name, there's a risk that the file was deleted and recreated
+      // while it was open. Since mtime and size are only used to check
+      // if a file has changed in the debugger, we will ignore this problem
+      // here.
+      struct stat Buf;
+      if (FileStat(IF->Name, &Buf) != 0) {
+         // Error
+         Fatal("Cannot stat '%s': %s", IF->Name, strerror(errno));
+      }
+      IF->Size = (unsigned long)Buf.st_size;
+      IF->MTime = (unsigned long)Buf.st_mtime;
 
-        // Set the debug data
-        g_fileinfo (IF->Name, IF->Size, IF->MTime);
-    }
+      // Set the debug data
+      g_fileinfo(IF->Name, IF->Size, IF->MTime);
+   }
 
-    // Insert the new structure into the AFile collection
-    CollAppend (&AFiles, AF);
+   // Insert the new structure into the AFile collection
+   CollAppend(&AFiles, AF);
 
-    // Get the path of this file and add it as an extra search path.
-    // To avoid file search overhead, we will add one path only once.
-    // This is checked by the PushSearchPath function.
-    SB_CopyBuf (&Path, IF->Name, FindName (IF->Name) - IF->Name);
-    SB_Terminate (&Path);
-    AF->SearchPath = PushSearchPath (UsrIncSearchPath, SB_GetConstBuf (&Path));
-    SB_Done (&Path);
+   // Get the path of this file and add it as an extra search path.
+   // To avoid file search overhead, we will add one path only once.
+   // This is checked by the PushSearchPath function.
+   SB_CopyBuf(&Path, IF->Name, FindName(IF->Name) - IF->Name);
+   SB_Terminate(&Path);
+   AF->SearchPath = PushSearchPath(UsrIncSearchPath, SB_GetConstBuf(&Path));
+   SB_Done(&Path);
 
-    // Return the new struct
-    return AF;
+   // Return the new struct
+   return AF;
 }
 
-static void FreeAFile (AFile* AF)
+static void FreeAFile(AFile *AF)
 // Free an AFile structure
 {
-    if (AF->PName != 0) {
-        xfree (AF->PName);
-    }
-    xfree (AF);
+   if (AF->PName != 0) {
+      xfree(AF->PName);
+   }
+   xfree(AF);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-static IFile* FindFile (const char* Name)
+static IFile *FindFile(const char *Name)
 // Find the file with the given name in the list of all files. Since the list
 // is not large (usually less than 10), I don't care about using hashes or
 // similar things and do a linear search.
 {
-    unsigned I;
-    for (I = 0; I < CollCount (&IFiles); ++I) {
-        // Get the file struct
-        IFile* IF = (IFile*) CollAt (&IFiles, I);
-        // Check the name
-        if (strcmp (Name, IF->Name) == 0) {
-            // Found, return the struct
-            return IF;
-        }
-    }
+   unsigned I;
+   for (I = 0; I < CollCount(&IFiles); ++I) {
+      // Get the file struct
+      IFile *IF = (IFile *)CollAt(&IFiles, I);
+      // Check the name
+      if (strcmp(Name, IF->Name) == 0) {
+         // Found, return the struct
+         return IF;
+      }
+   }
 
-    // Not found
-    return 0;
+   // Not found
+   return 0;
 }
 
-void OpenMainFile (const char* Name)
+void OpenMainFile(const char *Name)
 // Open the main file. Will call Fatal() in case of failures.
 {
-    AFile* MainFile;
+   AFile *MainFile;
 
-    // Setup a new IFile structure for the main file
-    IFile* IF = NewIFile (Name, IT_MAIN);
+   // Setup a new IFile structure for the main file
+   IFile *IF = NewIFile(Name, IT_MAIN);
 
-    // Open the file for reading
-    FILE* F = fopen (Name, "r");
-    if (F == 0) {
-        // Cannot open
-        Fatal ("Cannot open input file '%s': %s", Name, strerror (errno));
-    }
+   // Open the file for reading
+   FILE *F = fopen(Name, "r");
+   if (F == 0) {
+      // Cannot open
+      Fatal("Cannot open input file '%s': %s", Name, strerror(errno));
+   }
 
-    // Allocate a new AFile structure for the file
-    MainFile = NewAFile (IF, F);
+   // Allocate a new AFile structure for the file
+   MainFile = NewAFile(IF, F);
 
-    // Use this file with PP
-    SetPPIfStack (&MainFile->IfStack);
+   // Use this file with PP
+   SetPPIfStack(&MainFile->IfStack);
 
-    // Begin PP for this file
-    PreprocessBegin (IF);
+   // Begin PP for this file
+   PreprocessBegin(IF);
 
-    // Allocate the input line buffer
-    Line = NewStrBuf ();
+   // Allocate the input line buffer
+   Line = NewStrBuf();
 
-    // Update the line infos, so we have a valid line info even at start of
-    // the main file before the first line is read.
-    UpdateCurrentLineInfo (Line);
+   // Update the line infos, so we have a valid line info even at start of
+   // the main file before the first line is read.
+   UpdateCurrentLineInfo(Line);
 
-    // Initialize the __COUNTER__ counter
-    MainFileCounter = 0;
+   // Initialize the __COUNTER__ counter
+   MainFileCounter = 0;
 }
 
-void OpenIncludeFile (const char* Name, InputType IT)
+void OpenIncludeFile(const char *Name, InputType IT)
 // Open an include file and insert it into the tables.
 {
-    char*  N;
-    FILE*  F;
-    IFile* IF;
-    AFile* AF;
+   char *N;
+   FILE *F;
+   IFile *IF;
+   AFile *AF;
 
-    // Check for the maximum include nesting
-    if (CollCount (&AFiles) > MAX_INC_NESTING) {
-        PPError ("Include nesting too deep");
-        return;
-    }
+   // Check for the maximum include nesting
+   if (CollCount(&AFiles) > MAX_INC_NESTING) {
+      PPError("Include nesting too deep");
+      return;
+   }
 
-    // Search for the file
-    N = SearchFile ((IT == IT_SYSINC)? SysIncSearchPath : UsrIncSearchPath, Name);
-    if (N == 0) {
-        PPError ("Include file '%s' not found", Name);
-        return;
-    }
+   // Search for the file
+   N = SearchFile((IT == IT_SYSINC) ? SysIncSearchPath : UsrIncSearchPath,
+                  Name);
+   if (N == 0) {
+      PPError("Include file '%s' not found", Name);
+      return;
+   }
 
-    // Search the list of all input files for this file. If we don't find
-    // it, create a new IFile object. If we do already know the file and it
-    // has an include guard, check for the include guard before opening the
-    // file.
-    IF = FindFile (N);
-    if (IF == 0) {
-        IF = NewIFile (N, IT);
-    } else if ((IF->GFlags & IG_ISGUARDED) != 0 &&
-              IsMacro (SB_GetConstBuf (&IF->GuardMacro))) {
-        if (Debug) {
-            printf ("Include guard %s found for \"%s\" - won't include it again\n",
-                    SB_GetConstBuf (&IF->GuardMacro),
-                    Name);
-        }
-        return;
-    }
+   // Search the list of all input files for this file. If we don't find
+   // it, create a new IFile object. If we do already know the file and it
+   // has an include guard, check for the include guard before opening the
+   // file.
+   IF = FindFile(N);
+   if (IF == 0) {
+      IF = NewIFile(N, IT);
+   }
+   else if ((IF->GFlags & IG_ISGUARDED) != 0 &&
+            IsMacro(SB_GetConstBuf(&IF->GuardMacro))) {
+      if (Debug) {
+         printf("Include guard %s found for \"%s\" - won't include it again\n",
+                SB_GetConstBuf(&IF->GuardMacro), Name);
+      }
+      return;
+   }
 
-    // We don't need N any longer, since we may now use IF->Name
-    xfree (N);
+   // We don't need N any longer, since we may now use IF->Name
+   xfree(N);
 
-    // Open the file
-    F = fopen (IF->Name, "r");
-    if (F == 0) {
-        // Error opening the file
-        PPError ("Cannot open include file '%s': %s", IF->Name, strerror (errno));
-        return;
-    }
+   // Open the file
+   F = fopen(IF->Name, "r");
+   if (F == 0) {
+      // Error opening the file
+      PPError("Cannot open include file '%s': %s", IF->Name, strerror(errno));
+      return;
+   }
 
-    // Debugging output
-    Print (stdout, 1, "Opened include file '%s'\n", IF->Name);
+   // Debugging output
+   Print(stdout, 1, "Opened include file '%s'\n", IF->Name);
 
-    // Allocate a new AFile structure
-    AF = NewAFile (IF, F);
+   // Allocate a new AFile structure
+   AF = NewAFile(IF, F);
 
-    // Use this file with PP
-    SetPPIfStack (&AF->IfStack);
+   // Use this file with PP
+   SetPPIfStack(&AF->IfStack);
 
-    // Begin PP for this file
-    PreprocessBegin (IF);
+   // Begin PP for this file
+   PreprocessBegin(IF);
 }
 
-void CloseIncludeFile (void)
+void CloseIncludeFile(void)
 // Close an include file and switch to the higher level file. Set Input to
 // NULL if this was the main file.
 {
-    // Get the currently active input file and remove it from set of active
-    // files. CollPop will FAIL if the collection is empty so no need to
-    // check this here.
-    AFile* Input = CollPop (&AFiles);
+   // Get the currently active input file and remove it from set of active
+   // files. CollPop will FAIL if the collection is empty so no need to
+   // check this here.
+   AFile *Input = CollPop(&AFiles);
 
-    // Determine the file that is active after closing this one. We never
-    // actually close the main file, since it is needed for errors found after
-    // compilation is completed.
-    AFile* NextInput = (CollCount (&AFiles) > 0)? CollLast (&AFiles) : Input;
+   // Determine the file that is active after closing this one. We never
+   // actually close the main file, since it is needed for errors found after
+   // compilation is completed.
+   AFile *NextInput = (CollCount(&AFiles) > 0) ? CollLast(&AFiles) : Input;
 
-    // End preprocessing for the current input file
-    PreprocessEnd (NextInput->Input);
+   // End preprocessing for the current input file
+   PreprocessEnd(NextInput->Input);
 
-    // Close the current input file (we're just reading so no error check)
-    fclose (Input->F);
+   // Close the current input file (we're just reading so no error check)
+   fclose(Input->F);
 
-    // If we had added an extra search path for this AFile, remove it
-    if (Input->SearchPath) {
-        PopSearchPath (UsrIncSearchPath);
-    }
+   // If we had added an extra search path for this AFile, remove it
+   if (Input->SearchPath) {
+      PopSearchPath(UsrIncSearchPath);
+   }
 
-    // Delete the active file structure
-    FreeAFile (Input);
+   // Delete the active file structure
+   FreeAFile(Input);
 
-    // If we've switched files, use the if stack from the previous file
-    if (Input != NextInput) {
-        SetPPIfStack (&NextInput->IfStack);
-    }
+   // If we've switched files, use the if stack from the previous file
+   if (Input != NextInput) {
+      SetPPIfStack(&NextInput->IfStack);
+   }
 }
 
-static void GetInputChar (void)
+static void GetInputChar(void)
 // Read the next character from the input stream and make CurC and NextC
 // valid. If end of line is reached, both are set to NUL, no more lines
 // are read by this function.
 {
-    // Get the next-next character from the line
-    if (SB_GetIndex (Line) + 1 < SB_GetLen (Line)) {
-        // CurC and NextC come from this fragment
-        CurC  = SB_AtUnchecked (Line, SB_GetIndex (Line));
-        NextC = SB_AtUnchecked (Line, SB_GetIndex (Line) + 1);
-    } else {
-        // NextC is '\0' by default
-        NextC = '\0';
+   // Get the next-next character from the line
+   if (SB_GetIndex(Line) + 1 < SB_GetLen(Line)) {
+      // CurC and NextC come from this fragment
+      CurC = SB_AtUnchecked(Line, SB_GetIndex(Line));
+      NextC = SB_AtUnchecked(Line, SB_GetIndex(Line) + 1);
+   }
+   else {
+      // NextC is '\0' by default
+      NextC = '\0';
 
-        // Get CurC from the line
-        CurC = SB_LookAt (Line, SB_GetIndex (Line));
-    }
-
+      // Get CurC from the line
+      CurC = SB_LookAt(Line, SB_GetIndex(Line));
+   }
 }
 
-void NextChar (void)
+void NextChar(void)
 // Skip the current input character and read the next one from the input
 // stream. CurC and NextC are valid after the call. If end of line is
 // reached, both are set to NUL, no more lines are read by this function.
 {
-    // Skip the last character read
-    SB_Skip (Line);
+   // Skip the last character read
+   SB_Skip(Line);
 
-    // Read the next one
-    GetInputChar ();
+   // Read the next one
+   GetInputChar();
 }
 
-Collection* UseInputStack (Collection* InputStack)
+Collection *UseInputStack(Collection *InputStack)
 // Use the provided input stack for incoming input. Return the previously used
 // InputStack.
 {
-    Collection* OldInputStack = CurrentInputStack;
+   Collection *OldInputStack = CurrentInputStack;
 
-    CurrentInputStack = InputStack;
-    return OldInputStack;
+   CurrentInputStack = InputStack;
+   return OldInputStack;
 }
 
-void PushLine (StrBuf* L)
+void PushLine(StrBuf *L)
 // Save the current input line and use a new one
 {
-    PRECONDITION (CurrentInputStack != 0);
-    CollAppend (CurrentInputStack, Line);
-    Line = L;
-    GetInputChar ();
+   PRECONDITION(CurrentInputStack != 0);
+   CollAppend(CurrentInputStack, Line);
+   Line = L;
+   GetInputChar();
 }
 
-void ReuseInputLine (void)
+void ReuseInputLine(void)
 // Save and reuse the current line as the next line
 {
-    CurReusedLine = Line;
+   CurReusedLine = Line;
 }
 
-void ClearLine (void)
+void ClearLine(void)
 // Clear the current input line
 {
-    // Clear the contents of Line
-    SB_Clear (Line);
-    CurC    = '\0';
-    NextC   = '\0';
+   // Clear the contents of Line
+   SB_Clear(Line);
+   CurC = '\0';
+   NextC = '\0';
 }
 
-StrBuf* InitLine (StrBuf* Buf)
+StrBuf *InitLine(StrBuf *Buf)
 // Initialize Line from Buf and read CurC and NextC from the new input line.
 // The function returns the old input line.
 {
-    StrBuf* OldLine = Line;
-    Line  = Buf;
-    CurC  = SB_LookAt (Buf, SB_GetIndex (Buf));
-    NextC = SB_LookAt (Buf, SB_GetIndex (Buf) + 1);
-    return OldLine;
+   StrBuf *OldLine = Line;
+   Line = Buf;
+   CurC = SB_LookAt(Buf, SB_GetIndex(Buf));
+   NextC = SB_LookAt(Buf, SB_GetIndex(Buf) + 1);
+   return OldLine;
 }
 
-int NextLine (void)
+int NextLine(void)
 // Get a line from the current input. Returns 0 on end of file with no new
 // input bytes.
 {
-    int         C;
-    AFile*      Input;
+   int C;
+   AFile *Input;
 
-    // Overwrite the next input line with the pushed line if there is one
-    if (CurReusedLine != 0) {
-        // Use data move to resolve the issue that Line may be impersistent
-        if (Line != CurReusedLine) {
-            SB_Move (Line, CurReusedLine);
-        }
-        // Continue with this Line
-        InitLine (Line);
-        CurReusedLine = 0;
+   // Overwrite the next input line with the pushed line if there is one
+   if (CurReusedLine != 0) {
+      // Use data move to resolve the issue that Line may be impersistent
+      if (Line != CurReusedLine) {
+         SB_Move(Line, CurReusedLine);
+      }
+      // Continue with this Line
+      InitLine(Line);
+      CurReusedLine = 0;
 
-        return 1;
-    }
+      return 1;
+   }
 
-    // If there are pushed input lines, read from them
-    if (CurrentInputStack != 0 && CollCount (CurrentInputStack) > 0) {
-        // Drop all pushed fragments that have no data left until one can be
-        // used as input.
-        do {
-            // Use data move to resolve the issue that Line may be impersistent
-            if (Line != CollLast (CurrentInputStack)) {
-                SB_Move (Line, CollPop (CurrentInputStack));
-            } else {
-                CollPop (CurrentInputStack);
-            }
-        } while (CollCount (CurrentInputStack) > 0 &&
-                 SB_GetIndex (Line) >= SB_GetLen (Line));
+   // If there are pushed input lines, read from them
+   if (CurrentInputStack != 0 && CollCount(CurrentInputStack) > 0) {
+      // Drop all pushed fragments that have no data left until one can be
+      // used as input.
+      do {
+         // Use data move to resolve the issue that Line may be impersistent
+         if (Line != CollLast(CurrentInputStack)) {
+            SB_Move(Line, CollPop(CurrentInputStack));
+         }
+         else {
+            CollPop(CurrentInputStack);
+         }
+      } while (CollCount(CurrentInputStack) > 0 &&
+               SB_GetIndex(Line) >= SB_GetLen(Line));
 
-        if (SB_GetIndex (Line) < SB_GetLen (Line)) {
-            InitLine (Line);
+      if (SB_GetIndex(Line) < SB_GetLen(Line)) {
+         InitLine(Line);
 
-            // Successive
-            return 1;
-        }
-    }
+         // Successive
+         return 1;
+      }
+   }
 
-    // Otherwise, clear the current line
-    ClearLine ();
+   // Otherwise, clear the current line
+   ClearLine();
 
-    // Must have an input file when going on
-    if (CollCount (&AFiles) == 0) {
-        return 0;
-    }
+   // Must have an input file when going on
+   if (CollCount(&AFiles) == 0) {
+      return 0;
+   }
 
-    // Get the current input file
-    Input = CollLast (&AFiles);
+   // Get the current input file
+   Input = CollLast(&AFiles);
 
-    // Read characters until we have one complete line
-    while (1) {
+   // Read characters until we have one complete line
+   while (1) {
 
-        // Read the next character
-        C = fgetc (Input->F);
+      // Read the next character
+      C = fgetc(Input->F);
 
-        // Check for EOF
-        if (C == EOF) {
+      // Check for EOF
+      if (C == EOF) {
 
-            if (!Input->MissingNL || SB_NotEmpty (Line)) {
+         if (!Input->MissingNL || SB_NotEmpty(Line)) {
 
-                // Accept files without a newline at the end
-                ++Input->LineNum;
-
-                // Assume no new line
-                Input->MissingNL = 1;
-
-            }
-            break;
-        }
-
-        // Assume no new line
-        Input->MissingNL = 1;
-
-        // Check for end of line
-        if (C == '\n') {
-
-            // We got a new line
+            // Accept files without a newline at the end
             ++Input->LineNum;
 
-            // If the \n is preceeded by a \r, remove the \r, so we can read
-            // DOS/Windows files under *nix.
-            if (SB_LookAtLast (Line) == '\r') {
-                SB_Drop (Line, 1);
-            }
+            // Assume no new line
+            Input->MissingNL = 1;
+         }
+         break;
+      }
 
-            // If we don't have a line continuation character at the end, we
-            // are done with this line. Otherwise just skip the character and
-            // continue reading.
-            if (SB_LookAtLast (Line) != '\\') {
-                Input->MissingNL = 0;
-                break;
-            } else {
-                SB_Drop (Line, 1);
-                ContinueLine ();
-            }
+      // Assume no new line
+      Input->MissingNL = 1;
 
-        } else if (C != '\0') {         // Ignore embedded NULs
+      // Check for end of line
+      if (C == '\n') {
 
-            // Just some character, add it to the line
-            SB_AppendChar (Line, C);
+         // We got a new line
+         ++Input->LineNum;
 
-        }
-    }
+         // If the \n is preceeded by a \r, remove the \r, so we can read
+         // DOS/Windows files under *nix.
+         if (SB_LookAtLast(Line) == '\r') {
+            SB_Drop(Line, 1);
+         }
 
-    // Add a termination character to the string buffer
-    SB_Terminate (Line);
+         // If we don't have a line continuation character at the end, we
+         // are done with this line. Otherwise just skip the character and
+         // continue reading.
+         if (SB_LookAtLast(Line) != '\\') {
+            Input->MissingNL = 0;
+            break;
+         }
+         else {
+            SB_Drop(Line, 1);
+            ContinueLine();
+         }
+      }
+      else if (C != '\0') { // Ignore embedded NULs
 
-    // Initialize the current and next characters.
-    InitLine (Line);
+         // Just some character, add it to the line
+         SB_AppendChar(Line, C);
+      }
+   }
 
-    // Create line information for this line
-    UpdateCurrentLineInfo (Line);
+   // Add a termination character to the string buffer
+   SB_Terminate(Line);
 
-    // Done
-    return C != EOF || SB_NotEmpty (Line);
+   // Initialize the current and next characters.
+   InitLine(Line);
+
+   // Create line information for this line
+   UpdateCurrentLineInfo(Line);
+
+   // Done
+   return C != EOF || SB_NotEmpty(Line);
 }
 
-int PreprocessNextLine (void)
+int PreprocessNextLine(void)
 // Get a line from opened input files and do preprocess. Returns 0 on end of
 // main file.
 {
-    while (NextLine() == 0) {
+   while (NextLine() == 0) {
 
-        // If there is no input file open, bail out. Otherwise get the previous
-        // input file and start over.
-        if (CollCount (&AFiles) == 0) {
-            return 0;
-        }
+      // If there is no input file open, bail out. Otherwise get the previous
+      // input file and start over.
+      if (CollCount(&AFiles) == 0) {
+         return 0;
+      }
 
-        // Leave the current file
-        CloseIncludeFile ();
-    }
+      // Leave the current file
+      CloseIncludeFile();
+   }
 
-    // Do preprocess anyways
-    Preprocess ();
+   // Do preprocess anyways
+   Preprocess();
 
-    // Write it to the output file if in preprocess-only mode
-    if (PreprocessOnly) {
-        WriteOutput ("%.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
-    }
+   // Write it to the output file if in preprocess-only mode
+   if (PreprocessOnly) {
+      WriteOutput("%.*s\n", (int)SB_GetLen(Line), SB_GetConstBuf(Line));
+   }
 
-    // Done
-    return 1;
+   // Done
+   return 1;
 }
 
-static LineInfoFile* NewLineInfoFile (const AFile* AF)
-{
-    const char* Name = AF->PName == 0 ? AF->Input->Name : AF->PName;
-    unsigned    Len  = strlen (Name);
+static LineInfoFile *NewLineInfoFile(const AFile *AF) {
+   const char *Name = AF->PName == 0 ? AF->Input->Name : AF->PName;
+   unsigned Len = strlen(Name);
 
-    // Allocate memory for the file info and the file name
-    LineInfoFile* LIF = xmalloc (sizeof (LineInfoFile) + Len);
+   // Allocate memory for the file info and the file name
+   LineInfoFile *LIF = xmalloc(sizeof(LineInfoFile) + Len);
 
-    // Copy info
-    LIF->InputFile = AF->Input;
-    LIF->LineNum   = AF->LineNum + AF->LineOffs;
-    memcpy (LIF->Name, Name, Len + 1);
+   // Copy info
+   LIF->InputFile = AF->Input;
+   LIF->LineNum = AF->LineNum + AF->LineOffs;
+   memcpy(LIF->Name, Name, Len + 1);
 
-    return LIF;
+   return LIF;
 }
 
-void GetFileInclusionInfo (struct LineInfo* LI)
+void GetFileInclusionInfo(struct LineInfo *LI)
 // Get info about source file inclusion for LineInfo struct
 {
-    unsigned        FileCount = CollCount (&AFiles);
+   unsigned FileCount = CollCount(&AFiles);
 
-    CHECK (FileCount > 0);
+   CHECK(FileCount > 0);
 
-    // Get the correct index
-    --FileCount;
+   // Get the correct index
+   --FileCount;
 
-    if (LI->IncFiles != 0) {
-        FreeFileInclusionInfo (LI);
-    }
-    LI->IncFiles = 0;
+   if (LI->IncFiles != 0) {
+      FreeFileInclusionInfo(LI);
+   }
+   LI->IncFiles = 0;
 
-    if (LI->File != 0) {
-        xfree (LI->File);
-    }
+   if (LI->File != 0) {
+      xfree(LI->File);
+   }
 
-    // Copy info from the AFile
-    LI->File = NewLineInfoFile (CollAtUnchecked (&AFiles, FileCount));
+   // Copy info from the AFile
+   LI->File = NewLineInfoFile(CollAtUnchecked(&AFiles, FileCount));
 
-    // Remember the actual line number
-    LI->ActualLineNum = ((AFile*)CollAtUnchecked (&AFiles, FileCount))->LineNum;
+   // Remember the actual line number
+   LI->ActualLineNum = ((AFile *)CollAtUnchecked(&AFiles, FileCount))->LineNum;
 
-    if (FileCount > 0) {
-        // The file is included from another
+   if (FileCount > 0) {
+      // The file is included from another
 
-        // Always use a new collection
-        LI->IncFiles = NewCollection ();
+      // Always use a new collection
+      LI->IncFiles = NewCollection();
 
-        while (FileCount-- > 0) {
-            // Copy info from the AFile
-            LineInfoFile* LIF = NewLineInfoFile (CollAtUnchecked (&AFiles, FileCount));
+      while (FileCount-- > 0) {
+         // Copy info from the AFile
+         LineInfoFile *LIF =
+             NewLineInfoFile(CollAtUnchecked(&AFiles, FileCount));
 
-            // Add this file
-            CollAppend (LI->IncFiles, LIF);
-        }
-    }
+         // Add this file
+         CollAppend(LI->IncFiles, LIF);
+      }
+   }
 }
 
-void FreeFileInclusionInfo (struct LineInfo* LI)
+void FreeFileInclusionInfo(struct LineInfo *LI)
 // Free info about source file inclusion for LineInfo struct
 {
-    if (LI->File != 0) {
-        xfree (LI->File);
-        LI->File = 0;
-    }
+   if (LI->File != 0) {
+      xfree(LI->File);
+      LI->File = 0;
+   }
 
-    if (LI->IncFiles != 0) {
-        unsigned I;
-        for (I = 0; I < CollCount (LI->IncFiles); ++I) {
-            CollAtUnchecked (LI->IncFiles, I);
-        }
-        FreeCollection (LI->IncFiles);
-        LI->IncFiles = 0;
-    }
+   if (LI->IncFiles != 0) {
+      unsigned I;
+      for (I = 0; I < CollCount(LI->IncFiles); ++I) {
+         CollAtUnchecked(LI->IncFiles, I);
+      }
+      FreeCollection(LI->IncFiles);
+      LI->IncFiles = 0;
+   }
 }
 
-static int IsDifferentLineInfoFile (const LineInfoFile* Lhs, const LineInfoFile* Rhs)
+static int IsDifferentLineInfoFile(const LineInfoFile *Lhs,
+                                   const LineInfoFile *Rhs)
 // Return true if the two files are different
 {
-    // If the input files are the same but their presumed names are different,
-    // we still consider the files same.
-    return Lhs->InputFile != Rhs->InputFile || Lhs->LineNum != Rhs->LineNum;
+   // If the input files are the same but their presumed names are different,
+   // we still consider the files same.
+   return Lhs->InputFile != Rhs->InputFile || Lhs->LineNum != Rhs->LineNum;
 }
 
-int HasFileInclusionChanged (const struct LineInfo* LI)
+int HasFileInclusionChanged(const struct LineInfo *LI)
 // Return true if file inclusion has changed from last time
 {
-    if (LI->File != 0) {
-        LineInfo* PrevLI = GetPrevCheckedLI ();
+   if (LI->File != 0) {
+      LineInfo *PrevLI = GetPrevCheckedLI();
 
-        if (LI == PrevLI) {
-            return 0;
-        }
+      if (LI == PrevLI) {
+         return 0;
+      }
 
-        if (PrevLI == 0) {
+      if (PrevLI == 0) {
+         return 1;
+      }
+
+      if (LI->IncFiles != 0) {
+         unsigned I;
+
+         if (PrevLI->IncFiles == 0 ||
+             CollCount(LI->IncFiles) != CollCount(PrevLI->IncFiles)) {
             return 1;
-        }
+         }
 
-        if (LI->IncFiles != 0) {
-            unsigned I;
-
-            if (PrevLI->IncFiles == 0 ||
-                CollCount (LI->IncFiles) != CollCount (PrevLI->IncFiles)) {
-                return 1;
+         for (I = 0; I < CollCount(LI->IncFiles); ++I) {
+            // If this refers to a different file, then the inclusion has
+            // changed
+            if (IsDifferentLineInfoFile(CollAtUnchecked(LI->IncFiles, I),
+                                        CollAtUnchecked(PrevLI->IncFiles, I))) {
+               return 1;
             }
+         }
+      }
+   }
 
-            for (I = 0; I < CollCount (LI->IncFiles); ++I) {
-                // If this refers to a different file, then the inclusion has changed
-                if (IsDifferentLineInfoFile (CollAtUnchecked (LI->IncFiles, I),
-                                             CollAtUnchecked (PrevLI->IncFiles, I))) {
-                    return 1;
-                }
-            }
-        }
-    }
-
-    // Unchanged
-    return 0;
+   // Unchanged
+   return 0;
 }
 
-const char* GetInputFileName (const struct IFile* IF)
+const char *GetInputFileName(const struct IFile *IF)
 // Return the name of the file from an IFile struct
 {
-    return IF->Name;
+   return IF->Name;
 }
 
-const char* GetCurrentFileName (void)
+const char *GetCurrentFileName(void)
 // Return the name of the current input file
 {
-    unsigned AFileCount = CollCount (&AFiles);
-    if (AFileCount > 0) {
-        const AFile* AF = CollLast (&AFiles);
-        return AF->PName == 0 ? AF->Input->Name : AF->PName;
-    } else {
-        // No open file
-        return "(outside file scope)";
-    }
+   unsigned AFileCount = CollCount(&AFiles);
+   if (AFileCount > 0) {
+      const AFile *AF = CollLast(&AFiles);
+      return AF->PName == 0 ? AF->Input->Name : AF->PName;
+   }
+   else {
+      // No open file
+      return "(outside file scope)";
+   }
 }
 
-unsigned GetCurrentLineNum (void)
+unsigned GetCurrentLineNum(void)
 // Return the line number in the current input file
 {
-    unsigned AFileCount = CollCount (&AFiles);
-    if (AFileCount > 0) {
-        const AFile* AF = CollLast (&AFiles);
-        return AF->LineNum + AF->LineOffs;
-    } else {
-        // No open file
-        return 0;
-    }
+   unsigned AFileCount = CollCount(&AFiles);
+   if (AFileCount > 0) {
+      const AFile *AF = CollLast(&AFiles);
+      return AF->LineNum + AF->LineOffs;
+   }
+   else {
+      // No open file
+      return 0;
+   }
 }
 
-void SetCurrentLineNum (unsigned LineNum)
+void SetCurrentLineNum(unsigned LineNum)
 // Set the presumed line number in the current input file
 {
-    unsigned AFileCount = CollCount (&AFiles);
-    if (AFileCount > 0) {
-        AFile* AF = CollLast (&AFiles);
-        AF->LineOffs = LineNum - AF->LineNum;
-    }
+   unsigned AFileCount = CollCount(&AFiles);
+   if (AFileCount > 0) {
+      AFile *AF = CollLast(&AFiles);
+      AF->LineOffs = LineNum - AF->LineNum;
+   }
 }
 
-void SetCurrentFileName (const char* Name)
+void SetCurrentFileName(const char *Name)
 // Set the presumed name of the current input file
 {
-    unsigned AFileCount = CollCount (&AFiles);
-    if (AFileCount > 0) {
-        size_t Len = strlen (Name);
-        AFile* AF = CollLast (&AFiles);
-        if (AF->PName != 0) {
-            xfree (AF->PName);
-        }
-        AF->PName = xmalloc (Len + 1);
-        memcpy (AF->PName, Name, Len + 1);
-    }
+   unsigned AFileCount = CollCount(&AFiles);
+   if (AFileCount > 0) {
+      size_t Len = strlen(Name);
+      AFile *AF = CollLast(&AFiles);
+      if (AF->PName != 0) {
+         xfree(AF->PName);
+      }
+      AF->PName = xmalloc(Len + 1);
+      memcpy(AF->PName, Name, Len + 1);
+   }
 }
 
-unsigned GetCurrentCounter (void)
+unsigned GetCurrentCounter(void)
 // Return the counter number in the current input file
 {
-    return MainFileCounter++;
+   return MainFileCounter++;
 }
 
-static void WriteEscaped (FILE* F, const char* Name)
+static void WriteEscaped(FILE *F, const char *Name)
 // Write a file name to a dependency file escaping spaces
 {
-    while (*Name) {
-        if (*Name == ' ') {
-            // Escape spaces
-            fputc ('\\', F);
-        }
-        fputc (*Name, F);
-        ++Name;
-    }
+   while (*Name) {
+      if (*Name == ' ') {
+         // Escape spaces
+         fputc('\\', F);
+      }
+      fputc(*Name, F);
+      ++Name;
+   }
 }
 
-static void WriteDep (FILE* F, InputType Types)
+static void WriteDep(FILE *F, InputType Types)
 // Helper function. Writes all file names that match Types to the output
 {
-    unsigned I;
+   unsigned I;
 
-    // Loop over all files
-    unsigned FileCount = CollCount (&IFiles);
-    for (I = 0; I < FileCount; ++I) {
+   // Loop over all files
+   unsigned FileCount = CollCount(&IFiles);
+   for (I = 0; I < FileCount; ++I) {
 
-        // Get the next input file
-        const IFile* IF = (const IFile*) CollAt (&IFiles, I);
+      // Get the next input file
+      const IFile *IF = (const IFile *)CollAt(&IFiles, I);
 
-        // Ignore it if it is not of the correct type
-        if ((IF->Type & Types) == 0) {
-            continue;
-        }
+      // Ignore it if it is not of the correct type
+      if ((IF->Type & Types) == 0) {
+         continue;
+      }
 
-        // If this is not the first file, add a space
-        if (I > 0) {
-            fputc (' ', F);
-        }
+      // If this is not the first file, add a space
+      if (I > 0) {
+         fputc(' ', F);
+      }
 
-        // Print the dependency escaping spaces
-        WriteEscaped (F, IF->Name);
-    }
+      // Print the dependency escaping spaces
+      WriteEscaped(F, IF->Name);
+   }
 }
 
-static void CreateDepFile (const char* Name, InputType Types)
+static void CreateDepFile(const char *Name, InputType Types)
 // Create a dependency file with the given name and place dependencies for
 // all files with the given types there.
 {
-    // Open the file
-    FILE* F = fopen (Name, "w");
-    if (F == 0) {
-        Fatal ("Cannot open dependency file '%s': %s", Name, strerror (errno));
-    }
+   // Open the file
+   FILE *F = fopen(Name, "w");
+   if (F == 0) {
+      Fatal("Cannot open dependency file '%s': %s", Name, strerror(errno));
+   }
 
-    // If a dependency target was given, use it, otherwise use the output
-    // file name as target, followed by a tab character.
-    if (SB_IsEmpty (&DepTarget)) {
-        WriteEscaped (F, OutputFilename);
-    } else {
-        WriteEscaped (F, SB_GetConstBuf (&DepTarget));
-    }
-    fputs (":\t", F);
+   // If a dependency target was given, use it, otherwise use the output
+   // file name as target, followed by a tab character.
+   if (SB_IsEmpty(&DepTarget)) {
+      WriteEscaped(F, OutputFilename);
+   }
+   else {
+      WriteEscaped(F, SB_GetConstBuf(&DepTarget));
+   }
+   fputs(":\t", F);
 
-    // Write out the dependencies for the output file
-    WriteDep (F, Types);
-    fputs ("\n\n", F);
+   // Write out the dependencies for the output file
+   WriteDep(F, Types);
+   fputs("\n\n", F);
 
-    // Write out a phony dependency for the included files
-    WriteDep (F, Types);
-    fputs (":\n\n", F);
+   // Write out a phony dependency for the included files
+   WriteDep(F, Types);
+   fputs(":\n\n", F);
 
-    // Close the file, check for errors
-    if (fclose (F) != 0) {
-        remove (Name);
-        Fatal ("Cannot write to dependeny file (disk full?)");
-    }
+   // Close the file, check for errors
+   if (fclose(F) != 0) {
+      remove(Name);
+      Fatal("Cannot write to dependeny file (disk full?)");
+   }
 }
 
-void CreateDependencies (void)
+void CreateDependencies(void)
 // Create dependency files requested by the user
 {
-    if (SB_NotEmpty (&DepName)) {
-        CreateDepFile (SB_GetConstBuf (&DepName),
-                       IT_MAIN | IT_USRINC);
-    }
-    if (SB_NotEmpty (&FullDepName)) {
-        CreateDepFile (SB_GetConstBuf (&FullDepName),
-                       IT_MAIN | IT_SYSINC | IT_USRINC);
-    }
+   if (SB_NotEmpty(&DepName)) {
+      CreateDepFile(SB_GetConstBuf(&DepName), IT_MAIN | IT_USRINC);
+   }
+   if (SB_NotEmpty(&FullDepName)) {
+      CreateDepFile(SB_GetConstBuf(&FullDepName),
+                    IT_MAIN | IT_SYSINC | IT_USRINC);
+   }
 }

@@ -41,28 +41,28 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-FuncDesc* NewFuncDesc (void)
+FuncDesc *NewFuncDesc(void)
 // Create a new symbol table with the given name
 {
-    // Create a new function descriptor
-    FuncDesc* F = (FuncDesc*) xmalloc (sizeof (FuncDesc));
+   // Create a new function descriptor
+   FuncDesc *F = (FuncDesc *)xmalloc(sizeof(FuncDesc));
 
-    // Nullify the fields
-    F->Flags           = 0;
-    F->SymTab          = 0;
-    F->TagTab          = 0;
-    F->ParamCount      = 0;
-    F->ParamSize       = 0;
-    F->LastParam       = 0;
-    F->FuncDef         = 0;
+   // Nullify the fields
+   F->Flags = 0;
+   F->SymTab = 0;
+   F->TagTab = 0;
+   F->ParamCount = 0;
+   F->ParamSize = 0;
+   F->LastParam = 0;
+   F->FuncDef = 0;
 
-    // Return the new struct
-    return F;
+   // Return the new struct
+   return F;
 }
 
-void FreeFuncDesc (FuncDesc* F)
+void FreeFuncDesc(FuncDesc *F)
 // Free a function descriptor
 {
-    // Free the structure
-    xfree (F);
+   // Free the structure
+   xfree(F);
 }

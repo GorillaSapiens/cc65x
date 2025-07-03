@@ -45,7 +45,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void WriteCFile (const StrBuf* Data, const Collection* A, const Bitmap* B);
+void WriteCFile(const StrBuf *Data, const Collection *A, const Bitmap *B);
 // Write the contents of Data to a file in C format
 
 // End of c.h

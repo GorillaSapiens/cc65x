@@ -41,30 +41,28 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Current language standard, will be set to STD_DEFAULT on startup
-IntStack Standard           = INTSTACK(STD_UNKNOWN);
+IntStack Standard = INTSTACK(STD_UNKNOWN);
 
 // Table mapping names to standards, sorted by standard.
-static const char* const StdNames[STD_COUNT] = {
-    "c89", "c99", "cc65"
-};
+static const char *const StdNames[STD_COUNT] = {"c89", "c99", "cc65"};
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-standard_t FindStandard (const char* Name)
+standard_t FindStandard(const char *Name)
 // Find a standard by name. Returns one of the constants defined above.
 // STD_UNKNOWN is returned if Name doesn't match a standard.
 {
-    unsigned I;
+   unsigned I;
 
-    // Check for a standard string
-    for (I = 0; I < STD_COUNT; ++I) {
-        if (strcmp (StdNames [I], Name) == 0) {
-            return (standard_t)I;
-        }
-    }
+   // Check for a standard string
+   for (I = 0; I < STD_COUNT; ++I) {
+      if (strcmp(StdNames[I], Name) == 0) {
+         return (standard_t)I;
+      }
+   }
 
-    // Not found
-    return STD_UNKNOWN;
+   // Not found
+   return STD_UNKNOWN;
 }

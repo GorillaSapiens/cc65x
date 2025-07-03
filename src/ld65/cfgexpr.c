@@ -48,181 +48,192 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-static ExprNode* Factor (void)
+static ExprNode *Factor(void)
 // Read and return a factor
 {
-    ExprNode* N = 0;            // Initialize to avoid compiler warnings
-    Export*   E;
-    unsigned  Name;
+   ExprNode *N = 0; // Initialize to avoid compiler warnings
+   Export *E;
+   unsigned Name;
 
-    switch (CfgTok) {
+   switch (CfgTok) {
 
-        case CFGTOK_IDENT:
-            // Get the name as an id
-            Name = GetStrBufId (&CfgSVal);
+      case CFGTOK_IDENT:
+         // Get the name as an id
+         Name = GetStrBufId(&CfgSVal);
 
-            // Check if we know the symbol already
-            E = FindExport (Name);
-            if (E != 0 && IsConstExport (E)) {
-                N = LiteralExpr (GetExportVal (E), 0);
-            } else {
-                N = NewExprNode (0, EXPR_SYMBOL);
-                N->V.Imp = InsertImport (GenImport (Name, ADDR_SIZE_ABS));
-                CollAppend (&N->V.Imp->RefLines, GenLineInfo (&CfgErrorPos));
-            }
+         // Check if we know the symbol already
+         E = FindExport(Name);
+         if (E != 0 && IsConstExport(E)) {
+            N = LiteralExpr(GetExportVal(E), 0);
+         }
+         else {
+            N = NewExprNode(0, EXPR_SYMBOL);
+            N->V.Imp = InsertImport(GenImport(Name, ADDR_SIZE_ABS));
+            CollAppend(&N->V.Imp->RefLines, GenLineInfo(&CfgErrorPos));
+         }
 
-            // Skip the symbol name
-            CfgNextTok ();
-            break;
+         // Skip the symbol name
+         CfgNextTok();
+         break;
 
-        case CFGTOK_INTCON:
-            // An integer constant
-            N = LiteralExpr (CfgIVal, 0);
-            CfgNextTok ();
-            break;
+      case CFGTOK_INTCON:
+         // An integer constant
+         N = LiteralExpr(CfgIVal, 0);
+         CfgNextTok();
+         break;
 
-        case CFGTOK_PLUS:
-            // Unary plus
-            CfgNextTok ();
-            N = Factor ();
-            break;
+      case CFGTOK_PLUS:
+         // Unary plus
+         CfgNextTok();
+         N = Factor();
+         break;
 
-        case CFGTOK_MINUS:
-            // Unary minus
-            CfgNextTok ();
-            N = NewExprNode (0, EXPR_UNARY_MINUS);
-            N->Left = Factor ();
-            break;
+      case CFGTOK_MINUS:
+         // Unary minus
+         CfgNextTok();
+         N = NewExprNode(0, EXPR_UNARY_MINUS);
+         N->Left = Factor();
+         break;
 
-        case CFGTOK_LPAR:
-            // Left parenthesis
-            CfgNextTok ();
-            N = CfgExpr ();
-            CfgConsume (CFGTOK_RPAR, "')' expected");
-            break;
+      case CFGTOK_LPAR:
+         // Left parenthesis
+         CfgNextTok();
+         N = CfgExpr();
+         CfgConsume(CFGTOK_RPAR, "')' expected");
+         break;
 
-        default:
-            CfgError (&CfgErrorPos, "Invalid expression: %d", CfgTok);
-            break;
-    }
+      default:
+         CfgError(&CfgErrorPos, "Invalid expression: %d", CfgTok);
+         break;
+   }
 
-    // Return the new expression node
-    return N;
+   // Return the new expression node
+   return N;
 }
 
-static ExprNode* Term (void)
+static ExprNode *Term(void)
 // Multiplicative operators: * and /
 {
-    // Read left hand side
-    ExprNode* Root = Factor ();
+   // Read left hand side
+   ExprNode *Root = Factor();
 
-    // Handle multiplicative operators
-    while (CfgTok == CFGTOK_MUL || CfgTok == CFGTOK_DIV) {
+   // Handle multiplicative operators
+   while (CfgTok == CFGTOK_MUL || CfgTok == CFGTOK_DIV) {
 
-        ExprNode* Left;
-        ExprNode* Right;
-        unsigned char Op;
+      ExprNode *Left;
+      ExprNode *Right;
+      unsigned char Op;
 
-        // Remember the token, then skip it
-        cfgtok_t Tok = CfgTok;
-        CfgNextTok ();
+      // Remember the token, then skip it
+      cfgtok_t Tok = CfgTok;
+      CfgNextTok();
 
-        // Move root to left side, then read right side
-        Left = Root;
-        Right = Factor ();
+      // Move root to left side, then read right side
+      Left = Root;
+      Right = Factor();
 
-        // Handle the operation
-        switch (Tok) {
-            case CFGTOK_MUL:    Op = EXPR_MUL;  break;
-            case CFGTOK_DIV:    Op = EXPR_DIV;  break;
-            default:            Internal ("Unhandled token in Term: %d", Tok);
-        }
-        Root = NewExprNode (0, Op);
-        Root->Left = Left;
-        Root->Right = Right;
-    }
+      // Handle the operation
+      switch (Tok) {
+         case CFGTOK_MUL:
+            Op = EXPR_MUL;
+            break;
+         case CFGTOK_DIV:
+            Op = EXPR_DIV;
+            break;
+         default:
+            Internal("Unhandled token in Term: %d", Tok);
+      }
+      Root = NewExprNode(0, Op);
+      Root->Left = Left;
+      Root->Right = Right;
+   }
 
-    // Return the expression tree we've created
-    return Root;
+   // Return the expression tree we've created
+   return Root;
 }
 
-static ExprNode* SimpleExpr (void)
+static ExprNode *SimpleExpr(void)
 // Additive operators: + and -
 {
-    // Read left hand side
-    ExprNode* Root = Term ();
+   // Read left hand side
+   ExprNode *Root = Term();
 
-    // Handle additive operators
-    while (CfgTok == CFGTOK_PLUS || CfgTok == CFGTOK_MINUS) {
+   // Handle additive operators
+   while (CfgTok == CFGTOK_PLUS || CfgTok == CFGTOK_MINUS) {
 
-        ExprNode* Left;
-        ExprNode* Right;
-        unsigned char Op;
+      ExprNode *Left;
+      ExprNode *Right;
+      unsigned char Op;
 
-        // Remember the token, then skip it
-        cfgtok_t Tok = CfgTok;
-        CfgNextTok ();
+      // Remember the token, then skip it
+      cfgtok_t Tok = CfgTok;
+      CfgNextTok();
 
-        // Move root to left side, then read right side
-        Left = Root;
-        Right = Term ();
+      // Move root to left side, then read right side
+      Left = Root;
+      Right = Term();
 
-        // Handle the operation
-        switch (Tok) {
-            case CFGTOK_PLUS:   Op = EXPR_PLUS;         break;
-            case CFGTOK_MINUS:  Op = EXPR_MINUS;        break;
-            default:            Internal ("Unhandled token in SimpleExpr: %d", Tok);
-        }
-        Root = NewExprNode (0, Op);
-        Root->Left = Left;
-        Root->Right = Right;
-    }
+      // Handle the operation
+      switch (Tok) {
+         case CFGTOK_PLUS:
+            Op = EXPR_PLUS;
+            break;
+         case CFGTOK_MINUS:
+            Op = EXPR_MINUS;
+            break;
+         default:
+            Internal("Unhandled token in SimpleExpr: %d", Tok);
+      }
+      Root = NewExprNode(0, Op);
+      Root->Left = Left;
+      Root->Right = Right;
+   }
 
-    // Return the expression tree we've created
-    return Root;
+   // Return the expression tree we've created
+   return Root;
 }
 
-ExprNode* CfgExpr (void)
+ExprNode *CfgExpr(void)
 // Full expression
 {
-    return SimpleExpr ();
+   return SimpleExpr();
 }
 
-long CfgConstExpr (void)
+long CfgConstExpr(void)
 // Read an integer expression, make sure its constant and return its value
 {
-    long Val;
+   long Val;
 
-    // Parse the expression
-    ExprNode* Expr = CfgExpr ();
+   // Parse the expression
+   ExprNode *Expr = CfgExpr();
 
-    // Check that it's const
-    if (!IsConstExpr (Expr)) {
-        CfgError (&CfgErrorPos, "Constant expression expected");
-    }
+   // Check that it's const
+   if (!IsConstExpr(Expr)) {
+      CfgError(&CfgErrorPos, "Constant expression expected");
+   }
 
-    // Get the value
-    Val = GetExprVal (Expr);
+   // Get the value
+   Val = GetExprVal(Expr);
 
-    // Cleanup E
-    FreeExpr (Expr);
+   // Cleanup E
+   FreeExpr(Expr);
 
-    // Return the value
-    return Val;
+   // Return the value
+   return Val;
 }
 
-long CfgCheckedConstExpr (long Min, long Max)
+long CfgCheckedConstExpr(long Min, long Max)
 // Read an expression, make sure it's an int and in range, then return its
 // value.
 {
-    // Get the value
-    long Val = CfgConstExpr ();
+   // Get the value
+   long Val = CfgConstExpr();
 
-    // Check the range
-    if (Val < Min || Val > Max) {
-        CfgError (&CfgErrorPos, "Range error");
-    }
+   // Check the range
+   if (Val < Min || Val > Max) {
+      CfgError(&CfgErrorPos, "Range error");
+   }
 
-    // Return the value
-    return Val;
+   // Return the value
+   return Val;
 }

@@ -39,28 +39,28 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Size of scope available?
-#define SCOPE_SIZELESS          0x00U   // No scope size available
-#define SCOPE_SIZE              0x01U   // Scope has a size
-#define SCOPE_MASK_SIZE         0x01U   // Size mask
+#define SCOPE_SIZELESS 0x00U  // No scope size available
+#define SCOPE_SIZE 0x01U      // Scope has a size
+#define SCOPE_MASK_SIZE 0x01U // Size mask
 
-#define SCOPE_HAS_SIZE(x)       (((x) & SCOPE_MASK_SIZE) == SCOPE_SIZE)
+#define SCOPE_HAS_SIZE(x) (((x) & SCOPE_MASK_SIZE) == SCOPE_SIZE)
 
 // Does the scope has a label?
-#define SCOPE_UNLABELED         0x00U   // Scope has no label
-#define SCOPE_LABELED           0x02U   // Scope has a label
-#define SCOPE_MASK_LABEL        0x02U   // Label size
+#define SCOPE_UNLABELED 0x00U  // Scope has no label
+#define SCOPE_LABELED 0x02U    // Scope has a label
+#define SCOPE_MASK_LABEL 0x02U // Label size
 
-#define SCOPE_HAS_LABEL(x)      (((x) & SCOPE_MASK_LABEL) == SCOPE_LABELED)
+#define SCOPE_HAS_LABEL(x) (((x) & SCOPE_MASK_LABEL) == SCOPE_LABELED)
 
 // Scope types
 enum {
-    SCOPE_GLOBAL,                       // Global level
-    SCOPE_FILE,                         // File level
-    SCOPE_SCOPE,                        // .SCOPE/.PROC
-    SCOPE_HAS_DATA = SCOPE_SCOPE,       // Last scope that contains data
-    SCOPE_STRUCT,                       // .STRUCT/.UNION
-    SCOPE_ENUM,                         // .ENUM
-    SCOPE_UNDEF    = 0xFF
+   SCOPE_GLOBAL,                 // Global level
+   SCOPE_FILE,                   // File level
+   SCOPE_SCOPE,                  // .SCOPE/.PROC
+   SCOPE_HAS_DATA = SCOPE_SCOPE, // Last scope that contains data
+   SCOPE_STRUCT,                 // .STRUCT/.UNION
+   SCOPE_ENUM,                   // .ENUM
+   SCOPE_UNDEF = 0xFF
 };
 
 // End of scopedefs.h

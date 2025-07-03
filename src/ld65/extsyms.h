@@ -48,33 +48,33 @@ typedef struct ExtSymTab ExtSymTab;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-ExtSym* NewExtSym (ExtSymTab* Tab, unsigned Name);
+ExtSym *NewExtSym(ExtSymTab *Tab, unsigned Name);
 // Create a new external symbol and insert it into the list
 
-ExtSymTab* NewExtSymTab (void);
+ExtSymTab *NewExtSymTab(void);
 // Create a new external symbol table
 
-void FreeExtSymTab (ExtSymTab* Tab);
+void FreeExtSymTab(ExtSymTab *Tab);
 // Free an external symbol structure
 
-ExtSym* GetExtSym (const ExtSymTab* Tab, unsigned Name);
+ExtSym *GetExtSym(const ExtSymTab *Tab, unsigned Name);
 // Return the entry for the external symbol with the given name. Return NULL
 // if there is no such symbol.
 
-unsigned ExtSymCount (const ExtSymTab* Tab);
+unsigned ExtSymCount(const ExtSymTab *Tab);
 // Return the number of symbols in the table
 
-const ExtSym* ExtSymList (const ExtSymTab* Tab);
+const ExtSym *ExtSymList(const ExtSymTab *Tab);
 // Return the start of the symbol list sorted by symbol number. Call
 // ExtSymNext for the next symbol.
 
-unsigned ExtSymNum (const ExtSym* E);
+unsigned ExtSymNum(const ExtSym *E);
 // Return the number of an external symbol
 
-unsigned ExtSymName (const ExtSym* E);
+unsigned ExtSymName(const ExtSym *E);
 // Return the symbol name index
 
-const ExtSym* ExtSymNext (const ExtSym* E);
+const ExtSym *ExtSymNext(const ExtSym *E);
 // Return the next symbol in the list
 
 // End of extsyms.h

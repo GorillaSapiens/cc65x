@@ -38,36 +38,36 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-SearchPaths*    SysIncSearchPath;       // System include path
-SearchPaths*    UsrIncSearchPath;       // User include path
+SearchPaths *SysIncSearchPath; // System include path
+SearchPaths *UsrIncSearchPath; // User include path
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void InitIncludePaths (void)
+void InitIncludePaths(void)
 // Initialize the include path search list
 {
-    // Create the search path lists
-    SysIncSearchPath = NewSearchPath ();
-    UsrIncSearchPath = NewSearchPath ();
+   // Create the search path lists
+   SysIncSearchPath = NewSearchPath();
+   UsrIncSearchPath = NewSearchPath();
 }
 
-void FinishIncludePaths (void)
+void FinishIncludePaths(void)
 // Finish creating the include path search lists.
 {
-    // Add specific paths from the environment
-    AddSearchPathFromEnv (SysIncSearchPath, "CC65_INC");
-    AddSearchPathFromEnv (UsrIncSearchPath, "CC65_INC");
+   // Add specific paths from the environment
+   AddSearchPathFromEnv(SysIncSearchPath, "CC65_INC");
+   AddSearchPathFromEnv(UsrIncSearchPath, "CC65_INC");
 
-    // Add paths relative to a main directory defined in an env. var.
-    AddSubSearchPathFromEnv (SysIncSearchPath, "CC65_HOME", "include");
+   // Add paths relative to a main directory defined in an env. var.
+   AddSubSearchPathFromEnv(SysIncSearchPath, "CC65_HOME", "include");
 
-    // Add some compiled-in search paths if defined at compile time.
+   // Add some compiled-in search paths if defined at compile time.
 #if defined(CC65_INC) && !defined(_WIN32) && !defined(_AMIGA)
-    AddSearchPath (SysIncSearchPath, CC65_INC);
+   AddSearchPath(SysIncSearchPath, CC65_INC);
 #endif
 
-    // Add paths relative to the parent directory of the Windows binary.
-    AddSubSearchPathFromBin (SysIncSearchPath, "include");
+   // Add paths relative to the parent directory of the Windows binary.
+   AddSubSearchPathFromBin(SysIncSearchPath, "include");
 }

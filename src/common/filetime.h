@@ -46,7 +46,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-int SetFileTimes (const char* Path, time_t T);
+int SetFileTimes(const char *Path, time_t T);
 // Set the time of last modification and the time of last access of a file to
 // the given time T. This calls utime() for system where it works, and applies
 // workarounds for all others (which in fact means "WINDOWS").

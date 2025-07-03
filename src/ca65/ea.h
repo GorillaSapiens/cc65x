@@ -39,21 +39,21 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // EffAddr Flags
-#define EFFADDR_OVERRIDE_ZP     0x00000001UL
+#define EFFADDR_OVERRIDE_ZP 0x00000001UL
 
 // GetEA result struct
 typedef struct EffAddr EffAddr;
 struct EffAddr {
-    // First three fields get filled when calling GetEA
-    unsigned long       AddrModeSet;    // Possible addressing modes
-    struct ExprNode*    Expr;           // Expression if any (NULL otherwise)
-    unsigned            Reg;            // Register number in sweet16 mode
-    unsigned long       Flags;          // Other properties
+   // First three fields get filled when calling GetEA
+   unsigned long AddrModeSet; // Possible addressing modes
+   struct ExprNode *Expr;     // Expression if any (NULL otherwise)
+   unsigned Reg;              // Register number in sweet16 mode
+   unsigned long Flags;       // Other properties
 
-    // The following fields are used inside instr.c
-    unsigned            AddrMode;       // Actual addressing mode used
-    unsigned long       AddrModeBit;    // Addressing mode as bit mask
-    unsigned char       Opcode;         // Opcode
+   // The following fields are used inside instr.c
+   unsigned AddrMode;         // Actual addressing mode used
+   unsigned long AddrModeBit; // Addressing mode as bit mask
+   unsigned char Opcode;      // Opcode
 };
 
 // End of ea.h

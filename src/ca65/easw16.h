@@ -44,10 +44,9 @@ struct EffAddr;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void GetSweet16EA (EffAddr* A);
+void GetSweet16EA(EffAddr *A);
 // Parse an effective address, return the result in A
 
 // End of easw16.h
 
 #endif
-

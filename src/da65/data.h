@@ -38,25 +38,25 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-uint32_t ByteTable (void);
+uint32_t ByteTable(void);
 // Output a table of bytes
 
-uint32_t DByteTable (void);
+uint32_t DByteTable(void);
 // Output a table of dbytes
 
-uint32_t WordTable (void);
+uint32_t WordTable(void);
 // Output a table of words
 
-uint32_t DWordTable (void);
+uint32_t DWordTable(void);
 // Output a table of double words
 
-uint32_t AddrTable (void);
+uint32_t AddrTable(void);
 // Output a table of addresses
 
-uint32_t RtsTable (void);
+uint32_t RtsTable(void);
 // Output a table of RTS addresses (address - 1)
 
-uint32_t TextTable (void);
+uint32_t TextTable(void);
 // Output a table of text messages
 
 // End of data.h

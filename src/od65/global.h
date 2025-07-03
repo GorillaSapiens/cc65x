@@ -38,19 +38,19 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-#define D_HEADER        0x0001U         // Dump the header
-#define D_OPTIONS       0x0002U         // Dump the options
-#define D_FILES         0x0004U         // Dump source file info
-#define D_SEGMENTS      0x0008U         // Dump segment info
-#define D_IMPORTS       0x0010U         // Dump imported symbols
-#define D_EXPORTS       0x0020U         // Dump exported symbols
-#define D_DBGSYMS       0x0040U         // Dump debug symbols
-#define D_LINEINFO      0x0080U         // Dump line infos
-#define D_SCOPES        0x0100U         // Dump scopes
-#define D_SEGSIZE       0x0200U         // Dump segment sizes
-#define D_ALL           0xFFFFU         // Dump anything
+#define D_HEADER 0x0001U   // Dump the header
+#define D_OPTIONS 0x0002U  // Dump the options
+#define D_FILES 0x0004U    // Dump source file info
+#define D_SEGMENTS 0x0008U // Dump segment info
+#define D_IMPORTS 0x0010U  // Dump imported symbols
+#define D_EXPORTS 0x0020U  // Dump exported symbols
+#define D_DBGSYMS 0x0040U  // Dump debug symbols
+#define D_LINEINFO 0x0080U // Dump line infos
+#define D_SCOPES 0x0100U   // Dump scopes
+#define D_SEGSIZE 0x0200U  // Dump segment sizes
+#define D_ALL 0xFFFFU      // Dump anything
 
-extern unsigned         What;           // What should get dumped?
+extern unsigned What; // What should get dumped?
 
 // End of global.h
 

@@ -40,20 +40,20 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-#define PARAVIRT_BASE        0xFFF1
+#define PARAVIRT_BASE 0xFFF1
 // Lowest address used by a paravirtualization hook
 
-#define PV_PATH_SIZE         1024
+#define PV_PATH_SIZE 1024
 // Maximum path size supported by PVOpen/PVSysRemove
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void ParaVirtInit (unsigned aArgStart, unsigned char aSPAddr);
+void ParaVirtInit(unsigned aArgStart, unsigned char aSPAddr);
 // Initialize the paravirtualization subsystem
 
-void ParaVirtHooks (CPURegs* Regs);
+void ParaVirtHooks(CPURegs *Regs);
 // Potentially execute paravirtualization hooks
 
 // End of paravirt.h

@@ -48,58 +48,58 @@ struct StrBuf;
 ////////////////////////////////////////////////////////////////////////////////
 
 // Length of the header of a listing line
-#define LINE_HEADER_LEN         24
+#define LINE_HEADER_LEN 24
 
 // One listing line as it is stored in memory
 typedef struct ListLine ListLine;
 struct ListLine {
-    ListLine*           Next;           // Pointer to next line
-    Fragment*           FragList;       // List of fragments for this line
-    Fragment*           FragLast;       // Last entry in fragment list
-    unsigned long       PC;             // Program counter for this line
-    unsigned char       Reloc;          // Relocatable mode?
-    unsigned char       File;           // From which file is the line?
-    unsigned char       Depth;          // Include depth
-    unsigned char       Output;         // Should we output this line?
-    unsigned char       ListBytes;      // How many bytes at max?
-    char                Line[1];        // Line with dynamic length
+   ListLine *Next;          // Pointer to next line
+   Fragment *FragList;      // List of fragments for this line
+   Fragment *FragLast;      // Last entry in fragment list
+   unsigned long PC;        // Program counter for this line
+   unsigned char Reloc;     // Relocatable mode?
+   unsigned char File;      // From which file is the line?
+   unsigned char Depth;     // Include depth
+   unsigned char Output;    // Should we output this line?
+   unsigned char ListBytes; // How many bytes at max?
+   char Line[1];            // Line with dynamic length
 };
 
 // Single linked list of lines
-extern ListLine*        LineList;       // List of listing lines
-extern ListLine*        LineCur;        // Current listing line
-extern ListLine*        LineLast;       // Last listing line
+extern ListLine *LineList; // List of listing lines
+extern ListLine *LineCur;  // Current listing line
+extern ListLine *LineLast; // Last listing line
 
 // Page formatting
-#define MIN_PAGE_LEN    32
-#define MAX_PAGE_LEN    127
-extern int              PageLength;     // Length of a listing page
+#define MIN_PAGE_LEN 32
+#define MAX_PAGE_LEN 127
+extern int PageLength; // Length of a listing page
 
 // Byte for one listing line
-#define MIN_LIST_BYTES  4
-#define MAX_LIST_BYTES  255
+#define MIN_LIST_BYTES 4
+#define MAX_LIST_BYTES 255
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void NewListingLine (const struct StrBuf* Line, unsigned char File,
-                     unsigned char Depth);
+void NewListingLine(const struct StrBuf *Line, unsigned char File,
+                    unsigned char Depth);
 // Create a new ListLine struct
 
-void EnableListing (void);
+void EnableListing(void);
 // Enable output of lines to the listing
 
-void DisableListing (void);
+void DisableListing(void);
 // Disable output of lines to the listing
 
-void SetListBytes (int Bytes);
+void SetListBytes(int Bytes);
 // Set the maximum number of bytes listed for one line
 
-void InitListingLine (void);
+void InitListingLine(void);
 // Initialize the current listing line
 
-void CreateListing (void);
+void CreateListing(void);
 // Create the listing
 
 // End of listing.h

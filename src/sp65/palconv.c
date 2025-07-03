@@ -48,50 +48,46 @@
 // Type of the entry in the palette table
 typedef struct PaletteMapEntry PaletteMapEntry;
 struct PaletteMapEntry {
-    const char*         Format;
-    StrBuf*             (*PaletteFunc) (const Bitmap*, const Collection*);
+   const char *Format;
+   StrBuf *(*PaletteFunc)(const Bitmap *, const Collection *);
 };
 
 // Converter table
 // CAUTION: table must be alphabetically sorted for bsearch
 static const PaletteMapEntry PaletteMap[] = {
-// BEGIN SORTED.SH
-    {   "lynx-palette",         GenLynxPalette  },
-// END SORTED.SH
+    // BEGIN SORTED.SH
+    {"lynx-palette", GenLynxPalette},
+    // END SORTED.SH
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-static int Compare (const void* Key, const void* MapEntry)
+static int Compare(const void *Key, const void *MapEntry)
 // Compare function for bsearch
 {
-    return strcmp (Key, ((const PaletteMapEntry*) MapEntry)->Format);
+   return strcmp(Key, ((const PaletteMapEntry *)MapEntry)->Format);
 }
 
-StrBuf* PaletteTo (const Bitmap* B, const Collection* A)
+StrBuf *PaletteTo(const Bitmap *B, const Collection *A)
 // Convert the palette of bitmap B into some sort of other binary format.
 // The output is stored in a string buffer (which is actually a dynamic
 // char array) and returned. The actual output format is taken from the
 // "format" attribute in the attribute collection A.
 {
-    const PaletteMapEntry* E;
+   const PaletteMapEntry *E;
 
-    // Get the format to convert to
-    const char* Format = NeedAttrVal (A, "target", "palette");
+   // Get the format to convert to
+   const char *Format = NeedAttrVal(A, "target", "palette");
 
-    // Search for the matching converter
-    E = bsearch (Format,
-                 PaletteMap,
-                 sizeof (PaletteMap) / sizeof (PaletteMap[0]),
-                 sizeof (PaletteMap[0]),
-                 Compare);
-    if (E == 0) {
-        Error ("No such target format: '%s'", Format);
-    }
+   // Search for the matching converter
+   E = bsearch(Format, PaletteMap, sizeof(PaletteMap) / sizeof(PaletteMap[0]),
+               sizeof(PaletteMap[0]), Compare);
+   if (E == 0) {
+      Error("No such target format: '%s'", Format);
+   }
 
-    // Do the conversion
-    return E->PaletteFunc (B, A);
+   // Do the conversion
+   return E->PaletteFunc(B, A);
 }
-

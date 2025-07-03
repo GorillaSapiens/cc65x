@@ -58,275 +58,279 @@
 
 typedef struct SwitchCtrl SwitchCtrl;
 struct SwitchCtrl {
-    Collection* Nodes;             // CaseNode tree
-    const Type* ExprType;          // Switch controlling expression type
-    unsigned    Depth;             // Number of bytes the selector type has
-    unsigned    DefaultLabel;      // Label for the default branch
-    CodeMark    CaseCodeStart;     // Start of code marker
-    bool        CaseCodeStartFlag; // flag to tell if we've done an override
-
+   Collection *Nodes;      // CaseNode tree
+   const Type *ExprType;   // Switch controlling expression type
+   unsigned Depth;         // Number of bytes the selector type has
+   unsigned DefaultLabel;  // Label for the default branch
+   CodeMark CaseCodeStart; // Start of code marker
+   bool CaseCodeStartFlag; // flag to tell if we've done an override
 };
 
 // Pointer to current switch control struct
-static SwitchCtrl* Switch = 0;
+static SwitchCtrl *Switch = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void SwitchStatement (void)
+void SwitchStatement(void)
 // Handle a switch statement for chars with a cmp cascade for the selector
 {
-    ExprDesc    SwitchExpr;     // Switch statement expression
-    CodeMark    SwitchCodeStart;// Start of switch code
-    CodeMark    SwitchCodeEnd;  // End of switch code
-    CodeMark    OrigCaseCodeStart;  // Unmodified beginning of case code
-    CodeMark    SaveCodeMark;
-    unsigned    ExitLabel;      // Exit label
-    unsigned    SwitchCodeLabel;// Label for the switch code
-    int         HaveBreak = 0;  // True if the last statement had a break
-    int         RCurlyBrace;    // True if last token is right curly brace
-    SwitchCtrl* OldSwitch;      // Pointer to old switch control data
-    SwitchCtrl  SwitchData;     // New switch data
+   ExprDesc SwitchExpr;        // Switch statement expression
+   CodeMark SwitchCodeStart;   // Start of switch code
+   CodeMark SwitchCodeEnd;     // End of switch code
+   CodeMark OrigCaseCodeStart; // Unmodified beginning of case code
+   CodeMark SaveCodeMark;
+   unsigned ExitLabel;       // Exit label
+   unsigned SwitchCodeLabel; // Label for the switch code
+   int HaveBreak = 0;        // True if the last statement had a break
+   int RCurlyBrace;          // True if last token is right curly brace
+   SwitchCtrl *OldSwitch;    // Pointer to old switch control data
+   SwitchCtrl SwitchData;    // New switch data
 
-    // Eat the "switch" token
-    NextToken ();
+   // Eat the "switch" token
+   NextToken();
 
-    // Read the switch expression and load it into the primary. It must have
-    // integer type.
-    ConsumeLParen ();
+   // Read the switch expression and load it into the primary. It must have
+   // integer type.
+   ConsumeLParen();
 
-    ED_Init (&SwitchExpr);
-    Expression0 (&SwitchExpr);
-    if (!IsClassInt (SwitchExpr.Type))  {
-        Error ("Switch quantity is not an integer");
-        // To avoid any compiler errors, make the expression a valid int
-        ED_MakeConstAbsInt (&SwitchExpr, 1);
-    }
-    ConsumeRParen ();
+   ED_Init(&SwitchExpr);
+   Expression0(&SwitchExpr);
+   if (!IsClassInt(SwitchExpr.Type)) {
+      Error("Switch quantity is not an integer");
+      // To avoid any compiler errors, make the expression a valid int
+      ED_MakeConstAbsInt(&SwitchExpr, 1);
+   }
+   ConsumeRParen();
 
-    // Add a jump to the switch code. This jump is usually unnecessary,
-    // because the switch code will moved up just behind the switch
-    // expression. However, in rare cases, there's a label at the end of
-    // the switch expression. This label will not get moved, so the code
-    // jumps around the switch code, and after moving the switch code,
-    // things look really weird. If we add a jump here, we will never have
-    // a label attached to the current code position, and the jump itself
-    // will get removed by the optimizer if it is unnecessary.
-    SwitchCodeLabel = GetLocalLabel ();
-    // save state for switch logic
-    g_switchsave (SizeOf (SwitchExpr.Type));
-    GetCodePos (&SaveCodeMark);
+   // Add a jump to the switch code. This jump is usually unnecessary,
+   // because the switch code will moved up just behind the switch
+   // expression. However, in rare cases, there's a label at the end of
+   // the switch expression. This label will not get moved, so the code
+   // jumps around the switch code, and after moving the switch code,
+   // things look really weird. If we add a jump here, we will never have
+   // a label attached to the current code position, and the jump itself
+   // will get removed by the optimizer if it is unnecessary.
+   SwitchCodeLabel = GetLocalLabel();
+   // save state for switch logic
+   g_switchsave(SizeOf(SwitchExpr.Type));
+   GetCodePos(&SaveCodeMark);
 
-    // Remember the current code position. We will move the switch code
-    // to this position later.  This will get overwritten if we actually
-    // find a "case" or "default" label.
-    GetCodePos (&SwitchData.CaseCodeStart);
-    SwitchData.CaseCodeStartFlag = false;
-    OrigCaseCodeStart = SwitchData.CaseCodeStart;
+   // Remember the current code position. We will move the switch code
+   // to this position later.  This will get overwritten if we actually
+   // find a "case" or "default" label.
+   GetCodePos(&SwitchData.CaseCodeStart);
+   SwitchData.CaseCodeStartFlag = false;
+   OrigCaseCodeStart = SwitchData.CaseCodeStart;
 
-    // Setup the control structure, save the old and activate the new one
-    SwitchData.Nodes        = NewCollection ();
-    SwitchData.ExprType     = SwitchExpr.Type;
-    SwitchData.Depth        = SizeOf (SwitchExpr.Type);
-    SwitchData.DefaultLabel = 0;
-    OldSwitch = Switch;
-    Switch = &SwitchData;
+   // Setup the control structure, save the old and activate the new one
+   SwitchData.Nodes = NewCollection();
+   SwitchData.ExprType = SwitchExpr.Type;
+   SwitchData.Depth = SizeOf(SwitchExpr.Type);
+   SwitchData.DefaultLabel = 0;
+   OldSwitch = Switch;
+   Switch = &SwitchData;
 
-    // Get the exit label for the switch statement
-    ExitLabel = GetLocalLabel ();
+   // Get the exit label for the switch statement
+   ExitLabel = GetLocalLabel();
 
-    // Create a loop so we may use break.
-    AddLoop (ExitLabel, 0);
+   // Create a loop so we may use break.
+   AddLoop(ExitLabel, 0);
 
-    // Parse the following statement, which may actually be a compound
-    // statement if there is a curly brace at the current input position
-    HaveBreak = AnyStatement (&RCurlyBrace);
+   // Parse the following statement, which may actually be a compound
+   // statement if there is a curly brace at the current input position
+   HaveBreak = AnyStatement(&RCurlyBrace);
 
-    // Check if we had any labels
-    if (CollCount (SwitchData.Nodes) == 0 && SwitchData.DefaultLabel == 0) {
-        Warning ("No reachable case labels for switch");
-    }
+   // Check if we had any labels
+   if (CollCount(SwitchData.Nodes) == 0 && SwitchData.DefaultLabel == 0) {
+      Warning("No reachable case labels for switch");
+   }
 
-    // If the last statement did not have a break, we may have an open
-    // label (maybe from an if or similar). Emitting code and then moving
-    // this code to the top will also move the label to the top which is
-    // wrong. So if the last statement did not have a break (which would
-    // carry the label), add a jump to the exit. If it is useless, the
-    // optimizer will remove it later.
-    if (!HaveBreak) {
-        g_jump (ExitLabel);
-    }
+   // If the last statement did not have a break, we may have an open
+   // label (maybe from an if or similar). Emitting code and then moving
+   // this code to the top will also move the label to the top which is
+   // wrong. So if the last statement did not have a break (which would
+   // carry the label), add a jump to the exit. If it is useless, the
+   // optimizer will remove it later.
+   if (!HaveBreak) {
+      g_jump(ExitLabel);
+   }
 
-    // Remember the current position
-    GetCodePos (&SwitchCodeStart);
+   // Remember the current position
+   GetCodePos(&SwitchCodeStart);
 
-    // Output the switch code label
-    g_defcodelabel (SwitchCodeLabel);
+   // Output the switch code label
+   g_defcodelabel(SwitchCodeLabel);
 
-    // restore state for switch logic
-    g_switchrest (SwitchData.Depth);
+   // restore state for switch logic
+   g_switchrest(SwitchData.Depth);
 
-    // Generate code
-    if (SwitchData.DefaultLabel == 0) {
-        // No default label, use switch exit
-        SwitchData.DefaultLabel = ExitLabel;
-    }
-    g_switch (SwitchData.Nodes, SwitchData.DefaultLabel, SwitchData.Depth);
+   // Generate code
+   if (SwitchData.DefaultLabel == 0) {
+      // No default label, use switch exit
+      SwitchData.DefaultLabel = ExitLabel;
+   }
+   g_switch(SwitchData.Nodes, SwitchData.DefaultLabel, SwitchData.Depth);
 
-    // Move the code to the front
-    GetCodePos (&SwitchCodeEnd);
-    MoveCode (&SwitchCodeStart, &SwitchCodeEnd, &SwitchData.CaseCodeStart);
+   // Move the code to the front
+   GetCodePos(&SwitchCodeEnd);
+   MoveCode(&SwitchCodeStart, &SwitchCodeEnd, &SwitchData.CaseCodeStart);
 
-    CleanupSwitch(&SaveCodeMark);
+   CleanupSwitch(&SaveCodeMark);
 
-    // Error on "unreachable" code before the switch code
-    // (only variable definitions are allowed)
-    // 
-    // originally i wanted to detect and remove/replace the instructions
-    // related to this unreachable code.
-    // detection is easy, but it turns out that remove/replace is way too
-    // complicated in the general case.
-    // 
-    // so instead we'll just detect and produce an error.
-    // producing an error is better than producing incorrect code.
-    ErrorOnNonDefinition(&OrigCaseCodeStart, &SwitchData.CaseCodeStart);
+   // Error on "unreachable" code before the switch code
+   // (only variable definitions are allowed)
+   //
+   // originally i wanted to detect and remove/replace the instructions
+   // related to this unreachable code.
+   // detection is easy, but it turns out that remove/replace is way too
+   // complicated in the general case.
+   //
+   // so instead we'll just detect and produce an error.
+   // producing an error is better than producing incorrect code.
+   ErrorOnNonDefinition(&OrigCaseCodeStart, &SwitchData.CaseCodeStart);
 
-    // Define the exit label
-    g_defcodelabel (ExitLabel);
+   // Define the exit label
+   g_defcodelabel(ExitLabel);
 
-    // Exit the loop
-    DelLoop ();
+   // Exit the loop
+   DelLoop();
 
-    // Switch back to the enclosing switch statement if any
-    Switch = OldSwitch;
+   // Switch back to the enclosing switch statement if any
+   Switch = OldSwitch;
 
-    // Free the case value tree
-    FreeCaseNodeColl (SwitchData.Nodes);
+   // Free the case value tree
+   FreeCaseNodeColl(SwitchData.Nodes);
 
-    // If the case statement was terminated by a closing curly
-    // brace, skip it now.
-    if (RCurlyBrace) {
-        NextToken ();
-    }
+   // If the case statement was terminated by a closing curly
+   // brace, skip it now.
+   if (RCurlyBrace) {
+      NextToken();
+   }
 }
 
-void CaseLabel (void)
+void CaseLabel(void)
 // Handle a case label
 {
-    ExprDesc CaseExpr;          // Case label expression
+   ExprDesc CaseExpr; // Case label expression
 
-    // Skip the "case" token
-    NextToken ();
+   // Skip the "case" token
+   NextToken();
 
-    // Read the selector expression
-    CaseExpr = NoCodeConstAbsIntExpr (hie1);
+   // Read the selector expression
+   CaseExpr = NoCodeConstAbsIntExpr(hie1);
 
-    // Now check if we're inside a switch statement
-    if (Switch != 0) {
+   // Now check if we're inside a switch statement
+   if (Switch != 0) {
 
-        // Check the range of the expression
-        const Type* CaseT       = CaseExpr.Type;
-        long        CaseVal     = CaseExpr.IVal;
-        int         OutOfRange  = 0;
-        const char* DiagMsg     = 0;
+      // Check the range of the expression
+      const Type *CaseT = CaseExpr.Type;
+      long CaseVal = CaseExpr.IVal;
+      int OutOfRange = 0;
+      const char *DiagMsg = 0;
 
-        // we want switch logic before the first case/default label
-        if (!Switch->CaseCodeStartFlag) {
-            Switch->CaseCodeStartFlag = true;
-            GetCodePos (&Switch->CaseCodeStart);
-        }
+      // we want switch logic before the first case/default label
+      if (!Switch->CaseCodeStartFlag) {
+         Switch->CaseCodeStartFlag = true;
+         GetCodePos(&Switch->CaseCodeStart);
+      }
 
-        CaseExpr.Type = IntPromotion (Switch->ExprType);
-        LimitExprValue (&CaseExpr, 1);
+      CaseExpr.Type = IntPromotion(Switch->ExprType);
+      LimitExprValue(&CaseExpr, 1);
 
-        if (CaseVal != CaseExpr.IVal ||
-            (IsSignSigned (CaseT) != IsSignSigned (CaseExpr.Type) &&
-            (IsSignSigned (CaseT) ? CaseVal < 0 : CaseExpr.IVal < 0))) {
-            Warning (IsSignSigned (CaseT) ?
-                     IsSignSigned (CaseExpr.Type) ?
-                     "Case value is implicitly converted (%ld to %ld)" :
-                     "Case value is implicitly converted (%ld to %lu)" :
-                     IsSignSigned (CaseExpr.Type) ?
-                     "Case value is implicitly converted (%lu to %ld)" :
-                     "Case value is implicitly converted (%lu to %lu)",
-                     CaseVal, CaseExpr.IVal);
-        }
+      if (CaseVal != CaseExpr.IVal ||
+          (IsSignSigned(CaseT) != IsSignSigned(CaseExpr.Type) &&
+           (IsSignSigned(CaseT) ? CaseVal < 0 : CaseExpr.IVal < 0))) {
+         Warning(IsSignSigned(CaseT)
+                     ? IsSignSigned(CaseExpr.Type)
+                           ? "Case value is implicitly converted (%ld to %ld)"
+                           : "Case value is implicitly converted (%ld to %lu)"
+                 : IsSignSigned(CaseExpr.Type)
+                     ? "Case value is implicitly converted (%lu to %ld)"
+                     : "Case value is implicitly converted (%lu to %lu)",
+                 CaseVal, CaseExpr.IVal);
+      }
 
-        // Check the range of the expression
-        if (IsSignSigned (CaseExpr.Type)) {
-            if (CaseExpr.IVal < GetIntegerTypeMin (Switch->ExprType)) {
-                DiagMsg = "Case value (%ld) out of range for switch condition type";
-                OutOfRange = 1;
-            } else if (IsSignSigned (Switch->ExprType) ?
-                       CaseExpr.IVal > (long)GetIntegerTypeMax (Switch->ExprType) :
-                       SizeOf (CaseExpr.Type) > SizeOf (Switch->ExprType) &&
-                       (unsigned long)CaseExpr.IVal > GetIntegerTypeMax (Switch->ExprType)) {
-                DiagMsg = "Case value (%ld) out of range for switch condition type";
-                OutOfRange = 1;
-            }
-        } else if ((unsigned long)CaseExpr.IVal > GetIntegerTypeMax (Switch->ExprType)) {
-            DiagMsg = "Case value (%lu) out of range for switch condition type";
+      // Check the range of the expression
+      if (IsSignSigned(CaseExpr.Type)) {
+         if (CaseExpr.IVal < GetIntegerTypeMin(Switch->ExprType)) {
+            DiagMsg = "Case value (%ld) out of range for switch condition type";
             OutOfRange = 1;
-        }
+         }
+         else if (IsSignSigned(Switch->ExprType)
+                      ? CaseExpr.IVal >
+                            (long)GetIntegerTypeMax(Switch->ExprType)
+                      : SizeOf(CaseExpr.Type) > SizeOf(Switch->ExprType) &&
+                            (unsigned long)CaseExpr.IVal >
+                                GetIntegerTypeMax(Switch->ExprType)) {
+            DiagMsg = "Case value (%ld) out of range for switch condition type";
+            OutOfRange = 1;
+         }
+      }
+      else if ((unsigned long)CaseExpr.IVal >
+               GetIntegerTypeMax(Switch->ExprType)) {
+         DiagMsg = "Case value (%lu) out of range for switch condition type";
+         OutOfRange = 1;
+      }
 
-        if (OutOfRange == 0) {
-            unsigned CodeLabel;
+      if (OutOfRange == 0) {
+         unsigned CodeLabel;
 
-            // Insert the case selector into the selector table
-            CodeLabel = InsertCaseValue (Switch->Nodes, CaseExpr.IVal, Switch->Depth);
+         // Insert the case selector into the selector table
+         CodeLabel =
+             InsertCaseValue(Switch->Nodes, CaseExpr.IVal, Switch->Depth);
 
-            // Define this label
-            g_defcodelabel (CodeLabel);
-        } else {
-            Warning (DiagMsg, CaseExpr.IVal);
-        }
+         // Define this label
+         g_defcodelabel(CodeLabel);
+      }
+      else {
+         Warning(DiagMsg, CaseExpr.IVal);
+      }
+   }
+   else {
 
-    } else {
+      // case keyword outside a switch statement
+      Error("Case label not within a switch statement");
+   }
 
-        // case keyword outside a switch statement
-        Error ("Case label not within a switch statement");
-
-    }
-
-    // Skip the colon
-    ConsumeColon ();
+   // Skip the colon
+   ConsumeColon();
 }
 
-void DefaultLabel (void)
+void DefaultLabel(void)
 // Handle a default label
 {
-    // Default case
-    NextToken ();
+   // Default case
+   NextToken();
 
-    // Now check if we're inside a switch statement
-    if (Switch != 0) {
+   // Now check if we're inside a switch statement
+   if (Switch != 0) {
 
-        // Check if we do already have a default branch
-        if (Switch->DefaultLabel == 0) {
+      // Check if we do already have a default branch
+      if (Switch->DefaultLabel == 0) {
 
-            // we want switch logic before the first case/default label
-            if (!Switch->CaseCodeStartFlag) {
-                Switch->CaseCodeStartFlag = true;
-                GetCodePos (&Switch->CaseCodeStart);
-            }
+         // we want switch logic before the first case/default label
+         if (!Switch->CaseCodeStartFlag) {
+            Switch->CaseCodeStartFlag = true;
+            GetCodePos(&Switch->CaseCodeStart);
+         }
 
-            // Generate and emit the default label
-            Switch->DefaultLabel = GetLocalLabel ();
-            g_defcodelabel (Switch->DefaultLabel);
+         // Generate and emit the default label
+         Switch->DefaultLabel = GetLocalLabel();
+         g_defcodelabel(Switch->DefaultLabel);
+      }
+      else {
+         // We had the default label already
+         Error("Multiple default labels in one switch");
+      }
+   }
+   else {
 
-        } else {
-            // We had the default label already
-            Error ("Multiple default labels in one switch");
-        }
+      // case keyword outside a switch statement
+      Error("'default' label not within a switch statement");
+   }
 
-    } else {
-
-        // case keyword outside a switch statement
-        Error ("'default' label not within a switch statement");
-
-    }
-
-    // Skip the colon
-    ConsumeColon ();
+   // Skip the colon
+   ConsumeColon();
 }

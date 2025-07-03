@@ -41,127 +41,131 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void RC_Invalidate (RegContents* C)
+void RC_Invalidate(RegContents *C)
 // Invalidate all registers
 {
-    C->RegA   = UNKNOWN_REGVAL;
-    C->RegX   = UNKNOWN_REGVAL;
-    C->RegY   = UNKNOWN_REGVAL;
-    C->SRegLo = UNKNOWN_REGVAL;
-    C->SRegHi = UNKNOWN_REGVAL;
-    C->Ptr1Lo = UNKNOWN_REGVAL;
-    C->Ptr1Hi = UNKNOWN_REGVAL;
-    C->Tmp1   = UNKNOWN_REGVAL;
+   C->RegA = UNKNOWN_REGVAL;
+   C->RegX = UNKNOWN_REGVAL;
+   C->RegY = UNKNOWN_REGVAL;
+   C->SRegLo = UNKNOWN_REGVAL;
+   C->SRegHi = UNKNOWN_REGVAL;
+   C->Ptr1Lo = UNKNOWN_REGVAL;
+   C->Ptr1Hi = UNKNOWN_REGVAL;
+   C->Tmp1 = UNKNOWN_REGVAL;
 }
 
-void RC_InvalidateZP (RegContents* C)
+void RC_InvalidateZP(RegContents *C)
 // Invalidate all ZP registers
 {
-    C->SRegLo = UNKNOWN_REGVAL;
-    C->SRegHi = UNKNOWN_REGVAL;
-    C->Ptr1Lo = UNKNOWN_REGVAL;
-    C->Ptr1Hi = UNKNOWN_REGVAL;
-    C->Tmp1   = UNKNOWN_REGVAL;
+   C->SRegLo = UNKNOWN_REGVAL;
+   C->SRegHi = UNKNOWN_REGVAL;
+   C->Ptr1Lo = UNKNOWN_REGVAL;
+   C->Ptr1Hi = UNKNOWN_REGVAL;
+   C->Tmp1 = UNKNOWN_REGVAL;
 }
 
-void RC_InvalidatePS (RegContents* C)
+void RC_InvalidatePS(RegContents *C)
 // Invalidate processor status
 {
-    C->PFlags = UNKNOWN_PFVAL_ALL;
-    C->ZNRegs = ZNREG_NONE;
+   C->PFlags = UNKNOWN_PFVAL_ALL;
+   C->ZNRegs = ZNREG_NONE;
 }
 
-static void RC_Dump1 (FILE* F, const char* Desc, short Val)
+static void RC_Dump1(FILE *F, const char *Desc, short Val)
 // Dump one register value
 {
-    if (RegValIsKnown (Val)) {
-        fprintf (F, "%s=$%02X ", Desc, Val);
-    } else {
-        fprintf (F, "%s=$XX ", Desc);
-    }
+   if (RegValIsKnown(Val)) {
+      fprintf(F, "%s=$%02X ", Desc, Val);
+   }
+   else {
+      fprintf(F, "%s=$XX ", Desc);
+   }
 }
 
-void RC_Dump (FILE* F, const RegContents* RC)
+void RC_Dump(FILE *F, const RegContents *RC)
 // Dump the contents of the given RegContents struct
 {
-    RC_Dump1 (F, "A", RC->RegA);
-    RC_Dump1 (F, "X", RC->RegX);
-    RC_Dump1 (F, "Y", RC->RegY);
-    RC_Dump1 (F, "SREG", RC->SRegLo);
-    RC_Dump1 (F, "SREG+1", RC->SRegHi);
-    RC_Dump1 (F, "PTR1", RC->Ptr1Lo);
-    RC_Dump1 (F, "PTR1+1", RC->Ptr1Hi);
-    RC_Dump1 (F, "TMP1", RC->Tmp1);
-    fprintf (F, "\n");
+   RC_Dump1(F, "A", RC->RegA);
+   RC_Dump1(F, "X", RC->RegX);
+   RC_Dump1(F, "Y", RC->RegY);
+   RC_Dump1(F, "SREG", RC->SRegLo);
+   RC_Dump1(F, "SREG+1", RC->SRegHi);
+   RC_Dump1(F, "PTR1", RC->Ptr1Lo);
+   RC_Dump1(F, "PTR1+1", RC->Ptr1Hi);
+   RC_Dump1(F, "TMP1", RC->Tmp1);
+   fprintf(F, "\n");
 }
 
 #if !defined(HAVE_INLINE)
-int PStatesAreKnown (unsigned short PFlags, unsigned WhatStates)
+int PStatesAreKnown(unsigned short PFlags, unsigned WhatStates)
 // Return true if all queried processor states are known.
 // Note: WhatStates takes PSTATE_* rather than PFVAL_*.
 {
-    return ((PFlags << (PSTATE_BITS_SHIFT - 8)) & WhatStates & PSTATE_BITS_MASK) == 0;
+   return ((PFlags << (PSTATE_BITS_SHIFT - 8)) & WhatStates &
+           PSTATE_BITS_MASK) == 0;
 }
 #endif
 
 #if !defined(HAVE_INLINE)
-int PStatesAreSet (unsigned short PFlags, unsigned WhatStates)
+int PStatesAreSet(unsigned short PFlags, unsigned WhatStates)
 // Return true if all queried processor states are known to be set.
 // Note: WhatStates takes PSTATE_* rather than PFVAL_*.
 {
-    return (PFlags & (WhatStates >> (PSTATE_BITS_SHIFT - 8))) == 0 &&
-           (PFlags & (WhatStates >> PSTATE_BITS_SHIFT)) == WhatStates >> PSTATE_BITS_SHIFT;
+   return (PFlags & (WhatStates >> (PSTATE_BITS_SHIFT - 8))) == 0 &&
+          (PFlags & (WhatStates >> PSTATE_BITS_SHIFT)) ==
+              WhatStates >> PSTATE_BITS_SHIFT;
 }
 #endif
 
 #if !defined(HAVE_INLINE)
-int PStatesAreClear (unsigned short PFlags, unsigned WhatStates)
+int PStatesAreClear(unsigned short PFlags, unsigned WhatStates)
 // Return true if all queried processor states are known to be cleared.
 // Note: WhatStates takes PSTATE_* rather than PFVAL_*.
 {
-    return (PFlags & (WhatStates >> (PSTATE_BITS_SHIFT - 8))) == 0 &&
-           (PFlags & (WhatStates >> PSTATE_BITS_SHIFT)) == 0;
+   return (PFlags & (WhatStates >> (PSTATE_BITS_SHIFT - 8))) == 0 &&
+          (PFlags & (WhatStates >> PSTATE_BITS_SHIFT)) == 0;
 }
 #endif
 
-RegInfo* NewRegInfo (const RegContents* RC)
+RegInfo *NewRegInfo(const RegContents *RC)
 // Allocate a new register info, initialize and return it. If RC is not
 // a NULL pointer, it is used to initialize both, the input and output
 // registers. If the pointer is NULL, all registers are set to unknown.
 {
-    // Allocate memory
-    RegInfo* RI = xmalloc (sizeof (RegInfo));
+   // Allocate memory
+   RegInfo *RI = xmalloc(sizeof(RegInfo));
 
-    // Initialize the registers
-    if (RC) {
-        RI->In   = *RC;
-        RI->Out  = *RC;
-        RI->Out2 = *RC;
-    } else {
-        RC_Invalidate (&RI->In);
-        RC_Invalidate (&RI->Out);
-        RC_Invalidate (&RI->Out2);
-        RC_InvalidatePS (&RI->In);
-        RC_InvalidatePS (&RI->Out);
-        RC_InvalidatePS (&RI->Out2);
-    }
+   // Initialize the registers
+   if (RC) {
+      RI->In = *RC;
+      RI->Out = *RC;
+      RI->Out2 = *RC;
+   }
+   else {
+      RC_Invalidate(&RI->In);
+      RC_Invalidate(&RI->Out);
+      RC_Invalidate(&RI->Out2);
+      RC_InvalidatePS(&RI->In);
+      RC_InvalidatePS(&RI->Out);
+      RC_InvalidatePS(&RI->Out2);
+   }
 
-    // Return the new struct
-    return RI;
+   // Return the new struct
+   return RI;
 }
 
-void FreeRegInfo (RegInfo* RI)
+void FreeRegInfo(RegInfo *RI)
 // Free a RegInfo struct
 {
-    xfree (RI);
+   xfree(RI);
 }
 
-void DumpRegInfo (const char* Desc, const RegInfo* RI)
+void DumpRegInfo(const char *Desc, const RegInfo *RI)
 // Dump the register info for debugging
 {
-    fprintf (stdout, "%s:\n", Desc);
-    fprintf (stdout, "In:  ");
-    RC_Dump (stdout, &RI->In);
-    fprintf (stdout, "Out: ");
-    RC_Dump (stdout, &RI->Out);
+   fprintf(stdout, "%s:\n", Desc);
+   fprintf(stdout, "In:  ");
+   RC_Dump(stdout, &RI->In);
+   fprintf(stdout, "Out: ");
+   RC_Dump(stdout, &RI->Out);
 }

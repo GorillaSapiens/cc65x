@@ -44,208 +44,212 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void GetEA (EffAddr* A)
+void GetEA(EffAddr *A)
 // Parse an effective address, return the result in A
 {
-    unsigned long Restrictions;
-    token_t IndirectEnter;
-    token_t IndirectLeave;
-    const char* IndirectExpect;
+   unsigned long Restrictions;
+   token_t IndirectEnter;
+   token_t IndirectLeave;
+   const char *IndirectExpect;
 
-    // Choose syntax for indirection
-    if (BracketAsIndirect) {
-        IndirectEnter = TOK_LBRACK;
-        IndirectLeave = TOK_RBRACK;
-        IndirectExpect = "']' expected";
-    } else {
-        IndirectEnter = TOK_LPAREN;
-        IndirectLeave = TOK_RPAREN;
-        IndirectExpect = "')' expected";
-    }
+   // Choose syntax for indirection
+   if (BracketAsIndirect) {
+      IndirectEnter = TOK_LBRACK;
+      IndirectLeave = TOK_RBRACK;
+      IndirectExpect = "']' expected";
+   }
+   else {
+      IndirectEnter = TOK_LPAREN;
+      IndirectLeave = TOK_RPAREN;
+      IndirectExpect = "')' expected";
+   }
 
-    // Clear the output struct
-    A->AddrModeSet = 0;
-    A->Expr = 0;
-    A->Flags = 0;
+   // Clear the output struct
+   A->AddrModeSet = 0;
+   A->Expr = 0;
+   A->Flags = 0;
 
-    // Handle an addressing size override
-    switch (CurTok.Tok) {
-        case TOK_OVERRIDE_ZP:
-            Restrictions = AM65_DIR | AM65_DIR_X | AM65_DIR_Y;
-            A->Flags |= EFFADDR_OVERRIDE_ZP;
-            NextTok ();
-            break;
+   // Handle an addressing size override
+   switch (CurTok.Tok) {
+      case TOK_OVERRIDE_ZP:
+         Restrictions = AM65_DIR | AM65_DIR_X | AM65_DIR_Y;
+         A->Flags |= EFFADDR_OVERRIDE_ZP;
+         NextTok();
+         break;
 
-        case TOK_OVERRIDE_ABS:
-            Restrictions = AM65_ABS | AM65_ABS_X | AM65_ABS_Y;
-            NextTok ();
-            break;
+      case TOK_OVERRIDE_ABS:
+         Restrictions = AM65_ABS | AM65_ABS_X | AM65_ABS_Y;
+         NextTok();
+         break;
 
-        case TOK_OVERRIDE_FAR:
-            Restrictions = AM65_ABS_LONG | AM65_ABS_LONG_X;
-            NextTok ();
-            break;
+      case TOK_OVERRIDE_FAR:
+         Restrictions = AM65_ABS_LONG | AM65_ABS_LONG_X;
+         NextTok();
+         break;
 
-        default:
-            Restrictions = ~0UL;        // None
-            break;
-    }
+      default:
+         Restrictions = ~0UL; // None
+         break;
+   }
 
-    // Parse the effective address
-    if (TokIsSep (CurTok.Tok)) {
+   // Parse the effective address
+   if (TokIsSep(CurTok.Tok)) {
 
-        A->AddrModeSet = AM65_IMPLICIT;
-        if (GetCPU () == CPU_45GS02) {
-            A->AddrModeSet |= AM65_Q;
-        }
+      A->AddrModeSet = AM65_IMPLICIT;
+      if (GetCPU() == CPU_45GS02) {
+         A->AddrModeSet |= AM65_Q;
+      }
+   }
+   else if (CurTok.Tok == TOK_HASH) {
 
-    } else if (CurTok.Tok == TOK_HASH) {
+      // #val
+      NextTok();
+      A->Expr = Expression();
+      A->AddrModeSet = AM65_ALL_IMM;
+   }
+   else if (CurTok.Tok == TOK_A) {
 
-        // #val
-        NextTok ();
-        A->Expr  = Expression ();
-        A->AddrModeSet = AM65_ALL_IMM;
+      NextTok();
+      A->AddrModeSet = AM65_ACCU;
+   }
+   else if (CurTok.Tok == TOK_Q) {
 
-    } else if (CurTok.Tok == TOK_A) {
+      NextTok();
+      A->AddrModeSet = AM65_Q;
+   }
+   else if (CurTok.Tok == IndirectEnter) {
 
-        NextTok ();
-        A->AddrModeSet = AM65_ACCU;
+      // One of the indirect modes
+      NextTok();
+      A->Expr = Expression();
 
-    } else if (CurTok.Tok == TOK_Q) {
+      if (CurTok.Tok == TOK_COMMA) {
 
-        NextTok ();
-        A->AddrModeSet = AM65_Q;
+         // (expr,X) or (rel,S),y
+         NextTok();
+         if (CurTok.Tok == TOK_X) {
+            // (adr,x)
+            NextTok();
+            A->AddrModeSet = AM65_ABS_X_IND | AM65_DIR_X_IND;
+            Consume(IndirectLeave, IndirectExpect);
+         }
+         else if (CurTok.Tok == TOK_S) {
+            // (rel,s),y
+            NextTok();
+            A->AddrModeSet = AM65_STACK_REL_IND_Y;
+            Consume(IndirectLeave, IndirectExpect);
+            ConsumeComma();
+            Consume(TOK_Y, "'Y' expected");
+         }
+         else {
+            Error("Syntax error");
+         }
+      }
+      else {
 
-    } else if (CurTok.Tok == IndirectEnter) {
-
-        // One of the indirect modes
-        NextTok ();
-        A->Expr = Expression ();
-
-        if (CurTok.Tok == TOK_COMMA) {
-
-            // (expr,X) or (rel,S),y
-            NextTok ();
-            if (CurTok.Tok == TOK_X) {
-                // (adr,x)
-                NextTok ();
-                A->AddrModeSet = AM65_ABS_X_IND | AM65_DIR_X_IND;
-                Consume (IndirectLeave, IndirectExpect);
-            } else if (CurTok.Tok == TOK_S) {
-                // (rel,s),y
-                NextTok ();
-                A->AddrModeSet = AM65_STACK_REL_IND_Y;
-                Consume (IndirectLeave, IndirectExpect);
-                ConsumeComma ();
-                Consume (TOK_Y, "'Y' expected");
-            } else {
-                Error ("Syntax error");
-            }
-
-        } else {
-
-            // (adr), (adr),y or (adr),z
-            Consume (IndirectLeave, IndirectExpect);
-            if (CurTok.Tok == TOK_COMMA) {
-                // (adr),y
-                NextTok ();
-                switch (CurTok.Tok) {
-                case TOK_Z:
-                    // only set by scanner.c if in 4510-mode
-                    NextTok ();
-                    A->AddrModeSet = AM65_DIR_IND;
-                    break;
-                default:
-                    Consume (TOK_Y, "'Y' expected");
-                    A->AddrModeSet = AM65_DIR_IND_Y;
-                    break;
-                }
-            } else {
-                // (adr)
-                switch (CPU) {
-                    case CPU_4510:
-                        A->AddrModeSet = AM65_ABS_IND;
-                        break;
-
-                    case CPU_45GS02:
-                        A->AddrModeSet = AM65_ABS_IND | AM65_DIR_IND;
-                        break;
-
-                    default:
-                        A->AddrModeSet = AM65_ABS_IND | AM65_ABS_IND_LONG | AM65_DIR_IND;
-                        break;
-                }
-            }
-        }
-
-    } else if (CurTok.Tok == TOK_LBRACK) {
-
-        // Never executed if BracketAsIndirect feature is enabled.
-        // [dir] or [dir],y
-        NextTok ();
-        A->Expr = Expression ();
-        Consume (TOK_RBRACK, "']' expected");
-        if (CurTok.Tok == TOK_COMMA) {
-            // [dir],y
-            NextTok ();
-            if (GetCPU () == CPU_45GS02) {
-                Consume (TOK_Z, "'Z' expected");
-                A->AddrModeSet = AM65_32BIT_BASE_IND_Z;
-            }
-            else {
-                Consume (TOK_Y, "'Y' expected");
-                A->AddrModeSet = AM65_DIR_IND_LONG_Y;
-            }
-        } else {
-            // [dir]
-            A->AddrModeSet = AM65_DIR_IND_LONG | AM65_ABS_IND_LONG;
-        }
-
-    } else {
-
-        // Remaining stuff:
-        // 
-        // addr
-        // addr, x
-        // addr, y
-        // addr, s
-        // addr, relative addr
-        A->Expr = Expression ();
-
-        if (CurTok.Tok == TOK_COMMA) {
-
-            NextTok ();
+         // (adr), (adr),y or (adr),z
+         Consume(IndirectLeave, IndirectExpect);
+         if (CurTok.Tok == TOK_COMMA) {
+            // (adr),y
+            NextTok();
             switch (CurTok.Tok) {
-
-                case TOK_X:
-                    A->AddrModeSet = AM65_ABS_LONG_X | AM65_ABS_X | AM65_DIR_X;
-                    NextTok ();
-                    break;
-
-                case TOK_Y:
-                    A->AddrModeSet = AM65_ABS_Y | AM65_DIR_Y;
-                    NextTok ();
-                    break;
-
-                case TOK_S:
-                    A->AddrModeSet = AM65_STACK_REL;
-                    NextTok ();
-                    break;
-
-                default:
-                    // FIXME: syntax error if not zp, ind
-                    A->AddrModeSet = AM65_ZP_REL;
-                    break;
-
+               case TOK_Z:
+                  // only set by scanner.c if in 4510-mode
+                  NextTok();
+                  A->AddrModeSet = AM65_DIR_IND;
+                  break;
+               default:
+                  Consume(TOK_Y, "'Y' expected");
+                  A->AddrModeSet = AM65_DIR_IND_Y;
+                  break;
             }
+         }
+         else {
+            // (adr)
+            switch (CPU) {
+               case CPU_4510:
+                  A->AddrModeSet = AM65_ABS_IND;
+                  break;
 
-        } else {
+               case CPU_45GS02:
+                  A->AddrModeSet = AM65_ABS_IND | AM65_DIR_IND;
+                  break;
 
-            A->AddrModeSet = AM65_ABS_LONG | AM65_ABS | AM65_DIR;
+               default:
+                  A->AddrModeSet =
+                      AM65_ABS_IND | AM65_ABS_IND_LONG | AM65_DIR_IND;
+                  break;
+            }
+         }
+      }
+   }
+   else if (CurTok.Tok == TOK_LBRACK) {
 
-        }
-    }
+      // Never executed if BracketAsIndirect feature is enabled.
+      // [dir] or [dir],y
+      NextTok();
+      A->Expr = Expression();
+      Consume(TOK_RBRACK, "']' expected");
+      if (CurTok.Tok == TOK_COMMA) {
+         // [dir],y
+         NextTok();
+         if (GetCPU() == CPU_45GS02) {
+            Consume(TOK_Z, "'Z' expected");
+            A->AddrModeSet = AM65_32BIT_BASE_IND_Z;
+         }
+         else {
+            Consume(TOK_Y, "'Y' expected");
+            A->AddrModeSet = AM65_DIR_IND_LONG_Y;
+         }
+      }
+      else {
+         // [dir]
+         A->AddrModeSet = AM65_DIR_IND_LONG | AM65_ABS_IND_LONG;
+      }
+   }
+   else {
 
-    // Apply addressing mode overrides
-    A->AddrModeSet &= Restrictions;
+      // Remaining stuff:
+      //
+      // addr
+      // addr, x
+      // addr, y
+      // addr, s
+      // addr, relative addr
+      A->Expr = Expression();
+
+      if (CurTok.Tok == TOK_COMMA) {
+
+         NextTok();
+         switch (CurTok.Tok) {
+
+            case TOK_X:
+               A->AddrModeSet = AM65_ABS_LONG_X | AM65_ABS_X | AM65_DIR_X;
+               NextTok();
+               break;
+
+            case TOK_Y:
+               A->AddrModeSet = AM65_ABS_Y | AM65_DIR_Y;
+               NextTok();
+               break;
+
+            case TOK_S:
+               A->AddrModeSet = AM65_STACK_REL;
+               NextTok();
+               break;
+
+            default:
+               // FIXME: syntax error if not zp, ind
+               A->AddrModeSet = AM65_ZP_REL;
+               break;
+         }
+      }
+      else {
+
+         A->AddrModeSet = AM65_ABS_LONG | AM65_ABS | AM65_DIR;
+      }
+   }
+
+   // Apply addressing mode overrides
+   A->AddrModeSet &= Restrictions;
 }

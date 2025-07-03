@@ -44,24 +44,24 @@
 // Segment definition
 typedef struct SegDef SegDef;
 struct SegDef {
-    char*         Name;         // Segment name
-    unsigned char AddrSize;     // Default address size
+   char *Name;             // Segment name
+   unsigned char AddrSize; // Default address size
 };
 
 // Initializer for static SegDefs
-#define STATIC_SEGDEF_INITIALIZER(name, addrsize) { name, addrsize }
+#define STATIC_SEGDEF_INITIALIZER(name, addrsize) {name, addrsize}
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-SegDef* NewSegDef (const char* Name, unsigned char AddrSize);
+SegDef *NewSegDef(const char *Name, unsigned char AddrSize);
 // Create a new segment definition and return it
 
-void FreeSegDef (SegDef* D);
+void FreeSegDef(SegDef *D);
 // Free a segment definition
 
-SegDef* DupSegDef (const SegDef* D);
+SegDef *DupSegDef(const SegDef *D);
 // Duplicate a segment definition and return it
 
 // End of segdef.h

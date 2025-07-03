@@ -44,130 +44,130 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void Write8 (FILE* F, unsigned char Val)
+void Write8(FILE *F, unsigned char Val)
 // Write an 8 bit value to the file
 {
-    if (putc (Val, F) == EOF) {
-        Error ("Write error (disk full?)");
-    }
+   if (putc(Val, F) == EOF) {
+      Error("Write error (disk full?)");
+   }
 }
 
-void Write16 (FILE* F, unsigned Val)
+void Write16(FILE *F, unsigned Val)
 // Write a 16 bit value to the file
 {
-    Write8 (F, (unsigned char) Val);
-    Write8 (F, (unsigned char) (Val >> 8));
+   Write8(F, (unsigned char)Val);
+   Write8(F, (unsigned char)(Val >> 8));
 }
 
-void Write32 (FILE* F, unsigned long Val)
+void Write32(FILE *F, unsigned long Val)
 // Write a 32 bit value to the file
 {
-    Write8 (F, (unsigned char) Val);
-    Write8 (F, (unsigned char) (Val >> 8));
-    Write8 (F, (unsigned char) (Val >> 16));
-    Write8 (F, (unsigned char) (Val >> 24));
+   Write8(F, (unsigned char)Val);
+   Write8(F, (unsigned char)(Val >> 8));
+   Write8(F, (unsigned char)(Val >> 16));
+   Write8(F, (unsigned char)(Val >> 24));
 }
 
-void WriteVar (FILE* F, unsigned long V)
+void WriteVar(FILE *F, unsigned long V)
 // Write a variable sized value to the file in special encoding
 {
-    // We will write the value to the file in 7 bit chunks. If the 8th bit
-    // is clear, we're done, if it is set, another chunk follows. This will
-    // allow us to encode smaller values with less bytes, at the expense of
-    // needing 5 bytes if a 32 bit value is written to file.
-    do {
-        unsigned char C = (V & 0x7F);
-        V >>= 7;
-        if (V) {
-            C |= 0x80;
-        }
-        Write8 (F, C);
-    } while (V != 0);
+   // We will write the value to the file in 7 bit chunks. If the 8th bit
+   // is clear, we're done, if it is set, another chunk follows. This will
+   // allow us to encode smaller values with less bytes, at the expense of
+   // needing 5 bytes if a 32 bit value is written to file.
+   do {
+      unsigned char C = (V & 0x7F);
+      V >>= 7;
+      if (V) {
+         C |= 0x80;
+      }
+      Write8(F, C);
+   } while (V != 0);
 }
 
-void WriteStr (FILE* F, const char* S)
+void WriteStr(FILE *F, const char *S)
 // Write a string to the file
 {
-    unsigned Len = strlen (S);
-    WriteVar (F, Len);
-    WriteData (F, S, Len);
+   unsigned Len = strlen(S);
+   WriteVar(F, Len);
+   WriteData(F, S, Len);
 }
 
-void WriteData (FILE* F, const void* Data, unsigned Size)
+void WriteData(FILE *F, const void *Data, unsigned Size)
 // Write data to the file
 {
-    if (fwrite (Data, 1, Size, F) != Size) {
-        Error ("Write error (disk full?)");
-    }
+   if (fwrite(Data, 1, Size, F) != Size) {
+      Error("Write error (disk full?)");
+   }
 }
 
-unsigned Read8 (FILE* F)
+unsigned Read8(FILE *F)
 // Read an 8 bit value from the file
 {
-    int C = getc (F);
-    if (C == EOF) {
-        Error ("Read error (file corrupt?)");
-    }
-    return C;
+   int C = getc(F);
+   if (C == EOF) {
+      Error("Read error (file corrupt?)");
+   }
+   return C;
 }
 
-unsigned Read16 (FILE* F)
+unsigned Read16(FILE *F)
 // Read a 16 bit value from the file
 {
-    unsigned Lo = Read8 (F);
-    unsigned Hi = Read8 (F);
-    return (Hi << 8) | Lo;
+   unsigned Lo = Read8(F);
+   unsigned Hi = Read8(F);
+   return (Hi << 8) | Lo;
 }
 
-unsigned long Read32 (FILE* F)
+unsigned long Read32(FILE *F)
 // Read a 32 bit value from the file
 {
-    unsigned long Lo = Read16 (F);
-    unsigned long Hi = Read16 (F);
-    return (Hi << 16) | Lo;
+   unsigned long Lo = Read16(F);
+   unsigned long Hi = Read16(F);
+   return (Hi << 16) | Lo;
 }
 
-unsigned long ReadVar (FILE* F)
+unsigned long ReadVar(FILE *F)
 // Read a variable size value from the file
 {
-    // The value was written to the file in 7 bit chunks LSB first. If there
-    // are more bytes, bit 8 is set, otherwise it is clear.
-    unsigned char C;
-    unsigned long V = 0;
-    unsigned Shift = 0;
-    do {
-        // Read one byte
-        C = Read8 (F);
-        // Encode it into the target value
-        V |= ((unsigned long)(C & 0x7F)) << Shift;
-        // Next value
-        Shift += 7;
-    } while (C & 0x80);
+   // The value was written to the file in 7 bit chunks LSB first. If there
+   // are more bytes, bit 8 is set, otherwise it is clear.
+   unsigned char C;
+   unsigned long V = 0;
+   unsigned Shift = 0;
+   do {
+      // Read one byte
+      C = Read8(F);
+      // Encode it into the target value
+      V |= ((unsigned long)(C & 0x7F)) << Shift;
+      // Next value
+      Shift += 7;
+   } while (C & 0x80);
 
-    // Return the value read
-    return V;
+   // Return the value read
+   return V;
 }
 
-char* ReadStr (FILE* F)
+char *ReadStr(FILE *F)
 // Read a string from the file (the memory will be malloc'ed)
 {
-    // Read the length
-    unsigned Len = ReadVar (F);
+   // Read the length
+   unsigned Len = ReadVar(F);
 
-    // Allocate memory and read the string itself
-    char* S = xmalloc (Len + 1);
-    ReadData (F, S, Len);
+   // Allocate memory and read the string itself
+   char *S = xmalloc(Len + 1);
+   ReadData(F, S, Len);
 
-    // Terminate the string and return it
-    S [Len] = '\0';
-    return S;
+   // Terminate the string and return it
+   S[Len] = '\0';
+   return S;
 }
 
-void* ReadData (FILE* F, void* Data, unsigned Size)
+void *ReadData(FILE *F, void *Data, unsigned Size)
 // Read data from the file
 {
-    if (fread (Data, 1, Size, F) != Size) {
-        Error ("Read error (file corrupt?)");
-    }
-    return Data;
+   if (fread(Data, 1, Size, F) != Size) {
+      Error("Read error (file corrupt?)");
+   }
+   return Data;
 }

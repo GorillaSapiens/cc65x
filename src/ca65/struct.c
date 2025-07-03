@@ -50,245 +50,248 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-enum {
-    STRUCT,
-    UNION
-};
+enum { STRUCT, UNION };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-static long Member (long AllocSize)
+static long Member(long AllocSize)
 // Read one struct member and return its size
 {
-    long Multiplier;
+   long Multiplier;
 
-    // A multiplier may follow
-    if (CurTok.Tok != TOK_SEP) {
-        Multiplier = ConstExpression ();
-        if (Multiplier <= 0) {
-            ErrorSkip ("Range error");
-            Multiplier = 1;
-        }
-        AllocSize *= Multiplier;
-    }
+   // A multiplier may follow
+   if (CurTok.Tok != TOK_SEP) {
+      Multiplier = ConstExpression();
+      if (Multiplier <= 0) {
+         ErrorSkip("Range error");
+         Multiplier = 1;
+      }
+      AllocSize *= Multiplier;
+   }
 
-    // Check the size for a reasonable value
-    if (AllocSize >= 0x1000000) {
-        ErrorSkip ("Range error");
-        AllocSize = 1;
-    }
+   // Check the size for a reasonable value
+   if (AllocSize >= 0x1000000) {
+      ErrorSkip("Range error");
+      AllocSize = 1;
+   }
 
-    // Return the size
-    return AllocSize;
+   // Return the size
+   return AllocSize;
 }
 
-static long DoStructInternal (long Offs, unsigned Type)
+static long DoStructInternal(long Offs, unsigned Type)
 // Handle the .STRUCT command
 {
-    long Size = 0;
+   long Size = 0;
 
-    // Outside of other structs, we need a name. Inside another struct or
-    // union, the struct may be anonymous; in which case, no new lexical level
-    // is started.
-    int Anon = (CurTok.Tok != TOK_IDENT);
+   // Outside of other structs, we need a name. Inside another struct or
+   // union, the struct may be anonymous; in which case, no new lexical level
+   // is started.
+   int Anon = (CurTok.Tok != TOK_IDENT);
 
-    if (!Anon) {
-        // Enter a new scope, then skip the name
-        SymEnterLevel (&CurTok.SVal, SCOPE_STRUCT, ADDR_SIZE_ABS, 0);
-        NextTok ();
-        // Start at zero offset in the new scope
-        Offs = 0;
-    }
+   if (!Anon) {
+      // Enter a new scope, then skip the name
+      SymEnterLevel(&CurTok.SVal, SCOPE_STRUCT, ADDR_SIZE_ABS, 0);
+      NextTok();
+      // Start at zero offset in the new scope
+      Offs = 0;
+   }
 
-    // Test for end of line
-    ConsumeSep ();
+   // Test for end of line
+   ConsumeSep();
 
-    // Read until end of struct
-    while (CurTok.Tok != TOK_ENDSTRUCT &&
-           CurTok.Tok != TOK_ENDUNION  &&
-           CurTok.Tok != TOK_EOF) {
-        long      MemberSize;
-        SymTable* Struct;
-        SymEntry* Sym;
+   // Read until end of struct
+   while (CurTok.Tok != TOK_ENDSTRUCT && CurTok.Tok != TOK_ENDUNION &&
+          CurTok.Tok != TOK_EOF) {
+      long MemberSize;
+      SymTable *Struct;
+      SymEntry *Sym;
 
-        // Allow empty and comment lines
-        if (CurTok.Tok == TOK_SEP) {
-            NextTok ();
+      // Allow empty and comment lines
+      if (CurTok.Tok == TOK_SEP) {
+         NextTok();
+         continue;
+      }
+
+      // The format is "[identifier ].storage-allocator[ multiplier]"
+      Sym = 0;
+      if (CurTok.Tok == TOK_IDENT) {
+         // Beware: An identifier may be a macro also;
+         // in which case, we must start over.
+         Macro *M = FindMacro(&CurTok.SVal);
+
+         if (M) {
+            MacExpandStart(M);
             continue;
-        }
+         }
 
-        // The format is "[identifier ].storage-allocator[ multiplier]"
-        Sym = 0;
-        if (CurTok.Tok == TOK_IDENT) {
-            // Beware: An identifier may be a macro also;
-            // in which case, we must start over.
-            Macro* M = FindMacro (&CurTok.SVal);
+         // We have an identifier, generate a symbol
+         Sym = SymFind(CurrentScope, &CurTok.SVal, SYM_ALLOC_NEW);
 
-            if (M) {
-                MacExpandStart (M);
-                continue;
+         // Assign the symbol the offset of the current member
+         SymDef(Sym, GenLiteralExpr(Offs), ADDR_SIZE_DEFAULT, SF_NONE);
+
+         // Skip the member name
+         NextTok();
+      }
+
+      // Read the storage allocator
+      MemberSize = 0; // In case of errors or .ORG, use zero
+      switch (CurTok.Tok) {
+         case TOK_BYTE:
+            NextTok();
+            MemberSize = Member(1);
+            break;
+
+         case TOK_DBYT:
+         case TOK_WORD:
+         case TOK_ADDR:
+            NextTok();
+            MemberSize = Member(2);
+            break;
+
+         case TOK_FARADDR:
+            NextTok();
+            MemberSize = Member(3);
+            break;
+
+         case TOK_DWORD:
+            NextTok();
+            MemberSize = Member(4);
+            break;
+
+         case TOK_RES:
+            NextTok();
+            if (CurTok.Tok == TOK_SEP) {
+               ErrorSkip("Size is missing");
             }
-
-            // We have an identifier, generate a symbol
-            Sym = SymFind (CurrentScope, &CurTok.SVal, SYM_ALLOC_NEW);
-
-            // Assign the symbol the offset of the current member
-            SymDef (Sym, GenLiteralExpr (Offs), ADDR_SIZE_DEFAULT, SF_NONE);
-
-            // Skip the member name
-            NextTok ();
-        }
-
-        // Read the storage allocator
-        MemberSize = 0;                 // In case of errors or .ORG, use zero
-        switch (CurTok.Tok) {
-            case TOK_BYTE:
-                NextTok ();
-                MemberSize = Member (1);
-                break;
-
-            case TOK_DBYT:
-            case TOK_WORD:
-            case TOK_ADDR:
-                NextTok ();
-                MemberSize = Member (2);
-                break;
-
-            case TOK_FARADDR:
-                NextTok ();
-                MemberSize = Member (3);
-                break;
-
-            case TOK_DWORD:
-                NextTok ();
-                MemberSize = Member (4);
-                break;
-
-            case TOK_RES:
-                NextTok ();
-                if (CurTok.Tok == TOK_SEP) {
-                    ErrorSkip ("Size is missing");
-                } else {
-                    MemberSize = Member (1);
-                }
-                break;
-
-            case TOK_ORG:
-                NextTok ();
-                if (CurTok.Tok == TOK_SEP) {
-                    ErrorSkip ("Address is missing");
-                } else {
-                    Offs = ConstExpression ();
-
-                    // Check the address for a reasonable value
-                    if (Offs >= 0x1000000) {
-                        ErrorSkip ("Range error");
-                        Offs = 0;
-                    }
-                }
-                break;
-
-            case TOK_TAG:
-                NextTok ();
-                Struct = ParseScopedSymTable ();
-                if (Struct == 0) {
-                    ErrorSkip ("Unknown struct/union");
-                } else if (GetSymTabType (Struct) != SCOPE_STRUCT) {
-                    ErrorSkip ("Not a struct/union");
-                } else {
-                    SymEntry* SizeSym = GetSizeOfScope (Struct);
-                    if (!SymIsDef (SizeSym) || !SymIsConst (SizeSym, &MemberSize)) {
-                        ErrorSkip ("Size of struct/union is unknown");
-                    }
-                }
-                MemberSize = Member (MemberSize);
-                break;
-
-            case TOK_STRUCT:
-                NextTok ();
-                MemberSize = DoStructInternal (Offs, STRUCT);
-                break;
-
-            case TOK_UNION:
-                NextTok ();
-                MemberSize = DoStructInternal (Offs, UNION);
-                break;
-
-            default:
-                if (!CheckConditionals ()) {
-                    // Not a conditional directive
-                    ErrorSkip ("Invalid storage allocator in struct/union");
-                }
-        }
-
-        // Assign the size to the member if it has a name
-        if (Sym) {
-            DefSizeOfSymbol (Sym, MemberSize);
-        }
-
-        // Next member
-        if (Type == STRUCT) {
-            // Struct
-            Offs += MemberSize;
-            Size += MemberSize;
-        } else {
-            // Union
-            if (MemberSize > Size) {
-                Size = MemberSize;
+            else {
+               MemberSize = Member(1);
             }
-        }
+            break;
 
-        // Expect end of line
-        ConsumeSep ();
-    }
+         case TOK_ORG:
+            NextTok();
+            if (CurTok.Tok == TOK_SEP) {
+               ErrorSkip("Address is missing");
+            }
+            else {
+               Offs = ConstExpression();
 
-    // If this is not an anon. struct, enter a special symbol named ".size"
-    // into the symbol table, of the struct, that holds the size of the
-    // struct. Since the symbol starts with a dot, it cannot be accessed
-    // by user code.
-    // Leave the struct scope level.
-    if (!Anon) {
-        // Add a symbol
-        SymEntry* SizeSym = GetSizeOfScope (CurrentScope);
-        SymDef (SizeSym, GenLiteralExpr (Size), ADDR_SIZE_DEFAULT, SF_NONE);
+               // Check the address for a reasonable value
+               if (Offs >= 0x1000000) {
+                  ErrorSkip("Range error");
+                  Offs = 0;
+               }
+            }
+            break;
 
-        // Close the struct scope
-        SymLeaveLevel ();
-    }
+         case TOK_TAG:
+            NextTok();
+            Struct = ParseScopedSymTable();
+            if (Struct == 0) {
+               ErrorSkip("Unknown struct/union");
+            }
+            else if (GetSymTabType(Struct) != SCOPE_STRUCT) {
+               ErrorSkip("Not a struct/union");
+            }
+            else {
+               SymEntry *SizeSym = GetSizeOfScope(Struct);
+               if (!SymIsDef(SizeSym) || !SymIsConst(SizeSym, &MemberSize)) {
+                  ErrorSkip("Size of struct/union is unknown");
+               }
+            }
+            MemberSize = Member(MemberSize);
+            break;
 
-    // End of struct/union definition
-    if (Type == STRUCT) {
-        Consume (TOK_ENDSTRUCT, "'.ENDSTRUCT' expected");
-    } else {
-        Consume (TOK_ENDUNION, "'.ENDUNION' expected");
-    }
+         case TOK_STRUCT:
+            NextTok();
+            MemberSize = DoStructInternal(Offs, STRUCT);
+            break;
 
-    // Return the size of the struct
-    return Size;
+         case TOK_UNION:
+            NextTok();
+            MemberSize = DoStructInternal(Offs, UNION);
+            break;
+
+         default:
+            if (!CheckConditionals()) {
+               // Not a conditional directive
+               ErrorSkip("Invalid storage allocator in struct/union");
+            }
+      }
+
+      // Assign the size to the member if it has a name
+      if (Sym) {
+         DefSizeOfSymbol(Sym, MemberSize);
+      }
+
+      // Next member
+      if (Type == STRUCT) {
+         // Struct
+         Offs += MemberSize;
+         Size += MemberSize;
+      }
+      else {
+         // Union
+         if (MemberSize > Size) {
+            Size = MemberSize;
+         }
+      }
+
+      // Expect end of line
+      ConsumeSep();
+   }
+
+   // If this is not an anon. struct, enter a special symbol named ".size"
+   // into the symbol table, of the struct, that holds the size of the
+   // struct. Since the symbol starts with a dot, it cannot be accessed
+   // by user code.
+   // Leave the struct scope level.
+   if (!Anon) {
+      // Add a symbol
+      SymEntry *SizeSym = GetSizeOfScope(CurrentScope);
+      SymDef(SizeSym, GenLiteralExpr(Size), ADDR_SIZE_DEFAULT, SF_NONE);
+
+      // Close the struct scope
+      SymLeaveLevel();
+   }
+
+   // End of struct/union definition
+   if (Type == STRUCT) {
+      Consume(TOK_ENDSTRUCT, "'.ENDSTRUCT' expected");
+   }
+   else {
+      Consume(TOK_ENDUNION, "'.ENDUNION' expected");
+   }
+
+   // Return the size of the struct
+   return Size;
 }
 
-long GetStructSize (SymTable* Struct)
+long GetStructSize(SymTable *Struct)
 // Get the size of a struct or union
 {
-    SymEntry* SizeSym = FindSizeOfScope (Struct);
-    if (SizeSym == 0) {
-        Error ("Size of struct/union is unknown");
-        return 0;
-    } else {
-        return GetSymVal (SizeSym);
-    }
+   SymEntry *SizeSym = FindSizeOfScope(Struct);
+   if (SizeSym == 0) {
+      Error("Size of struct/union is unknown");
+      return 0;
+   }
+   else {
+      return GetSymVal(SizeSym);
+   }
 }
 
-void DoStruct (void)
+void DoStruct(void)
 // Handle the .STRUCT command
 {
-    DoStructInternal (0, STRUCT);
+   DoStructInternal(0, STRUCT);
 }
 
-void DoUnion (void)
+void DoUnion(void)
 // Handle the .UNION command
 {
-    DoStructInternal (0, UNION);
+   DoStructInternal(0, UNION);
 }

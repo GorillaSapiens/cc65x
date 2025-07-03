@@ -46,14 +46,14 @@ struct ObjData;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void ObjReadData (FILE* F, struct ObjData* O);
+void ObjReadData(FILE *F, struct ObjData *O);
 // Read object file data from the given file. The function expects the Name
 // and Start fields to be valid. Header and basic data are read.
 
-void ObjAdd (const char* Name);
+void ObjAdd(const char *Name);
 // Add an object file to the library
 
-void ObjExtract (const char* Name);
+void ObjExtract(const char *Name);
 // Extract a module from the library
 
 // End of objfile.h

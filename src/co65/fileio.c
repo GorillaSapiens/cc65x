@@ -44,48 +44,48 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned Read8 (FILE* F)
+unsigned Read8(FILE *F)
 // Read an 8 bit value from the file
 {
-    int C = getc (F);
-    if (C == EOF) {
-        Error ("Read error (file corrupt?)");
-    }
-    return C;
+   int C = getc(F);
+   if (C == EOF) {
+      Error("Read error (file corrupt?)");
+   }
+   return C;
 }
 
-unsigned Read16 (FILE* F)
+unsigned Read16(FILE *F)
 // Read a 16 bit value from the file
 {
-    unsigned Lo = Read8 (F);
-    unsigned Hi = Read8 (F);
-    return (Hi << 8) | Lo;
+   unsigned Lo = Read8(F);
+   unsigned Hi = Read8(F);
+   return (Hi << 8) | Lo;
 }
 
-unsigned long Read24 (FILE* F)
+unsigned long Read24(FILE *F)
 // Read a 24 bit value from the file
 {
-    unsigned long Lo = Read16 (F);
-    unsigned long Hi = Read8 (F);
-    return (Hi << 16) | Lo;
+   unsigned long Lo = Read16(F);
+   unsigned long Hi = Read8(F);
+   return (Hi << 16) | Lo;
 }
 
-unsigned long Read32 (FILE* F)
+unsigned long Read32(FILE *F)
 // Read a 32 bit value from the file
 {
-    unsigned long Lo = Read16 (F);
-    unsigned long Hi = Read16 (F);
-    return (Hi << 16) | Lo;
+   unsigned long Lo = Read16(F);
+   unsigned long Hi = Read16(F);
+   return (Hi << 16) | Lo;
 }
 
-void* ReadData (FILE* F, void* Data, unsigned Size)
+void *ReadData(FILE *F, void *Data, unsigned Size)
 // Read data from the file
 {
-    // Explicitly allow reading zero bytes
-    if (Size > 0) {
-        if (fread (Data, 1, Size, F) != Size) {
-            Error ("Read error (file corrupt?)");
-        }
-    }
-    return Data;
+   // Explicitly allow reading zero bytes
+   if (Size > 0) {
+      if (fread(Data, 1, Size, F) != Size) {
+         Error("Read error (file corrupt?)");
+      }
+   }
+   return Data;
 }

@@ -45,7 +45,7 @@ struct O65Data;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void Convert (const struct O65Data* D);
+void Convert(const struct O65Data *D);
 // Convert the o65 file in D
 
 // End of convert.h

@@ -45,7 +45,7 @@ extern unsigned char DefaultBinFmt;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-int RelocatableBinFmt (unsigned Format);
+int RelocatableBinFmt(unsigned Format);
 // Return true if this is a relocatable format, return false otherwise
 
 // End of binfmt.h

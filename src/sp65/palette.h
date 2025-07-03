@@ -45,27 +45,27 @@
 
 typedef struct Palette Palette;
 struct Palette {
-    unsigned            Count;          // Number of entries
-    Color               Entries[1];     // Palette entries - dynamic
+   unsigned Count;   // Number of entries
+   Color Entries[1]; // Palette entries - dynamic
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Palette* NewPalette (unsigned Entries);
+Palette *NewPalette(unsigned Entries);
 // Create a new palette with the given number of entries
 
-Palette* NewMonochromePalette (void);
+Palette *NewMonochromePalette(void);
 // Create and return a palette with two entries (black and white)
 
-Palette* DupPalette (const Palette* P);
+Palette *DupPalette(const Palette *P);
 // Create a copy of a palette
 
-void FreePalette (Palette* P);
+void FreePalette(Palette *P);
 // Free a dynamically allocated palette
 
-void DumpPalette (FILE* F, const Palette* P);
+void DumpPalette(FILE *F, const Palette *P);
 // Dump the palette in readable form to the given file
 
 // End of palette.h

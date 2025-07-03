@@ -36,41 +36,45 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void IPS_Get (const IntPtrStack* S, long *Val, void **Ptr)
+void IPS_Get(const IntPtrStack *S, long *Val, void **Ptr)
 // Get the value on top of an int stack
 {
-    PRECONDITION (S->Count > 0);
-    if (Val) *Val = S->Stack[S->Count-1].val;
-    if (Ptr) *Ptr = S->Stack[S->Count-1].ptr;
+   PRECONDITION(S->Count > 0);
+   if (Val)
+      *Val = S->Stack[S->Count - 1].val;
+   if (Ptr)
+      *Ptr = S->Stack[S->Count - 1].ptr;
 }
 
-void IPS_Set (IntPtrStack* S, long Val, void *Ptr)
+void IPS_Set(IntPtrStack *S, long Val, void *Ptr)
 // Set the value on top of an int stack
 {
-    PRECONDITION (S->Count > 0);
-    S->Stack[S->Count-1].val = Val;
-    S->Stack[S->Count-1].ptr = Ptr;
+   PRECONDITION(S->Count > 0);
+   S->Stack[S->Count - 1].val = Val;
+   S->Stack[S->Count - 1].ptr = Ptr;
 }
 
-void IPS_Drop (IntPtrStack* S)
+void IPS_Drop(IntPtrStack *S)
 // Drop a value from an int stack
 {
-    PRECONDITION (S->Count > 0);
-    --S->Count;
+   PRECONDITION(S->Count > 0);
+   --S->Count;
 }
 
-void IPS_Push (IntPtrStack* S, long Val, void *Ptr)
+void IPS_Push(IntPtrStack *S, long Val, void *Ptr)
 // Push a value onto an int stack
 {
-    PRECONDITION (S->Count < sizeof (S->Stack) / sizeof (S->Stack[0]));
-    S->Stack[S->Count].val = Val;
-    S->Stack[S->Count++].ptr = Ptr;
+   PRECONDITION(S->Count < sizeof(S->Stack) / sizeof(S->Stack[0]));
+   S->Stack[S->Count].val = Val;
+   S->Stack[S->Count++].ptr = Ptr;
 }
 
-void IPS_Pop (IntPtrStack* S, long *Val, void **Ptr)
+void IPS_Pop(IntPtrStack *S, long *Val, void **Ptr)
 // Pop a value from an int stack
 {
-    PRECONDITION (S->Count > 0);
-    if (Val) *Val = S->Stack[--S->Count].val;
-    if (Ptr) *Ptr = S->Stack[S->Count].ptr;
+   PRECONDITION(S->Count > 0);
+   if (Val)
+      *Val = S->Stack[--S->Count].val;
+   if (Ptr)
+      *Ptr = S->Stack[S->Count].ptr;
 }

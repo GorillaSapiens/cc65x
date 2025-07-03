@@ -37,18 +37,18 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-int PowerOf2 (unsigned long Val)
+int PowerOf2(unsigned long Val)
 // Return the exponent if val is a power of two. Return -1 if val is not a
 // power of two.
 {
-    int I;
-    unsigned long Mask = 0x0001;
+   int I;
+   unsigned long Mask = 0x0001;
 
-    for (I = 0; I < 32; ++I) {
-        if (Val == Mask) {
-            return I;
-        }
-        Mask <<= 1;
-    }
-    return -1;
+   for (I = 0; I < 32; ++I) {
+      if (Val == Mask) {
+         return I;
+      }
+      Mask <<= 1;
+   }
+   return -1;
 }

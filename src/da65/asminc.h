@@ -38,7 +38,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown);
+void AsmInc(const char *Filename, char CommentStart, int IgnoreUnknown);
 // Read an assembler include file
 
 // End of asminc.h

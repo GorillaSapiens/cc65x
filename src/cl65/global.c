@@ -37,4 +37,4 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned char Debug     = 0;            // Debug mode enabled?
+unsigned char Debug = 0; // Debug mode enabled?

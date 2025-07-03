@@ -49,7 +49,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-int FileStat (const char* Path, struct stat* Buf);
+int FileStat(const char *Path, struct stat *Buf);
 // Replacement function for stat()
 
 // End of filestat.h

@@ -43,10 +43,10 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void SetComment (uint32_t Addr, const char* Text);
+void SetComment(uint32_t Addr, const char *Text);
 // Set a comment for the given address
 
-const char* GetComment (uint32_t Addr);
+const char *GetComment(uint32_t Addr);
 // Return the comment for an address
 
 // End of comments.h

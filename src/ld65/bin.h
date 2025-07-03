@@ -47,13 +47,13 @@ typedef struct BinDesc BinDesc;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-BinDesc* NewBinDesc (void);
+BinDesc *NewBinDesc(void);
 // Create a new binary format descriptor
 
-void FreeBinDesc (BinDesc* D);
+void FreeBinDesc(BinDesc *D);
 // Free a binary format descriptor
 
-void BinWriteTarget (BinDesc* D, File* F);
+void BinWriteTarget(BinDesc *D, File *F);
 // Write a binary output file
 
 // End of bin.h

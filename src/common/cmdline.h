@@ -41,46 +41,46 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Program name - is set after call to InitCmdLine
-extern const char* ProgName;
+extern const char *ProgName;
 
 // The program argument vector
-extern char** ArgVec;
+extern char **ArgVec;
 extern unsigned ArgCount;
 
 // Structure defining a long option
-typedef struct LongOpt  LongOpt;
+typedef struct LongOpt LongOpt;
 struct LongOpt {
-    const char* Option;
-    unsigned    ArgCount;
-    void        (*Func) (const char* Opt, const char* Arg);
+   const char *Option;
+   unsigned ArgCount;
+   void (*Func)(const char *Opt, const char *Arg);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void InitCmdLine (int* aArgCount, char*** aArgVec, const char* aProgName);
+void InitCmdLine(int *aArgCount, char ***aArgVec, const char *aProgName);
 // Initialize command line parsing. aArgVec is the argument array terminated by
 // a NULL pointer (as usual), ArgCount is the number of valid arguments in the
 // array. Both arguments are remembered in static storage.
 
-void UnknownOption (const char* Opt) attribute ((noreturn));
+void UnknownOption(const char *Opt) attribute((noreturn));
 // Print an error about an unknown option and die.
 
-void NeedArg (const char* Opt) attribute ((noreturn));
+void NeedArg(const char *Opt) attribute((noreturn));
 // Print an error about a missing option argument and exit.
 
-void InvArg (const char* Opt, const char* Arg) attribute ((noreturn));
+void InvArg(const char *Opt, const char *Arg) attribute((noreturn));
 // Print an error about an invalid option argument and exit.
 
-void InvDef (const char* Def) attribute ((noreturn));
+void InvDef(const char *Def) attribute((noreturn));
 // Print an error about an invalid definition and die
 
-const char* GetArg (unsigned* ArgNum, unsigned Len);
+const char *GetArg(unsigned *ArgNum, unsigned Len);
 // Get an argument for a short option. The argument may be appended to the
 // option itself or may be separate. Len is the length of the option string.
 
-void LongOption (unsigned* ArgNum, const LongOpt* OptTab, unsigned OptCount);
+void LongOption(unsigned *ArgNum, const LongOpt *OptTab, unsigned OptCount);
 // Handle a long command line option
 
 // End of cmdline.h

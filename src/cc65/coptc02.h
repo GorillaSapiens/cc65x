@@ -41,13 +41,13 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned Opt65C02Ind (CodeSeg* S);
+unsigned Opt65C02Ind(CodeSeg *S);
 // Try to use the indirect addressing mode where possible
 
-unsigned Opt65C02BitOps (CodeSeg* S);
+unsigned Opt65C02BitOps(CodeSeg *S);
 // Use special bit op instructions of the C02
 
-unsigned Opt65C02Stores (CodeSeg* S);
+unsigned Opt65C02Stores(CodeSeg *S);
 // Use STZ where possible
 
 // End of coptc02.h

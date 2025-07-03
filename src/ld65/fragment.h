@@ -55,41 +55,41 @@ struct Section;
 // Fragment structure
 typedef struct Fragment Fragment;
 struct Fragment {
-    Fragment*           Next;           // Next fragment in list
-    struct ObjData*     Obj;            // Source of fragment
-    struct Section*     Sec;            // Section for this fragment
-    unsigned            Size;           // Size of data/expression
-    struct ExprNode*    Expr;           // Expression if FRAG_EXPR
-    Collection          LineInfos;      // Line info for this fragment
-    unsigned char       Type;           // Type of fragment
-    unsigned char       LitBuf [1];     // Dynamically alloc'ed literal buffer
+   Fragment *Next;          // Next fragment in list
+   struct ObjData *Obj;     // Source of fragment
+   struct Section *Sec;     // Section for this fragment
+   unsigned Size;           // Size of data/expression
+   struct ExprNode *Expr;   // Expression if FRAG_EXPR
+   Collection LineInfos;    // Line info for this fragment
+   unsigned char Type;      // Type of fragment
+   unsigned char LitBuf[1]; // Dynamically alloc'ed literal buffer
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Fragment* NewFragment (unsigned char Type, unsigned Size, struct Section* S);
+Fragment *NewFragment(unsigned char Type, unsigned Size, struct Section *S);
 // Create a new fragment and insert it into the section S
 
 #if defined(HAVE_INLINE)
-INLINE const char* GetFragmentSourceName (const Fragment* F)
+INLINE const char *GetFragmentSourceName(const Fragment *F)
 // Return the name of the source file for this fragment
 {
-    return GetSourceNameFromList (&F->LineInfos);
+   return GetSourceNameFromList(&F->LineInfos);
 }
 #else
-#  define GetFragmentSourceName(F)      GetSourceNameFromList (&(F)->LineInfos)
+#define GetFragmentSourceName(F) GetSourceNameFromList(&(F)->LineInfos)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE unsigned GetFragmentSourceLine (const Fragment* F)
+INLINE unsigned GetFragmentSourceLine(const Fragment *F)
 // Return the source file line for this fragment
 {
-    return GetSourceLineFromList (&F->LineInfos);
+   return GetSourceLineFromList(&F->LineInfos);
 }
 #else
-#  define GetFragmentSourceLine(F)      GetSourceLineFromList (&(F)->LineInfos)
+#define GetFragmentSourceLine(F) GetSourceLineFromList(&(F)->LineInfos)
 #endif
 
 // End of fragment.h

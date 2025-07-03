@@ -52,24 +52,26 @@
 
 typedef struct TextSeg TextSeg;
 struct TextSeg {
-    SymEntry*           Func;           // Owner function
-    Collection          Lines;          // List of text lines
+   SymEntry *Func;   // Owner function
+   Collection Lines; // List of text lines
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-TextSeg* NewTextSeg (SymEntry* Func);
+TextSeg *NewTextSeg(SymEntry *Func);
 // Create a new text segment, initialize and return it
 
-void TS_AddVLine (TextSeg* S, const char* Format, va_list ap) attribute ((format(printf,2,0)));
+void TS_AddVLine(TextSeg *S, const char *Format, va_list ap)
+    attribute((format(printf, 2, 0)));
 // Add a line to the given text segment
 
-void TS_AddLine (TextSeg* S, const char* Format, ...) attribute ((format(printf,2,3)));
+void TS_AddLine(TextSeg *S, const char *Format, ...)
+    attribute((format(printf, 2, 3)));
 // Add a line to the given text segment
 
-void TS_Output (const TextSeg* S);
+void TS_Output(const TextSeg *S);
 // Output the text segment data to the output file
 
 // End of textseg.h

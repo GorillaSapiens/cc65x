@@ -45,19 +45,19 @@ typedef struct XexDesc XexDesc;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-XexDesc* NewXexDesc (void);
+XexDesc *NewXexDesc(void);
 // Create a new XEX format descriptor
 
-void FreeXexDesc (XexDesc* D);
+void FreeXexDesc(XexDesc *D);
 // Free a XEX format descriptor
 
-void XexWriteTarget (XexDesc* D, File* F);
+void XexWriteTarget(XexDesc *D, File *F);
 // Write a XEX output file
 
-void XexSetRunAd (XexDesc* D, Import *RunAd);
+void XexSetRunAd(XexDesc *D, Import *RunAd);
 // Set the RUNAD export
 
-int XexAddInitAd (XexDesc* D, MemoryArea *InitMem, Import *InitAd);
+int XexAddInitAd(XexDesc *D, MemoryArea *InitMem, Import *InitAd);
 // Sets and INITAD for the given memory area
 
 // End of xex.h

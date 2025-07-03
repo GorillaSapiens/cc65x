@@ -38,19 +38,19 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-StringPool* StrPool = 0;
+StringPool *StrPool = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void InitStrPool (void)
+void InitStrPool(void)
 // Initialize the string pool
 {
-    // Allocate a string pool
-    StrPool = NewStringPool (1103);
+   // Allocate a string pool
+   StrPool = NewStringPool(1103);
 
-    // We insert a first string here, which will have id zero. This means
-    // that we can treat index zero later as invalid.
-    SP_AddStr (StrPool, "<invalid message #0>");
+   // We insert a first string here, which will have id zero. This means
+   // that we can treat index zero later as invalid.
+   SP_AddStr(StrPool, "<invalid message #0>");
 }

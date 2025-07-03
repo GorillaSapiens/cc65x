@@ -39,7 +39,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Segment flags
-#define SEG_FLAG_NONE           0x00
+#define SEG_FLAG_NONE 0x00
 
 // End of segdefs.h
 

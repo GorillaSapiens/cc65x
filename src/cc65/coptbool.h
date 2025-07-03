@@ -41,13 +41,13 @@
 //           Optimize bool comparison and transformer subroutines
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned OptBoolCmp (CodeSeg* S);
+unsigned OptBoolCmp(CodeSeg *S);
 // Search for calls to compare subroutines followed by a conditional branch
 // and replace them by cheaper versions, since the branch means that the
 // boolean value returned by these routines is not needed (we may also check
 // that explicitly, but for the current code generator it is always true).
 
-unsigned OptBoolTrans (CodeSeg* S);
+unsigned OptBoolTrans(CodeSeg *S);
 // Try to remove the call to boolean transformer routines where the call is
 // not really needed and change following branch condition accordingly.
 
@@ -55,97 +55,97 @@ unsigned OptBoolTrans (CodeSeg* S);
 //           Remove calls to the boolean cast/negation subroutines
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned OptBoolUnary1 (CodeSeg* S);
+unsigned OptBoolUnary1(CodeSeg *S);
 // Search for and remove bcastax adjacent to bnegax
 
-unsigned OptBoolUnary2 (CodeSeg* S);
+unsigned OptBoolUnary2(CodeSeg *S);
 // Search for and remove bcastax/bnegax following a boolean transformer.
 // Invert the boolean transformer if it is bnegax to be removed.
 
-unsigned OptBoolUnary3 (CodeSeg* S);
+unsigned OptBoolUnary3(CodeSeg *S);
 // Replace bcastax/bnegax with
-// 
+//
 // cpx #0
 // jsr boolne/booleq
-// 
+//
 // if A == 0, or replace bcastax/bnegax with
-// 
+//
 // cmp #0
 // jsr boolne/booleq
-// 
+//
 // if X == 0.
 
 ////////////////////////////////////////////////////////////////////////////////
 //                            bnega optimizations
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned OptBNegA1 (CodeSeg* S);
+unsigned OptBNegA1(CodeSeg *S);
 // Check for
-// 
+//
 // ldx     #$00
 // lda     ..
 // jsr     bnega
-// 
+//
 // Remove the ldx if the lda does not use it.
 
-unsigned OptBNegA2 (CodeSeg* S);
+unsigned OptBNegA2(CodeSeg *S);
 // Check for
-// 
+//
 // lda     ..
 // jsr     bnega
 // jeq/jne ..
-// 
+//
 // Adjust the conditional branch and remove the call to the subroutine.
 
 ////////////////////////////////////////////////////////////////////////////////
 //                            bnegax optimizations
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned OptBNegAX1 (CodeSeg* S);
+unsigned OptBNegAX1(CodeSeg *S);
 // On a call to bnegax, if X is zero, the result depends only on the value in
 // A, so change the call to a call to bnega. This will get further optimized
 // later if possible.
 
-unsigned OptBNegAX2 (CodeSeg* S);
+unsigned OptBNegAX2(CodeSeg *S);
 // Search for the sequence:
-// 
+//
 // lda     (xx),y
 // tax
 // dey
 // lda     (xx),y
 // jsr     bnegax
 // jne/jeq ...
-// 
+//
 // and replace it by
-// 
+//
 // lda     (xx),y
 // dey
 // ora     (xx),y
 // jeq/jne ...
 
-unsigned OptBNegAX3 (CodeSeg* S);
+unsigned OptBNegAX3(CodeSeg *S);
 // Search for the sequence:
-// 
+//
 // lda     xx
 // ldx     yy
 // jsr     bnegax
 // jne/jeq ...
-// 
+//
 // and replace it by
-// 
+//
 // lda     xx
 // ora     xx+1
 // jeq/jne ...
 
-unsigned OptBNegAX4 (CodeSeg* S);
+unsigned OptBNegAX4(CodeSeg *S);
 // Search for the sequence:
-// 
+//
 // jsr     xxx
 // jsr     bnega(x)
 // jeq/jne ...
-// 
+//
 // and replace it by:
-// 
+//
 // jsr     xxx
 // <boolean test>
 // jne/jeq ...

@@ -40,23 +40,23 @@
 
 typedef struct LoopDesc LoopDesc;
 struct LoopDesc {
-    LoopDesc*   Next;
-    unsigned    StackPtr;
-    unsigned    BreakLabel;
-    unsigned    ContinueLabel;
+   LoopDesc *Next;
+   unsigned StackPtr;
+   unsigned BreakLabel;
+   unsigned ContinueLabel;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   code
 ////////////////////////////////////////////////////////////////////////////////
 
-LoopDesc* AddLoop (unsigned BreakLabel, unsigned ContinueLabel);
+LoopDesc *AddLoop(unsigned BreakLabel, unsigned ContinueLabel);
 // Create and add a new loop descriptor.
 
-LoopDesc* CurrentLoop (void);
+LoopDesc *CurrentLoop(void);
 // Return a pointer to the descriptor of the current loop
 
-void DelLoop (void);
+void DelLoop(void);
 // Remove the current loop
 
 // End of loop.h

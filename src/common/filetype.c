@@ -45,53 +45,33 @@
 // CAUTION: table must be sorted for bsearch
 static const FileId TypeTable[] = {
     // Upper case stuff for obsolete operating systems
-// BEGIN SORTED.SH
-    {   "A",    FILETYPE_LIB    },
-    {   "A65",  FILETYPE_ASM    },
-    {   "ASM",  FILETYPE_ASM    },
-    {   "C",    FILETYPE_C      },
-    {   "EMD",  FILETYPE_O65    },
-    {   "GRC",  FILETYPE_GR     },
-    {   "JOY",  FILETYPE_O65    },
-    {   "LIB",  FILETYPE_LIB    },
-    {   "MOU",  FILETYPE_O65    },
-    {   "O",    FILETYPE_OBJ    },
-    {   "O65",  FILETYPE_O65    },
-    {   "OBJ",  FILETYPE_OBJ    },
-    {   "S",    FILETYPE_ASM    },
-    {   "SER",  FILETYPE_O65    },
-    {   "TGI",  FILETYPE_O65    },
-    {   "a",    FILETYPE_LIB    },
-    {   "a65",  FILETYPE_ASM    },
-    {   "asm",  FILETYPE_ASM    },
-    {   "c",    FILETYPE_C      },
-    {   "emd",  FILETYPE_O65    },
-    {   "grc",  FILETYPE_GR     },
-    {   "joy",  FILETYPE_O65    },
-    {   "lib",  FILETYPE_LIB    },
-    {   "mou",  FILETYPE_O65    },
-    {   "o",    FILETYPE_OBJ    },
-    {   "o65",  FILETYPE_O65    },
-    {   "obj",  FILETYPE_OBJ    },
-    {   "s",    FILETYPE_ASM    },
-    {   "ser",  FILETYPE_O65    },
-    {   "tgi",  FILETYPE_O65    },
-// END SORTED.SH
+    // BEGIN SORTED.SH
+    {"A", FILETYPE_LIB},   {"A65", FILETYPE_ASM}, {"ASM", FILETYPE_ASM},
+    {"C", FILETYPE_C},     {"EMD", FILETYPE_O65}, {"GRC", FILETYPE_GR},
+    {"JOY", FILETYPE_O65}, {"LIB", FILETYPE_LIB}, {"MOU", FILETYPE_O65},
+    {"O", FILETYPE_OBJ},   {"O65", FILETYPE_O65}, {"OBJ", FILETYPE_OBJ},
+    {"S", FILETYPE_ASM},   {"SER", FILETYPE_O65}, {"TGI", FILETYPE_O65},
+    {"a", FILETYPE_LIB},   {"a65", FILETYPE_ASM}, {"asm", FILETYPE_ASM},
+    {"c", FILETYPE_C},     {"emd", FILETYPE_O65}, {"grc", FILETYPE_GR},
+    {"joy", FILETYPE_O65}, {"lib", FILETYPE_LIB}, {"mou", FILETYPE_O65},
+    {"o", FILETYPE_OBJ},   {"o65", FILETYPE_O65}, {"obj", FILETYPE_OBJ},
+    {"s", FILETYPE_ASM},   {"ser", FILETYPE_O65}, {"tgi", FILETYPE_O65},
+    // END SORTED.SH
 };
 
-#define FILETYPE_COUNT (sizeof (TypeTable) / sizeof (TypeTable[0]))
+#define FILETYPE_COUNT (sizeof(TypeTable) / sizeof(TypeTable[0]))
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-FILETYPE GetTypeOfFile (const char* Name)
+FILETYPE GetTypeOfFile(const char *Name)
 // Determine the type of the given file by looking at the name. If the file
 // type could not be determined, the function returns FILETYPE_UNKOWN.
 {
-    // Search for a table entry
-    const FileId* F = GetFileId (Name, TypeTable, FILETYPE_COUNT);
+   // Search for a table entry
+   const FileId *F = GetFileId(Name, TypeTable, FILETYPE_COUNT);
 
-    // Return the result
-    return F? F->Id : FILETYPE_UNKNOWN;
+   // Return the result
+   return F ? F->Id : FILETYPE_UNKNOWN;
 }

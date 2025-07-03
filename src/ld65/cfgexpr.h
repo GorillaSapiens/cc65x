@@ -41,13 +41,13 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-ExprNode* CfgExpr (void);
+ExprNode *CfgExpr(void);
 // Read an integer expression and return its value
 
-long CfgConstExpr (void);
+long CfgConstExpr(void);
 // Read an integer expression, make sure its constant and return its value
 
-long CfgCheckedConstExpr (long Min, long Max);
+long CfgCheckedConstExpr(long Min, long Max);
 // Read an expression, make sure it's an int and in range, then return its
 // value.
 

@@ -41,18 +41,18 @@
 //                            negax optimizations
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned OptNegAX1 (CodeSeg* S);
+unsigned OptNegAX1(CodeSeg *S);
 // Search for a call to negax and replace it by
-// 
+//
 // eor     #$FF
 // clc
 // adc     #$01
-// 
+//
 // if X isn't used later.
 
-unsigned OptNegAX2 (CodeSeg* S);
+unsigned OptNegAX2(CodeSeg *S);
 // Search for a call to negax and replace it by
-// 
+//
 // ldx     #$FF
 // eor     #$FF
 // clc
@@ -60,18 +60,18 @@ unsigned OptNegAX2 (CodeSeg* S);
 // bcc     L1
 // inx
 // L1:
-// 
+//
 // if X is known and zero on entry.
 
 ////////////////////////////////////////////////////////////////////////////////
 //                           complax optimizations
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned OptComplAX1 (CodeSeg* S);
+unsigned OptComplAX1(CodeSeg *S);
 // Search for a call to complax and replace it by
-// 
+//
 // eor     #$FF
-// 
+//
 // if X isn't used later.
 
 // End of coptunary.h

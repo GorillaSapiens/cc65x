@@ -50,85 +50,86 @@
 // A hash table entry
 typedef struct HashEntry HashEntry;
 struct HashEntry {
-    HashEntry*          Next;           // Next in list
-    const ObjData*      Module;         // Pointer to object module
-    char                Name [1];       // Name of identifier
+   HashEntry *Next;       // Next in list
+   const ObjData *Module; // Pointer to object module
+   char Name[1];          // Name of identifier
 };
 
 // Hash table
-#define HASHTAB_SIZE    4783
-static HashEntry*       HashTab [HASHTAB_SIZE];
+#define HASHTAB_SIZE 4783
+static HashEntry *HashTab[HASHTAB_SIZE];
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-static HashEntry* NewHashEntry (const char* Name, const ObjData* Module)
+static HashEntry *NewHashEntry(const char *Name, const ObjData *Module)
 // Create and return a new hash entry
 {
-    // Get the length of the name
-    unsigned Len = strlen (Name);
+   // Get the length of the name
+   unsigned Len = strlen(Name);
 
-    // Get memory for the struct
-    HashEntry* H = xmalloc (sizeof (HashEntry) + Len);
+   // Get memory for the struct
+   HashEntry *H = xmalloc(sizeof(HashEntry) + Len);
 
-    // Initialize the fields and return it
-    H->Next     = 0;
-    H->Module   = Module;
-    memcpy (H->Name, Name, Len);
-    H->Name [Len] = '\0';
-    return H;
+   // Initialize the fields and return it
+   H->Next = 0;
+   H->Module = Module;
+   memcpy(H->Name, Name, Len);
+   H->Name[Len] = '\0';
+   return H;
 }
 
-void ExpInsert (const char* Name, const ObjData* Module)
+void ExpInsert(const char *Name, const ObjData *Module)
 // Insert an exported identifier and check if it's already in the list
 {
-    HashEntry* L;
+   HashEntry *L;
 
-    // Create a hash value for the given name
-    unsigned HashVal = HashStr (Name) % HASHTAB_SIZE;
+   // Create a hash value for the given name
+   unsigned HashVal = HashStr(Name) % HASHTAB_SIZE;
 
-    // Create a new hash entry
-    HashEntry* H = NewHashEntry (Name, Module);
+   // Create a new hash entry
+   HashEntry *H = NewHashEntry(Name, Module);
 
-    // Search through the list in that slot and print matching duplicates
-    if (HashTab [HashVal] == 0) {
-        // The slot is empty
-        HashTab [HashVal] = H;
-        return;
-    }
-    L = HashTab [HashVal];
-    while (1) {
-        if (strcmp (L->Name, Name) == 0) {
-            // Duplicate entry
-            Warning ("External symbol '%s' in module '%s', library '%s', "
-                     "is duplicated in module '%s'",
-                     Name, L->Module->Name, LibName, Module->Name);
-        }
-        if (L->Next == 0) {
-            break;
-        } else {
-            L = L->Next;
-        }
-    }
-    L->Next = H;
+   // Search through the list in that slot and print matching duplicates
+   if (HashTab[HashVal] == 0) {
+      // The slot is empty
+      HashTab[HashVal] = H;
+      return;
+   }
+   L = HashTab[HashVal];
+   while (1) {
+      if (strcmp(L->Name, Name) == 0) {
+         // Duplicate entry
+         Warning("External symbol '%s' in module '%s', library '%s', "
+                 "is duplicated in module '%s'",
+                 Name, L->Module->Name, LibName, Module->Name);
+      }
+      if (L->Next == 0) {
+         break;
+      }
+      else {
+         L = L->Next;
+      }
+   }
+   L->Next = H;
 }
 
-const ObjData* ExpFind (const char* Name)
+const ObjData *ExpFind(const char *Name)
 // Check for an identifier in the list. Return NULL if not found, otherwise
 // return a pointer to the module, that exports the identifer.
 {
-    // Get a pointer to the list with the symbols hash value
-    HashEntry* L = HashTab [HashStr (Name) % HASHTAB_SIZE];
-    while (L) {
-        // Search through the list in that slot
-        if (strcmp (L->Name, Name) == 0) {
-            // Entry found
-            return L->Module;
-        }
-        L = L->Next;
-    }
+   // Get a pointer to the list with the symbols hash value
+   HashEntry *L = HashTab[HashStr(Name) % HASHTAB_SIZE];
+   while (L) {
+      // Search through the list in that slot
+      if (strcmp(L->Name, Name) == 0) {
+         // Entry found
+         return L->Module;
+      }
+      L = L->Next;
+   }
 
-    // Not found
-    return 0;
+   // Not found
+   return 0;
 }

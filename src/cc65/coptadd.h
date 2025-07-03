@@ -41,17 +41,17 @@
 //                            Optimize additions
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned OptAdd1 (CodeSeg* S);
+unsigned OptAdd1(CodeSeg *S);
 // Search for the sequence
-// 
+//
 // jsr     pushax
 // ldy     xxx
 // ldx     #$00
 // lda     (c_sp),y
 // jsr     tosaddax
-// 
+//
 // and replace it by:
-// 
+//
 // ldy     xxx-2
 // clc
 // adc     (c_sp),y
@@ -59,9 +59,9 @@ unsigned OptAdd1 (CodeSeg* S);
 // inx
 // L:
 
-unsigned OptAdd2 (CodeSeg* S);
+unsigned OptAdd2(CodeSeg *S);
 // Search for the sequence
-// 
+//
 // ldy     #xx
 // lda     (c_sp),y
 // tax
@@ -69,9 +69,9 @@ unsigned OptAdd2 (CodeSeg* S);
 // lda     (c_sp),y
 // ldy     #$yy
 // jsr     addeqysp
-// 
+//
 // and replace it by:
-// 
+//
 // ldy     #xx-1
 // lda     (c_sp),y
 // ldy     #yy
@@ -83,35 +83,35 @@ unsigned OptAdd2 (CodeSeg* S);
 // ldy     #yy+1
 // adc     (c_sp),y
 // sta     (c_sp),y
-// 
+//
 // provided that a/x is not used later.
 
-unsigned OptAdd3 (CodeSeg* S);
+unsigned OptAdd3(CodeSeg *S);
 // Search for the sequence
-// 
+//
 // jsr     pushax
 // ldx     #$00
 // lda     xxx
 // jsr     tosaddax
-// 
+//
 // and replace it by
-// 
+//
 // clc
 // adc     xxx
 // bcc     L1
 // inx
 // L1:
 
-unsigned OptAdd4 (CodeSeg* S);
+unsigned OptAdd4(CodeSeg *S);
 // Search for the sequence
-// 
+//
 // jsr     pushax
 // lda     xxx
 // ldx     yyy
 // jsr     tosaddax
-// 
+//
 // and replace it by
-// 
+//
 // clc
 // adc     xxx
 // pha
@@ -120,18 +120,18 @@ unsigned OptAdd4 (CodeSeg* S);
 // tax
 // pla
 
-unsigned OptAdd5 (CodeSeg* S);
+unsigned OptAdd5(CodeSeg *S);
 // Search for a call to incaxn and replace it by an 8 bit add if the X register
 // is not used later.
 
-unsigned OptAdd6 (CodeSeg* S);
+unsigned OptAdd6(CodeSeg *S);
 // Search for the sequence
-// 
+//
 // adc     ...
 // bcc     L
 // inx
 // L:
-// 
+//
 // and remove the handling of the high byte if X is not used later.
 
 // End of coptadd.h

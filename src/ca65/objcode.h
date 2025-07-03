@@ -42,43 +42,43 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void Emit0 (unsigned char OPC);
+void Emit0(unsigned char OPC);
 // Emit an instruction with a zero sized operand
 
-void Emit1 (unsigned char OPC, ExprNode* Value);
+void Emit1(unsigned char OPC, ExprNode *Value);
 // Emit an instruction with an one byte argument
 
-void Emit2 (unsigned char OPC, ExprNode* Value);
+void Emit2(unsigned char OPC, ExprNode *Value);
 // Emit an instruction with a two byte argument
 
-void Emit3 (unsigned char OPC, ExprNode* Expr);
+void Emit3(unsigned char OPC, ExprNode *Expr);
 // Emit an instruction with a three byte argument
 
-void EmitSigned (ExprNode* Expr, unsigned Size);
+void EmitSigned(ExprNode *Expr, unsigned Size);
 // Emit a signed expression with the given size
 
-void EmitPCRel (unsigned char OPC, ExprNode* Expr, unsigned Size);
+void EmitPCRel(unsigned char OPC, ExprNode *Expr, unsigned Size);
 // Emit an opcode with a PC relative argument of one or two bytes
 
-void EmitData (const void* Data, unsigned Size);
+void EmitData(const void *Data, unsigned Size);
 // Emit data into the current segment
 
-void EmitStrBuf (const StrBuf* Data);
+void EmitStrBuf(const StrBuf *Data);
 // Emit a string into the current segment
 
-void EmitByte (ExprNode* Expr);
+void EmitByte(ExprNode *Expr);
 // Emit one byte
 
-void EmitWord (ExprNode* Expr);
+void EmitWord(ExprNode *Expr);
 // Emit one word
 
-void EmitFarAddr (ExprNode* Expr);
+void EmitFarAddr(ExprNode *Expr);
 // Emit a 24 bit expression
 
-void EmitDWord (ExprNode* Expr);
+void EmitDWord(ExprNode *Expr);
 // Emit one dword
 
-void EmitFill (unsigned long Count);
+void EmitFill(unsigned long Count);
 // Emit Count fill bytes
 
 // End of objcode.h

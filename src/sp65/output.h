@@ -44,7 +44,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void WriteOutputFile (const StrBuf* Data, const Collection* A, const Bitmap* B);
+void WriteOutputFile(const StrBuf *Data, const Collection *A, const Bitmap *B);
 // Write the contents of Data to a file. Format, file name etc. must be given
 // as attributes in A. If no format is given, the function tries to autodetect
 // it by using the extension of the file name. The bitmap passed to the

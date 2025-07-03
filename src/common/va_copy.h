@@ -41,17 +41,17 @@
 
 // The watcom compiler doesn't have va_copy and a problematic va_list definition
 #if defined(__WATCOMC__)
-#define va_copy(dest,src)       memcpy((dest), (src), sizeof (va_list))
+#define va_copy(dest, src) memcpy((dest), (src), sizeof(va_list))
 #endif
 
 // GNU C has a builtin function
 #if defined(__GNUC__)
-#define va_copy(dest,src)       __va_copy(dest, src)
+#define va_copy(dest, src) __va_copy(dest, src)
 #endif
 
 // MS VC allows for assignment
 #if defined(_MSC_VER)
-#define va_copy(dest,src)       ((dest) = (src))
+#define va_copy(dest, src) ((dest) = (src))
 #endif
 
 // If va_copy is not defined now, we have a problem

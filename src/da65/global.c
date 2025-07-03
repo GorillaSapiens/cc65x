@@ -38,38 +38,38 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // File names
-const char* InFile            = 0;      // Name of input file
-const char* OutFile           = 0;      // Name of output file
+const char *InFile = 0;  // Name of input file
+const char *OutFile = 0; // Name of output file
 
 // Default extensions
-const char OutExt[]           = ".dis"; // Output file extension
-const char CfgExt[]           = ".cfg"; // Config file extension
+const char OutExt[] = ".dis"; // Output file extension
+const char CfgExt[] = ".cfg"; // Config file extension
 
 // Flags and other command line stuff
-unsigned char DebugInfo       = 0;      // Add debug info to the object file
-unsigned char FormFeeds       = 0;      // Add form feeds to the output?
-unsigned char MultiPass       = 0;      // Run several passes to resolve labels
-unsigned char UseHexOffs      = 0;      // Use hexadecimal label offsets
-signed char   NewlineAfterJMP = -1;     // Add a newline after a JMP insn?
-signed char   NewlineAfterRTS = -1;     // Add a newline after a RTS insn?
-unsigned char HaveStartAddr   = 0;      // Flag for start address given
-uint32_t      StartAddr       = 0;      // Start/load address of the program
-unsigned char SyncLines       = 0;      // Accept line markers in the info file
-long          InputOffs       = -1L;    // Offset into input file
-long          InputSize       = -1L;    // Number of bytes to read from input
+unsigned char DebugInfo = 0;      // Add debug info to the object file
+unsigned char FormFeeds = 0;      // Add form feeds to the output?
+unsigned char MultiPass = 0;      // Run several passes to resolve labels
+unsigned char UseHexOffs = 0;     // Use hexadecimal label offsets
+signed char NewlineAfterJMP = -1; // Add a newline after a JMP insn?
+signed char NewlineAfterRTS = -1; // Add a newline after a RTS insn?
+unsigned char HaveStartAddr = 0;  // Flag for start address given
+uint32_t StartAddr = 0;           // Start/load address of the program
+unsigned char SyncLines = 0;      // Accept line markers in the info file
+long InputOffs = -1L;             // Offset into input file
+long InputSize = -1L;             // Number of bytes to read from input
 
 // Stuff needed by many routines
-unsigned      Pass            = 0;      // Disassembler pass
-char          Now[128];                 // Current time as string
+unsigned Pass = 0; // Disassembler pass
+char Now[128];     // Current time as string
 
 // Comments
-unsigned      Comments        = 0;      // Add which comments to the output?
+unsigned Comments = 0; // Add which comments to the output?
 
 // Page formatting
-unsigned PageLength           = 0;      // Length of a listing page
-unsigned LBreak               = 7;      // Linefeed if labels exceed this limit
-unsigned MCol                 = 9;      // Mnemonic column
-unsigned ACol                 = 17;     // Argument column
-unsigned CCol                 = 49;     // Comment column
-unsigned TCol                 = 81;     // Text bytes column
-unsigned BytesPerLine         = 8;      // Max. number of data bytes per line
+unsigned PageLength = 0;   // Length of a listing page
+unsigned LBreak = 7;       // Linefeed if labels exceed this limit
+unsigned MCol = 9;         // Mnemonic column
+unsigned ACol = 17;        // Argument column
+unsigned CCol = 49;        // Comment column
+unsigned TCol = 81;        // Text bytes column
+unsigned BytesPerLine = 8; // Max. number of data bytes per line

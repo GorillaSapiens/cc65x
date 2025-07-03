@@ -50,13 +50,13 @@ struct Segment;
 
 // Span definition
 typedef struct Span Span;
-struct Span{
-    HashNode        Node;               // Node for hash table
-    unsigned        Id;                 // Id of span
-    struct Segment* Seg;                // Pointer to segment
-    unsigned        Start;              // Start of range
-    unsigned        End;                // End of range
-    unsigned        Type;               // Type of data in span
+struct Span {
+   HashNode Node;       // Node for hash table
+   unsigned Id;         // Id of span
+   struct Segment *Seg; // Pointer to segment
+   unsigned Start;      // Start of range
+   unsigned End;        // End of range
+   unsigned Type;       // Type of data in span
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,38 +64,38 @@ struct Span{
 ////////////////////////////////////////////////////////////////////////////////
 
 #if defined(HAVE_INLINE)
-INLINE unsigned long GetSpanSize (const Span* R)
+INLINE unsigned long GetSpanSize(const Span *R)
 // Return the span size in bytes
 {
-    return (R->End - R->Start);
+   return (R->End - R->Start);
 }
 #else
-#  define GetSpanSize(R)   ((R)->End - (R)->Start)
+#define GetSpanSize(R) ((R)->End - (R)->Start)
 #endif
 
-void SetSpanType (Span* S, const StrBuf* Type);
+void SetSpanType(Span *S, const StrBuf *Type);
 // Set the generic type of the span to Type
 
-Span* OpenSpan (void);
+Span *OpenSpan(void);
 // Open a span for the active segment and return it.
 
-Span* CloseSpan (Span* S);
+Span *CloseSpan(Span *S);
 // Close the given span. Be sure to replace the passed span by the one
 // returned, since the span will get deleted if it is empty or may be
 // replaced if a duplicate exists.
 
-void OpenSpanList (Collection* Spans);
+void OpenSpanList(Collection *Spans);
 // Open a list of spans for all existing segments to the given collection of
 // spans. The currently active segment will be inserted first with all others
 // following.
 
-void CloseSpanList (Collection* Spans);
+void CloseSpanList(Collection *Spans);
 // Close all open spans by setting PC to the current PC for the segment.
 
-void WriteSpanList (const Collection* Spans);
+void WriteSpanList(const Collection *Spans);
 // Write a list of spans to the output file
 
-void WriteSpans (void);
+void WriteSpans(void);
 // Write all spans to the object file
 
 // End of span.h

@@ -41,7 +41,7 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-#define SIM65_ERROR         -1
+#define SIM65_ERROR -1
 // An error result for errors that are not part of the simulated test.
 // Note that set simulated test can only return 8-bit errors 0-255.
 
@@ -55,19 +55,21 @@ extern int PrintCycles;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void Warning (const char* Format, ...) attribute((format(printf,1,2)));
+void Warning(const char *Format, ...) attribute((format(printf, 1, 2)));
 // Print a warning message
 
-void Error (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
+void Error(const char *Format, ...) attribute((noreturn, format(printf, 1, 2)));
 // Print an error message and die
 
-void ErrorCode (int Code, const char* Format, ...) attribute((noreturn, format(printf,2,3)));
+void ErrorCode(int Code, const char *Format, ...)
+    attribute((noreturn, format(printf, 2, 3)));
 // Print an error message and die with the given exit code
 
-void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
+void Internal(const char *Format, ...)
+    attribute((noreturn, format(printf, 1, 2)));
 // Print an internal error message and die
 
-void SimExit (int Code);
+void SimExit(int Code);
 // Exit the simulation with an exit code
 
 // End of error.h

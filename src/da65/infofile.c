@@ -37,10 +37,10 @@
 #include <limits.h>
 #if defined(_MSC_VER)
 // Microsoft compiler
-#  include <io.h>
+#include <io.h>
 #else
 // Anyone else
-#  include <unistd.h>
+#include <unistd.h>
 #endif
 
 // common
@@ -64,856 +64,875 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-static void AddAttr (const char* Name, unsigned* Set, unsigned Attr)
+static void AddAttr(const char *Name, unsigned *Set, unsigned Attr)
 // Add an attribute to the set and check that it is not given twice
 {
-    if (*Set & Attr) {
-        // Attribute is already in the set
-        InfoError ("%s given twice", Name);
-    }
-    *Set |= Attr;
+   if (*Set & Attr) {
+      // Attribute is already in the set
+      InfoError("%s given twice", Name);
+   }
+   *Set |= Attr;
 }
 
-static void AsmIncSection (void)
+static void AsmIncSection(void)
 // Parse a asminc section
 {
-    static const IdentTok LabelDefs[] = {
-        {   "COMMENTSTART",     INFOTOK_COMMENTSTART    },
-        {   "FILE",             INFOTOK_FILE            },
-        {   "IGNOREUNKNOWN",    INFOTOK_IGNOREUNKNOWN   },
-    };
+   static const IdentTok LabelDefs[] = {
+       {"COMMENTSTART", INFOTOK_COMMENTSTART},
+       {"FILE", INFOTOK_FILE},
+       {"IGNOREUNKNOWN", INFOTOK_IGNOREUNKNOWN},
+   };
 
-    // Locals - initialize to avoid gcc warnings
-    char* Name = 0;
-    int CommentStart = EOF;
-    int IgnoreUnknown = -1;
+   // Locals - initialize to avoid gcc warnings
+   char *Name = 0;
+   int CommentStart = EOF;
+   int IgnoreUnknown = -1;
 
-    // Skip the token
-    InfoNextTok ();
+   // Skip the token
+   InfoNextTok();
 
-    // Expect the opening curly brace
-    InfoConsumeLCurly ();
+   // Expect the opening curly brace
+   InfoConsumeLCurly();
 
-    // Look for section tokens
-    while (InfoTok != INFOTOK_RCURLY) {
+   // Look for section tokens
+   while (InfoTok != INFOTOK_RCURLY) {
 
-        // Convert to special token
-        InfoSpecialToken (LabelDefs, ENTRY_COUNT (LabelDefs), "Asminc directive");
+      // Convert to special token
+      InfoSpecialToken(LabelDefs, ENTRY_COUNT(LabelDefs), "Asminc directive");
 
-        // Look at the token
-        switch (InfoTok) {
+      // Look at the token
+      switch (InfoTok) {
 
-            case INFOTOK_COMMENTSTART:
-                InfoNextTok ();
-                if (CommentStart != EOF) {
-                    InfoError ("Commentstart already given");
-                }
-                InfoAssureChar ();
-                CommentStart = (char) InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_COMMENTSTART:
+            InfoNextTok();
+            if (CommentStart != EOF) {
+               InfoError("Commentstart already given");
+            }
+            InfoAssureChar();
+            CommentStart = (char)InfoIVal;
+            InfoNextTok();
+            break;
 
-            case INFOTOK_FILE:
-                InfoNextTok ();
-                if (Name) {
-                    InfoError ("File name already given");
-                }
-                InfoAssureStr ();
-                if (InfoSVal[0] == '\0') {
-                    InfoError ("File name may not be empty");
-                }
-                Name = xstrdup (InfoSVal);
-                InfoNextTok ();
-                break;
+         case INFOTOK_FILE:
+            InfoNextTok();
+            if (Name) {
+               InfoError("File name already given");
+            }
+            InfoAssureStr();
+            if (InfoSVal[0] == '\0') {
+               InfoError("File name may not be empty");
+            }
+            Name = xstrdup(InfoSVal);
+            InfoNextTok();
+            break;
 
-            case INFOTOK_IGNOREUNKNOWN:
-                InfoNextTok ();
-                if (IgnoreUnknown != -1) {
-                    InfoError ("Ignoreunknown already specified");
-                }
-                InfoBoolToken ();
-                IgnoreUnknown = (InfoTok != INFOTOK_FALSE);
-                InfoNextTok ();
-                break;
+         case INFOTOK_IGNOREUNKNOWN:
+            InfoNextTok();
+            if (IgnoreUnknown != -1) {
+               InfoError("Ignoreunknown already specified");
+            }
+            InfoBoolToken();
+            IgnoreUnknown = (InfoTok != INFOTOK_FALSE);
+            InfoNextTok();
+            break;
 
-            default:
-                Internal ("Unexpected token: %u", InfoTok);
-        }
+         default:
+            Internal("Unexpected token: %u", InfoTok);
+      }
 
-        // Directive is followed by a semicolon
-        InfoConsumeSemi ();
-    }
+      // Directive is followed by a semicolon
+      InfoConsumeSemi();
+   }
 
-    // Check for the necessary data and assume defaults
-    if (Name == 0) {
-        InfoError ("File name is missing");
-    }
-    if (CommentStart == EOF) {
-        CommentStart = ';';
-    }
-    if (IgnoreUnknown == -1) {
-        IgnoreUnknown = 0;
-    }
+   // Check for the necessary data and assume defaults
+   if (Name == 0) {
+      InfoError("File name is missing");
+   }
+   if (CommentStart == EOF) {
+      CommentStart = ';';
+   }
+   if (IgnoreUnknown == -1) {
+      IgnoreUnknown = 0;
+   }
 
-    // Open the file and read the symbol definitions
-    AsmInc (Name, CommentStart, IgnoreUnknown);
+   // Open the file and read the symbol definitions
+   AsmInc(Name, CommentStart, IgnoreUnknown);
 
-    // Delete the dynamically allocated memory for Name
-    xfree (Name);
+   // Delete the dynamically allocated memory for Name
+   xfree(Name);
 
-    // Consume the closing brace
-    InfoConsumeRCurly ();
+   // Consume the closing brace
+   InfoConsumeRCurly();
 }
 
-static void GlobalSection (void)
+static void GlobalSection(void)
 // Parse a global section
 {
-    static const IdentTok GlobalDefs[] = {
-        {   "ARGUMENTCOL",      INFOTOK_ARGUMENT_COLUMN },
-        {   "ARGUMENTCOLUMN",   INFOTOK_ARGUMENT_COLUMN },
-        {   "COMMENTCOL",       INFOTOK_COMMENT_COLUMN  },
-        {   "COMMENTCOLUMN",    INFOTOK_COMMENT_COLUMN  },
-        {   "COMMENTS",         INFOTOK_COMMENTS        },
-        {   "CPU",              INFOTOK_CPU             },
-        {   "HEXOFFS",          INFOTOK_HEXOFFS         },
-        {   "INPUTNAME",        INFOTOK_INPUTNAME       },
-        {   "INPUTOFFS",        INFOTOK_INPUTOFFS       },
-        {   "INPUTSIZE",        INFOTOK_INPUTSIZE       },
-        {   "LABELBREAK",       INFOTOK_LABELBREAK      },
-        {   "MNEMONICCOL",      INFOTOK_MNEMONIC_COLUMN },
-        {   "MNEMONICCOLUMN",   INFOTOK_MNEMONIC_COLUMN },
-        {   "NEWLINEAFTERJMP",  INFOTOK_NL_AFTER_JMP    },
-        {   "NEWLINEAFTERRTS",  INFOTOK_NL_AFTER_RTS    },
-        {   "OUTPUTNAME",       INFOTOK_OUTPUTNAME      },
-        {   "PAGELENGTH",       INFOTOK_PAGELENGTH      },
-        {   "STARTADDR",        INFOTOK_STARTADDR       },
-        {   "TEXTCOL",          INFOTOK_TEXT_COLUMN     },
-        {   "TEXTCOLUMN",       INFOTOK_TEXT_COLUMN     },
-    };
+   static const IdentTok GlobalDefs[] = {
+       {"ARGUMENTCOL", INFOTOK_ARGUMENT_COLUMN},
+       {"ARGUMENTCOLUMN", INFOTOK_ARGUMENT_COLUMN},
+       {"COMMENTCOL", INFOTOK_COMMENT_COLUMN},
+       {"COMMENTCOLUMN", INFOTOK_COMMENT_COLUMN},
+       {"COMMENTS", INFOTOK_COMMENTS},
+       {"CPU", INFOTOK_CPU},
+       {"HEXOFFS", INFOTOK_HEXOFFS},
+       {"INPUTNAME", INFOTOK_INPUTNAME},
+       {"INPUTOFFS", INFOTOK_INPUTOFFS},
+       {"INPUTSIZE", INFOTOK_INPUTSIZE},
+       {"LABELBREAK", INFOTOK_LABELBREAK},
+       {"MNEMONICCOL", INFOTOK_MNEMONIC_COLUMN},
+       {"MNEMONICCOLUMN", INFOTOK_MNEMONIC_COLUMN},
+       {"NEWLINEAFTERJMP", INFOTOK_NL_AFTER_JMP},
+       {"NEWLINEAFTERRTS", INFOTOK_NL_AFTER_RTS},
+       {"OUTPUTNAME", INFOTOK_OUTPUTNAME},
+       {"PAGELENGTH", INFOTOK_PAGELENGTH},
+       {"STARTADDR", INFOTOK_STARTADDR},
+       {"TEXTCOL", INFOTOK_TEXT_COLUMN},
+       {"TEXTCOLUMN", INFOTOK_TEXT_COLUMN},
+   };
 
-    // Skip the token
-    InfoNextTok ();
+   // Skip the token
+   InfoNextTok();
 
-    // Expect the opening curly brace
-    InfoConsumeLCurly ();
+   // Expect the opening curly brace
+   InfoConsumeLCurly();
 
-    // Look for section tokens
-    while (InfoTok != INFOTOK_RCURLY) {
+   // Look for section tokens
+   while (InfoTok != INFOTOK_RCURLY) {
 
-        // Convert to special token
-        InfoSpecialToken (GlobalDefs, ENTRY_COUNT (GlobalDefs), "Global directive");
+      // Convert to special token
+      InfoSpecialToken(GlobalDefs, ENTRY_COUNT(GlobalDefs), "Global directive");
 
-        // Look at the token
-        switch (InfoTok) {
+      // Look at the token
+      switch (InfoTok) {
 
-            case INFOTOK_ARGUMENT_COLUMN:
-                InfoNextTok ();
-                InfoAssureInt ();
-                InfoRangeCheck ("ARGUMENTCOLUMN", MIN_ACOL, MAX_ACOL);
-                ACol = InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_ARGUMENT_COLUMN:
+            InfoNextTok();
+            InfoAssureInt();
+            InfoRangeCheck("ARGUMENTCOLUMN", MIN_ACOL, MAX_ACOL);
+            ACol = InfoIVal;
+            InfoNextTok();
+            break;
 
-            case INFOTOK_COMMENT_COLUMN:
-                InfoNextTok ();
-                InfoAssureInt ();
-                InfoRangeCheck ("COMMENTCOLUMN", MIN_CCOL, MAX_CCOL);
-                CCol = InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_COMMENT_COLUMN:
+            InfoNextTok();
+            InfoAssureInt();
+            InfoRangeCheck("COMMENTCOLUMN", MIN_CCOL, MAX_CCOL);
+            CCol = InfoIVal;
+            InfoNextTok();
+            break;
 
-            case INFOTOK_COMMENTS:
-                InfoNextTok ();
-                InfoAssureInt ();
-                InfoRangeCheck ("COMMENTS", MIN_COMMENTS, MAX_COMMENTS);
-                Comments = InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_COMMENTS:
+            InfoNextTok();
+            InfoAssureInt();
+            InfoRangeCheck("COMMENTS", MIN_COMMENTS, MAX_COMMENTS);
+            Comments = InfoIVal;
+            InfoNextTok();
+            break;
 
-            case INFOTOK_CPU:
-                InfoNextTok ();
-                InfoAssureStr ();
-                if (CPU != CPU_UNKNOWN) {
-                    InfoError ("CPU already specified");
-                }
-                CPU = FindCPU (InfoSVal);
-                SetOpcTable (CPU);
-                InfoNextTok ();
-                break;
+         case INFOTOK_CPU:
+            InfoNextTok();
+            InfoAssureStr();
+            if (CPU != CPU_UNKNOWN) {
+               InfoError("CPU already specified");
+            }
+            CPU = FindCPU(InfoSVal);
+            SetOpcTable(CPU);
+            InfoNextTok();
+            break;
 
-            case INFOTOK_HEXOFFS:
-                InfoNextTok ();
-                InfoBoolToken ();
-                switch (InfoTok) {
-                    case INFOTOK_FALSE: UseHexOffs = 0; break;
-                    case INFOTOK_TRUE:  UseHexOffs = 1; break;
-                }
-                InfoNextTok ();
-                break;
+         case INFOTOK_HEXOFFS:
+            InfoNextTok();
+            InfoBoolToken();
+            switch (InfoTok) {
+               case INFOTOK_FALSE:
+                  UseHexOffs = 0;
+                  break;
+               case INFOTOK_TRUE:
+                  UseHexOffs = 1;
+                  break;
+            }
+            InfoNextTok();
+            break;
 
-            case INFOTOK_INPUTNAME:
-                InfoNextTok ();
-                InfoAssureStr ();
-                if (InFile) {
-                    InfoError ("Input file name already given");
-                }
-                InFile = xstrdup (InfoSVal);
-                InfoNextTok ();
-                break;
+         case INFOTOK_INPUTNAME:
+            InfoNextTok();
+            InfoAssureStr();
+            if (InFile) {
+               InfoError("Input file name already given");
+            }
+            InFile = xstrdup(InfoSVal);
+            InfoNextTok();
+            break;
 
-            case INFOTOK_INPUTOFFS:
-                InfoNextTok ();
-                InfoAssureInt ();
-                InputOffs = InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_INPUTOFFS:
+            InfoNextTok();
+            InfoAssureInt();
+            InputOffs = InfoIVal;
+            InfoNextTok();
+            break;
 
-            case INFOTOK_INPUTSIZE:
-                InfoNextTok ();
-                InfoAssureInt ();
-                InfoRangeCheck ("INPUTSIZE", 1, 0x10000);
-                InputSize = InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_INPUTSIZE:
+            InfoNextTok();
+            InfoAssureInt();
+            InfoRangeCheck("INPUTSIZE", 1, 0x10000);
+            InputSize = InfoIVal;
+            InfoNextTok();
+            break;
 
-            case INFOTOK_LABELBREAK:
-                InfoNextTok ();
-                InfoAssureInt ();
-                InfoRangeCheck ("LABELBREAK", 0, UCHAR_MAX);
-                LBreak = (unsigned char) InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_LABELBREAK:
+            InfoNextTok();
+            InfoAssureInt();
+            InfoRangeCheck("LABELBREAK", 0, UCHAR_MAX);
+            LBreak = (unsigned char)InfoIVal;
+            InfoNextTok();
+            break;
 
-            case INFOTOK_MNEMONIC_COLUMN:
-                InfoNextTok ();
-                InfoAssureInt ();
-                InfoRangeCheck ("MNEMONICCOLUMN", MIN_MCOL, MAX_MCOL);
-                MCol = InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_MNEMONIC_COLUMN:
+            InfoNextTok();
+            InfoAssureInt();
+            InfoRangeCheck("MNEMONICCOLUMN", MIN_MCOL, MAX_MCOL);
+            MCol = InfoIVal;
+            InfoNextTok();
+            break;
 
-            case INFOTOK_NL_AFTER_JMP:
-                InfoNextTok ();
-                if (NewlineAfterJMP != -1) {
-                    InfoError ("NLAfterJMP already specified");
-                }
-                InfoBoolToken ();
-                NewlineAfterJMP = (InfoTok != INFOTOK_FALSE);
-                InfoNextTok ();
-                break;
+         case INFOTOK_NL_AFTER_JMP:
+            InfoNextTok();
+            if (NewlineAfterJMP != -1) {
+               InfoError("NLAfterJMP already specified");
+            }
+            InfoBoolToken();
+            NewlineAfterJMP = (InfoTok != INFOTOK_FALSE);
+            InfoNextTok();
+            break;
 
-            case INFOTOK_NL_AFTER_RTS:
-                InfoNextTok ();
-                InfoBoolToken ();
-                if (NewlineAfterRTS != -1) {
-                    InfoError ("NLAfterRTS already specified");
-                }
-                NewlineAfterRTS = (InfoTok != INFOTOK_FALSE);
-                InfoNextTok ();
-                break;
+         case INFOTOK_NL_AFTER_RTS:
+            InfoNextTok();
+            InfoBoolToken();
+            if (NewlineAfterRTS != -1) {
+               InfoError("NLAfterRTS already specified");
+            }
+            NewlineAfterRTS = (InfoTok != INFOTOK_FALSE);
+            InfoNextTok();
+            break;
 
-            case INFOTOK_OUTPUTNAME:
-                InfoNextTok ();
-                InfoAssureStr ();
-                if (OutFile) {
-                    InfoError ("Output file name already given");
-                }
-                OutFile = xstrdup (InfoSVal);
-                InfoNextTok ();
-                break;
+         case INFOTOK_OUTPUTNAME:
+            InfoNextTok();
+            InfoAssureStr();
+            if (OutFile) {
+               InfoError("Output file name already given");
+            }
+            OutFile = xstrdup(InfoSVal);
+            InfoNextTok();
+            break;
 
-            case INFOTOK_PAGELENGTH:
-                InfoNextTok ();
-                InfoAssureInt ();
-                if (InfoIVal != 0) {
-                    InfoRangeCheck ("PAGELENGTH", MIN_PAGE_LEN, MAX_PAGE_LEN);
-                }
-                PageLength = InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_PAGELENGTH:
+            InfoNextTok();
+            InfoAssureInt();
+            if (InfoIVal != 0) {
+               InfoRangeCheck("PAGELENGTH", MIN_PAGE_LEN, MAX_PAGE_LEN);
+            }
+            PageLength = InfoIVal;
+            InfoNextTok();
+            break;
 
-            case INFOTOK_STARTADDR:
-                InfoNextTok ();
-                InfoAssureInt ();
-                InfoRangeCheck ("STARTADDR", 0x0000, 0xFFFF);
-                StartAddr = InfoIVal;
-                HaveStartAddr = 1;
-                InfoNextTok ();
-                break;
+         case INFOTOK_STARTADDR:
+            InfoNextTok();
+            InfoAssureInt();
+            InfoRangeCheck("STARTADDR", 0x0000, 0xFFFF);
+            StartAddr = InfoIVal;
+            HaveStartAddr = 1;
+            InfoNextTok();
+            break;
 
-            case INFOTOK_TEXT_COLUMN:
-                InfoNextTok ();
-                InfoAssureInt ();
-                InfoRangeCheck ("TEXTCOLUMN", MIN_TCOL, MAX_TCOL);
-                TCol = InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_TEXT_COLUMN:
+            InfoNextTok();
+            InfoAssureInt();
+            InfoRangeCheck("TEXTCOLUMN", MIN_TCOL, MAX_TCOL);
+            TCol = InfoIVal;
+            InfoNextTok();
+            break;
 
-            default:
-                Internal ("Unexpected token: %u", InfoTok);
+         default:
+            Internal("Unexpected token: %u", InfoTok);
+      }
 
-        }
+      // Directive is followed by a semicolon
+      InfoConsumeSemi();
+   }
 
-        // Directive is followed by a semicolon
-        InfoConsumeSemi ();
-
-    }
-
-    // Consume the closing brace
-    InfoConsumeRCurly ();
+   // Consume the closing brace
+   InfoConsumeRCurly();
 }
 
-static void LabelSection (void)
+static void LabelSection(void)
 // Parse a label section
 {
-    static const IdentTok LabelDefs[] = {
-        {   "COMMENT",      INFOTOK_COMMENT     },
-        {   "ADDR",         INFOTOK_ADDR        },
-        {   "NAME",         INFOTOK_NAME        },
-        {   "SIZE",         INFOTOK_SIZE        },
-        {   "PARAMSIZE",    INFOTOK_PARAMSIZE   },
-    };
+   static const IdentTok LabelDefs[] = {
+       {"COMMENT", INFOTOK_COMMENT},     {"ADDR", INFOTOK_ADDR},
+       {"NAME", INFOTOK_NAME},           {"SIZE", INFOTOK_SIZE},
+       {"PARAMSIZE", INFOTOK_PARAMSIZE},
+   };
 
-    // Locals - initialize to avoid gcc warnings
-    char* Name      = 0;
-    char* Comment   = 0;
-    long Value      = -1;
-    long Size       = -1;
-    long ParamSize  = -1;
+   // Locals - initialize to avoid gcc warnings
+   char *Name = 0;
+   char *Comment = 0;
+   long Value = -1;
+   long Size = -1;
+   long ParamSize = -1;
 
-    // Skip the token
-    InfoNextTok ();
+   // Skip the token
+   InfoNextTok();
 
-    // Expect the opening curly brace
-    InfoConsumeLCurly ();
+   // Expect the opening curly brace
+   InfoConsumeLCurly();
 
-    // Look for section tokens
-    while (InfoTok != INFOTOK_RCURLY) {
+   // Look for section tokens
+   while (InfoTok != INFOTOK_RCURLY) {
 
-        // Convert to special token
-        InfoSpecialToken (LabelDefs, ENTRY_COUNT (LabelDefs), "Label attribute");
+      // Convert to special token
+      InfoSpecialToken(LabelDefs, ENTRY_COUNT(LabelDefs), "Label attribute");
 
-        // Look at the token
-        switch (InfoTok) {
+      // Look at the token
+      switch (InfoTok) {
 
-            case INFOTOK_ADDR:
-                InfoNextTok ();
-                if (Value >= 0) {
-                    InfoError ("Value already given");
-                }
-                InfoAssureInt ();
-                InfoRangeCheck ("ADDR", 0, 0xFFFF);
-                Value = InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_ADDR:
+            InfoNextTok();
+            if (Value >= 0) {
+               InfoError("Value already given");
+            }
+            InfoAssureInt();
+            InfoRangeCheck("ADDR", 0, 0xFFFF);
+            Value = InfoIVal;
+            InfoNextTok();
+            break;
 
-            case INFOTOK_COMMENT:
-                InfoNextTok ();
-                if (Comment) {
-                    InfoError ("Comment already given");
-                }
-                InfoAssureStr ();
-                if (InfoSVal[0] == '\0') {
-                    InfoError ("Comment may not be empty");
-                }
-                Comment = xstrdup (InfoSVal);
-                InfoNextTok ();
-                break;
+         case INFOTOK_COMMENT:
+            InfoNextTok();
+            if (Comment) {
+               InfoError("Comment already given");
+            }
+            InfoAssureStr();
+            if (InfoSVal[0] == '\0') {
+               InfoError("Comment may not be empty");
+            }
+            Comment = xstrdup(InfoSVal);
+            InfoNextTok();
+            break;
 
-            case INFOTOK_NAME:
-                InfoNextTok ();
-                if (Name) {
-                    InfoError ("Name already given");
-                }
-                InfoAssureStr ();
-                Name = xstrdup (InfoSVal);
-                InfoNextTok ();
-                break;
+         case INFOTOK_NAME:
+            InfoNextTok();
+            if (Name) {
+               InfoError("Name already given");
+            }
+            InfoAssureStr();
+            Name = xstrdup(InfoSVal);
+            InfoNextTok();
+            break;
 
-            case INFOTOK_SIZE:
-                InfoNextTok ();
-                if (Size >= 0) {
-                    InfoError ("Size already given");
-                }
-                InfoAssureInt ();
-                InfoRangeCheck ("SIZE", 1, 0x10000);
-                Size = InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_SIZE:
+            InfoNextTok();
+            if (Size >= 0) {
+               InfoError("Size already given");
+            }
+            InfoAssureInt();
+            InfoRangeCheck("SIZE", 1, 0x10000);
+            Size = InfoIVal;
+            InfoNextTok();
+            break;
 
-            case INFOTOK_PARAMSIZE:
-                InfoNextTok ();
-                if (ParamSize >= 0) {
-                    InfoError ("ParamSize already given");
-                }
-                InfoAssureInt ();
-                InfoRangeCheck ("PARAMSIZE", 1, 0x10000);
-                ParamSize = InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_PARAMSIZE:
+            InfoNextTok();
+            if (ParamSize >= 0) {
+               InfoError("ParamSize already given");
+            }
+            InfoAssureInt();
+            InfoRangeCheck("PARAMSIZE", 1, 0x10000);
+            ParamSize = InfoIVal;
+            InfoNextTok();
+            break;
 
-            default:
-                Internal ("Unexpected token: %u", InfoTok);
-        }
+         default:
+            Internal("Unexpected token: %u", InfoTok);
+      }
 
-        // Directive is followed by a semicolon
-        InfoConsumeSemi ();
-    }
+      // Directive is followed by a semicolon
+      InfoConsumeSemi();
+   }
 
-    // Did we get the necessary data
-    if (Name == 0) {
-        InfoError ("Label name is missing");
-    }
-    if (Name[0] == '\0' && Size > 1) {
-        InfoError ("Unnamed labels must not have a size > 1");
-    }
-    if (Value < 0) {
-        InfoError ("Label value is missing");
-    }
-    if (Size < 0) {
-        // Use default
-        Size = 1;
-    }
-    if (Value + Size > 0x10000) {
-        InfoError ("Invalid size (address out of range)");
-    }
-    if (HaveLabel ((unsigned) Value)) {
-        InfoError ("Label for address $%04lX already defined", Value);
-    }
+   // Did we get the necessary data
+   if (Name == 0) {
+      InfoError("Label name is missing");
+   }
+   if (Name[0] == '\0' && Size > 1) {
+      InfoError("Unnamed labels must not have a size > 1");
+   }
+   if (Value < 0) {
+      InfoError("Label value is missing");
+   }
+   if (Size < 0) {
+      // Use default
+      Size = 1;
+   }
+   if (Value + Size > 0x10000) {
+      InfoError("Invalid size (address out of range)");
+   }
+   if (HaveLabel((unsigned)Value)) {
+      InfoError("Label for address $%04lX already defined", Value);
+   }
 
-    // Define the label(s)
-    if (Name[0] == '\0') {
-        // Size has already beed checked
-        AddUnnamedLabel (Value);
-    } else {
-        AddExtLabelRange ((unsigned) Value, Name, Size);
-    }
-    if (ParamSize >= 0) {
-        SetSubroutineParamSize ((unsigned) Value, (unsigned) ParamSize);
-    }
+   // Define the label(s)
+   if (Name[0] == '\0') {
+      // Size has already beed checked
+      AddUnnamedLabel(Value);
+   }
+   else {
+      AddExtLabelRange((unsigned)Value, Name, Size);
+   }
+   if (ParamSize >= 0) {
+      SetSubroutineParamSize((unsigned)Value, (unsigned)ParamSize);
+   }
 
-    // Define the comment
-    if (Comment) {
-        SetComment (Value, Comment);
-    }
+   // Define the comment
+   if (Comment) {
+      SetComment(Value, Comment);
+   }
 
-    // Delete the dynamically allocated memory for Name and Comment
-    xfree (Name);
-    xfree (Comment);
+   // Delete the dynamically allocated memory for Name and Comment
+   xfree(Name);
+   xfree(Comment);
 
-    // Consume the closing brace
-    InfoConsumeRCurly ();
+   // Consume the closing brace
+   InfoConsumeRCurly();
 }
 
-static void RangeSection (void)
+static void RangeSection(void)
 // Parse a range section
 {
-    static const IdentTok RangeDefs[] = {
-        {   "COMMENT",          INFOTOK_COMMENT  },
-        {   "END",              INFOTOK_END      },
-        {   "NAME",             INFOTOK_NAME     },
-        {   "START",            INFOTOK_START    },
-        {   "TYPE",             INFOTOK_TYPE     },
-        {   "ADDRMODE",         INFOTOK_ADDRMODE },
-        {   "UNIT",             INFOTOK_UNIT     },
-    };
+   static const IdentTok RangeDefs[] = {
+       {"COMMENT", INFOTOK_COMMENT}, {"END", INFOTOK_END},
+       {"NAME", INFOTOK_NAME},       {"START", INFOTOK_START},
+       {"TYPE", INFOTOK_TYPE},       {"ADDRMODE", INFOTOK_ADDRMODE},
+       {"UNIT", INFOTOK_UNIT},
+   };
 
-    static const IdentTok TypeDefs[] = {
-        {   "ADDRTABLE",        INFOTOK_ADDRTAB  },
-        {   "BYTETABLE",        INFOTOK_BYTETAB  },
-        {   "CODE",             INFOTOK_CODE     },
-        {   "DBYTETABLE",       INFOTOK_DBYTETAB },
-        {   "DWORDTABLE",       INFOTOK_DWORDTAB },
-        {   "RTSTABLE",         INFOTOK_RTSTAB   },
-        {   "SKIP",             INFOTOK_SKIP     },
-        {   "TEXTTABLE",        INFOTOK_TEXTTAB  },
-        {   "WORDTABLE",        INFOTOK_WORDTAB  },
-    };
+   static const IdentTok TypeDefs[] = {
+       {"ADDRTABLE", INFOTOK_ADDRTAB},   {"BYTETABLE", INFOTOK_BYTETAB},
+       {"CODE", INFOTOK_CODE},           {"DBYTETABLE", INFOTOK_DBYTETAB},
+       {"DWORDTABLE", INFOTOK_DWORDTAB}, {"RTSTABLE", INFOTOK_RTSTAB},
+       {"SKIP", INFOTOK_SKIP},           {"TEXTTABLE", INFOTOK_TEXTTAB},
+       {"WORDTABLE", INFOTOK_WORDTAB},
+   };
 
-    // Which values did we get?
-    enum {
-        tNone     = 0x00,
-        tStart    = 0x01,
-        tEnd      = 0x02,
-        tType     = 0x04,
-        tName     = 0x08,
-        tComment  = 0x10,
-        tAddrMode = 0x20,
-        tUnit     = 0x40,
-        tNeeded   = (tStart | tEnd | tType)
-    };
-    unsigned Attributes = tNone;
+   // Which values did we get?
+   enum {
+      tNone = 0x00,
+      tStart = 0x01,
+      tEnd = 0x02,
+      tType = 0x04,
+      tName = 0x08,
+      tComment = 0x10,
+      tAddrMode = 0x20,
+      tUnit = 0x40,
+      tNeeded = (tStart | tEnd | tType)
+   };
+   unsigned Attributes = tNone;
 
-    // Locals - initialize to avoid gcc warnings
-    uint32_t Start      = 0;
-    uint32_t End        = 0;
-    unsigned char Type  = 0;
-    unsigned AddrMode   = 0;
-    char* Name          = 0;
-    char* Comment       = 0;
-    unsigned MemberSize = 0;
-    unsigned Unit       = 0;
+   // Locals - initialize to avoid gcc warnings
+   uint32_t Start = 0;
+   uint32_t End = 0;
+   unsigned char Type = 0;
+   unsigned AddrMode = 0;
+   char *Name = 0;
+   char *Comment = 0;
+   unsigned MemberSize = 0;
+   unsigned Unit = 0;
 
-    // Skip the token
-    InfoNextTok ();
+   // Skip the token
+   InfoNextTok();
 
-    // Expect the opening curly brace
-    InfoConsumeLCurly ();
+   // Expect the opening curly brace
+   InfoConsumeLCurly();
 
-    // Look for section tokens
-    while (InfoTok != INFOTOK_RCURLY) {
+   // Look for section tokens
+   while (InfoTok != INFOTOK_RCURLY) {
 
-        // Convert to special token
-        InfoSpecialToken (RangeDefs, ENTRY_COUNT (RangeDefs), "Range attribute");
+      // Convert to special token
+      InfoSpecialToken(RangeDefs, ENTRY_COUNT(RangeDefs), "Range attribute");
 
-        // Look at the token
-        switch (InfoTok) {
+      // Look at the token
+      switch (InfoTok) {
 
-            case INFOTOK_COMMENT:
-                AddAttr ("COMMENT", &Attributes, tComment);
-                InfoNextTok ();
-                InfoAssureStr ();
-                if (InfoSVal[0] == '\0') {
-                    InfoError ("Comment may not be empty");
-                }
-                Comment = xstrdup (InfoSVal);
-                Attributes |= tComment;
-                InfoNextTok ();
-                break;
+         case INFOTOK_COMMENT:
+            AddAttr("COMMENT", &Attributes, tComment);
+            InfoNextTok();
+            InfoAssureStr();
+            if (InfoSVal[0] == '\0') {
+               InfoError("Comment may not be empty");
+            }
+            Comment = xstrdup(InfoSVal);
+            Attributes |= tComment;
+            InfoNextTok();
+            break;
 
-            case INFOTOK_END:
-                AddAttr ("END", &Attributes, tEnd);
-                InfoNextTok ();
-                if (InfoTok == INFOTOK_OFFSET_INTCON) {
-                    InfoRangeCheck ("END", 0x0000, 0xFFFF);
-                    if ((Attributes & tStart) == 0) {
-                        InfoError ("When using End with an offset, Start must be specified before");
-                    }
-                    End = Start + InfoIVal - 1;
-                    if (End > 0xFFFF) {
-                        InfoError ("Range error");
-                    }
-                } else {
-                    InfoAssureInt ();
-                    InfoRangeCheck ("END", 0x0000, 0xFFFF);
-                    End = InfoIVal;
-                }
-                InfoNextTok ();
-                break;
+         case INFOTOK_END:
+            AddAttr("END", &Attributes, tEnd);
+            InfoNextTok();
+            if (InfoTok == INFOTOK_OFFSET_INTCON) {
+               InfoRangeCheck("END", 0x0000, 0xFFFF);
+               if ((Attributes & tStart) == 0) {
+                  InfoError("When using End with an offset, Start must be "
+                            "specified before");
+               }
+               End = Start + InfoIVal - 1;
+               if (End > 0xFFFF) {
+                  InfoError("Range error");
+               }
+            }
+            else {
+               InfoAssureInt();
+               InfoRangeCheck("END", 0x0000, 0xFFFF);
+               End = InfoIVal;
+            }
+            InfoNextTok();
+            break;
 
-            case INFOTOK_NAME:
-                AddAttr ("NAME", &Attributes, tName);
-                InfoNextTok ();
-                InfoAssureStr ();
-                if (InfoSVal[0] == '\0') {
-                    InfoError ("Name may not be empty");
-                }
-                Name = xstrdup (InfoSVal);
-                Attributes |= tName;
-                InfoNextTok ();
-                break;
+         case INFOTOK_NAME:
+            AddAttr("NAME", &Attributes, tName);
+            InfoNextTok();
+            InfoAssureStr();
+            if (InfoSVal[0] == '\0') {
+               InfoError("Name may not be empty");
+            }
+            Name = xstrdup(InfoSVal);
+            Attributes |= tName;
+            InfoNextTok();
+            break;
 
-            case INFOTOK_START:
-                AddAttr ("START", &Attributes, tStart);
-                InfoNextTok ();
-                InfoAssureInt ();
-                InfoRangeCheck ("START", 0x0000, 0xFFFF);
-                Start = InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_START:
+            AddAttr("START", &Attributes, tStart);
+            InfoNextTok();
+            InfoAssureInt();
+            InfoRangeCheck("START", 0x0000, 0xFFFF);
+            Start = InfoIVal;
+            InfoNextTok();
+            break;
 
-            case INFOTOK_TYPE:
-                AddAttr ("TYPE", &Attributes, tType);
-                InfoNextTok ();
-                InfoSpecialToken (TypeDefs, ENTRY_COUNT (TypeDefs), "TYPE");
-                switch (InfoTok) {
-                    case INFOTOK_ADDRTAB:  Type = atAddrTab;  MemberSize = 2; break;
-                    case INFOTOK_BYTETAB:  Type = atByteTab;  MemberSize = 1; break;
-                    case INFOTOK_CODE:     Type = atCode;     MemberSize = 1; break;
-                    case INFOTOK_DBYTETAB: Type = atDByteTab; MemberSize = 2; break;
-                    case INFOTOK_DWORDTAB: Type = atDWordTab; MemberSize = 4; break;
-                    case INFOTOK_RTSTAB:   Type = atRtsTab;   MemberSize = 2; break;
-                    case INFOTOK_SKIP:     Type = atSkip;     MemberSize = 1; break;
-                    case INFOTOK_TEXTTAB:  Type = atTextTab;  MemberSize = 1; break;
-                    case INFOTOK_WORDTAB:  Type = atWordTab;  MemberSize = 2; break;
-                }
-                InfoNextTok ();
-                break;
+         case INFOTOK_TYPE:
+            AddAttr("TYPE", &Attributes, tType);
+            InfoNextTok();
+            InfoSpecialToken(TypeDefs, ENTRY_COUNT(TypeDefs), "TYPE");
+            switch (InfoTok) {
+               case INFOTOK_ADDRTAB:
+                  Type = atAddrTab;
+                  MemberSize = 2;
+                  break;
+               case INFOTOK_BYTETAB:
+                  Type = atByteTab;
+                  MemberSize = 1;
+                  break;
+               case INFOTOK_CODE:
+                  Type = atCode;
+                  MemberSize = 1;
+                  break;
+               case INFOTOK_DBYTETAB:
+                  Type = atDByteTab;
+                  MemberSize = 2;
+                  break;
+               case INFOTOK_DWORDTAB:
+                  Type = atDWordTab;
+                  MemberSize = 4;
+                  break;
+               case INFOTOK_RTSTAB:
+                  Type = atRtsTab;
+                  MemberSize = 2;
+                  break;
+               case INFOTOK_SKIP:
+                  Type = atSkip;
+                  MemberSize = 1;
+                  break;
+               case INFOTOK_TEXTTAB:
+                  Type = atTextTab;
+                  MemberSize = 1;
+                  break;
+               case INFOTOK_WORDTAB:
+                  Type = atWordTab;
+                  MemberSize = 2;
+                  break;
+            }
+            InfoNextTok();
+            break;
 
-            case INFOTOK_ADDRMODE:
-                AddAttr ("ADDRMODE", &Attributes, tAddrMode);
-                InfoNextTok ();
-                InfoAssureStr ();
-                if (InfoSVal[0] == '\0') {
-                    InfoError ("AddrMode may not be empty");
-                }
-                if (InfoSVal[1] == '\0') {
-                    InfoError ("AddrMode must be two characters long");
-                }
-                if (tolower (InfoSVal[0]) == 'm') {
-                    if (InfoSVal[0] == 'm') {
-                        AddrMode = atMem16;
-                    } else {
-                        AddrMode = atMem8;
-                    }
-                } else {
-                    InfoError ("AddrMode syntax: mx");
-                }
-                if (tolower (InfoSVal[1]) == 'x') {
-                    if (InfoSVal[1] == 'x') {
-                        AddrMode |= atIdx16;
-                    } else {
-                        AddrMode |= atIdx8;
-                    }
-                } else {
-                    InfoError ("AddrMode syntax: mx");
-                }
-                InfoNextTok ();
-                break;
+         case INFOTOK_ADDRMODE:
+            AddAttr("ADDRMODE", &Attributes, tAddrMode);
+            InfoNextTok();
+            InfoAssureStr();
+            if (InfoSVal[0] == '\0') {
+               InfoError("AddrMode may not be empty");
+            }
+            if (InfoSVal[1] == '\0') {
+               InfoError("AddrMode must be two characters long");
+            }
+            if (tolower(InfoSVal[0]) == 'm') {
+               if (InfoSVal[0] == 'm') {
+                  AddrMode = atMem16;
+               }
+               else {
+                  AddrMode = atMem8;
+               }
+            }
+            else {
+               InfoError("AddrMode syntax: mx");
+            }
+            if (tolower(InfoSVal[1]) == 'x') {
+               if (InfoSVal[1] == 'x') {
+                  AddrMode |= atIdx16;
+               }
+               else {
+                  AddrMode |= atIdx8;
+               }
+            }
+            else {
+               InfoError("AddrMode syntax: mx");
+            }
+            InfoNextTok();
+            break;
 
-            case INFOTOK_UNIT:
-                AddAttr ("UNIT", &Attributes, tUnit);
-                InfoNextTok ();
-                InfoAssureInt ();
-                InfoRangeCheck ("UNIT", 0x0002, 0xFFFF);
-                Unit = InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_UNIT:
+            AddAttr("UNIT", &Attributes, tUnit);
+            InfoNextTok();
+            InfoAssureInt();
+            InfoRangeCheck("UNIT", 0x0002, 0xFFFF);
+            Unit = InfoIVal;
+            InfoNextTok();
+            break;
 
-            default:
-                Internal ("Unexpected token: %u", InfoTok);
-        }
+         default:
+            Internal("Unexpected token: %u", InfoTok);
+      }
 
-        // Directive is followed by a semicolon
-        InfoConsumeSemi ();
+      // Directive is followed by a semicolon
+      InfoConsumeSemi();
+   }
 
-    }
+   // Did we get all required values?
+   if ((Attributes & tNeeded) != tNeeded) {
+      InfoError("Required values missing from this section");
+   }
 
-    // Did we get all required values?
-    if ((Attributes & tNeeded) != tNeeded) {
-        InfoError ("Required values missing from this section");
-    }
+   if (CPU == CPU_65816) {
+      if (Type == atCode && !(Attributes & tAddrMode)) {
+         InfoError("65816 code sections require addressing mode");
+      }
+      if (Type != atCode && (Attributes & tAddrMode)) {
+         InfoError("AddrMode is only valid for code sections");
+      }
+   }
 
-    if (CPU == CPU_65816) {
-        if (Type == atCode && !(Attributes & tAddrMode)) {
-            InfoError ("65816 code sections require addressing mode");
-        }
-        if (Type != atCode && (Attributes & tAddrMode)) {
-            InfoError ("AddrMode is only valid for code sections");
-        }
-    }
+   // Only tables support unit sizes
+   if ((Attributes & tUnit) && Type != atAddrTab && Type != atByteTab &&
+       Type != atDByteTab && Type != atDWordTab && Type != atRtsTab &&
+       Type != atTextTab && Type != atWordTab) {
+      InfoError("Only table types support unit size");
+   }
 
-    // Only tables support unit sizes
-    if ((Attributes & tUnit) &&
-        Type != atAddrTab &&
-        Type != atByteTab &&
-        Type != atDByteTab &&
-        Type != atDWordTab &&
-        Type != atRtsTab &&
-        Type != atTextTab &&
-        Type != atWordTab) {
-        InfoError ("Only table types support unit size");
-    }
+   // Mark each unit separator
+   if (Attributes & tUnit) {
+      unsigned i;
+      for (i = Start; i < End; i += Unit) {
+         MarkAddr(i, atTableUnit);
+      }
+   }
 
-    // Mark each unit separator
-    if (Attributes & tUnit) {
-        unsigned i;
-        for (i = Start; i < End; i += Unit) {
-            MarkAddr (i, atTableUnit);
-        }
-    }
+   // Start must be less than end
+   if (Start > End) {
+      InfoError("Start value must not be greater than end value");
+   }
 
-    // Start must be less than end
-    if (Start > End) {
-        InfoError ("Start value must not be greater than end value");
-    }
+   // Check the granularity
+   if (((End - Start + 1) % MemberSize) != 0) {
+      InfoError("Type of range needs a granularity of %u", MemberSize);
+   }
 
-    // Check the granularity
-    if (((End - Start + 1) % MemberSize) != 0) {
-        InfoError ("Type of range needs a granularity of %u", MemberSize);
-    }
+   // Set the range
+   MarkRange(Start, End, Type | AddrMode);
 
-    // Set the range
-    MarkRange (Start, End, Type | AddrMode);
+   // Do we have a label?
+   if (Attributes & tName) {
 
-    // Do we have a label?
-    if (Attributes & tName) {
+      // Define a label for the table
+      AddExtLabel(Start, Name);
 
-        // Define a label for the table
-        AddExtLabel (Start, Name);
+      // Set the comment if we have one
+      if (Comment) {
+         SetComment(Start, Comment);
+      }
 
-        // Set the comment if we have one
-        if (Comment) {
-            SetComment (Start, Comment);
-        }
+      // Delete name and comment
+      xfree(Name);
+      xfree(Comment);
+   }
 
-        // Delete name and comment
-        xfree (Name);
-        xfree (Comment);
-    }
-
-    // Consume the closing brace
-    InfoConsumeRCurly ();
+   // Consume the closing brace
+   InfoConsumeRCurly();
 }
 
-static void SegmentSection (void)
+static void SegmentSection(void)
 // Parse a segment section
 {
-    static const IdentTok LabelDefs[] = {
-        {   "END",      INFOTOK_END     },
-        {   "NAME",     INFOTOK_NAME    },
-        {   "START",    INFOTOK_START   },
-    };
+   static const IdentTok LabelDefs[] = {
+       {"END", INFOTOK_END},
+       {"NAME", INFOTOK_NAME},
+       {"START", INFOTOK_START},
+   };
 
-    // Locals - initialize to avoid gcc warnings
-    long End    = -1;
-    long Start  = -1;
-    char* Name  = 0;
+   // Locals - initialize to avoid gcc warnings
+   long End = -1;
+   long Start = -1;
+   char *Name = 0;
 
-    // Skip the token
-    InfoNextTok ();
+   // Skip the token
+   InfoNextTok();
 
-    // Expect the opening curly brace
-    InfoConsumeLCurly ();
+   // Expect the opening curly brace
+   InfoConsumeLCurly();
 
-    // Look for section tokens
-    while (InfoTok != INFOTOK_RCURLY) {
+   // Look for section tokens
+   while (InfoTok != INFOTOK_RCURLY) {
 
-        // Convert to special token
-        InfoSpecialToken (LabelDefs, ENTRY_COUNT (LabelDefs), "Segment attribute");
+      // Convert to special token
+      InfoSpecialToken(LabelDefs, ENTRY_COUNT(LabelDefs), "Segment attribute");
 
-        // Look at the token
-        switch (InfoTok) {
+      // Look at the token
+      switch (InfoTok) {
 
-            case INFOTOK_END:
-                InfoNextTok ();
-                if (End >= 0) {
-                    InfoError ("Value already given");
-                }
-                InfoAssureInt ();
-                InfoRangeCheck ("END", 0, 0xFFFF);
-                End = InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_END:
+            InfoNextTok();
+            if (End >= 0) {
+               InfoError("Value already given");
+            }
+            InfoAssureInt();
+            InfoRangeCheck("END", 0, 0xFFFF);
+            End = InfoIVal;
+            InfoNextTok();
+            break;
 
-            case INFOTOK_NAME:
-                InfoNextTok ();
-                if (Name) {
-                    InfoError ("Name already given");
-                }
-                InfoAssureStr ();
-                Name = xstrdup (InfoSVal);
-                InfoNextTok ();
-                break;
+         case INFOTOK_NAME:
+            InfoNextTok();
+            if (Name) {
+               InfoError("Name already given");
+            }
+            InfoAssureStr();
+            Name = xstrdup(InfoSVal);
+            InfoNextTok();
+            break;
 
-            case INFOTOK_START:
-                InfoNextTok ();
-                if (Start >= 0) {
-                    InfoError ("Value already given");
-                }
-                InfoAssureInt ();
-                InfoRangeCheck ("START", 0, 0xFFFF);
-                Start = InfoIVal;
-                InfoNextTok ();
-                break;
+         case INFOTOK_START:
+            InfoNextTok();
+            if (Start >= 0) {
+               InfoError("Value already given");
+            }
+            InfoAssureInt();
+            InfoRangeCheck("START", 0, 0xFFFF);
+            Start = InfoIVal;
+            InfoNextTok();
+            break;
 
-            default:
-                Internal ("Unexpected token: %u", InfoTok);
-        }
+         default:
+            Internal("Unexpected token: %u", InfoTok);
+      }
 
-        // Directive is followed by a semicolon
-        InfoConsumeSemi ();
-    }
+      // Directive is followed by a semicolon
+      InfoConsumeSemi();
+   }
 
-    // Did we get the necessary data, and is it correct?
-    if (Name == 0 || Name[0] == '\0') {
-        InfoError ("Segment name is missing");
-    }
-    if (End < 0) {
-        InfoError ("End address is missing");
-    }
-    if (Start < 0) {
-        InfoError ("Start address is missing");
-    }
-    if (Start > End) {
-        InfoError ("Start address of segment is greater than end address");
-    }
+   // Did we get the necessary data, and is it correct?
+   if (Name == 0 || Name[0] == '\0') {
+      InfoError("Segment name is missing");
+   }
+   if (End < 0) {
+      InfoError("End address is missing");
+   }
+   if (Start < 0) {
+      InfoError("Start address is missing");
+   }
+   if (Start > End) {
+      InfoError("Start address of segment is greater than end address");
+   }
 
-    // Check that segments do not overlap
-    if (SegmentDefined ((unsigned) Start, (unsigned) End)) {
-        InfoError ("Segments must not overlap");
-    }
+   // Check that segments do not overlap
+   if (SegmentDefined((unsigned)Start, (unsigned)End)) {
+      InfoError("Segments must not overlap");
+   }
 
-    // Remember the segment data
-    AddAbsSegment ((unsigned) Start, (unsigned) End, Name);
+   // Remember the segment data
+   AddAbsSegment((unsigned)Start, (unsigned)End, Name);
 
-    // Delete the dynamically allocated memory for Name
-    xfree (Name);
+   // Delete the dynamically allocated memory for Name
+   xfree(Name);
 
-    // Consume the closing brace
-    InfoConsumeRCurly ();
+   // Consume the closing brace
+   InfoConsumeRCurly();
 }
 
-static void InfoParse (void)
+static void InfoParse(void)
 // Parse the config file
 {
-    static const IdentTok Globals[] = {
-        {   "ASMINC",   INFOTOK_ASMINC  },
-        {   "GLOBAL",   INFOTOK_GLOBAL  },
-        {   "LABEL",    INFOTOK_LABEL   },
-        {   "RANGE",    INFOTOK_RANGE   },
-        {   "SEGMENT",  INFOTOK_SEGMENT },
-    };
+   static const IdentTok Globals[] = {
+       {"ASMINC", INFOTOK_ASMINC},   {"GLOBAL", INFOTOK_GLOBAL},
+       {"LABEL", INFOTOK_LABEL},     {"RANGE", INFOTOK_RANGE},
+       {"SEGMENT", INFOTOK_SEGMENT},
+   };
 
-    while (InfoTok != INFOTOK_EOF) {
+   while (InfoTok != INFOTOK_EOF) {
 
-        // Convert an identifier into a token
-        InfoSpecialToken (Globals, ENTRY_COUNT (Globals), "Config directive");
+      // Convert an identifier into a token
+      InfoSpecialToken(Globals, ENTRY_COUNT(Globals), "Config directive");
 
-        // Check the token
-        switch (InfoTok) {
+      // Check the token
+      switch (InfoTok) {
 
-            case INFOTOK_ASMINC:
-                AsmIncSection ();
-                break;
+         case INFOTOK_ASMINC:
+            AsmIncSection();
+            break;
 
-            case INFOTOK_GLOBAL:
-                GlobalSection ();
-                break;
+         case INFOTOK_GLOBAL:
+            GlobalSection();
+            break;
 
-            case INFOTOK_LABEL:
-                LabelSection ();
-                break;
+         case INFOTOK_LABEL:
+            LabelSection();
+            break;
 
-            case INFOTOK_RANGE:
-                RangeSection ();
-                break;
+         case INFOTOK_RANGE:
+            RangeSection();
+            break;
 
-            case INFOTOK_SEGMENT:
-                SegmentSection ();
-                break;
+         case INFOTOK_SEGMENT:
+            SegmentSection();
+            break;
 
-            default:
-                Internal ("Unexpected token: %u", InfoTok);
-        }
+         default:
+            Internal("Unexpected token: %u", InfoTok);
+      }
 
-        // Semicolon expected
-        InfoConsumeSemi ();
-    }
+      // Semicolon expected
+      InfoConsumeSemi();
+   }
 }
 
-void ReadInfoFile (void)
+void ReadInfoFile(void)
 // Read the info file
 {
-    // Check if we have a info file given
-    if (InfoAvail ()) {
-        // Open the config file
-        InfoOpenInput ();
+   // Check if we have a info file given
+   if (InfoAvail()) {
+      // Open the config file
+      InfoOpenInput();
 
-        // Parse the config file
-        InfoParse ();
+      // Parse the config file
+      InfoParse();
 
-        // Close the file
-        InfoCloseInput ();
-    }
+      // Close the file
+      InfoCloseInput();
+   }
 }

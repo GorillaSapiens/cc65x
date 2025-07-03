@@ -48,7 +48,7 @@ struct ExprDesc;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void ShiftExpr (struct ExprDesc* Expr);
+void ShiftExpr(struct ExprDesc *Expr);
 // Parse the << and >> operators.
 
 // End of shiftexpr.h

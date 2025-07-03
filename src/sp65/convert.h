@@ -47,13 +47,13 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-StrBuf* ConvertTo (const Bitmap* B, const Collection* A);
+StrBuf *ConvertTo(const Bitmap *B, const Collection *A);
 // Convert the bitmap B into some sort of other binary format. The output is
 // stored in a string buffer (which is actually a dynamic char array) and
 // returned. The actual output format is taken from the "format" attribute
 // in the attribute collection A.
 
-void ListConversionTargets (FILE* F);
+void ListConversionTargets(FILE *F);
 // Output a list of conversion targets
 
 // End of convert.h

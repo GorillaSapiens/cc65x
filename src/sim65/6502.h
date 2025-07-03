@@ -41,11 +41,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Supported CPUs
-typedef enum CPUType {
-    CPU_6502  = 0,
-    CPU_65C02 = 1,
-    CPU_6502X = 2
-} CPUType;
+typedef enum CPUType { CPU_6502 = 0, CPU_65C02 = 1, CPU_6502X = 2 } CPUType;
 
 // Current CPU
 extern CPUType CPU;
@@ -53,40 +49,40 @@ extern CPUType CPU;
 // 6502 CPU registers
 typedef struct CPURegs CPURegs;
 struct CPURegs {
-    uint8_t     AC;             // Accumulator
-    uint8_t     XR;             // X register
-    uint8_t     YR;             // Y register
-    uint8_t     SR;             // Status register
-    uint8_t     SP;             // Stackpointer
-    uint16_t    PC;             // Program counter
+   uint8_t AC;  // Accumulator
+   uint8_t XR;  // X register
+   uint8_t YR;  // Y register
+   uint8_t SR;  // Status register
+   uint8_t SP;  // Stackpointer
+   uint16_t PC; // Program counter
 };
 
 // Current CPU registers
 extern CPURegs Regs;
 
 // Status register bits
-#define CF      0x01            // Carry flag
-#define ZF      0x02            // Zero flag
-#define IF      0x04            // Interrupt flag
-#define DF      0x08            // Decimal flag
-#define BF      0x10            // Break flag
-#define OF      0x40            // Overflow flag
-#define SF      0x80            // Sign flag
+#define CF 0x01 // Carry flag
+#define ZF 0x02 // Zero flag
+#define IF 0x04 // Interrupt flag
+#define DF 0x08 // Decimal flag
+#define BF 0x10 // Break flag
+#define OF 0x40 // Overflow flag
+#define SF 0x80 // Sign flag
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void Reset (void);
+void Reset(void);
 // Generate a CPU RESET
 
-void IRQRequest (void);
+void IRQRequest(void);
 // Generate an IRQ
 
-void NMIRequest (void);
+void NMIRequest(void);
 // Generate an NMI
 
-unsigned ExecuteInsn (void);
+unsigned ExecuteInsn(void);
 // Execute one CPU instruction. Return the number of clock cycles for the
 // executed instruction.
 

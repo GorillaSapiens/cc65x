@@ -50,167 +50,168 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-#define F_SIZE  sizeof(float)
-#define D_SIZE  sizeof(float)           // NOT double!
+#define F_SIZE sizeof(float)
+#define D_SIZE sizeof(float) // NOT double!
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-size_t FP_F_Size (void)
+size_t FP_F_Size(void)
 // Return the size of the data type float
 {
-    return F_SIZE;
+   return F_SIZE;
 }
 
-unsigned char* FP_F_Data (Float Val)
+unsigned char *FP_F_Data(Float Val)
 // Return the raw data of a float in a malloc'ed buffer. Free after use.
 {
-    return memcpy (xmalloc (F_SIZE), &Val.V, F_SIZE);
+   return memcpy(xmalloc(F_SIZE), &Val.V, F_SIZE);
 }
 
-Float FP_F_Make (float Val)
+Float FP_F_Make(float Val)
 // Make a floating point variable from a float value
 {
-    Float D;
-    D.V = Val;
-    return D;
+   Float D;
+   D.V = Val;
+   return D;
 }
 
-Float FP_F_FromInt (long Val)
+Float FP_F_FromInt(long Val)
 // Convert an integer into a floating point variable
 {
-    Float D;
-    D.V = (float) Val;
-    return D;
+   Float D;
+   D.V = (float)Val;
+   return D;
 }
 
-float FP_F_ToFloat (Float Val)
+float FP_F_ToFloat(Float Val)
 // Convert a Float into a native float
 {
-    return Val.V;
+   return Val.V;
 }
 
-Float FP_F_Add (Float Left, Float Right)
+Float FP_F_Add(Float Left, Float Right)
 // Add two floats
 {
-    Float D;
-    D.V = Left.V + Right.V;
-    return D;
+   Float D;
+   D.V = Left.V + Right.V;
+   return D;
 }
 
-Float FP_F_Sub (Float Left, Float Right)
+Float FP_F_Sub(Float Left, Float Right)
 // Subtract two floats
 {
-    Float D;
-    D.V = Left.V - Right.V;
-    return D;
+   Float D;
+   D.V = Left.V - Right.V;
+   return D;
 }
 
-Float FP_F_Mul (Float Left, Float Right)
+Float FP_F_Mul(Float Left, Float Right)
 // Multiply two floats
 {
-    Float D;
-    D.V = Left.V * Right.V;
-    return D;
+   Float D;
+   D.V = Left.V * Right.V;
+   return D;
 }
 
-Float FP_F_Div (Float Left, Float Right)
+Float FP_F_Div(Float Left, Float Right)
 // Divide two floats
 {
-    Float D;
-    D.V = Left.V / Right.V;
-    return D;
+   Float D;
+   D.V = Left.V / Right.V;
+   return D;
 }
 
-size_t FP_D_Size (void)
+size_t FP_D_Size(void)
 // Return the size of the data type double
 {
-    return D_SIZE;
+   return D_SIZE;
 }
 
-unsigned char* FP_D_Data (Double Val)
+unsigned char *FP_D_Data(Double Val)
 // Return the raw data of a double in a malloc'ed buffer. Free after use.
 {
-    float F = (float) Val.V;
-    return memcpy (xmalloc (F_SIZE), &F, F_SIZE);
+   float F = (float)Val.V;
+   return memcpy(xmalloc(F_SIZE), &F, F_SIZE);
 }
 
-Double FP_D_Make (double Val)
+Double FP_D_Make(double Val)
 // Make a floating point variable from a float value
 {
-    Double D;
-    D.V = Val;
-    return D;
+   Double D;
+   D.V = Val;
+   return D;
 }
 
-Double FP_D_FromInt (long Val)
+Double FP_D_FromInt(long Val)
 // Convert an integer into a floating point variable
 {
-    Double D;
-    D.V = Val;
-    return D;
+   Double D;
+   D.V = Val;
+   return D;
 }
 
-long FP_D_ToLong (Double Val)
+long FP_D_ToLong(Double Val)
 // Convert a floating point variable into a long
 {
-    return (long)Val.V;
+   return (long)Val.V;
 }
 
-double FP_D_ToFloat (Double Val)
+double FP_D_ToFloat(Double Val)
 // Convert a Double into a native double
 {
-    return Val.V;
+   return Val.V;
 }
 
-Double FP_D_Add (Double Left, Double Right)
+Double FP_D_Add(Double Left, Double Right)
 // Add two floats
 {
-    Double D;
-    D.V = Left.V + Right.V;
-    return D;
+   Double D;
+   D.V = Left.V + Right.V;
+   return D;
 }
 
-Double FP_D_Sub (Double Left, Double Right)
+Double FP_D_Sub(Double Left, Double Right)
 // Subtract two floats
 {
-    Double D;
-    D.V = Left.V - Right.V;
-    return D;
+   Double D;
+   D.V = Left.V - Right.V;
+   return D;
 }
 
-Double FP_D_Mul (Double Left, Double Right)
+Double FP_D_Mul(Double Left, Double Right)
 // Multiply two floats
 {
-    Double D;
-    D.V = Left.V * Right.V;
-    return D;
+   Double D;
+   D.V = Left.V * Right.V;
+   return D;
 }
 
-Double FP_D_Div (Double Left, Double Right)
+Double FP_D_Div(Double Left, Double Right)
 // Divide two floats
 {
-    Double D;
-    D.V = Left.V / Right.V;
-    return D;
+   Double D;
+   D.V = Left.V / Right.V;
+   return D;
 }
 
 #if defined(_MSC_VER)
-#pragma warning( push )
-#pragma warning( disable : 4244 )   // conversion from double to float
+#pragma warning(push)
+#pragma warning(disable : 4244) // conversion from double to float
 #endif
 uint32_t FP_D_As32bitRaw(Double Val)
-// converts double into 32bit (float) and then returns its raw content as a 32bit int
+// converts double into 32bit (float) and then returns its raw content as a
+// 32bit int
 {
-    static float f;
-    uint32_t *lptr;
-    uint32_t lval;
-    f = Val.V;
-    lptr = (uint32_t *)&f;
-    lval = *lptr;
-    return lval;
+   static float f;
+   uint32_t *lptr;
+   uint32_t lval;
+   f = Val.V;
+   lptr = (uint32_t *)&f;
+   lval = *lptr;
+   return lval;
 }
 #if defined(_MSC_VER)
-#pragma warning( pop )
+#pragma warning(pop)
 #endif

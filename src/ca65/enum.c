@@ -50,98 +50,97 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void DoEnum (void)
+void DoEnum(void)
 // Handle the .ENUM command
 {
-    // Start at zero
-    long      Offs     = 0;
-    ExprNode* BaseExpr = GenLiteral0 ();
+   // Start at zero
+   long Offs = 0;
+   ExprNode *BaseExpr = GenLiteral0();
 
-    // Check for a name
-    int Anon = (CurTok.Tok != TOK_IDENT);
-    if (!Anon) {
-        // Enter a new scope, then skip the name
-        SymEnterLevel (&CurTok.SVal, SCOPE_ENUM, ADDR_SIZE_ABS, 0);
-        NextTok ();
-    }
+   // Check for a name
+   int Anon = (CurTok.Tok != TOK_IDENT);
+   if (!Anon) {
+      // Enter a new scope, then skip the name
+      SymEnterLevel(&CurTok.SVal, SCOPE_ENUM, ADDR_SIZE_ABS, 0);
+      NextTok();
+   }
 
-    // Test for end of line
-    ConsumeSep ();
+   // Test for end of line
+   ConsumeSep();
 
-    // Read until end of struct
-    while (CurTok.Tok != TOK_ENDENUM && CurTok.Tok != TOK_EOF) {
+   // Read until end of struct
+   while (CurTok.Tok != TOK_ENDENUM && CurTok.Tok != TOK_EOF) {
 
-        Macro*    M;
-        SymEntry* Sym;
-        ExprNode* EnumExpr;
+      Macro *M;
+      SymEntry *Sym;
+      ExprNode *EnumExpr;
 
-        // Skip empty lines
-        if (CurTok.Tok == TOK_SEP) {
-            NextTok ();
-            continue;
-        }
+      // Skip empty lines
+      if (CurTok.Tok == TOK_SEP) {
+         NextTok();
+         continue;
+      }
 
-        // The format is "identifier [ = value ]"
-        if (CurTok.Tok != TOK_IDENT) {
-            // Maybe it's a conditional?
-            if (!CheckConditionals ()) {
-                ErrorSkip ("Identifier expected");
-            }
-            continue;
-        }
+      // The format is "identifier [ = value ]"
+      if (CurTok.Tok != TOK_IDENT) {
+         // Maybe it's a conditional?
+         if (!CheckConditionals()) {
+            ErrorSkip("Identifier expected");
+         }
+         continue;
+      }
 
-        // We have an identifier. Is it a macro?
-        if ((M = FindMacro (&CurTok.SVal)) != 0) {
-            MacExpandStart (M);
-            continue;
-        }
+      // We have an identifier. Is it a macro?
+      if ((M = FindMacro(&CurTok.SVal)) != 0) {
+         MacExpandStart(M);
+         continue;
+      }
 
-        // We have an identifier, generate a symbol
-        Sym = SymFind (CurrentScope, &CurTok.SVal, SYM_ALLOC_NEW);
+      // We have an identifier, generate a symbol
+      Sym = SymFind(CurrentScope, &CurTok.SVal, SYM_ALLOC_NEW);
 
-        // Skip the member name
-        NextTok ();
+      // Skip the member name
+      NextTok();
 
-        // Check for an assignment
-        if (CurTok.Tok == TOK_EQ) {
+      // Check for an assignment
+      if (CurTok.Tok == TOK_EQ) {
 
-            // Skip the equal sign
-            NextTok ();
+         // Skip the equal sign
+         NextTok();
 
-            // Read the new expression
-            EnumExpr = Expression ();
+         // Read the new expression
+         EnumExpr = Expression();
 
-            // Reset the base expression and the offset
-            FreeExpr (BaseExpr);
-            BaseExpr = CloneExpr (EnumExpr);
-            Offs     = 0;
+         // Reset the base expression and the offset
+         FreeExpr(BaseExpr);
+         BaseExpr = CloneExpr(EnumExpr);
+         Offs = 0;
+      }
+      else {
 
-        } else {
+         // No assignment, use last value + 1
+         EnumExpr = GenAddExpr(CloneExpr(BaseExpr), GenLiteralExpr(Offs));
+      }
 
-            // No assignment, use last value + 1
-            EnumExpr = GenAddExpr (CloneExpr (BaseExpr), GenLiteralExpr (Offs));
+      // Assign the value to the enum member
+      SymDef(Sym, EnumExpr, ADDR_SIZE_DEFAULT, SF_NONE);
 
-        }
+      // Increment the offset for the next member
+      ++Offs;
 
-        // Assign the value to the enum member
-        SymDef (Sym, EnumExpr, ADDR_SIZE_DEFAULT, SF_NONE);
+      // Expect end of line
+      ConsumeSep();
+   }
 
-        // Increment the offset for the next member
-        ++Offs;
+   // If this is not an anon enum, leave its scope
+   if (!Anon) {
+      // Close the enum scope
+      SymLeaveLevel();
+   }
 
-        // Expect end of line
-        ConsumeSep ();
-    }
+   // End of enum definition
+   Consume(TOK_ENDENUM, "'.ENDENUM' expected");
 
-    // If this is not an anon enum, leave its scope
-    if (!Anon) {
-        // Close the enum scope
-        SymLeaveLevel ();
-    }
-
-    // End of enum definition
-    Consume (TOK_ENDENUM, "'.ENDENUM' expected");
-
-    // Free the base expression
-    FreeExpr (BaseExpr);
+   // Free the base expression
+   FreeExpr(BaseExpr);
 }

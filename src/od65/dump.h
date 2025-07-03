@@ -40,34 +40,34 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void DumpObjHeader (FILE* F, unsigned long Offset);
+void DumpObjHeader(FILE *F, unsigned long Offset);
 // Dump the header of the given object file
 
-void DumpObjOptions (FILE* F, unsigned long Offset);
+void DumpObjOptions(FILE *F, unsigned long Offset);
 // Dump the file options
 
-void DumpObjFiles (FILE* F, unsigned long Offset);
+void DumpObjFiles(FILE *F, unsigned long Offset);
 // Dump the source files
 
-void DumpObjSegments (FILE* F, unsigned long Offset);
+void DumpObjSegments(FILE *F, unsigned long Offset);
 // Dump the segments in the object file
 
-void DumpObjImports (FILE* F, unsigned long Offset);
+void DumpObjImports(FILE *F, unsigned long Offset);
 // Dump the imports in the object file
 
-void DumpObjExports (FILE* F, unsigned long Offset);
+void DumpObjExports(FILE *F, unsigned long Offset);
 // Dump the exports in the object file
 
-void DumpObjDbgSyms (FILE* F, unsigned long Offset);
+void DumpObjDbgSyms(FILE *F, unsigned long Offset);
 // Dump the debug symbols from an object file
 
-void DumpObjLineInfo (FILE* F, unsigned long Offset);
+void DumpObjLineInfo(FILE *F, unsigned long Offset);
 // Dump the line infos from an object file
 
-void DumpObjScopes (FILE* F, unsigned long Offset);
+void DumpObjScopes(FILE *F, unsigned long Offset);
 // Dump the scopes from an object file
 
-void DumpObjSegSize (FILE* F, unsigned long Offset);
+void DumpObjSegSize(FILE *F, unsigned long Offset);
 // Dump the sizes of the segment in the object file
 
 // End of dump.h

@@ -45,7 +45,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-StrBuf* GenRaw (const Bitmap* B, const Collection* A);
+StrBuf *GenRaw(const Bitmap *B, const Collection *A);
 // Generate binary output in raw format. The output is stored in a string
 // buffer (which is actually a dynamic char array) and returned.
 

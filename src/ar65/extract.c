@@ -42,32 +42,32 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void ExtractObjFiles (int argc, char* argv [])
+void ExtractObjFiles(int argc, char *argv[])
 // Extract object files from a library
 {
-    int I;
+   int I;
 
-    // Check the argument count
-    if (argc <= 0) {
-        Error ("No library name given");
-    }
-    if (argc <= 1) {
-        Error ("No object files to extract");
-    }
+   // Check the argument count
+   if (argc <= 0) {
+      Error("No library name given");
+   }
+   if (argc <= 1) {
+      Error("No object files to extract");
+   }
 
-    // Open the library, read the index
-    LibOpen (argv [0], 1, 0);
+   // Open the library, read the index
+   LibOpen(argv[0], 1, 0);
 
-    // Extract the object files
-    I = 1;
-    while (I < argc) {
-        ObjExtract (argv [I]);
-        ++I;
-    }
+   // Extract the object files
+   I = 1;
+   while (I < argc) {
+      ObjExtract(argv[I]);
+      ++I;
+   }
 
-    // Create a new library file and close the old one
-    LibClose ();
+   // Create a new library file and close the old one
+   LibClose();
 
-    // Successful end
-    exit (EXIT_SUCCESS);
+   // Successful end
+   exit(EXIT_SUCCESS);
 }

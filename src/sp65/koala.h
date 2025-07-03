@@ -45,7 +45,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-StrBuf* GenKoala (const Bitmap* B, const Collection* A);
+StrBuf *GenKoala(const Bitmap *B, const Collection *A);
 // Generate binary output in koala format for the bitmap B. The output is
 // stored in a string buffer (which is actually a dynamic char array) and
 // returned.

@@ -41,7 +41,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned OptStackOps (CodeSeg* S);
+unsigned OptStackOps(CodeSeg *S);
 // Optimize operations that take operands via the stack
 
 // End of coptstop.h

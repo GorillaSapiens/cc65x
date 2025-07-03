@@ -44,114 +44,113 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Size of the stack (== maximum nested macro or repeat count)
-#define ISTACK_MAX      256
+#define ISTACK_MAX 256
 
 // Structure holding a stack element
 typedef struct IElement IElement;
 struct IElement {
-    IElement*   Next;           // Next stack element
-    int         (*Func)(void*); // Function called for input
-    void*       Data;           // User data given as argument
-    const char* Desc;           // Description
+   IElement *Next;      // Next stack element
+   int (*Func)(void *); // Function called for input
+   void *Data;          // User data given as argument
+   const char *Desc;    // Description
 };
 
 // The stack
-static IElement* IStack = 0;    // Input stack pointer
-static unsigned  ICount = 0;    // Number of items on the stack
+static IElement *IStack = 0; // Input stack pointer
+static unsigned ICount = 0;  // Number of items on the stack
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void PushInput (int (*Func) (void*), void* Data, const char* Desc)
+void PushInput(int (*Func)(void *), void *Data, const char *Desc)
 // Push an input function onto the input stack
 {
-    IElement* E;
+   IElement *E;
 
-    // Check for a stack overflow
-    if (ICount > ISTACK_MAX) {
-        Fatal ("Maximum input stack nesting exceeded");
-    }
+   // Check for a stack overflow
+   if (ICount > ISTACK_MAX) {
+      Fatal("Maximum input stack nesting exceeded");
+   }
 
-    // Create a new stack element
-    E = xmalloc (sizeof (*E));
+   // Create a new stack element
+   E = xmalloc(sizeof(*E));
 
-    // Initialize it
-    E->Func = Func;
-    E->Data = Data;
-    E->Desc = Desc;
+   // Initialize it
+   E->Func = Func;
+   E->Data = Data;
+   E->Desc = Desc;
 
-    // Push it
-    E->Next = IStack;
-    IStack  = E;
+   // Push it
+   E->Next = IStack;
+   IStack = E;
 }
 
-void PopInput (void)
+void PopInput(void)
 // Pop the current input function from the input stack
 {
-    IElement* E;
+   IElement *E;
 
-    // We cannot pop from an empty stack
-    PRECONDITION (IStack != 0);
+   // We cannot pop from an empty stack
+   PRECONDITION(IStack != 0);
 
-    // Remember the last element
-    E = IStack;
+   // Remember the last element
+   E = IStack;
 
-    // Pop it
-    IStack = IStack->Next;
+   // Pop it
+   IStack = IStack->Next;
 
-    // And delete it
-    xfree (E);
+   // And delete it
+   xfree(E);
 }
 
-int InputFromStack (void)
+int InputFromStack(void)
 // Try to get input from the input stack. Return true if we had such input,
 // return false otherwise.
 {
-    // Repeatedly call the TOS routine until we have a token or if run out of
-    // routines.
-    while (IStack) {
-        if (IStack->Func (IStack->Data) != 0) {
-            // We have a token
-            return 1;
-        }
-    }
+   // Repeatedly call the TOS routine until we have a token or if run out of
+   // routines.
+   while (IStack) {
+      if (IStack->Func(IStack->Data) != 0) {
+         // We have a token
+         return 1;
+      }
+   }
 
-    // Nothing is on the stack
-    return 0;
+   // Nothing is on the stack
+   return 0;
 }
 
-int HavePushedInput (void)
+int HavePushedInput(void)
 // Return true if we have stacked input available, return false if not
 {
-    return (IStack != 0);
+   return (IStack != 0);
 }
 
-void CheckInputStack (void)
+void CheckInputStack(void)
 // Called from the scanner before closing an input file. Will check for any
 // stuff on the input stack.
 {
-    if (IStack) {
-        Error ("Open %s", IStack->Desc);
-    }
+   if (IStack) {
+      Error("Open %s", IStack->Desc);
+   }
 }
 
-InputStack RetrieveInputStack (void)
+InputStack RetrieveInputStack(void)
 // Retrieve the current input stack. This will also clear it. Used when
 // including a file. The current input stack is stored together with the old
 // input file and restored when the file is closed.
 {
-    // We do not touch the counter so input sources are counted across
-    // includes.
-    InputStack S = IStack;
-    IStack = 0;
-    return S;
+   // We do not touch the counter so input sources are counted across
+   // includes.
+   InputStack S = IStack;
+   IStack = 0;
+   return S;
 }
 
-void RestoreInputStack (InputStack S)
+void RestoreInputStack(InputStack S)
 // Restore an old input stack that was retrieved by RetrieveInputStack().
 {
-    CHECK (IStack == 0);
-    IStack = S;
+   CHECK(IStack == 0);
+   IStack = S;
 }
-

@@ -42,44 +42,44 @@
 
 typedef enum attr_t {
 
-    // Styles
-    atDefault      = 0x0000,    // Default style
-    atCode         = 0x0001,
-    atIllegal      = 0x0002,
-    atByteTab      = 0x0003,    // Same as illegal
-    atDByteTab     = 0x0004,
-    atWordTab      = 0x0005,
-    atDWordTab     = 0x0006,
-    atAddrTab      = 0x0007,
-    atRtsTab       = 0x0008,
-    atTextTab      = 0x0009,
-    atSkip         = 0x000A,    // Skip code completely
+   // Styles
+   atDefault = 0x0000, // Default style
+   atCode = 0x0001,
+   atIllegal = 0x0002,
+   atByteTab = 0x0003, // Same as illegal
+   atDByteTab = 0x0004,
+   atWordTab = 0x0005,
+   atDWordTab = 0x0006,
+   atAddrTab = 0x0007,
+   atRtsTab = 0x0008,
+   atTextTab = 0x0009,
+   atSkip = 0x000A, // Skip code completely
 
-    // Label flags
-    atNoLabel      = 0x0000,    // No label for this address
-    atExtLabel     = 0x0010,    // External label
-    atIntLabel     = 0x0020,    // Internally generated label
-    atDepLabel     = 0x0040,    // Dependent label
-    atUnnamedLabel = 0x0080,    // Unnamed label
+   // Label flags
+   atNoLabel = 0x0000,      // No label for this address
+   atExtLabel = 0x0010,     // External label
+   atIntLabel = 0x0020,     // Internally generated label
+   atDepLabel = 0x0040,     // Dependent label
+   atUnnamedLabel = 0x0080, // Unnamed label
 
-    // Segment
-    atSegment      = 0x0100,    // Code is in a segment
-    atSegmentEnd   = 0x0200,    // Segment end
-    atSegmentStart = 0x0400,    // Segment start
+   // Segment
+   atSegment = 0x0100,      // Code is in a segment
+   atSegmentEnd = 0x0200,   // Segment end
+   atSegmentStart = 0x0400, // Segment start
 
-    // Table unit separator
-    atTableUnit    = 0x0800,
+   // Table unit separator
+   atTableUnit = 0x0800,
 
-    // 65816 addressing mode
-    atMem8         = 0x1000,    // M flag enabled, 8-bit
-    atMem16        = 0x2000,    // M flag disabled, 16-bit
-    atIdx8         = 0x4000,    // X flag enabled, 8-bit
-    atIdx16        = 0x8000,    // X flag disabled, 16-bit
+   // 65816 addressing mode
+   atMem8 = 0x1000,  // M flag enabled, 8-bit
+   atMem16 = 0x2000, // M flag disabled, 16-bit
+   atIdx8 = 0x4000,  // X flag enabled, 8-bit
+   atIdx16 = 0x8000, // X flag disabled, 16-bit
 
-    atStyleMask    = 0x000F,    // Output style
-    atLabelMask    = 0x00F0,    // Label information
-    atSegmentMask  = 0x0700,    // Segment information
-    at65816Mask    = 0xF000,    // 65816 information
+   atStyleMask = 0x000F,   // Output style
+   atLabelMask = 0x00F0,   // Label information
+   atSegmentMask = 0x0700, // Segment information
+   at65816Mask = 0xF000,   // 65816 information
 
 } attr_t;
 
@@ -87,37 +87,37 @@ typedef enum attr_t {
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void AddrCheck (uint32_t Addr);
+void AddrCheck(uint32_t Addr);
 // Check if the given address has a valid range
 
-unsigned char IsLongAddr (uint32_t Addr);
+unsigned char IsLongAddr(uint32_t Addr);
 // Check if the given address is 24-bit
 
-attr_t GetAttr (uint32_t Addr);
+attr_t GetAttr(uint32_t Addr);
 // Return the attribute for the given address
 
-int SegmentDefined (uint32_t Start, unsigned End);
+int SegmentDefined(uint32_t Start, unsigned End);
 // Return true if the atSegment bit is set somewhere in the given range
 
-int IsSegmentEnd (uint32_t Addr);
+int IsSegmentEnd(uint32_t Addr);
 // Return true if a segment ends at the given address
 
-int IsSegmentStart (uint32_t Addr);
+int IsSegmentStart(uint32_t Addr);
 // Return true if a segment starts at the given address
 
-unsigned GetGranularity (attr_t Style);
+unsigned GetGranularity(attr_t Style);
 // Get the granularity for the given style
 
-void MarkRange (uint32_t Start, uint32_t End, attr_t Attr);
+void MarkRange(uint32_t Start, uint32_t End, attr_t Attr);
 // Mark a range with the given attribute
 
-void MarkAddr (uint32_t Addr, attr_t Attr);
+void MarkAddr(uint32_t Addr, attr_t Attr);
 // Mark an address with an attribute
 
-attr_t GetStyleAttr (uint32_t Addr);
+attr_t GetStyleAttr(uint32_t Addr);
 // Return the style attribute for the given address
 
-attr_t GetLabelAttr (uint32_t Addr);
+attr_t GetLabelAttr(uint32_t Addr);
 // Return the label attribute for the given address
 
 // End of attrtab.h

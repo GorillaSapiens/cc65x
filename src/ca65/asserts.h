@@ -48,13 +48,13 @@ struct ExprNode;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void AddAssertion (struct ExprNode* Expr, AssertAction Action, unsigned Msg);
+void AddAssertion(struct ExprNode *Expr, AssertAction Action, unsigned Msg);
 // Add an assertion to the assertion table
 
-void CheckAssertions (void);
+void CheckAssertions(void);
 // Check all assertions and evaluate the ones we can evaluate here.
 
-void WriteAssertions (void);
+void WriteAssertions(void);
 // Write the assertion table to the object file
 
 // End of asserts.h

@@ -51,63 +51,61 @@
 // Type of the entry in the converter table
 typedef struct ConverterMapEntry ConverterMapEntry;
 struct ConverterMapEntry {
-    const char*         Format;
-    StrBuf*             (*ConvertFunc) (const Bitmap*, const Collection*);
+   const char *Format;
+   StrBuf *(*ConvertFunc)(const Bitmap *, const Collection *);
 };
 
 // Converter table
 // CAUTION: table must be alphabetically sorted for bsearch
 static const ConverterMapEntry ConverterMap[] = {
-// BEGIN SORTED.SH
-    {   "geos-bitmap",          GenGeosBitmap   },
-    {   "geos-icon",            GenGeosIcon     },
-    {   "koala",                GenKoala        },
-    {   "lynx-sprite",          GenLynxSprite   },
-    {   "raw",                  GenRaw          },
-    {   "vic2-sprite",          GenVic2Sprite   },
-// END SORTED.SH
+    // BEGIN SORTED.SH
+    {"geos-bitmap", GenGeosBitmap},
+    {"geos-icon", GenGeosIcon},
+    {"koala", GenKoala},
+    {"lynx-sprite", GenLynxSprite},
+    {"raw", GenRaw},
+    {"vic2-sprite", GenVic2Sprite},
+    // END SORTED.SH
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-static int Compare (const void* Key, const void* MapEntry)
+static int Compare(const void *Key, const void *MapEntry)
 // Compare function for bsearch
 {
-    return strcmp (Key, ((const ConverterMapEntry*) MapEntry)->Format);
+   return strcmp(Key, ((const ConverterMapEntry *)MapEntry)->Format);
 }
 
-StrBuf* ConvertTo (const Bitmap* B, const Collection* A)
+StrBuf *ConvertTo(const Bitmap *B, const Collection *A)
 // Convert the bitmap B into some sort of other binary format. The output is
 // stored in a string buffer (which is actually a dynamic char array) and
 // returned. The actual output format is taken from the "format" attribute
 // in the attribute collection A.
 {
-    const ConverterMapEntry* E;
+   const ConverterMapEntry *E;
 
-    // Get the format to convert to
-    const char* Format = NeedAttrVal (A, "format", "convert");
+   // Get the format to convert to
+   const char *Format = NeedAttrVal(A, "format", "convert");
 
-    // Search for the matching converter
-    E = bsearch (Format,
-                 ConverterMap,
-                 sizeof (ConverterMap) / sizeof (ConverterMap[0]),
-                 sizeof (ConverterMap[0]),
-                 Compare);
-    if (E == 0) {
-        Error ("No such target format: '%s'", Format);
-    }
+   // Search for the matching converter
+   E = bsearch(Format, ConverterMap,
+               sizeof(ConverterMap) / sizeof(ConverterMap[0]),
+               sizeof(ConverterMap[0]), Compare);
+   if (E == 0) {
+      Error("No such target format: '%s'", Format);
+   }
 
-    // Do the conversion
-    return E->ConvertFunc (B, A);
+   // Do the conversion
+   return E->ConvertFunc(B, A);
 }
 
-void ListConversionTargets (FILE* F)
+void ListConversionTargets(FILE *F)
 // Output a list of conversion targets
 {
-    unsigned I;
-    for (I = 0; I < sizeof (ConverterMap) / sizeof (ConverterMap[0]); ++I) {
-        fprintf (F, "  %s\n", ConverterMap[I].Format);
-    }
+   unsigned I;
+   for (I = 0; I < sizeof(ConverterMap) / sizeof(ConverterMap[0]); ++I) {
+      fprintf(F, "  %s\n", ConverterMap[I].Format);
+   }
 }

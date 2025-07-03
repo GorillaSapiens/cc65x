@@ -41,82 +41,82 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned OptUnusedLoads (CodeSeg* S);
+unsigned OptUnusedLoads(CodeSeg *S);
 // Remove loads of or operations with registers where the value loaded or
 // produced is not used later.
 
-unsigned OptUnusedStores (CodeSeg* S);
+unsigned OptUnusedStores(CodeSeg *S);
 // Remove stores into zero page registers that aren't used later
 
-unsigned OptLoad3 (CodeSeg* S);
+unsigned OptLoad3(CodeSeg *S);
 // Remove repeated loads from one and the same memory location
 
-unsigned OptDupLoads (CodeSeg* S);
+unsigned OptDupLoads(CodeSeg *S);
 // Remove loads of registers where the value loaded is already in the register.
 
-unsigned OptStoreLoad (CodeSeg* S);
+unsigned OptStoreLoad(CodeSeg *S);
 // Remove a store followed by a load from the same location.
 
-unsigned OptLoadStore1 (CodeSeg* S);
+unsigned OptLoadStore1(CodeSeg *S);
 // Remove an 8 bit load followed by a store into the same location.
 
-unsigned OptLoadStoreLoad (CodeSeg* S);
+unsigned OptLoadStoreLoad(CodeSeg *S);
 // Remove a load, store followed by a reload of the same location.
 
-unsigned OptTransfers1 (CodeSeg* S);
+unsigned OptTransfers1(CodeSeg *S);
 // Remove transfers from one register to another and back
 
-unsigned OptTransfers2 (CodeSeg* S);
+unsigned OptTransfers2(CodeSeg *S);
 // Replace loads followed by a register transfer by a load with the second
 // register if possible.
 
-unsigned OptTransfers3 (CodeSeg* S);
+unsigned OptTransfers3(CodeSeg *S);
 // Replace a register transfer followed by a store of the second register by a
 // store of the first register if this is possible.
 
-unsigned OptTransfers4 (CodeSeg* S);
+unsigned OptTransfers4(CodeSeg *S);
 // Replace a load of a register followed by a transfer insn of the same register
 // by a load of the second register if possible.
 
-unsigned OptPushPop1 (CodeSeg* S);
+unsigned OptPushPop1(CodeSeg *S);
 // Remove a PHA/PLA sequence were A not used later
 
-unsigned OptPushPop2 (CodeSeg* S);
+unsigned OptPushPop2(CodeSeg *S);
 // Remove a PHP/PLP sequence were no processor flags changed inside
 
-unsigned OptPushPop3 (CodeSeg* S);
+unsigned OptPushPop3(CodeSeg *S);
 // Remove a pha/pla sequence where the contents of A are known
 
-unsigned OptPrecalc (CodeSeg* S);
+unsigned OptPrecalc(CodeSeg *S);
 // Replace immediate operations with the accu where the current contents are
 // known by a load of the final value.
 
-unsigned OptShiftBack (CodeSeg* S);
+unsigned OptShiftBack(CodeSeg *S);
 // Remove a pair of shifts to the opposite directions if none of the bits of
 // the register A or the Z/N flags modified by these shifts are used later.
 
-unsigned OptSignExtended (CodeSeg* S);
+unsigned OptSignExtended(CodeSeg *S);
 // Change
-// 
+//
 // lda     xxx     ; X is 0
 // bpl     L1
 // dex/ldx #$FF
 // L1: cpx     #$00
 // bpl     L2
-// 
+//
 // or
-// 
+//
 // lda     xxx     ; X is 0
 // bpl     L1
 // dex/ldx #$FF
 // L1: cpx     #$80
 // bcc/bmi L2
-// 
+//
 // into
 // lda     xxx     ; X is 0
 // bpl     L2
 // dex/ldx #$FF
-// 
+//
 // provided the C flag isn't used later.
 
 // End of coptind.h

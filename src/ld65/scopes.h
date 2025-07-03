@@ -50,29 +50,29 @@
 // Debug symbol structure
 typedef struct Scope Scope;
 struct Scope {
-    unsigned            Id;             // Id of scope
-    ObjData*            Obj;            // Object file that contains the scope
-    unsigned            ParentId;       // Id of parent scope
-    unsigned            LabelId;        // Id of the scope label if any
-    unsigned            LexicalLevel;   // Lexical level
-    unsigned            Flags;
-    unsigned            Type;           // Type of scope
-    unsigned            Name;           // Name of scope
-    unsigned long       Size;           // Size of scope
-    unsigned*           Spans;          // Spans for this scope
+   unsigned Id;           // Id of scope
+   ObjData *Obj;          // Object file that contains the scope
+   unsigned ParentId;     // Id of parent scope
+   unsigned LabelId;      // Id of the scope label if any
+   unsigned LexicalLevel; // Lexical level
+   unsigned Flags;
+   unsigned Type;      // Type of scope
+   unsigned Name;      // Name of scope
+   unsigned long Size; // Size of scope
+   unsigned *Spans;    // Spans for this scope
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id);
+Scope *ReadScope(FILE *F, ObjData *Obj, unsigned Id);
 // Read a scope from a file, insert and return it
 
-unsigned ScopeCount (void);
+unsigned ScopeCount(void);
 // Return the total number of scopes
 
-void PrintDbgScopes (FILE* F);
+void PrintDbgScopes(FILE *F);
 // Output the scopes to a debug info file
 
 // End of scopes.h

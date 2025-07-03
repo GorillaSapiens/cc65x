@@ -51,49 +51,49 @@ typedef struct LineInfo LineInfo;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void InitLineInfo (void);
+void InitLineInfo(void);
 // Initialize the line infos
 
-void DoneLineInfo (void);
+void DoneLineInfo(void);
 // Close down line infos
 
-void EndLine (LineInfo* LI);
+void EndLine(LineInfo *LI);
 // End a line that is tracked by the given LineInfo structure
 
-LineInfo* StartLine (const FilePos* Pos, unsigned Type, unsigned Count);
+LineInfo *StartLine(const FilePos *Pos, unsigned Type, unsigned Count);
 // Start line info for a new line
 
-void NewAsmLine (void);
+void NewAsmLine(void);
 // Start a new assembler input line. Use this function when generating new
 // line of LI_TYPE_ASM. It will check if line and/or file have actually
 // changed, end the old and start the new line as necessary.
 
-LineInfo* GetAsmLineInfo (void);
+LineInfo *GetAsmLineInfo(void);
 // Return the line info for the current assembler file. The function will
 // bump the reference counter before returning the line info.
 
-void ReleaseLineInfo (LineInfo* LI);
+void ReleaseLineInfo(LineInfo *LI);
 // Decrease the reference count for a line info
 
-void GetFullLineInfo (Collection* LineInfos);
+void GetFullLineInfo(Collection *LineInfos);
 // Return full line infos, that is line infos for currently active Slots. The
 // infos will be added to the given collection, existing entries will be left
 // intact. The reference count of all added entries will be increased.
 
-void ReleaseFullLineInfo (Collection* LineInfos);
+void ReleaseFullLineInfo(Collection *LineInfos);
 // Decrease the reference count for a collection full of LineInfos, then clear
 // the collection.
 
-const FilePos* GetSourcePos (const LineInfo* LI);
+const FilePos *GetSourcePos(const LineInfo *LI);
 // Return the source file position from the given line info
 
-unsigned GetLineInfoType (const LineInfo* LI);
+unsigned GetLineInfoType(const LineInfo *LI);
 // Return the type of a line info
 
-void WriteLineInfo (const Collection* LineInfos);
+void WriteLineInfo(const Collection *LineInfos);
 // Write a list of line infos to the object file.
 
-void WriteLineInfos (void);
+void WriteLineInfos(void);
 // Write a list of all line infos to the object file.
 
 // End of lineinfo.h

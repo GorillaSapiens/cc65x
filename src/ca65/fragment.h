@@ -47,22 +47,22 @@
 
 typedef struct Fragment Fragment;
 struct Fragment {
-    Fragment*           Next;       // Pointer to next fragment in segment
-    Fragment*           LineList;   // List of fragments for one src line
-    Collection          LI;         // Line info for this fragment
-    unsigned short      Len;        // Length for this fragment
-    unsigned char       Type;       // Fragment type
-    union {
-        unsigned char   Data[sizeof (ExprNode*)];       // Literal values
-        ExprNode*       Expr;                           // Expression
-    } V;
+   Fragment *Next;     // Pointer to next fragment in segment
+   Fragment *LineList; // List of fragments for one src line
+   Collection LI;      // Line info for this fragment
+   unsigned short Len; // Length for this fragment
+   unsigned char Type; // Fragment type
+   union {
+      unsigned char Data[sizeof(ExprNode *)]; // Literal values
+      ExprNode *Expr;                         // Expression
+   } V;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Fragment* NewFragment (unsigned char Type, unsigned short Len);
+Fragment *NewFragment(unsigned char Type, unsigned short Len);
 // Create, initialize and return a new fragment. The fragment will be inserted
 // into the current segment.
 

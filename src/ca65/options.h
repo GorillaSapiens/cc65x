@@ -38,28 +38,28 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void OptStr (unsigned char Type, const StrBuf* Text);
+void OptStr(unsigned char Type, const StrBuf *Text);
 // Add a string option
 
-void OptComment (const StrBuf* Comment);
+void OptComment(const StrBuf *Comment);
 // Add a comment
 
-void OptAuthor (const StrBuf* Author);
+void OptAuthor(const StrBuf *Author);
 // Add an author statement
 
-void OptTranslator (const StrBuf* Translator);
+void OptTranslator(const StrBuf *Translator);
 // Add a translator option
 
-void OptCompiler (const StrBuf* Compiler);
+void OptCompiler(const StrBuf *Compiler);
 // Add a compiler option
 
-void OptOS (const StrBuf* OS);
+void OptOS(const StrBuf *OS);
 // Add an operating system option
 
-void OptDateTime (unsigned long DateTime);
+void OptDateTime(unsigned long DateTime);
 // Add a date/time option
 
-void WriteOptions (void);
+void WriteOptions(void);
 // Write the options to the object file
 
 // End of options.h

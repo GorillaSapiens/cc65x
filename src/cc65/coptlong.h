@@ -42,10 +42,10 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned OptLongAssign (CodeSeg* S);
+unsigned OptLongAssign(CodeSeg *S);
 // Simplify long assigns.
 
-unsigned OptLongCopy (CodeSeg* S);
+unsigned OptLongCopy(CodeSeg *S);
 // Simplify long copy.
 
 // End of coptind.h

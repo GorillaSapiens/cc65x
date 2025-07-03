@@ -44,7 +44,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-Bitmap* ReadPCXFile (const Collection* A);
+Bitmap *ReadPCXFile(const Collection *A);
 // Read a bitmap from a PCX file
 
 // End of pcx.h

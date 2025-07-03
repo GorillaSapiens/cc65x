@@ -41,29 +41,29 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-char* StrCopy (char* Dest, size_t DestSize, const char* Source)
+char *StrCopy(char *Dest, size_t DestSize, const char *Source)
 // Copy Source to Dest honouring the maximum size of the target buffer. In
 // constrast to strncpy, the resulting string will always be NUL terminated.
 // The function returns the pointer to the destintation buffer.
 {
-    size_t Len = strlen (Source);
-    if (Len >= DestSize) {
-        memcpy (Dest, Source, DestSize-1);
-        Dest[DestSize-1] = '\0';
-    } else {
-        memcpy (Dest, Source, Len+1);
-    }
-    return Dest;
+   size_t Len = strlen(Source);
+   if (Len >= DestSize) {
+      memcpy(Dest, Source, DestSize - 1);
+      Dest[DestSize - 1] = '\0';
+   }
+   else {
+      memcpy(Dest, Source, Len + 1);
+   }
+   return Dest;
 }
 
-int StrCaseCmp (const char* S1, const char* S2)
+int StrCaseCmp(const char *S1, const char *S2)
 // Compare two strings ignoring case
 {
-    int Diff;
-    while ((Diff = toupper (*S1) - toupper (*S2)) == 0 && *S1) {
-        ++S1;
-        ++S2;
-    }
-    return Diff;
+   int Diff;
+   while ((Diff = toupper(*S1) - toupper(*S2)) == 0 && *S1) {
+      ++S1;
+      ++S2;
+   }
+   return Diff;
 }
-

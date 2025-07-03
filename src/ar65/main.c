@@ -51,82 +51,82 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-static void Usage (void)
+static void Usage(void)
 // Print usage information and exit
 {
-    fprintf (stderr, "Usage: %s <operation ...> lib file|module ...\n"
-            "Operations are some of:\n"
-            "\tr\tAdd modules\n"
-            "\td\tDelete modules\n"
-            "\tt\tList library table\n"
-            "\tv\tIncrease verbosity (put before other operation)\n"
-            "\tx\tExtract modules\n"
-            "\tV\tPrint the archiver version\n",
-            ProgName);
-    exit (EXIT_FAILURE);
+   fprintf(stderr,
+           "Usage: %s <operation ...> lib file|module ...\n"
+           "Operations are some of:\n"
+           "\tr\tAdd modules\n"
+           "\td\tDelete modules\n"
+           "\tt\tList library table\n"
+           "\tv\tIncrease verbosity (put before other operation)\n"
+           "\tx\tExtract modules\n"
+           "\tV\tPrint the archiver version\n",
+           ProgName);
+   exit(EXIT_FAILURE);
 }
 
-int main (int argc, char* argv [])
+int main(int argc, char *argv[])
 // Assembler main program
 {
-    unsigned I;
+   unsigned I;
 
-    // Initialize the cmdline module
-    InitCmdLine (&argc, &argv, "ar65");
+   // Initialize the cmdline module
+   InitCmdLine(&argc, &argv, "ar65");
 
-    // We must have a file name
-    if (ArgCount < 2) {
-        Usage ();
-    }
+   // We must have a file name
+   if (ArgCount < 2) {
+      Usage();
+   }
 
-    // Check the parameters
-    I = 1;
-    while (I < ArgCount) {
+   // Check the parameters
+   I = 1;
+   while (I < ArgCount) {
 
-        // Get the argument
-        const char* Arg = ArgVec [I];
+      // Get the argument
+      const char *Arg = ArgVec[I];
 
-        switch (Arg [0]) {
+      switch (Arg[0]) {
 
-            case 'r': // POSIX.2
-            case 'a': // staying compatible
-                AddObjFiles (ArgCount - I - 1, &ArgVec[I+1]);
-                break;
+         case 'r': // POSIX.2
+         case 'a': // staying compatible
+            AddObjFiles(ArgCount - I - 1, &ArgVec[I + 1]);
+            break;
 
-            case 'd':
-                DelObjFiles (ArgCount - I - 1, &ArgVec [I+1]);
-                break;
+         case 'd':
+            DelObjFiles(ArgCount - I - 1, &ArgVec[I + 1]);
+            break;
 
-            case 't': // POSIX.2
-            case 'l': // staying compatible
-                if (Arg [1] == 'v') {
-                    ++Verbosity;
-                }
-                ListObjFiles (ArgCount - I - 1, &ArgVec [I+1]);
-                break;
+         case 't': // POSIX.2
+         case 'l': // staying compatible
+            if (Arg[1] == 'v') {
+               ++Verbosity;
+            }
+            ListObjFiles(ArgCount - I - 1, &ArgVec[I + 1]);
+            break;
 
-            case 'v':
-                ++Verbosity;
-                break;
+         case 'v':
+            ++Verbosity;
+            break;
 
-            case 'x':
-                ExtractObjFiles (ArgCount - I - 1, &ArgVec [I+1]);
-                break;
+         case 'x':
+            ExtractObjFiles(ArgCount - I - 1, &ArgVec[I + 1]);
+            break;
 
-            case 'V':
-                fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
-                break;
+         case 'V':
+            fprintf(stderr, "%s V%s\n", ProgName, GetVersionAsString());
+            break;
 
-            default:
-                fprintf (stderr, "Unknown option: %s\n", Arg);
-                Usage ();
+         default:
+            fprintf(stderr, "Unknown option: %s\n", Arg);
+            Usage();
+      }
 
-        }
+      // Next argument
+      ++I;
+   }
 
-        // Next argument
-        ++I;
-    }
-
-    // Return an apropriate exit code
-    return EXIT_SUCCESS;
+   // Return an apropriate exit code
+   return EXIT_SUCCESS;
 }

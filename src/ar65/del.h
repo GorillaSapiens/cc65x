@@ -38,7 +38,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void DelObjFiles (int argc, char* argv []);
+void DelObjFiles(int argc, char *argv[]);
 // Delete modules from a library
 
 // End of del.h

@@ -38,11 +38,11 @@
 // replacement
 
 #if defined(_WIN32)
-#  include <errno.h>
-#  include <windows.h>
+#include <errno.h>
+#include <windows.h>
 #else
-#  include <sys/types.h>                          // FreeBSD needs this
-#  include <utime.h>
+#include <sys/types.h> // FreeBSD needs this
+#include <utime.h>
 #endif
 
 // common
@@ -54,68 +54,66 @@
 
 #if defined(_WIN32)
 
-static FILETIME* UnixTimeToFileTime (time_t T, FILETIME* FT)
+static FILETIME *UnixTimeToFileTime(time_t T, FILETIME *FT)
 // Calculate a FILETIME value from a time_t. FILETIME contains a 64 bit
 // value with point zero at 1600-01-01 00:00:00 and counting 100ns intervals.
 // time_t is in seconds since 1970-01-01 00:00:00.
 {
-    // Offset between 1600-01-01 and the Epoch in seconds. Watcom C has no
-    // way to express a number > 32 bit (known to me) but is able to do
-    // calculations with 64 bit integers, so we need to do it this way.
-    static const ULARGE_INTEGER Offs = { { 0xB6109100UL, 0x00000020UL } };
-    ULARGE_INTEGER V;
-    V.QuadPart = ((unsigned __int64) T + Offs.QuadPart) * 10000000U;
-    FT->dwLowDateTime  = V.LowPart;
-    FT->dwHighDateTime = V.HighPart;
-    return FT;
+   // Offset between 1600-01-01 and the Epoch in seconds. Watcom C has no
+   // way to express a number > 32 bit (known to me) but is able to do
+   // calculations with 64 bit integers, so we need to do it this way.
+   static const ULARGE_INTEGER Offs = {{0xB6109100UL, 0x00000020UL}};
+   ULARGE_INTEGER V;
+   V.QuadPart = ((unsigned __int64)T + Offs.QuadPart) * 10000000U;
+   FT->dwLowDateTime = V.LowPart;
+   FT->dwHighDateTime = V.HighPart;
+   return FT;
 }
 
-int SetFileTimes (const char* Path, time_t T)
+int SetFileTimes(const char *Path, time_t T)
 // Set the time of last modification and the time of last access of a file to
 // the given time T. This calls utime() for system where it works, and applies
 // workarounds for all others (which in fact means "WINDOWS").
 {
-    HANDLE   H;
-    FILETIME FileTime;
-    int      Error = EACCES;                    // Assume an error
+   HANDLE H;
+   FILETIME FileTime;
+   int Error = EACCES; // Assume an error
 
-    // Open the file
-    H = CreateFile (Path,
-                    GENERIC_WRITE,
-                    FILE_SHARE_READ,
-                    0,                          // Security attributes
-                    OPEN_EXISTING,
-                    0,                          // File flags
-                    0);                         // Template file
-    if (H != INVALID_HANDLE_VALUE) {
-        // Set access and modification time
-        UnixTimeToFileTime (T, &FileTime);
-        if (SetFileTime (H, 0, &FileTime, &FileTime)) {
-            // Done
-            Error = 0;
-        }
+   // Open the file
+   H = CreateFile(Path, GENERIC_WRITE, FILE_SHARE_READ,
+                  0, // Security attributes
+                  OPEN_EXISTING,
+                  0,  // File flags
+                  0); // Template file
+   if (H != INVALID_HANDLE_VALUE) {
+      // Set access and modification time
+      UnixTimeToFileTime(T, &FileTime);
+      if (SetFileTime(H, 0, &FileTime, &FileTime)) {
+         // Done
+         Error = 0;
+      }
 
-        // Close the handle
-        (void) CloseHandle (H);
-    }
+      // Close the handle
+      (void)CloseHandle(H);
+   }
 
-    // Return the error code
-    return Error;
+   // Return the error code
+   return Error;
 }
 
 #else
 
-int SetFileTimes (const char* Path, time_t T)
+int SetFileTimes(const char *Path, time_t T)
 // Set the time of last modification and the time of last access of a file to
 // the given time T. This calls utime() for system where it works, and applies
 // workarounds for all others (which in fact means "WINDOWS").
 {
-    struct utimbuf U;
+   struct utimbuf U;
 
-    // Set access and modification time
-    U.actime  = T;
-    U.modtime = T;
-    return utime (Path, &U);
+   // Set access and modification time
+   U.actime = T;
+   U.modtime = T;
+   return utime(Path, &U);
 }
 
 #endif

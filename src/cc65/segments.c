@@ -58,15 +58,15 @@
 
 // Table struct for address sizes of segments
 typedef struct {
-    StrBuf Name;
-    unsigned char AddrSize;
+   StrBuf Name;
+   unsigned char AddrSize;
 } SegAddrSize_t;
 
 // Pointer to the current segment context. Output goes here.
-SegContext* CS = 0;
+SegContext *CS = 0;
 
 // Pointer to the global segment context
-SegContext* GS = 0;
+SegContext *GS = 0;
 
 // Actual names for the segments
 static StrStack SegmentNames[SEG_COUNT];
@@ -84,257 +84,263 @@ static Collection SegContextStack = STATIC_COLLECTION_INITIALIZER;
 //                       Segment name and address size
 ////////////////////////////////////////////////////////////////////////////////
 
-void InitSegAddrSizes (void)
+void InitSegAddrSizes(void)
 // Initialize the segment address sizes
 {
-    InitCollection (&SegmentAddrSizes);
+   InitCollection(&SegmentAddrSizes);
 }
 
-void DoneSegAddrSizes (void)
+void DoneSegAddrSizes(void)
 // Free the segment address sizes
 {
-    SegAddrSize_t* A;
-    int I;
-    for (I = 0; I < (int)CollCount (&SegmentAddrSizes); ++I) {
-        A = CollAtUnchecked (&SegmentAddrSizes, I);
-        SB_Done (&A->Name);
-        xfree (A);
-    }
-    DoneCollection (&SegmentAddrSizes);
+   SegAddrSize_t *A;
+   int I;
+   for (I = 0; I < (int)CollCount(&SegmentAddrSizes); ++I) {
+      A = CollAtUnchecked(&SegmentAddrSizes, I);
+      SB_Done(&A->Name);
+      xfree(A);
+   }
+   DoneCollection(&SegmentAddrSizes);
 }
 
-static SegAddrSize_t* FindSegAddrSize (const char* Name)
+static SegAddrSize_t *FindSegAddrSize(const char *Name)
 // Find already specified address size for a segment by name.
 // Return the found struct or 0 if not found.
 {
-    SegAddrSize_t* A;
-    int I;
-    for (I = 0; I < (int)CollCount (&SegmentAddrSizes); ++I) {
-        A = CollAtUnchecked (&SegmentAddrSizes, I);
-        if (A && strcmp (SB_GetConstBuf (&A->Name), Name) == 0) {
-            return A;
-        }
-    }
-    return 0;
+   SegAddrSize_t *A;
+   int I;
+   for (I = 0; I < (int)CollCount(&SegmentAddrSizes); ++I) {
+      A = CollAtUnchecked(&SegmentAddrSizes, I);
+      if (A && strcmp(SB_GetConstBuf(&A->Name), Name) == 0) {
+         return A;
+      }
+   }
+   return 0;
 }
 
-void SetSegAddrSize (const char* Name, unsigned char AddrSize)
+void SetSegAddrSize(const char *Name, unsigned char AddrSize)
 // Set the address size for a segment
 {
-    SegAddrSize_t* A = FindSegAddrSize (Name);
-    if (!A) {
-        // New one
-        A = xmalloc (sizeof (SegAddrSize_t));
-        SB_Init (&A->Name);
-        SB_CopyStr (&A->Name, Name);
-        SB_Terminate (&A->Name);
-        CollAppend (&SegmentAddrSizes, A);
-    } else {
-        // Check for mismatching address sizes
-        if (A->AddrSize != AddrSize) {
-            Warning ("Segment address size changed from last time!");
-        }
-    }
+   SegAddrSize_t *A = FindSegAddrSize(Name);
+   if (!A) {
+      // New one
+      A = xmalloc(sizeof(SegAddrSize_t));
+      SB_Init(&A->Name);
+      SB_CopyStr(&A->Name, Name);
+      SB_Terminate(&A->Name);
+      CollAppend(&SegmentAddrSizes, A);
+   }
+   else {
+      // Check for mismatching address sizes
+      if (A->AddrSize != AddrSize) {
+         Warning("Segment address size changed from last time!");
+      }
+   }
 
-    // Set the address size anyway
-    A->AddrSize = AddrSize;
+   // Set the address size anyway
+   A->AddrSize = AddrSize;
 }
 
-unsigned char GetSegAddrSize (const char* Name)
+unsigned char GetSegAddrSize(const char *Name)
 // Get the address size of the given segment.
 // Return ADDR_SIZE_INVALID if not found.
 {
-    SegAddrSize_t* A = FindSegAddrSize (Name);
-    if (A) {
-        return A->AddrSize;
-    }
-    return ADDR_SIZE_INVALID;
+   SegAddrSize_t *A = FindSegAddrSize(Name);
+   if (A) {
+      return A->AddrSize;
+   }
+   return ADDR_SIZE_INVALID;
 }
 
-void InitSegNames (void)
+void InitSegNames(void)
 // Initialize the segment names
 {
-    SS_Push (&SegmentNames[SEG_BSS], SEGNAME_BSS);
-    SS_Push (&SegmentNames[SEG_CODE], SEGNAME_CODE);
-    SS_Push (&SegmentNames[SEG_DATA], SEGNAME_DATA);
-    SS_Push (&SegmentNames[SEG_RODATA], SEGNAME_RODATA);
+   SS_Push(&SegmentNames[SEG_BSS], SEGNAME_BSS);
+   SS_Push(&SegmentNames[SEG_CODE], SEGNAME_CODE);
+   SS_Push(&SegmentNames[SEG_DATA], SEGNAME_DATA);
+   SS_Push(&SegmentNames[SEG_RODATA], SEGNAME_RODATA);
 }
 
-void SetSegName (segment_t Seg, const char* Name)
+void SetSegName(segment_t Seg, const char *Name)
 // Set a new name for a segment
 {
-    SS_Set (&SegmentNames[Seg], Name);
+   SS_Set(&SegmentNames[Seg], Name);
 }
 
-void PushSegName (segment_t Seg, const char* Name)
+void PushSegName(segment_t Seg, const char *Name)
 // Push the current segment name and set a new name for a segment
 {
-    if (SS_IsFull (&SegmentNames[Seg])) {
-        Error ("Segment name stack overflow");
-    } else {
-        SS_Push (&SegmentNames[Seg], Name);
-    }
+   if (SS_IsFull(&SegmentNames[Seg])) {
+      Error("Segment name stack overflow");
+   }
+   else {
+      SS_Push(&SegmentNames[Seg], Name);
+   }
 }
 
-void PopSegName (segment_t Seg)
+void PopSegName(segment_t Seg)
 // Restore a segment name from the segment name stack
 {
-    if (SS_GetCount (&SegmentNames[Seg]) < 2) {
-        Error ("Segment name stack is empty");
-    } else {
-        SS_Drop (&SegmentNames[Seg]);
-    }
+   if (SS_GetCount(&SegmentNames[Seg]) < 2) {
+      Error("Segment name stack is empty");
+   }
+   else {
+      SS_Drop(&SegmentNames[Seg]);
+   }
 }
 
-const char* GetSegName (segment_t Seg)
+const char *GetSegName(segment_t Seg)
 // Get the name of the given segment
 {
-    return SS_Get (&SegmentNames[Seg]);
+   return SS_Get(&SegmentNames[Seg]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //                              Segment context
 ////////////////////////////////////////////////////////////////////////////////
 
-static SegContext* NewSegContext (SymEntry* Func)
+static SegContext *NewSegContext(SymEntry *Func)
 // Initialize a SegContext structure (set all fields to NULL)
 {
-    // Allocate memory
-    SegContext* S = xmalloc (sizeof (SegContext));
+   // Allocate memory
+   SegContext *S = xmalloc(sizeof(SegContext));
 
-    // Initialize the fields
-    S->Text    = NewTextSeg (Func);
-    S->Code    = NewCodeSeg (GetSegName (SEG_CODE), Func);
-    S->Data    = NewDataSeg (GetSegName (SEG_DATA), Func);
-    S->ROData  = NewDataSeg (GetSegName (SEG_RODATA), Func);
-    S->BSS     = NewDataSeg (GetSegName (SEG_BSS), Func);
-    S->CurDSeg = SEG_DATA;
-    S->NextLabel     = 0;
-    S->NextDataLabel = 0;
+   // Initialize the fields
+   S->Text = NewTextSeg(Func);
+   S->Code = NewCodeSeg(GetSegName(SEG_CODE), Func);
+   S->Data = NewDataSeg(GetSegName(SEG_DATA), Func);
+   S->ROData = NewDataSeg(GetSegName(SEG_RODATA), Func);
+   S->BSS = NewDataSeg(GetSegName(SEG_BSS), Func);
+   S->CurDSeg = SEG_DATA;
+   S->NextLabel = 0;
+   S->NextDataLabel = 0;
 
-    // Return the new struct
-    return S;
+   // Return the new struct
+   return S;
 }
 
-SegContext* PushSegContext (SymEntry* Func)
+SegContext *PushSegContext(SymEntry *Func)
 // Make the new segment context current but remember the old one
 {
-    // Push the current pointer onto the stack
-    CollAppend (&SegContextStack, CS);
+   // Push the current pointer onto the stack
+   CollAppend(&SegContextStack, CS);
 
-    // Create a new SegContext structure
-    CS = NewSegContext (Func);
+   // Create a new SegContext structure
+   CS = NewSegContext(Func);
 
-    // Return the new struct
-    return CS;
+   // Return the new struct
+   return CS;
 }
 
-void PopSegContext (void)
+void PopSegContext(void)
 // Pop the old segment context (make it current)
 {
-    // Must have something on the stack
-    PRECONDITION (CollCount (&SegContextStack) > 0);
+   // Must have something on the stack
+   PRECONDITION(CollCount(&SegContextStack) > 0);
 
-    // Pop the last segment and set it as current
-    CS = CollPop (&SegContextStack);
+   // Pop the last segment and set it as current
+   CS = CollPop(&SegContextStack);
 }
 
-void CreateGlobalSegments (void)
+void CreateGlobalSegments(void)
 // Create the global segments and remember them in GS
 {
-    GS = PushSegContext (0);
+   GS = PushSegContext(0);
 }
 
-void UseDataSeg (segment_t DSeg)
+void UseDataSeg(segment_t DSeg)
 // For the current segment context, use the data segment DSeg
 {
-    // Check the input
-    PRECONDITION (CS && DSeg != SEG_CODE);
+   // Check the input
+   PRECONDITION(CS && DSeg != SEG_CODE);
 
-    // Set the new segment to use
-    CS->CurDSeg = DSeg;
+   // Set the new segment to use
+   CS->CurDSeg = DSeg;
 }
 
-struct DataSeg* GetDataSeg (void)
+struct DataSeg *GetDataSeg(void)
 // Return the current data segment
 {
-    PRECONDITION (CS != 0);
-    switch (CS->CurDSeg) {
-        case SEG_BSS:     return CS->BSS;
-        case SEG_DATA:    return CS->Data;
-        case SEG_RODATA:  return CS->ROData;
-        default:
-            FAIL ("Invalid data segment");
-            return 0;
-    }
+   PRECONDITION(CS != 0);
+   switch (CS->CurDSeg) {
+      case SEG_BSS:
+         return CS->BSS;
+      case SEG_DATA:
+         return CS->Data;
+      case SEG_RODATA:
+         return CS->ROData;
+      default:
+         FAIL("Invalid data segment");
+         return 0;
+   }
 }
 
-void AddTextLine (const char* Format, ...)
+void AddTextLine(const char *Format, ...)
 // Add a line of code to the current text segment
 {
-    va_list ap;
-    va_start (ap, Format);
-    CHECK (CS != 0);
-    TS_AddVLine (CS->Text, Format, ap);
-    va_end (ap);
+   va_list ap;
+   va_start(ap, Format);
+   CHECK(CS != 0);
+   TS_AddVLine(CS->Text, Format, ap);
+   va_end(ap);
 }
 
-void AddCodeLine (const char* Format, ...)
+void AddCodeLine(const char *Format, ...)
 // Add a line of code to the current code segment
 {
-    va_list ap;
-    va_start (ap, Format);
-    CHECK (CS != 0);
-    CS_AddVLine (CS->Code, CurTok.LI, Format, ap);
-    va_end (ap);
+   va_list ap;
+   va_start(ap, Format);
+   CHECK(CS != 0);
+   CS_AddVLine(CS->Code, CurTok.LI, Format, ap);
+   va_end(ap);
 }
 
-void AddCode (opc_t OPC, am_t AM, const char* Arg, struct CodeLabel* JumpTo)
+void AddCode(opc_t OPC, am_t AM, const char *Arg, struct CodeLabel *JumpTo)
 // Add a code entry to the current code segment
 {
-    CHECK (CS != 0);
-    CS_AddEntry (CS->Code, NewCodeEntry (OPC, AM, Arg, JumpTo, CurTok.LI));
+   CHECK(CS != 0);
+   CS_AddEntry(CS->Code, NewCodeEntry(OPC, AM, Arg, JumpTo, CurTok.LI));
 }
 
-void AddDataLine (const char* Format, ...)
+void AddDataLine(const char *Format, ...)
 // Add a line of data to the current data segment
 {
-    va_list ap;
-    va_start (ap, Format);
-    CHECK (CS != 0);
-    DS_AddVLine (GetDataSeg(), Format, ap);
-    va_end (ap);
+   va_list ap;
+   va_start(ap, Format);
+   CHECK(CS != 0);
+   DS_AddVLine(GetDataSeg(), Format, ap);
+   va_end(ap);
 }
 
-int HaveGlobalCode (void)
+int HaveGlobalCode(void)
 // Return true if the global code segment contains entries (which is an error)
 {
-    return (CS_GetEntryCount (GS->Code) > 0);
+   return (CS_GetEntryCount(GS->Code) > 0);
 }
 
-void RemoveGlobalCode (void)
+void RemoveGlobalCode(void)
 // Remove all code from the global code segment. Used for error recovery.
 {
-    CS_DelEntries (GS->Code, 0, CS_GetEntryCount (GS->Code));
+   CS_DelEntries(GS->Code, 0, CS_GetEntryCount(GS->Code));
 }
 
-void OutputSegments (const SegContext* S)
+void OutputSegments(const SegContext *S)
 // Output the given segments to the output file
 {
-    // Output the function prologue if the segments came from a function
-    CS_OutputPrologue (S->Code);
+   // Output the function prologue if the segments came from a function
+   CS_OutputPrologue(S->Code);
 
-    // Output the text segment
-    TS_Output (S->Text);
+   // Output the text segment
+   TS_Output(S->Text);
 
-    // Output the code segment
-    CS_Output (S->Code);
+   // Output the code segment
+   CS_Output(S->Code);
 
-    // Output the three data segments
-    DS_Output (S->Data);
-    DS_Output (S->ROData);
-    DS_Output (S->BSS);
+   // Output the three data segments
+   DS_Output(S->Data);
+   DS_Output(S->ROData);
+   DS_Output(S->BSS);
 
-    // Output the code segment epiloque
-    CS_OutputEpilogue (S->Code);
+   // Output the code segment epiloque
+   CS_OutputEpilogue(S->Code);
 }

@@ -42,32 +42,32 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void AddObjFiles (int argc, char* argv [])
+void AddObjFiles(int argc, char *argv[])
 // Add object files to a library
 {
-    int I;
+   int I;
 
-    // Check the argument count
-    if (argc <= 0) {
-        Error ("No library name given");
-    }
-    if (argc <= 1) {
-        Error ("No object files to add");
-    }
+   // Check the argument count
+   if (argc <= 0) {
+      Error("No library name given");
+   }
+   if (argc <= 1) {
+      Error("No object files to add");
+   }
 
-    // Open the library, read the index
-    LibOpen (argv [0], 0, 1);
+   // Open the library, read the index
+   LibOpen(argv[0], 0, 1);
 
-    // Add the object files
-    I = 1;
-    while (I < argc) {
-        ObjAdd (argv [I]);
-        ++I;
-    }
+   // Add the object files
+   I = 1;
+   while (I < argc) {
+      ObjAdd(argv[I]);
+      ++I;
+   }
 
-    // Create a new library file and close the old one
-    LibClose ();
+   // Create a new library file and close the old one
+   LibClose();
 
-    // Successful end
-    exit (EXIT_SUCCESS);
+   // Successful end
+   exit(EXIT_SUCCESS);
 }

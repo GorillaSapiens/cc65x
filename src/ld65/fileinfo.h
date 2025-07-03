@@ -49,27 +49,27 @@
 
 typedef struct FileInfo FileInfo;
 struct FileInfo {
-    unsigned        Id;                 // Id of file for debug info
-    unsigned        Name;               // File name index
-    unsigned long   MTime;              // Time of last modification
-    unsigned long   Size;               // Size of the file
-    Collection      Modules;            // Modules that use this file
+   unsigned Id;         // Id of file for debug info
+   unsigned Name;       // File name index
+   unsigned long MTime; // Time of last modification
+   unsigned long Size;  // Size of the file
+   Collection Modules;  // Modules that use this file
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-FileInfo* ReadFileInfo (FILE* F, ObjData* O);
+FileInfo *ReadFileInfo(FILE *F, ObjData *O);
 // Read a file info from a file and return it
 
-unsigned FileInfoCount (void);
+unsigned FileInfoCount(void);
 // Return the total number of file infos
 
-void AssignFileInfoIds (void);
+void AssignFileInfoIds(void);
 // Assign the ids to the file infos
 
-void PrintDbgFileInfo (FILE* F);
+void PrintDbgFileInfo(FILE *F);
 // Output the file info to a debug info file
 
 // End of fileinfo.h

@@ -45,54 +45,52 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Screen size of geos icon
-#define WIDTH           24U
-#define HEIGHT          21U
+#define WIDTH 24U
+#define HEIGHT 21U
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-StrBuf* GenGeosIcon (const Bitmap* B, const Collection* A attribute ((unused)))
+StrBuf *GenGeosIcon(const Bitmap *B, const Collection *A attribute((unused)))
 // Generate binary output in GEOS icon format for the bitmap B. The output
 // is stored in a string buffer (which is actually a dynamic char array) and
 // returned.
 {
-    StrBuf* D;
-    unsigned X, Y;
+   StrBuf *D;
+   unsigned X, Y;
 
-    // Output the image properties
-    Print (stdout, 1, "Image is %ux%u with %u colors%s\n",
-           GetBitmapWidth (B), GetBitmapHeight (B), GetBitmapColors (B),
-           BitmapIsIndexed (B)? " (indexed)" : "");
+   // Output the image properties
+   Print(stdout, 1, "Image is %ux%u with %u colors%s\n", GetBitmapWidth(B),
+         GetBitmapHeight(B), GetBitmapColors(B),
+         BitmapIsIndexed(B) ? " (indexed)" : "");
 
-    // Check the bitmap properties
-    if (!BitmapIsIndexed (B)            ||
-        GetBitmapHeight (B) != HEIGHT   ||
-        GetBitmapWidth (B) != WIDTH     ||
-        GetBitmapColors (B) > 2) {
-        Error ("Invalid bitmap properties for conversion to GEOS icon");
-    }
+   // Check the bitmap properties
+   if (!BitmapIsIndexed(B) || GetBitmapHeight(B) != HEIGHT ||
+       GetBitmapWidth(B) != WIDTH || GetBitmapColors(B) > 2) {
+      Error("Invalid bitmap properties for conversion to GEOS icon");
+   }
 
-    // Create the output buffer and resize it to the required size.
-    D = NewStrBuf ();
-    SB_Realloc (D, 63);
+   // Create the output buffer and resize it to the required size.
+   D = NewStrBuf();
+   SB_Realloc(D, 63);
 
-    // Convert the image
-    for (Y = 0; Y < HEIGHT; ++Y) {
-        unsigned char V = 0;
-        for (X = 0; X < WIDTH; ++X) {
+   // Convert the image
+   for (Y = 0; Y < HEIGHT; ++Y) {
+      unsigned char V = 0;
+      for (X = 0; X < WIDTH; ++X) {
 
-            // Fetch next bit into byte buffer
-            V = (V << 1) | (GetPixel (B, X, Y).Index & 0x01);
+         // Fetch next bit into byte buffer
+         V = (V << 1) | (GetPixel(B, X, Y).Index & 0x01);
 
-            // Store full bytes into the output buffer
-            if ((X & 0x07) == 0x07) {
-                SB_AppendChar (D, V);
-                V = 0;
-            }
-        }
-    }
+         // Store full bytes into the output buffer
+         if ((X & 0x07) == 0x07) {
+            SB_AppendChar(D, V);
+            V = 0;
+         }
+      }
+   }
 
-    // Return the converted bitmap
-    return D;
+   // Return the converted bitmap
+   return D;
 }

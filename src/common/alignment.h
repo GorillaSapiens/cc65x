@@ -43,7 +43,7 @@
 
 // Maximum possible alignment. Beware: To increase the possible alignment it
 // is not enough to bump this value. Check the code inside.
-#define MAX_ALIGNMENT   0x10000UL
+#define MAX_ALIGNMENT 0x10000UL
 
 // The following value marks what is considered a "large alignment" and worth
 // a warning if not suppressed.
@@ -53,14 +53,14 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned long LeastCommonMultiple (unsigned long Left, unsigned long Right);
+unsigned long LeastCommonMultiple(unsigned long Left, unsigned long Right);
 // Calculate the least common multiple of two numbers and return
 // the result.
 
-unsigned long AlignAddr (unsigned long Addr, unsigned long Alignment);
+unsigned long AlignAddr(unsigned long Addr, unsigned long Alignment);
 // Align an address to the given alignment
 
-unsigned long AlignCount (unsigned long Addr, unsigned long Alignment);
+unsigned long AlignCount(unsigned long Addr, unsigned long Alignment);
 // Calculate how many bytes must be inserted to align Addr to Alignment
 
 // End of alignment.h

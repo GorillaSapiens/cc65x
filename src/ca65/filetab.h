@@ -44,31 +44,31 @@
 // An enum that describes different types of input files. The members are
 // choosen so that it is possible to combine them to bitsets
 typedef enum {
-    FT_MAIN     = 0x01,         // Main input file
-    FT_INCLUDE  = 0x02,         // Normal include file
-    FT_BINARY   = 0x04,         // Binary include file
-    FT_DBGINFO  = 0x08,         // File from debug info
+   FT_MAIN = 0x01,    // Main input file
+   FT_INCLUDE = 0x02, // Normal include file
+   FT_BINARY = 0x04,  // Binary include file
+   FT_DBGINFO = 0x08, // File from debug info
 } FileType;
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-const StrBuf* GetFileName (unsigned Name);
+const StrBuf *GetFileName(unsigned Name);
 // Get the name of a file where the name index is known
 
-unsigned GetFileIndex (const StrBuf* Name);
+unsigned GetFileIndex(const StrBuf *Name);
 // Return the file index for the given file name.
 
-unsigned AddFile (const StrBuf* Name, FileType Type,
-                  unsigned long Size, unsigned long MTime);
+unsigned AddFile(const StrBuf *Name, FileType Type, unsigned long Size,
+                 unsigned long MTime);
 // Add a new file to the list of input files. Return the index of the file in
 // the table.
 
-void WriteFiles (void);
+void WriteFiles(void);
 // Write the list of input files to the object file
 
-void CreateDependencies (void);
+void CreateDependencies(void);
 // Create dependency files requested by the user
 
 // End of filetab.h

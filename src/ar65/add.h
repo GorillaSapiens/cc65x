@@ -38,7 +38,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void AddObjFiles (int argc, char* argv []);
+void AddObjFiles(int argc, char *argv[]);
 // Add object files to a library
 
 // End of add.h

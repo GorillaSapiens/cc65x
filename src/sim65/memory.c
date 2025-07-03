@@ -47,58 +47,60 @@ uint8_t Mem[0x10000];
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void MemWriteByte (uint16_t Addr, uint8_t Val)
+void MemWriteByte(uint16_t Addr, uint8_t Val)
 // Write a byte to a memory location
 {
-    if ((PERIPHERALS_APERTURE_BASE_ADDRESS <= Addr) && (Addr <= PERIPHERALS_APERTURE_LAST_ADDRESS))
-    {
-        // Defer the the memory-mapped peripherals handler for this write.
-        PeripheralsWriteByte (Addr - PERIPHERALS_APERTURE_BASE_ADDRESS, Val);
-    } else {
-        // Write to the Mem array.
-        Mem[Addr] = Val;
-    }
+   if ((PERIPHERALS_APERTURE_BASE_ADDRESS <= Addr) &&
+       (Addr <= PERIPHERALS_APERTURE_LAST_ADDRESS)) {
+      // Defer the the memory-mapped peripherals handler for this write.
+      PeripheralsWriteByte(Addr - PERIPHERALS_APERTURE_BASE_ADDRESS, Val);
+   }
+   else {
+      // Write to the Mem array.
+      Mem[Addr] = Val;
+   }
 }
 
-void MemWriteWord (uint16_t Addr, uint16_t Val)
+void MemWriteWord(uint16_t Addr, uint16_t Val)
 // Write a word to a memory location
 {
-    MemWriteByte (Addr, Val & 0xFF);
-    MemWriteByte (Addr + 1, Val >> 8);
+   MemWriteByte(Addr, Val & 0xFF);
+   MemWriteByte(Addr + 1, Val >> 8);
 }
 
-uint8_t MemReadByte (uint16_t Addr)
+uint8_t MemReadByte(uint16_t Addr)
 // Read a byte from a memory location
 {
-    if ((PERIPHERALS_APERTURE_BASE_ADDRESS <= Addr) && (Addr <= PERIPHERALS_APERTURE_LAST_ADDRESS))
-    {
-        // Defer the the memory-mapped peripherals handler for this read.
-        return PeripheralsReadByte (Addr - PERIPHERALS_APERTURE_BASE_ADDRESS);
-    } else {
-        // Read from the Mem array.
-        return Mem[Addr];
-    }
+   if ((PERIPHERALS_APERTURE_BASE_ADDRESS <= Addr) &&
+       (Addr <= PERIPHERALS_APERTURE_LAST_ADDRESS)) {
+      // Defer the the memory-mapped peripherals handler for this read.
+      return PeripheralsReadByte(Addr - PERIPHERALS_APERTURE_BASE_ADDRESS);
+   }
+   else {
+      // Read from the Mem array.
+      return Mem[Addr];
+   }
 }
 
-uint16_t MemReadWord (uint16_t Addr)
+uint16_t MemReadWord(uint16_t Addr)
 // Read a word from a memory location
 {
-    uint8_t W = MemReadByte (Addr++);
-    return (W | (MemReadByte (Addr) << 8));
+   uint8_t W = MemReadByte(Addr++);
+   return (W | (MemReadByte(Addr) << 8));
 }
 
-uint16_t MemReadZPWord (uint8_t Addr)
-// Read a word from the zero page. This function differs from MemReadWord in that
-// the read will always be in the zero page, even in case of an address
+uint16_t MemReadZPWord(uint8_t Addr)
+// Read a word from the zero page. This function differs from MemReadWord in
+// that the read will always be in the zero page, even in case of an address
 // overflow.
 {
-    uint8_t W = MemReadByte (Addr++);
-    return (W | (MemReadByte (Addr) << 8));
+   uint8_t W = MemReadByte(Addr++);
+   return (W | (MemReadByte(Addr) << 8));
 }
 
-void MemInit (void)
+void MemInit(void)
 // Initialize the memory subsystem
 {
-    // Fill memory with illegal opcode
-    memset (Mem, 0xFF, sizeof (Mem));
+   // Fill memory with illegal opcode
+   memset(Mem, 0xFF, sizeof(Mem));
 }

@@ -38,25 +38,25 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-ExprNode* ULabRef (int Which);
+ExprNode *ULabRef(int Which);
 // Get an unnamed label. If Which is negative, it is a backreference (a
 // reference to an already defined label), and the function will return a
 // segment relative expression. If Which is positive, it is a forward ref,
 // and the function will return a expression node for an unnamed label that
 // must be resolved later.
 
-void ULabDef (void);
+void ULabDef(void);
 // Define an unnamed label at the current PC
 
-int ULabCanResolve (void);
+int ULabCanResolve(void);
 // Return true if we can resolve arbitrary ULabels.
 
-ExprNode* ULabResolve (unsigned Index);
+ExprNode *ULabResolve(unsigned Index);
 // Return a valid expression for the unnamed label with the given index. This
 // is used to resolve unnamed labels when assembly is done, so it is an error
 // if a label is still undefined in this phase.
 
-void ULabDone (void);
+void ULabDone(void);
 // Run through all unnamed labels, check for anomalies and errors and do
 // necessary cleanups.
 

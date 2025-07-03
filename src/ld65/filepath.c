@@ -38,58 +38,58 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-SearchPaths*     LibSearchPath;         // Library path
-SearchPaths*     ObjSearchPath;         // Object file path
-SearchPaths*     CfgSearchPath;         // Config file path
+SearchPaths *LibSearchPath; // Library path
+SearchPaths *ObjSearchPath; // Object file path
+SearchPaths *CfgSearchPath; // Config file path
 
-SearchPaths*     LibDefaultPath;        // Default Library path
-SearchPaths*     ObjDefaultPath;        // Default Object file path
-SearchPaths*     CfgDefaultPath;        // Default Config file path
+SearchPaths *LibDefaultPath; // Default Library path
+SearchPaths *ObjDefaultPath; // Default Object file path
+SearchPaths *CfgDefaultPath; // Default Config file path
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void InitSearchPaths (void)
+void InitSearchPaths(void)
 // Initialize the path search list
 {
-    // Create the search path lists
-    LibSearchPath = NewSearchPath ();
-    ObjSearchPath = NewSearchPath ();
-    CfgSearchPath = NewSearchPath ();
+   // Create the search path lists
+   LibSearchPath = NewSearchPath();
+   ObjSearchPath = NewSearchPath();
+   CfgSearchPath = NewSearchPath();
 
-    LibDefaultPath = NewSearchPath ();
-    ObjDefaultPath = NewSearchPath ();
-    CfgDefaultPath = NewSearchPath ();
+   LibDefaultPath = NewSearchPath();
+   ObjDefaultPath = NewSearchPath();
+   CfgDefaultPath = NewSearchPath();
 
-    // Always search all stuff in the current directory
-    AddSearchPath (LibSearchPath, "");
-    AddSearchPath (ObjSearchPath, "");
-    AddSearchPath (CfgSearchPath, "");
+   // Always search all stuff in the current directory
+   AddSearchPath(LibSearchPath, "");
+   AddSearchPath(ObjSearchPath, "");
+   AddSearchPath(CfgSearchPath, "");
 
-    // Add specific paths from the environment.
-    AddSearchPathFromEnv (LibDefaultPath, "LD65_LIB");
-    AddSearchPathFromEnv (ObjDefaultPath, "LD65_OBJ");
-    AddSearchPathFromEnv (CfgDefaultPath, "LD65_CFG");
+   // Add specific paths from the environment.
+   AddSearchPathFromEnv(LibDefaultPath, "LD65_LIB");
+   AddSearchPathFromEnv(ObjDefaultPath, "LD65_OBJ");
+   AddSearchPathFromEnv(CfgDefaultPath, "LD65_CFG");
 
-    // Add paths relative to a main directory defined in an env. var.
-    AddSubSearchPathFromEnv (LibDefaultPath, "CC65_HOME", "lib");
-    AddSubSearchPathFromEnv (ObjDefaultPath, "CC65_HOME", "lib");
-    AddSubSearchPathFromEnv (CfgDefaultPath, "CC65_HOME", "cfg");
+   // Add paths relative to a main directory defined in an env. var.
+   AddSubSearchPathFromEnv(LibDefaultPath, "CC65_HOME", "lib");
+   AddSubSearchPathFromEnv(ObjDefaultPath, "CC65_HOME", "lib");
+   AddSubSearchPathFromEnv(CfgDefaultPath, "CC65_HOME", "cfg");
 
-    // Add some compiled-in search paths if defined at compile time.
+   // Add some compiled-in search paths if defined at compile time.
 #if defined(LD65_LIB) && !defined(_WIN32) && !defined(_AMIGA)
-    AddSearchPath (LibDefaultPath, LD65_LIB);
+   AddSearchPath(LibDefaultPath, LD65_LIB);
 #endif
 #if defined(LD65_OBJ) && !defined(_WIN32) && !defined(_AMIGA)
-    AddSearchPath (ObjDefaultPath, LD65_OBJ);
+   AddSearchPath(ObjDefaultPath, LD65_OBJ);
 #endif
 #if defined(LD65_CFG) && !defined(_WIN32) && !defined(_AMIGA)
-    AddSearchPath (CfgDefaultPath, LD65_CFG);
+   AddSearchPath(CfgDefaultPath, LD65_CFG);
 #endif
 
-    // Add paths relative to the parent directory of the Windows binary.
-    AddSubSearchPathFromBin (LibDefaultPath, "lib");
-    AddSubSearchPathFromBin (ObjDefaultPath, "lib");
-    AddSubSearchPathFromBin (CfgDefaultPath, "cfg");
+   // Add paths relative to the parent directory of the Windows binary.
+   AddSubSearchPathFromBin(LibDefaultPath, "lib");
+   AddSubSearchPathFromBin(ObjDefaultPath, "lib");
+   AddSubSearchPathFromBin(CfgDefaultPath, "cfg");
 }

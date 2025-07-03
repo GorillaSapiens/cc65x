@@ -38,7 +38,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void CreateDbgFile (void);
+void CreateDbgFile(void);
 // Create a debug info file
 
 // End of dbgfile.h

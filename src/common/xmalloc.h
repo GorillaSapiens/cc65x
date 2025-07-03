@@ -40,19 +40,19 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void* xmalloc (size_t Size);
+void *xmalloc(size_t Size);
 // Allocate memory, check for out of memory condition. Do some debugging
 
-void* xrealloc (void* P, size_t Size);
+void *xrealloc(void *P, size_t Size);
 // Reallocate a memory block, check for out of memory
 
-void xfree (void* Block);
+void xfree(void *Block);
 // Free the block, do some debugging
 
-char* xstrdup (const char* S);
+char *xstrdup(const char *S);
 // Duplicate a string on the heap. The function checks for out of memory
 
-void* xdup (const void* Buf, size_t Size);
+void *xdup(const void *Buf, size_t Size);
 // Create a copy of Buf on the heap and return a pointer to it.
 
 // End of xmalloc.h

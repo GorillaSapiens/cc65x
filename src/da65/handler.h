@@ -47,73 +47,73 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Generic handlers
-void OH_Illegal (const OpcDesc* D attribute ((unused)));
-void OH_Accumulator (const OpcDesc*);
-void OH_Implicit (const OpcDesc*);
-void OH_Immediate (const OpcDesc*);
-void OH_Immediate65816M (const OpcDesc*);
-void OH_Immediate65816X (const OpcDesc*);
-void OH_ImmediateWord (const OpcDesc*);
-void OH_Direct (const OpcDesc*);
-void OH_DirectX (const OpcDesc*);
-void OH_DirectY (const OpcDesc*);
-void OH_Absolute (const OpcDesc*);
-void OH_AbsoluteX (const OpcDesc*);
-void OH_AbsoluteY (const OpcDesc*);
-void OH_AbsoluteLong (const OpcDesc*);
-void OH_AbsoluteLongX (const OpcDesc*);
-void OH_Relative (const OpcDesc*);
-void OH_RelativeLong (const OpcDesc*);
-void OH_RelativeLong4510 (const OpcDesc*);
-void OH_DirectIndirect (const OpcDesc*);
-void OH_DirectIndirectY (const OpcDesc*);
-void OH_DirectIndirectZ (const OpcDesc*);
-void OH_DirectXIndirect (const OpcDesc*);
-void OH_AbsoluteIndirect (const OpcDesc*);
+void OH_Illegal(const OpcDesc *D attribute((unused)));
+void OH_Accumulator(const OpcDesc *);
+void OH_Implicit(const OpcDesc *);
+void OH_Immediate(const OpcDesc *);
+void OH_Immediate65816M(const OpcDesc *);
+void OH_Immediate65816X(const OpcDesc *);
+void OH_ImmediateWord(const OpcDesc *);
+void OH_Direct(const OpcDesc *);
+void OH_DirectX(const OpcDesc *);
+void OH_DirectY(const OpcDesc *);
+void OH_Absolute(const OpcDesc *);
+void OH_AbsoluteX(const OpcDesc *);
+void OH_AbsoluteY(const OpcDesc *);
+void OH_AbsoluteLong(const OpcDesc *);
+void OH_AbsoluteLongX(const OpcDesc *);
+void OH_Relative(const OpcDesc *);
+void OH_RelativeLong(const OpcDesc *);
+void OH_RelativeLong4510(const OpcDesc *);
+void OH_DirectIndirect(const OpcDesc *);
+void OH_DirectIndirectY(const OpcDesc *);
+void OH_DirectIndirectZ(const OpcDesc *);
+void OH_DirectXIndirect(const OpcDesc *);
+void OH_AbsoluteIndirect(const OpcDesc *);
 
-void OH_BitBranch (const OpcDesc*);
-void OH_BitBranch_m740 (const OpcDesc*);
+void OH_BitBranch(const OpcDesc *);
+void OH_BitBranch_m740(const OpcDesc *);
 
-void OH_ImmediateDirect (const OpcDesc*);
-void OH_ImmediateDirectX (const OpcDesc*);
-void OH_ImmediateAbsolute (const OpcDesc*);
-void OH_ImmediateAbsoluteX (const OpcDesc*);
+void OH_ImmediateDirect(const OpcDesc *);
+void OH_ImmediateDirectX(const OpcDesc *);
+void OH_ImmediateAbsolute(const OpcDesc *);
+void OH_ImmediateAbsoluteX(const OpcDesc *);
 
-void OH_StackRelative (const OpcDesc*);
-void OH_DirectIndirectLongX (const OpcDesc*);
-void OH_StackRelativeIndirectY (const OpcDesc*);
-void OH_StackRelativeIndirectY4510 (const OpcDesc*);
-void OH_DirectIndirectLong (const OpcDesc*);
-void OH_DirectIndirectLongY (const OpcDesc*);
-void OH_BlockMove (const OpcDesc*);
-void OH_BlockMove65816 (const OpcDesc*);
-void OH_AbsoluteXIndirect (const OpcDesc*);
+void OH_StackRelative(const OpcDesc *);
+void OH_DirectIndirectLongX(const OpcDesc *);
+void OH_StackRelativeIndirectY(const OpcDesc *);
+void OH_StackRelativeIndirectY4510(const OpcDesc *);
+void OH_DirectIndirectLong(const OpcDesc *);
+void OH_DirectIndirectLongY(const OpcDesc *);
+void OH_BlockMove(const OpcDesc *);
+void OH_BlockMove65816(const OpcDesc *);
+void OH_AbsoluteXIndirect(const OpcDesc *);
 
 // Mitsubishi 740
-void OH_DirectImmediate (const OpcDesc*);
-void OH_ZeroPageBit (const OpcDesc*);
-void OH_AccumulatorBit (const OpcDesc*);
-void OH_AccumulatorBitBranch (const OpcDesc*);
-void OH_JmpDirectIndirect (const OpcDesc* D);
-void OH_SpecialPage (const OpcDesc*);
+void OH_DirectImmediate(const OpcDesc *);
+void OH_ZeroPageBit(const OpcDesc *);
+void OH_AccumulatorBit(const OpcDesc *);
+void OH_AccumulatorBitBranch(const OpcDesc *);
+void OH_JmpDirectIndirect(const OpcDesc *D);
+void OH_SpecialPage(const OpcDesc *);
 
 // 45GS02
-void OH_Direct_Q (const OpcDesc*);
-void OH_DirectIndirectZ_Q (const OpcDesc* D);
-void OH_Absolute_Q (const OpcDesc* D);
-void OH_AbsoluteX_Q (const OpcDesc* D);
-void OH_DirectX_Q (const OpcDesc* D);
-void OH_Implicit_ea_45GS02 (const OpcDesc* D);
-void OH_Implicit_42_45GS02 (const OpcDesc* D);
+void OH_Direct_Q(const OpcDesc *);
+void OH_DirectIndirectZ_Q(const OpcDesc *D);
+void OH_Absolute_Q(const OpcDesc *D);
+void OH_AbsoluteX_Q(const OpcDesc *D);
+void OH_DirectX_Q(const OpcDesc *D);
+void OH_Implicit_ea_45GS02(const OpcDesc *D);
+void OH_Implicit_42_45GS02(const OpcDesc *D);
 
 // Handlers for special instructions
-void OH_Rts (const OpcDesc*);
-void OH_JmpAbsolute (const OpcDesc*);
-void OH_JmpAbsoluteIndirect (const OpcDesc* D);
-void OH_JmpAbsoluteXIndirect (const OpcDesc* D);
-void OH_JsrAbsolute (const OpcDesc*);
+void OH_Rts(const OpcDesc *);
+void OH_JmpAbsolute(const OpcDesc *);
+void OH_JmpAbsoluteIndirect(const OpcDesc *D);
+void OH_JmpAbsoluteXIndirect(const OpcDesc *D);
+void OH_JsrAbsolute(const OpcDesc *);
 
-void SetSubroutineParamSize (uint32_t Addr, unsigned Size);
+void SetSubroutineParamSize(uint32_t Addr, unsigned Size);
 
 // End of handler.h
 

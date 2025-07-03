@@ -39,47 +39,48 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-const char* AddrSizeToStr (unsigned char AddrSize)
+const char *AddrSizeToStr(unsigned char AddrSize)
 // Return the name for an address size specifier
 {
-    switch (AddrSize) {
-        case ADDR_SIZE_DEFAULT:         return "default";
-        case ADDR_SIZE_ZP:              return "zeropage";
-        case ADDR_SIZE_ABS:             return "absolute";
-        case ADDR_SIZE_FAR:             return "far";
-        case ADDR_SIZE_LONG:            return "long";
-        default:                        return "unknown";
-    }
+   switch (AddrSize) {
+      case ADDR_SIZE_DEFAULT:
+         return "default";
+      case ADDR_SIZE_ZP:
+         return "zeropage";
+      case ADDR_SIZE_ABS:
+         return "absolute";
+      case ADDR_SIZE_FAR:
+         return "far";
+      case ADDR_SIZE_LONG:
+         return "long";
+      default:
+         return "unknown";
+   }
 }
 
-unsigned char AddrSizeFromStr (const char* Str)
+unsigned char AddrSizeFromStr(const char *Str)
 // Return the address size for a given string. Returns ADDR_SIZE_INVALID if
 // the string cannot be mapped to an address size.
 {
-    static const struct {
-        const char*     Name;
-        unsigned char   AddrSize;
-    } AddrSizeTable[] = {
-        { "abs",        ADDR_SIZE_ABS     },
-        { "absolute",   ADDR_SIZE_ABS     },
-        { "default",    ADDR_SIZE_DEFAULT },
-        { "direct",     ADDR_SIZE_ZP      },
-        { "dword",      ADDR_SIZE_LONG    },
-        { "far",        ADDR_SIZE_FAR     },
-        { "long",       ADDR_SIZE_LONG    },
-        { "near",       ADDR_SIZE_ABS     },
-        { "zeropage",   ADDR_SIZE_ZP      },
-        { "zp",         ADDR_SIZE_ZP      },
-    };
-    unsigned I;
+   static const struct {
+      const char *Name;
+      unsigned char AddrSize;
+   } AddrSizeTable[] = {
+       {"abs", ADDR_SIZE_ABS},         {"absolute", ADDR_SIZE_ABS},
+       {"default", ADDR_SIZE_DEFAULT}, {"direct", ADDR_SIZE_ZP},
+       {"dword", ADDR_SIZE_LONG},      {"far", ADDR_SIZE_FAR},
+       {"long", ADDR_SIZE_LONG},       {"near", ADDR_SIZE_ABS},
+       {"zeropage", ADDR_SIZE_ZP},     {"zp", ADDR_SIZE_ZP},
+   };
+   unsigned I;
 
-    for (I = 0; I < sizeof (AddrSizeTable) / sizeof (AddrSizeTable[0]); ++I) {
-        if (StrCaseCmp (Str, AddrSizeTable[I].Name) == 0) {
-            // Found
-            return AddrSizeTable[I].AddrSize;
-        }
-    }
+   for (I = 0; I < sizeof(AddrSizeTable) / sizeof(AddrSizeTable[0]); ++I) {
+      if (StrCaseCmp(Str, AddrSizeTable[I].Name) == 0) {
+         // Found
+         return AddrSizeTable[I].AddrSize;
+      }
+   }
 
-    // Not found
-    return ADDR_SIZE_INVALID;
+   // Not found
+   return ADDR_SIZE_INVALID;
 }

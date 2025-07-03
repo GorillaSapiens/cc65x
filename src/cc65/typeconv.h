@@ -41,15 +41,15 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void TypeConversion (ExprDesc* Expr, const Type* NewType);
+void TypeConversion(ExprDesc *Expr, const Type *NewType);
 // Do an automatic conversion of the given expression to the new type. Output
 // warnings or errors where this automatic conversion is suspicious or
 // impossible.
 
-void TypeCast (ExprDesc* Expr);
+void TypeCast(ExprDesc *Expr);
 // Handle an explicit cast.
 
-void TypeComposition (Type* lhs, const Type* rhs);
+void TypeComposition(Type *lhs, const Type *rhs);
 // Recursively compose two types into lhs. The two types must have compatible
 // type or this fails with a critical check.
 

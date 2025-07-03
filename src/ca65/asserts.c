@@ -50,10 +50,10 @@
 // An assertion entry
 typedef struct Assertion Assertion;
 struct Assertion {
-    ExprNode*       Expr;       // Expression to evaluate
-    AssertAction    Action;     // Action to take
-    unsigned        Msg;        // Message to print (if any)
-    Collection      LI;         // Line infos for the assertion
+   ExprNode *Expr;      // Expression to evaluate
+   AssertAction Action; // Action to take
+   unsigned Msg;        // Message to print (if any)
+   Collection LI;       // Line infos for the assertion
 };
 
 // Collection with all assertions for a module
@@ -63,100 +63,101 @@ static Collection Assertions = STATIC_COLLECTION_INITIALIZER;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-static Assertion* NewAssertion (ExprNode* Expr, AssertAction Action, unsigned Msg)
+static Assertion *NewAssertion(ExprNode *Expr, AssertAction Action,
+                               unsigned Msg)
 // Create a new Assertion struct and return it
 {
-    // Allocate memory
-    Assertion* A = xmalloc (sizeof (Assertion));
+   // Allocate memory
+   Assertion *A = xmalloc(sizeof(Assertion));
 
-    // Initialize the fields
-    A->Expr     = Expr;
-    A->Action   = Action;
-    A->Msg      = Msg;
-    A->LI       = EmptyCollection;
-    GetFullLineInfo (&A->LI);
+   // Initialize the fields
+   A->Expr = Expr;
+   A->Action = Action;
+   A->Msg = Msg;
+   A->LI = EmptyCollection;
+   GetFullLineInfo(&A->LI);
 
-    // Return the new struct
-    return A;
+   // Return the new struct
+   return A;
 }
 
-void AddAssertion (ExprNode* Expr, AssertAction Action, unsigned Msg)
+void AddAssertion(ExprNode *Expr, AssertAction Action, unsigned Msg)
 // Add an assertion to the assertion table
 {
-    // Add an assertion object to the table
-    CollAppend (&Assertions, NewAssertion (Expr, Action, Msg));
+   // Add an assertion object to the table
+   CollAppend(&Assertions, NewAssertion(Expr, Action, Msg));
 }
 
-void CheckAssertions (void)
+void CheckAssertions(void)
 // Check all assertions and evaluate the ones we can evaluate here.
 {
-    unsigned I;
+   unsigned I;
 
-    // Get the number of assertions
-    unsigned Count = CollCount (&Assertions);
+   // Get the number of assertions
+   unsigned Count = CollCount(&Assertions);
 
-    // Check the assertions
-    for (I = 0; I < Count; ++I) {
+   // Check the assertions
+   for (I = 0; I < Count; ++I) {
 
-        long Val;
+      long Val;
 
-        // Get the next assertion
-        Assertion* A = CollAtUnchecked (&Assertions, I);
+      // Get the next assertion
+      Assertion *A = CollAtUnchecked(&Assertions, I);
 
-        // Ignore it, if it should only be evaluated by the linker
-        if (!AssertAtAsmTime (A->Action)) {
-            continue;
-        }
+      // Ignore it, if it should only be evaluated by the linker
+      if (!AssertAtAsmTime(A->Action)) {
+         continue;
+      }
 
-        // Can we evaluate the expression?
-        if (IsConstExpr (A->Expr, &Val) && Val == 0) {
-            // Apply the action
-            const char* Msg = GetString (A->Msg);
-            switch (A->Action) {
+      // Can we evaluate the expression?
+      if (IsConstExpr(A->Expr, &Val) && Val == 0) {
+         // Apply the action
+         const char *Msg = GetString(A->Msg);
+         switch (A->Action) {
 
-                case ASSERT_ACT_WARN:
-                    LIWarning (&A->LI, 0, "%s", Msg);
-                    break;
+            case ASSERT_ACT_WARN:
+               LIWarning(&A->LI, 0, "%s", Msg);
+               break;
 
-                case ASSERT_ACT_ERROR:
-                    LIError (&A->LI, "%s", Msg);
-                    break;
+            case ASSERT_ACT_ERROR:
+               LIError(&A->LI, "%s", Msg);
+               break;
 
-                default:
-                    Internal ("Illegal assert action specifier");
-                    break;
-            }
-        }
-    }
+            default:
+               Internal("Illegal assert action specifier");
+               break;
+         }
+      }
+   }
 }
 
-void WriteAssertions (void)
+void WriteAssertions(void)
 // Write the assertion table to the object file
 {
-    unsigned I;
+   unsigned I;
 
-    // Get the number of assertions
-    unsigned Count = CollCount (&Assertions);
+   // Get the number of assertions
+   unsigned Count = CollCount(&Assertions);
 
-    // Tell the object file module that we're about to start the assertions
-    ObjStartAssertions ();
+   // Tell the object file module that we're about to start the assertions
+   ObjStartAssertions();
 
-    // Write the string count to the list
-    ObjWriteVar (Count);
+   // Write the string count to the list
+   ObjWriteVar(Count);
 
-    // Write the assertions
-    for (I = 0; I < Count; ++I) {
+   // Write the assertions
+   for (I = 0; I < Count; ++I) {
 
-        // Get the next assertion
-        Assertion* A = CollAtUnchecked (&Assertions, I);
+      // Get the next assertion
+      Assertion *A = CollAtUnchecked(&Assertions, I);
 
-        // Write it to the file
-        WriteExpr (A->Expr);
-        ObjWriteVar ((unsigned) A->Action);
-        ObjWriteVar (A->Msg);
-        WriteLineInfo (&A->LI);
-    }
+      // Write it to the file
+      WriteExpr(A->Expr);
+      ObjWriteVar((unsigned)A->Action);
+      ObjWriteVar(A->Msg);
+      WriteLineInfo(&A->LI);
+   }
 
-    // Done writing the assertions
-    ObjEndAssertions ();
+   // Done writing the assertions
+   ObjEndAssertions();
 }

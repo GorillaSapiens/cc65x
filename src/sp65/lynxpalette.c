@@ -48,39 +48,38 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-StrBuf* GenLynxPalette (const Bitmap* B, const Collection* A)
+StrBuf *GenLynxPalette(const Bitmap *B, const Collection *A)
 // Generate binary output in Lynx palette format for the bitmap B. The output
 // is stored in a string buffer (which is actually a dynamic char array) and
 // returned.
-// 
+//
 {
-    StrBuf* D;
-    const Palette* P = GetBitmapPalette (B);
-    const char* Format = GetAttrVal(A, "format");
-    unsigned I;
+   StrBuf *D;
+   const Palette *P = GetBitmapPalette(B);
+   const char *Format = GetAttrVal(A, "format");
+   unsigned I;
 
-    if (Format == 0) {
-        // No format specified
-    }
-    D = NewStrBuf ();
-    for (I = 0; I < 16; ++I) {
+   if (Format == 0) {
+      // No format specified
+   }
+   D = NewStrBuf();
+   for (I = 0; I < 16; ++I) {
 
-        // Get the color entry
-        const Color* C = P->Entries + I;
+      // Get the color entry
+      const Color *C = P->Entries + I;
 
-        // Add the green component
-        SB_AppendChar (D, C->G >> 4);
-    }
-    for (I = 0; I < 16; ++I) {
+      // Add the green component
+      SB_AppendChar(D, C->G >> 4);
+   }
+   for (I = 0; I < 16; ++I) {
 
-        // Get the color entry
-        const Color* C = P->Entries + I;
+      // Get the color entry
+      const Color *C = P->Entries + I;
 
-        // Add the blue,red component
-        SB_AppendChar (D, (C->B & 0xF0) | (C->R >> 4));
-    }
+      // Add the blue,red component
+      SB_AppendChar(D, (C->B & 0xF0) | (C->R >> 4));
+   }
 
-    // Return the converted palette
-    return D;
+   // Return the converted palette
+   return D;
 }
-

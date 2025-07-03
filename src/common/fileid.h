@@ -42,18 +42,18 @@
 // a table - sorted alphabetically - is passed to GetFileId.
 typedef struct FileId FileId;
 struct FileId {
-    const char  Ext[4];
-    int         Id;
+   const char Ext[4];
+   int Id;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-int CompareFileId (const void* Key, const void* Id);
+int CompareFileId(const void *Key, const void *Id);
 // Compare function used when calling bsearch with a table of FileIds
 
-const FileId* GetFileId (const char* Name, const FileId* Table, unsigned Count);
+const FileId *GetFileId(const char *Name, const FileId *Table, unsigned Count);
 // Determine the id of the given file by looking at file extension of the name.
 // The table passed to the function must be sorted alphabetically. If the
 // extension is found, a pointer to the matching table entry is returned. If

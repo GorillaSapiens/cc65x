@@ -33,11 +33,11 @@
 
 // According to the C standard, shifting a data type by the number of bits it
 // has causes undefined behaviour. So
-// 
+//
 // unsigned long l = 1;
 // unsigned u =32;
 // l <<= u;
-// 
+//
 // may be illegal. The functions in this module behave safely in that respect,
 // and they use proper casting to distinguish signed from unsigned shifts.
 // They are not a general purpose replacement for the shift operator!
@@ -51,62 +51,66 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-long asl_l (long l, unsigned count)
+long asl_l(long l, unsigned count)
 // Arithmetic shift left l by count.
 {
-    while (1) {
-        if (count >= CHAR_BIT * sizeof (l)) {
-            l <<= (CHAR_BIT * sizeof (l) - 1);
-            count -= (CHAR_BIT * sizeof (l) - 1);
-        } else {
-            l <<= count;
-            break;
-        }
-    }
-    return l;
+   while (1) {
+      if (count >= CHAR_BIT * sizeof(l)) {
+         l <<= (CHAR_BIT * sizeof(l) - 1);
+         count -= (CHAR_BIT * sizeof(l) - 1);
+      }
+      else {
+         l <<= count;
+         break;
+      }
+   }
+   return l;
 }
 
-long asr_l (long l, unsigned count)
+long asr_l(long l, unsigned count)
 // Arithmetic shift right l by count
 {
-    while (1) {
-        if (count >= CHAR_BIT * sizeof (l)) {
-            l >>= (CHAR_BIT * sizeof (l) - 1);
-            count -= (CHAR_BIT * sizeof (l) - 1);
-        } else {
-            l >>= count;
-            break;
-        }
-    }
-    return l;
+   while (1) {
+      if (count >= CHAR_BIT * sizeof(l)) {
+         l >>= (CHAR_BIT * sizeof(l) - 1);
+         count -= (CHAR_BIT * sizeof(l) - 1);
+      }
+      else {
+         l >>= count;
+         break;
+      }
+   }
+   return l;
 }
 
-unsigned long shl_l (unsigned long l, unsigned count)
+unsigned long shl_l(unsigned long l, unsigned count)
 // Logical shift left l by count
 {
-    while (1) {
-        if (count >= CHAR_BIT * sizeof (l)) {
-            l <<= (CHAR_BIT * sizeof (l) - 1);
-            count -= (CHAR_BIT * sizeof (l) - 1);
-        } else {
-            l <<= count;
-            break;
-        }
-    }
-    return l;
+   while (1) {
+      if (count >= CHAR_BIT * sizeof(l)) {
+         l <<= (CHAR_BIT * sizeof(l) - 1);
+         count -= (CHAR_BIT * sizeof(l) - 1);
+      }
+      else {
+         l <<= count;
+         break;
+      }
+   }
+   return l;
 }
 
-unsigned long shr_l (unsigned long l, unsigned count)
+unsigned long shr_l(unsigned long l, unsigned count)
 // Logical shift right l by count
 {
-    while (1) {
-        if (count >= CHAR_BIT * sizeof (l)) {
-            l >>= (CHAR_BIT * sizeof (l) - 1);
-            count -= (CHAR_BIT * sizeof (l) - 1);
-        } else {
-            l >>= count;
-            break;
-        }
-    }
-    return l;
+   while (1) {
+      if (count >= CHAR_BIT * sizeof(l)) {
+         l >>= (CHAR_BIT * sizeof(l) - 1);
+         count -= (CHAR_BIT * sizeof(l) - 1);
+      }
+      else {
+         l >>= count;
+         break;
+      }
+   }
+   return l;
 }

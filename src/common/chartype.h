@@ -51,50 +51,50 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-int IsAlpha (char C);
+int IsAlpha(char C);
 // Check for a letter
 
-int IsAlNum (char C);
+int IsAlNum(char C);
 // Check for letter or digit
 
-int IsAscii (char C);
+int IsAscii(char C);
 // Check for an ASCII character
 
-int IsBlank (char C);
+int IsBlank(char C);
 // Check for a space or tab
 
 #if defined(HAVE_INLINE)
-INLINE int IsControl (char C)
+INLINE int IsControl(char C)
 // Check for control chars
 {
-    return iscntrl ((unsigned char) C);
+   return iscntrl((unsigned char)C);
 }
 #else
-#  define IsControl(C)          iscntrl (C)
+#define IsControl(C) iscntrl(C)
 #endif
 
-int IsSpace (char C);
+int IsSpace(char C);
 // Check for any white space characters
 
-int IsDigit (char C);
+int IsDigit(char C);
 // Check for a digit
 
-int IsLower (char C);
+int IsLower(char C);
 // Check for a lower case char
 
-int IsUpper (char C);
+int IsUpper(char C);
 // Check for upper case characters
 
-int IsBDigit (char C);
+int IsBDigit(char C);
 // Check for binary digits (0/1)
 
-int IsODigit (char C);
+int IsODigit(char C);
 // Check for octal digits (0..7)
 
-int IsXDigit (char C);
+int IsXDigit(char C);
 // Check for hexadecimal digits
 
-int IsQuote (char C);
+int IsQuote(char C);
 // Check for a single or double quote
 
 // End of chartype.h

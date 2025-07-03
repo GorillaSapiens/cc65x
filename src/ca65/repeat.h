@@ -38,7 +38,7 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void ParseRepeat (void);
+void ParseRepeat(void);
 // Parse and handle the .REPEAT statement
 
 // End of repeat.h

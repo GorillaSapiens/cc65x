@@ -45,8 +45,8 @@ struct StrBuf;
 ////////////////////////////////////////////////////////////////////////////////
 
 // Macro styles
-#define MAC_STYLE_CLASSIC       0
-#define MAC_STYLE_DEFINE        1
+#define MAC_STYLE_CLASSIC 0
+#define MAC_STYLE_DEFINE 1
 
 // Macro as an opaque data type
 struct Macro;
@@ -56,34 +56,34 @@ typedef struct Macro Macro;
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void MacDef (unsigned Style);
+void MacDef(unsigned Style);
 // Parse a macro definition
 
-void MacUndef (const struct StrBuf* Name, unsigned char Style);
+void MacUndef(const struct StrBuf *Name, unsigned char Style);
 // Undefine the macro with the given name and style. A style mismatch is
 // treated as if the macro didn't exist.
 
-void MacExpandStart (Macro* M);
+void MacExpandStart(Macro *M);
 // Start expanding a macro
 
-void MacAbort (void);
+void MacAbort(void);
 // Abort the current macro expansion
 
-Macro* FindMacro (const struct StrBuf* Name);
+Macro *FindMacro(const struct StrBuf *Name);
 // Try to find the macro with the given name and return it. If no macro with
 // this name was found, return NULL.
 
-Macro* FindDefine (const struct StrBuf* Name);
+Macro *FindDefine(const struct StrBuf *Name);
 // Try to find the define style macro with the given name and return it. If no
 // such macro was found, return NULL.
 
-int InMacExpansion (void);
+int InMacExpansion(void);
 // Return true if we're currently expanding a macro
 
-void DisableDefineStyleMacros (void);
+void DisableDefineStyleMacros(void);
 // Disable define style macros until EnableDefineStyleMacros is called
 
-void EnableDefineStyleMacros (void);
+void EnableDefineStyleMacros(void);
 // Re-enable define style macros previously disabled with
 // DisableDefineStyleMacros.
 

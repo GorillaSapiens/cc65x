@@ -43,48 +43,48 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Values for the Flags field
-#define OBJ_HAVEDATA    0x0001          // The object data is in the tmp file
+#define OBJ_HAVEDATA 0x0001 // The object data is in the tmp file
 
 // Internal structure holding object file data
 typedef struct ObjData ObjData;
 struct ObjData {
-    char*               Name;           // Module name
+   char *Name; // Module name
 
-    // Index entry
-    unsigned            Flags;
-    unsigned long       MTime;          // Modifiation time of object file
-    unsigned long       Start;          // Start offset of data in library
-    unsigned long       Size;           // Size of data in library
+   // Index entry
+   unsigned Flags;
+   unsigned long MTime; // Modifiation time of object file
+   unsigned long Start; // Start offset of data in library
+   unsigned long Size;  // Size of data in library
 
-    // Object file header
-    ObjHeader           Header;
+   // Object file header
+   ObjHeader Header;
 
-    // Basic data needed for simple checks
-    Collection          Strings;        // Strings from the object file
-    Collection          Exports;        // Exports list from object file
+   // Basic data needed for simple checks
+   Collection Strings; // Strings from the object file
+   Collection Exports; // Exports list from object file
 };
 
 // Collection with all object files
-extern Collection       ObjPool;
+extern Collection ObjPool;
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-ObjData* NewObjData (void);
+ObjData *NewObjData(void);
 // Allocate a new structure on the heap, insert it into the list, return it
 
-void FreeObjData (ObjData* O);
+void FreeObjData(ObjData *O);
 // Free a complete struct
 
-void ClearObjData (ObjData* O);
+void ClearObjData(ObjData *O);
 // Remove any data stored in O
 
-ObjData* FindObjData (const char* Module);
+ObjData *FindObjData(const char *Module);
 // Search for the module with the given name and return it. Return NULL if the
 // module is not in the list.
 
-void DelObjData (const char* Module);
+void DelObjData(const char *Module);
 // Delete the object module from the list
 
 // End of objdata.h

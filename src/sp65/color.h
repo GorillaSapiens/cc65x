@@ -41,10 +41,10 @@
 // Color structure
 typedef struct Color Color;
 struct Color {
-    unsigned char R;
-    unsigned char G;
-    unsigned char B;
-    unsigned char A;
+   unsigned char R;
+   unsigned char G;
+   unsigned char B;
+   unsigned char A;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,28 +53,35 @@ struct Color {
 
 #if defined(HAVE_INLINE)
 
-INLINE Color RGB (unsigned char R, unsigned char G, unsigned char B)
+INLINE Color RGB(unsigned char R, unsigned char G, unsigned char B)
 // Generate a color value
 {
-    Color C;
-    C.R = R; C.G = G; C.B = B; C.A = 0;
-    return C;
+   Color C;
+   C.R = R;
+   C.G = G;
+   C.B = B;
+   C.A = 0;
+   return C;
 }
 
-INLINE Color RGBA (unsigned char R, unsigned char G, unsigned char B, unsigned char A)
+INLINE Color RGBA(unsigned char R, unsigned char G, unsigned char B,
+                  unsigned char A)
 // Generate a color value
 {
-    Color C;
-    C.R = R; C.G = G; C.B = B; C.A = A;
-    return C;
+   Color C;
+   C.R = R;
+   C.G = G;
+   C.B = B;
+   C.A = A;
+   return C;
 }
 
 #else
 
-Color RGB (unsigned char R, unsigned char G, unsigned char B);
+Color RGB(unsigned char R, unsigned char G, unsigned char B);
 // Generate a color value
 
-Color RGBA (unsigned char R, unsigned char G, unsigned char B, unsigned char A);
+Color RGBA(unsigned char R, unsigned char G, unsigned char B, unsigned char A);
 // Generate a color value
 
 #endif

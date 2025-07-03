@@ -41,17 +41,17 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-extern SearchPaths*     SysIncSearchPath;       // System include path
-extern SearchPaths*     UsrIncSearchPath;       // User include path
+extern SearchPaths *SysIncSearchPath; // System include path
+extern SearchPaths *UsrIncSearchPath; // User include path
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void InitIncludePaths (void);
+void InitIncludePaths(void);
 // Initialize the include path search list
 
-void FinishIncludePaths (void);
+void FinishIncludePaths(void);
 // Finish creating the include path search lists.
 
 // End of incpath.h

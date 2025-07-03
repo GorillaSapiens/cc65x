@@ -43,71 +43,71 @@
 //                                   code
 ////////////////////////////////////////////////////////////////////////////////
 
-void* xmalloc (size_t Size)
+void *xmalloc(size_t Size)
 // Allocate memory, check for out of memory condition. Do some debugging
 {
-    void* P = 0;
+   void *P = 0;
 
-    // Allow zero sized requests and return NULL in this case
-    if (Size) {
+   // Allow zero sized requests and return NULL in this case
+   if (Size) {
 
-        // Allocate memory
-        P = malloc (Size);
+      // Allocate memory
+      P = malloc(Size);
 
-        // Check for errors
-        if (P == 0) {
-            AbEnd ("Out of memory - requested block size = %lu",
-                   (unsigned long) Size);
-        }
-    }
+      // Check for errors
+      if (P == 0) {
+         AbEnd("Out of memory - requested block size = %lu",
+               (unsigned long)Size);
+      }
+   }
 
-    // Return a pointer to the block
-    return P;
+   // Return a pointer to the block
+   return P;
 }
 
-void* xrealloc (void* P, size_t Size)
+void *xrealloc(void *P, size_t Size)
 // Reallocate a memory block, check for out of memory
 {
-    // Reallocate the block
-    void* N = realloc (P, Size);
+   // Reallocate the block
+   void *N = realloc(P, Size);
 
-    // Check for errors
-    if (N == 0 && Size != 0) {
-        AbEnd ("Out of memory in realloc - requested block size = %lu", (unsigned long) Size);
-    }
+   // Check for errors
+   if (N == 0 && Size != 0) {
+      AbEnd("Out of memory in realloc - requested block size = %lu",
+            (unsigned long)Size);
+   }
 
-    // Return the pointer to the new block
-    return N;
+   // Return the pointer to the new block
+   return N;
 }
 
-void xfree (void* Block)
+void xfree(void *Block)
 // Free the block, do some debugging
 {
-    free (Block);
+   free(Block);
 }
 
-char* xstrdup (const char* S)
+char *xstrdup(const char *S)
 // Duplicate a string on the heap. The function checks for out of memory
 {
-    // Allow dup'ing of NULL strings
-    if (S) {
+   // Allow dup'ing of NULL strings
+   if (S) {
 
-        // Get the length of the string
-        unsigned Len = strlen (S) + 1;
+      // Get the length of the string
+      unsigned Len = strlen(S) + 1;
 
-        // Allocate memory and return a copy
-        return memcpy (xmalloc (Len), S, Len);
+      // Allocate memory and return a copy
+      return memcpy(xmalloc(Len), S, Len);
+   }
+   else {
 
-    } else {
-
-        // Return a NULL pointer
-        return 0;
-
-    }
+      // Return a NULL pointer
+      return 0;
+   }
 }
 
-void* xdup (const void* Buf, size_t Size)
+void *xdup(const void *Buf, size_t Size)
 // Create a copy of Buf on the heap and return a pointer to it.
 {
-    return memcpy (xmalloc (Size), Buf, Size);
+   return memcpy(xmalloc(Size), Buf, Size);
 }

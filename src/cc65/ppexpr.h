@@ -37,26 +37,25 @@
 
 // PPExpr data struct
 typedef struct PPExpr PPExpr;
-struct PPExpr
-{
-    long IVal;
-    unsigned Flags;
+struct PPExpr {
+   long IVal;
+   unsigned Flags;
 };
 
 // PPExpr initializers
-#define AUTO_PPEXPR_INITIALIZER     { 0, 0 }
-#define STATIC_PPEXPR_INITIALIZER   { 0, 0 }
+#define AUTO_PPEXPR_INITIALIZER {0, 0}
+#define STATIC_PPEXPR_INITIALIZER {0, 0}
 
 // PPExpr flags
-#define PPEXPR_NONE         0U
-#define PPEXPR_UNSIGNED     1U
-#define PPEXPR_UNDEFINED    2U
+#define PPEXPR_NONE 0U
+#define PPEXPR_UNSIGNED 1U
+#define PPEXPR_UNDEFINED 2U
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void ParsePPExprInLine (PPExpr* Expr);
+void ParsePPExprInLine(PPExpr *Expr);
 // Parse a line for PP expression
 
 // End of ppexpr.h

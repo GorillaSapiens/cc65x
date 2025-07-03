@@ -45,37 +45,37 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void Warning (const char* Format, ...)
+void Warning(const char *Format, ...)
 // Print a warning message
 {
-    va_list ap;
-    va_start (ap, Format);
-    fprintf (stderr, "%s: Warning: ", ProgName);
-    vfprintf (stderr, Format, ap);
-    putc ('\n', stderr);
-    va_end (ap);
+   va_list ap;
+   va_start(ap, Format);
+   fprintf(stderr, "%s: Warning: ", ProgName);
+   vfprintf(stderr, Format, ap);
+   putc('\n', stderr);
+   va_end(ap);
 }
 
-void Error (const char* Format, ...)
+void Error(const char *Format, ...)
 // Print an error message and die
 {
-    va_list ap;
-    va_start (ap, Format);
-    fprintf (stderr, "%s: Error: ", ProgName);
-    vfprintf (stderr, Format, ap);
-    putc ('\n', stderr);
-    va_end (ap);
-    exit (EXIT_FAILURE);
+   va_list ap;
+   va_start(ap, Format);
+   fprintf(stderr, "%s: Error: ", ProgName);
+   vfprintf(stderr, Format, ap);
+   putc('\n', stderr);
+   va_end(ap);
+   exit(EXIT_FAILURE);
 }
 
-void Internal (const char* Format, ...)
+void Internal(const char *Format, ...)
 // Print an internal error message and die
 {
-    va_list ap;
-    va_start (ap, Format);
-    fprintf (stderr, "%s: Internal error: ", ProgName);
-    vfprintf (stderr, Format, ap);
-    putc ('\n', stderr);
-    va_end (ap);
-    exit (EXIT_FAILURE);
+   va_list ap;
+   va_start(ap, Format);
+   fprintf(stderr, "%s: Internal error: ", ProgName);
+   vfprintf(stderr, Format, ap);
+   putc('\n', stderr);
+   va_end(ap);
+   exit(EXIT_FAILURE);
 }

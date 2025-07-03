@@ -38,9 +38,9 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-const char Func___bzero[]       = "__bzero";    // C name of "__bzero"
-const char Func_memcpy[]        = "memcpy";     // C name of "memcpy"
-const char Func_memset[]        = "memset";     // C name of "memset"
-const char Func_strcmp[]        = "strcmp";     // C name of "strcmp"
-const char Func_strcpy[]        = "strcpy";     // C name of "strcpy"
-const char Func_strlen[]        = "strlen";     // C name of "strlen"
+const char Func___bzero[] = "__bzero"; // C name of "__bzero"
+const char Func_memcpy[] = "memcpy";   // C name of "memcpy"
+const char Func_memset[] = "memset";   // C name of "memset"
+const char Func_strcmp[] = "strcmp";   // C name of "strcmp"
+const char Func_strcpy[] = "strcpy";   // C name of "strcpy"
+const char Func_strlen[] = "strlen";   // C name of "strlen"

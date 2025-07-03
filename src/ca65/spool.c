@@ -39,41 +39,41 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-StringPool* StrPool = 0;
+StringPool *StrPool = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-void WriteStrPool (void)
+void WriteStrPool(void)
 // Write the string pool to the object file
 {
-    unsigned I;
+   unsigned I;
 
-    // Get the number of strings in the string pool
-    unsigned Count = SP_GetCount (StrPool);
+   // Get the number of strings in the string pool
+   unsigned Count = SP_GetCount(StrPool);
 
-    // Tell the object file module that we're about to start the string pool
-    ObjStartStrPool ();
+   // Tell the object file module that we're about to start the string pool
+   ObjStartStrPool();
 
-    // Write the string count to the list
-    ObjWriteVar (Count);
+   // Write the string count to the list
+   ObjWriteVar(Count);
 
-    // Write the strings in id order
-    for (I = 0; I < Count; ++I) {
-        ObjWriteBuf (SP_Get (StrPool, I));
-    }
+   // Write the strings in id order
+   for (I = 0; I < Count; ++I) {
+      ObjWriteBuf(SP_Get(StrPool, I));
+   }
 
-    // Done writing the string pool
-    ObjEndStrPool ();
+   // Done writing the string pool
+   ObjEndStrPool();
 }
 
-void InitStrPool (void)
+void InitStrPool(void)
 // Initialize the string pool
 {
-    // Create a string pool
-    StrPool = NewStringPool (1103);
+   // Create a string pool
+   StrPool = NewStringPool(1103);
 
-    // Insert an empty string. It will have string id 0
-    SP_AddStr (StrPool, "");
+   // Insert an empty string. It will have string id 0
+   SP_AddStr(StrPool, "");
 }

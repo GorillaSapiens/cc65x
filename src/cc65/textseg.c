@@ -46,58 +46,58 @@
 //                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-TextSeg* NewTextSeg (SymEntry* Func)
+TextSeg *NewTextSeg(SymEntry *Func)
 // Create a new text segment, initialize and return it
 {
-    // Allocate memory for the structure
-    TextSeg* S  = xmalloc (sizeof (TextSeg));
+   // Allocate memory for the structure
+   TextSeg *S = xmalloc(sizeof(TextSeg));
 
-    // Initialize the fields
-    S->Func     = Func;
-    InitCollection (&S->Lines);
+   // Initialize the fields
+   S->Func = Func;
+   InitCollection(&S->Lines);
 
-    // Return the new struct
-    return S;
+   // Return the new struct
+   return S;
 }
 
-void TS_AddVLine (TextSeg* S, const char* Format, va_list ap)
+void TS_AddVLine(TextSeg *S, const char *Format, va_list ap)
 // Add a line to the given text segment
 {
-    // Format the line
-    char Buf [256];
-    xvsprintf (Buf, sizeof (Buf), Format, ap);
+   // Format the line
+   char Buf[256];
+   xvsprintf(Buf, sizeof(Buf), Format, ap);
 
-    // Add a copy to the data segment
-    CollAppend (&S->Lines, xstrdup (Buf));
+   // Add a copy to the data segment
+   CollAppend(&S->Lines, xstrdup(Buf));
 }
 
-void TS_AddLine (TextSeg* S, const char* Format, ...)
+void TS_AddLine(TextSeg *S, const char *Format, ...)
 // Add a line to the given text segment
 {
-    va_list ap;
-    va_start (ap, Format);
-    TS_AddVLine (S, Format, ap);
-    va_end (ap);
+   va_list ap;
+   va_start(ap, Format);
+   TS_AddVLine(S, Format, ap);
+   va_end(ap);
 }
 
-void TS_Output (const TextSeg* S)
+void TS_Output(const TextSeg *S)
 // Output the text segment data to the output file
 {
-    unsigned I;
+   unsigned I;
 
-    // Get the number of entries in this segment
-    unsigned Count = CollCount (&S->Lines);
+   // Get the number of entries in this segment
+   unsigned Count = CollCount(&S->Lines);
 
-    // If the segment is actually empty, bail out
-    if (Count == 0) {
-        return;
-    }
+   // If the segment is actually empty, bail out
+   if (Count == 0) {
+      return;
+   }
 
-    // Output all entries
-    for (I = 0; I < Count; ++I) {
-        WriteOutput ("%s\n", (const char*) CollConstAt (&S->Lines, I));
-    }
+   // Output all entries
+   for (I = 0; I < Count; ++I) {
+      WriteOutput("%s\n", (const char *)CollConstAt(&S->Lines, I));
+   }
 
-    // Add an additional newline after the segment output
-    WriteOutput ("\n");
+   // Add an additional newline after the segment output
+   WriteOutput("\n");
 }
