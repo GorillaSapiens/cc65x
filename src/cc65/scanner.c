@@ -812,7 +812,9 @@ static void NumericConst (void)
                 Error ("Invalid suffix \"%s\" on floating constant",
                        SB_GetConstBuf (&Src) + SB_GetIndex (&Src));
             }
-            NextTok.Type = type_double;
+            // leaving this here in case someone ever wants to do more.
+            // NextTok.Type = type_double;
+            NextTok.Type = type_float;
         }
 
         /* Set the value and the token */

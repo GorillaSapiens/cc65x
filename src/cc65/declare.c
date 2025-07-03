@@ -587,7 +587,9 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
 
         case TOK_DOUBLE:
             NextToken ();
-            Spec->Type[0].C = T_DOUBLE;
+            // leaving this here in case someone ever wants to do more.
+            // Spec->Type[0].C = T_DOUBLE;
+            Spec->Type[0].C = T_FLOAT;
             Spec->Type[1].C = T_END;
             break;
 
