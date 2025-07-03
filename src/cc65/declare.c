@@ -1,4 +1,4 @@
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 //
 //                                 declare.c
 //
@@ -29,7 +29,7 @@
 // 3. This notice may not be removed or altered from any source
 //    distribution.
 //
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 
 #include <limits.h>
 #include <stdio.h>
@@ -61,9 +61,9 @@
 #include "symtab.h"
 #include "typeconv.h"
 
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 //                                 Forwards
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 
 static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags);
 // Parse an enum specifier
@@ -74,9 +74,9 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags);
 static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags);
 // Parse a struct specifier
 
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 //                         Type specification parser
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 
 static void InitDeclSpec (DeclSpec* Spec)
 // Initialize the DeclSpec struct for use
@@ -677,9 +677,9 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
     Spec->Type[0].C |= Qualifiers;
 }
 
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 //                         Enum/struct/union parser
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 
 static SymEntry* ForwardESU (const char* Name, unsigned Flags, unsigned* DSFlags)
 // Handle an enum, struct or union forward declaration
@@ -1508,9 +1508,9 @@ EndOfDecl:
     return AddStructSym (Name, SC_STRUCT | SC_DEF | Flags, StructSize, FieldTab, DSFlags);
 }
 
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 //                             Declarator parser
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 
 static void InitDeclarator (Declarator* D)
 // Initialize the Declarator struct for use
@@ -2238,9 +2238,9 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, TypeCode* RemQ, declmode_
     *RemQ = Qualifiers;
 }
 
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 //                                   Code
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 
 Type* ParseType (Type* T)
 // Parse a complete type specification in parentheses

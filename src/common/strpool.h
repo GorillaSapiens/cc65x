@@ -1,4 +1,4 @@
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 //
 //                                 strpool.h
 //
@@ -29,7 +29,7 @@
 // 3. This notice may not be removed or altered from any source
 //    distribution.
 //
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 
 /* A string pool is used to store identifiers and other strings. Each string
 ** stored in the pool has a unique ID, which may be used to access the string
@@ -45,9 +45,9 @@
 #include "hashtab.h"
 #include "strbuf.h"
 
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 //                                     Data
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 
 // Opaque string pool entry
 typedef struct StringPoolEntry StringPoolEntry;
@@ -55,9 +55,9 @@ typedef struct StringPoolEntry StringPoolEntry;
 // A string pool
 typedef struct StringPool StringPool;
 
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 //                                     Code
-//***************************************************************************
+////////////////////////////////////////////////////////////////////////////////
 
 StringPool* NewStringPool (unsigned HashSlots);
 // Allocate, initialize and return a new string pool
