@@ -323,8 +323,8 @@ void g_cmp(unsigned flags, unsigned long val);
 void g_test(unsigned flags);
 // Test the value in the primary and set the condition codes
 
-void g_nopx(const char *comment, const char *file, int line);
-#define g_nop(x) g_nopx(x, __FILE__, __LINE__);
+void g_nopx(const char *file, int line, const char *fmt, ...);
+#define g_nop(...) g_nopx(__FILE__, __LINE__, __VA_ARGS__)
 // Add NOP with comments
 
 void g_push(unsigned flags, unsigned long val);

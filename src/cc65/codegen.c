@@ -2472,10 +2472,21 @@ void g_test(unsigned flags)
    }
 }
 
-void g_nopx(const char *comment, const char *file, int line)
+void g_nopx(const char *file, int line, const char *fmt, ...)
 // Add NOP with comments
 {
-   AddCodeLine("nop ; %s:%d %s", file, line, comment);
+   va_list args;
+   char buf[128];
+   char *p;
+
+   sprintf(buf, "nop ; [%s:%d] ", file, line);
+   p = buf + strlen(buf);
+
+   va_start(args, fmt);
+   vsprintf(p, fmt, args);
+   va_end(args);
+
+   AddCodeLine("%s", buf);
 }
 
 void g_push(unsigned flags, unsigned long val)
