@@ -323,8 +323,13 @@ void g_cmp(unsigned flags, unsigned long val);
 void g_test(unsigned flags);
 // Test the value in the primary and set the condition codes
 
+void g_nopx(const char *comment, const char *file, int line);
+#define g_nop(x) g_nopx(x, __FILE__, __LINE__);
+// Add NOP with comments
+
 void g_push(unsigned flags, unsigned long val);
 // Push the primary register or a constant value onto the stack
+
 void g_push_float(unsigned flags, double val);
 // Push the primary register or a constant value onto the stack
 

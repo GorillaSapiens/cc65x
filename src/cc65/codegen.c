@@ -2472,6 +2472,12 @@ void g_test(unsigned flags)
    }
 }
 
+void g_nopx(const char *comment, const char *file, int line)
+// Add NOP with comments
+{
+   AddCodeLine("nop ; %s:%d %s", file, line, comment);
+}
+
 void g_push(unsigned flags, unsigned long val)
 // Push the primary register or a constant value onto the stack
 {
