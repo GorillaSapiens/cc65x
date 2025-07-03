@@ -31,27 +31,18 @@
 //
 //***************************************************************************
 
-
-
 #ifndef OPC45GS02_H
 #define OPC45GS02_H
 
-
-
 #include "opcdesc.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Descriptions for all opcodes
 extern const OpcDesc OpcTable_45GS02[256];
 extern const OpcDesc OpcTable_45GS02_extended[256];
-
 
 // End of opc45GS02.h
 

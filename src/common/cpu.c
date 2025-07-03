@@ -31,21 +31,15 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "addrsize.h"
 #include "check.h"
 #include "cpu.h"
 #include "strutil.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // CPU used
 cpu_t CPU = CPU_UNKNOWN;
@@ -90,13 +84,9 @@ const unsigned CPUIsets[CPU_COUNT] = {
     CPU_ISET_65CE02  | CPU_ISET_6502                   | CPU_ISET_65C02,
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int ValidAddrSizeForCPU (unsigned char AddrSize)
 // Check if the given address size is valid for the current CPU
@@ -128,8 +118,6 @@ int ValidAddrSizeForCPU (unsigned char AddrSize)
             return 0;
     }
 }
-
-
 
 cpu_t FindCPU (const char* Name)
 /* Find a CPU by name and return the target id. CPU_UNKNOWN is returned if

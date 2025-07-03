@@ -31,32 +31,22 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "gentype.h"
 
 // ld65
 #include "tpool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // The string pool we're using
 StringPool* TypePool = 0;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void PrintDbgTypes (FILE* F)
 // Output the types to a debug info file
@@ -79,8 +69,6 @@ void PrintDbgTypes (FILE* F)
     // Free the memory for the temporary string
     SB_Done (&Type);
 }
-
-
 
 void InitTypePool (void)
 // Initialize the type pool

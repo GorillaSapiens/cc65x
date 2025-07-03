@@ -31,17 +31,11 @@
 //
 //***************************************************************************
 
-
-
 #include "color.h"
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 #if !defined(HAVE_INLINE)
 
@@ -52,8 +46,6 @@ Color RGB (unsigned char R, unsigned char G, unsigned char B)
     C.R = R; C.G = G; C.B = B; C.A = 0;
     return C;
 }
-
-
 
 Color RGBA (unsigned char R, unsigned char G, unsigned char B, unsigned char A)
 // Generate a color value

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -58,13 +56,9 @@
 #include "studyexpr.h"
 #include "symtab.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Combined symbol entry flags used within this module
 #define SF_UNDEFMASK    (SF_REFERENCED | SF_DEFINED | SF_IMPORT)
@@ -80,13 +74,9 @@ static unsigned     ScopeCount   = 0;   // Number of scopes
 static unsigned     ImportCount = 0;    // Counter for import symbols
 static unsigned     ExportCount = 0;    // Counter for export symbols
 
-
-
 //***************************************************************************
 //                         Internally used functions
 //***************************************************************************
-
-
 
 static int IsDbgSym (const SymEntry* S)
 // Return true if this is a debug symbol
@@ -100,8 +90,6 @@ static int IsDbgSym (const SymEntry* S)
     }
 }
 
-
-
 static unsigned ScopeTableSize (unsigned Level)
 // Get the size of a table for the given lexical level
 {
@@ -111,8 +99,6 @@ static unsigned ScopeTableSize (unsigned Level)
         default:        return  29;
     }
 }
-
-
 
 static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
 // Allocate a symbol table on the heap and return it
@@ -188,13 +174,9 @@ static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
     return S;
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
                     unsigned char AddrSize, SymEntry* ScopeLabel)
@@ -240,8 +222,6 @@ void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
     }
 }
 
-
-
 void SymLeaveLevel (void)
 // Leave the current lexical level
 {
@@ -273,8 +253,6 @@ void SymLeaveLevel (void)
     CurrentScope = CurrentScope->Parent;
 }
 
-
-
 SymTable* SymFindScope (SymTable* Parent, const StrBuf* Name, SymFindAction Action)
 // Find a scope in the given enclosing scope
 {
@@ -300,8 +278,6 @@ SymTable* SymFindScope (SymTable* Parent, const StrBuf* Name, SymFindAction Acti
     return *T;
 }
 
-
-
 SymTable* SymFindAnyScope (SymTable* Parent, const StrBuf* Name)
 /* Find a scope in the given or any of its parent scopes. The function will
 ** never create a new symbol, since this can only be done in one specific
@@ -320,8 +296,6 @@ SymTable* SymFindAnyScope (SymTable* Parent, const StrBuf* Name)
 
     return Scope;
 }
-
-
 
 SymEntry* SymFindLocal (SymEntry* Parent, const StrBuf* Name, SymFindAction Action)
 /* Find a cheap local symbol. If Action contains SYM_ALLOC_NEW and the entry is
@@ -370,8 +344,6 @@ SymEntry* SymFindLocal (SymEntry* Parent, const StrBuf* Name, SymFindAction Acti
     // We did not find the entry and AllocNew is false.
     return 0;
 }
-
-
 
 SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, SymFindAction Action)
 /* Find a new symbol table entry in the given table. If Action contains
@@ -423,8 +395,6 @@ SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, SymFindAction Action)
     return 0;
 }
 
-
-
 SymEntry* SymFindAny (SymTable* Scope, const StrBuf* Name)
 /* Find a symbol in the given or any of its parent scopes. The function will
 ** never create a new symbol, since this can only be done in one specific
@@ -460,8 +430,6 @@ SymEntry* SymFindAny (SymTable* Scope, const StrBuf* Name)
     // Return the result
     return Sym;
 }
-
-
 
 static void SymCheckUndefined (SymEntry* S)
 // Handle an undefined symbol
@@ -560,8 +528,6 @@ static void SymCheckUndefined (SymEntry* S)
         }
     }
 }
-
-
 
 void SymCheck (void)
 // Run through all symbols and check for anomalies and errors
@@ -698,8 +664,6 @@ void SymCheck (void)
     }
 }
 
-
-
 void SymDump (FILE* F)
 // Dump the symbol table
 {
@@ -721,8 +685,6 @@ void SymDump (FILE* F)
         S = S->List;
     }
 }
-
-
 
 void WriteImports (void)
 // Write the imports list to the object file
@@ -756,8 +718,6 @@ void WriteImports (void)
     // Done writing imports
     ObjEndImports ();
 }
-
-
 
 void WriteExports (void)
 // Write the exports list to the object file
@@ -837,8 +797,6 @@ void WriteExports (void)
     // Done writing exports
     ObjEndExports ();
 }
-
-
 
 void WriteDbgSyms (void)
 // Write a list of all symbols to the object file
@@ -945,8 +903,6 @@ void WriteDbgSyms (void)
     // Done writing debug symbols
     ObjEndDbgSyms ();
 }
-
-
 
 void WriteScopes (void)
 // Write the scope table to the object file

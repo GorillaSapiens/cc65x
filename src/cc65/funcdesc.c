@@ -31,21 +31,15 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "xmalloc.h"
 
 // cc65
 #include "funcdesc.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 FuncDesc* NewFuncDesc (void)
 // Create a new symbol table with the given name
@@ -65,8 +59,6 @@ FuncDesc* NewFuncDesc (void)
     // Return the new struct
     return F;
 }
-
-
 
 void FreeFuncDesc (FuncDesc* F)
 // Free a function descriptor

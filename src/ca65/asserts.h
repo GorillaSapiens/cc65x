@@ -31,34 +31,22 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ASSERTS_H
 #define ASSERTS_H
 
-
-
 // common
 #include "assertion.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Forwards
 struct ExprNode;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void AddAssertion (struct ExprNode* Expr, AssertAction Action, unsigned Msg);
 // Add an assertion to the assertion table
@@ -68,8 +56,6 @@ void CheckAssertions (void);
 
 void WriteAssertions (void);
 // Write the assertion table to the object file
-
-
 
 // End of asserts.h
 

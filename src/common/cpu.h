@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CPU_H
 #define CPU_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // CPUs
 typedef enum {
@@ -91,13 +85,9 @@ extern const char* CPUNames[CPU_COUNT];
 // Table with CPU the instruction sets
 extern const unsigned CPUIsets[CPU_COUNT];
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int ValidAddrSizeForCPU (unsigned char AddrSize);
 // Check if the given address size is valid for the current CPU
@@ -106,8 +96,6 @@ cpu_t FindCPU (const char* Name);
 /* Find a CPU by name and return the target id. CPU_UNKNOWN is returned if
 ** the given name is no valid target.
 */
-
-
 
 // End of cpu.h
 

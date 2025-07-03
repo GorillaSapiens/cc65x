@@ -31,21 +31,15 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "xmalloc.h"
 
 // ca65
 #include "fragment.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Fragment* NewFragment (unsigned char Type, unsigned short Len)
 /* Create, initialize and return a new fragment. The fragment will be inserted

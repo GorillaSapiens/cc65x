@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SYMTAB_H
 #define SYMTAB_H
-
-
 
 #include <stdio.h>
 
@@ -47,13 +43,9 @@
 // ca65
 #include "symentry.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Arguments for SymFind...
 typedef enum {
@@ -92,13 +84,9 @@ struct SymTable {
 extern SymTable*        CurrentScope;   // Pointer to current symbol table
 extern SymTable*        RootScope;      // Root symbol table
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
                     unsigned char AddrSize, SymEntry* OwnerSym);
@@ -172,8 +160,6 @@ void WriteDbgSyms (void);
 
 void WriteScopes (void);
 // Write the scope table to the object file
-
-
 
 // End of symtab.h
 

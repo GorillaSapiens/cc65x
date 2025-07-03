@@ -31,11 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CODEGEN_H
 #define CODEGEN_H
-
 
 #include <inttypes.h>
 
@@ -45,13 +42,9 @@
 // cc65
 #include "segments.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 /* Code generator flags.
 ** Note: The type flags are designed so that a smaller type may override a
@@ -95,18 +88,12 @@
 #define CF_CODE         0xB000  // C code label location
 #define CF_STACK        0xC000  // Function-local auto on stack
 
-
-
 // Forward
 struct StrBuf;
-
-
 
 //***************************************************************************
 //                         Files, pre- and postamble
 //***************************************************************************
-
-
 
 void g_preamble (void);
 // Generate the assembler code preamble
@@ -114,13 +101,9 @@ void g_preamble (void);
 void g_fileinfo (const char* Name, unsigned long Size, unsigned long MTime);
 // If debug info is enabled, place a file info into the source
 
-
-
 //***************************************************************************
 //                              Segment support
 //***************************************************************************
-
-
 
 void g_userodata (void);
 // Switch to the read only data segment
@@ -134,13 +117,9 @@ void g_usebss (void);
 void g_segname (segment_t Seg);
 // Emit the name of a segment if necessary
 
-
-
 //***************************************************************************
 //                      Functions handling local labels
 //***************************************************************************
-
-
 
 void g_defcodelabel (unsigned label);
 // Define a local code label
@@ -148,13 +127,9 @@ void g_defcodelabel (unsigned label);
 void g_defdatalabel (unsigned label);
 // Define a local data label
 
-
-
 //***************************************************************************
 //                     Functions handling global labels
 //***************************************************************************
-
-
 
 void g_defgloblabel (const char* Name);
 // Define a global label with the given name
@@ -177,13 +152,9 @@ void g_importstartup (void);
 void g_importmainargs (void);
 // Forced import of a special symbol that handles arguments to main
 
-
-
 //***************************************************************************
 //                                   stack
 //***************************************************************************
-
-
 
 int pop (unsigned flags);
 // Pop an argument of the given size
@@ -194,13 +165,9 @@ int push (unsigned flags);
 unsigned sizeofarg (unsigned flags);
 // Return the size of a function argument type that is encoded in flags
 
-
-
 //***************************************************************************
 //                    type conversion and similiar stuff
 //***************************************************************************
-
-
 
 void g_toslong (unsigned flags);
 // Make sure, the value on TOS is a long. Convert if necessary
@@ -240,13 +207,9 @@ void g_scale (unsigned flags, long val);
 ** pointer points to.
 */
 
-
-
 //***************************************************************************
 //                          Function entry and exit
 //***************************************************************************
-
-
 
 void g_enter (unsigned flags, unsigned argsize);
 // Function prologue
@@ -254,13 +217,9 @@ void g_enter (unsigned flags, unsigned argsize);
 void g_leave (int DoCleanup);
 // Function epilogue
 
-
-
 //***************************************************************************
 //                            Register variables
 //***************************************************************************
-
-
 
 void g_swap_regvars (int StackOffs, int RegOffs, unsigned Bytes);
 // Swap a register variable with a location on the stack
@@ -271,12 +230,9 @@ void g_save_regvars (int RegOffs, unsigned Bytes);
 void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes);
 // Restore register variables
 
-
-
 //***************************************************************************
 //                           Fetching memory cells
 //***************************************************************************
-
 
 void g_getimmed (unsigned Flags, uintptr_t Val, long Offs);
 
@@ -301,13 +257,9 @@ void g_leavariadic (int Offs);
 ** register
 */
 
-
-
 //***************************************************************************
 //                             Store into memory
 //***************************************************************************
-
-
 
 void g_putstatic (unsigned flags, uintptr_t label, long offs);
 // Store the primary register into the specified static memory cell
@@ -320,13 +272,9 @@ void g_putind (unsigned flags, unsigned offs);
 ** on the top of the stack
 */
 
-
-
 //***************************************************************************
 //              Adds and subs of variables fix a fixed address
 //***************************************************************************
-
-
 
 void g_addlocal (unsigned flags, int offs);
 // Add a local variable to ax
@@ -334,13 +282,9 @@ void g_addlocal (unsigned flags, int offs);
 void g_addstatic (unsigned flags, uintptr_t label, long offs);
 // Add a static variable to ax
 
-
-
 //***************************************************************************
 //                           Special op= functions
 //***************************************************************************
-
-
 
 void g_addeqstatic (unsigned flags, uintptr_t label, long offs,
                     unsigned long val);
@@ -362,13 +306,9 @@ void g_subeqlocal (unsigned flags, int offs, unsigned long val);
 void g_subeqind (unsigned flags, unsigned offs, unsigned long val);
 // Emit -= for the location with address in ax
 
-
-
 //***************************************************************************
 //                 Add a variable address to the value in ax
 //***************************************************************************
-
-
 
 void g_addaddr_local (unsigned flags, int offs);
 // Add the address of a local variable to ax
@@ -376,13 +316,9 @@ void g_addaddr_local (unsigned flags, int offs);
 void g_addaddr_static (unsigned flags, uintptr_t label, long offs);
 // Add the address of a static variable to ax
 
-
-
 //***************************************************************************
 //
 //***************************************************************************
-
-
 
 void g_save (unsigned flags);
 // Copy primary register to hold register.
@@ -491,8 +427,6 @@ void g_initauto (unsigned Label, unsigned Size);
 void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size);
 // Initialize a static local variable from static initialization data
 
-
-
 //***************************************************************************
 //                                Bit-fields
 //***************************************************************************
@@ -508,8 +442,6 @@ void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
 //                             Switch statement
 //***************************************************************************
 
-
-
 void g_switchsave (unsigned Depth);
 // Generate save code for a switch statement
 
@@ -519,18 +451,12 @@ void g_switchrest (unsigned Depth);
 void g_switch (Collection* Nodes, unsigned DefaultLabel, unsigned Depth);
 // Generate code for a switch statement
 
-
-
 //***************************************************************************
 //                       User supplied assembler code
 //***************************************************************************
 
-
-
 void g_asmcode (struct StrBuf* B);
 // Output one line of assembler code.
-
-
 
 // End of codegen.h
 

@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SCANSTRBUF_H
 #define SCANSTRBUF_H
-
-
 
 // common
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void SB_SkipWhite (StrBuf* B);
 // Skip whitespace in the string buffer
@@ -73,8 +65,6 @@ int SB_GetNumber (StrBuf* B, long* Val);
 ** minus or plus sign. The function returns 1 if a number was found and
 ** zero otherwise. Errors are only output for invalid numbers.
 */
-
-
 
 // End of scanstrbuf.h
 

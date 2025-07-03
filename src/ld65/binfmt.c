@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "target.h"
 
@@ -40,24 +38,16 @@
 #include "error.h"
 #include "binfmt.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Default format (depends on target system)
 unsigned char DefaultBinFmt     = BINFMT_BINARY;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int RelocatableBinFmt (unsigned Format)
 // Return true if this is a relocatable format, return false otherwise

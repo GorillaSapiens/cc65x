@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -49,13 +47,9 @@
 #include "error.h"
 #include "scanner.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Current token and attributes
 unsigned        InfoTok;
@@ -76,13 +70,9 @@ static unsigned         InputCol        = 0;
 static FILE*            InputFile       = 0;
 static char*            InputSrcName    = 0;
 
-
-
 //***************************************************************************
 //                              Error handling
 //***************************************************************************
-
-
 
 void InfoWarning (const char* Format, ...)
 // Print a warning message adding file name and line number of the config file
@@ -97,8 +87,6 @@ void InfoWarning (const char* Format, ...)
     fprintf (stderr, "%s:%u: Warning: %s\n",
             InputSrcName, InfoErrorLine, Buf);
 }
-
-
 
 void InfoError (const char* Format, ...)
 // Print an error message adding file name and line number of the config file
@@ -115,14 +103,9 @@ void InfoError (const char* Format, ...)
     exit (EXIT_FAILURE);
 }
 
-
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void NextChar (void)
 // Read the next character from the input file
@@ -142,8 +125,6 @@ static void NextChar (void)
     }
 }
 
-
-
 static unsigned DigitVal (int C)
 // Return the value for a numeric digit
 {
@@ -154,16 +135,12 @@ static unsigned DigitVal (int C)
     }
 }
 
-
-
 static void SkipBlanks (int SingleLine)
 {
     while (C != EOF && (!SingleLine || C != '\n') && IsSpace (C)) {
         NextChar ();
     }
 }
-
-
 
 static long GetDecimalToken (void)
 {
@@ -175,8 +152,6 @@ static long GetDecimalToken (void)
     }
     return Value;
 }
-
-
 
 static int GetEncodedChar (char* Buf, unsigned* IPtr, unsigned Size)
 {
@@ -226,8 +201,6 @@ Store:
     Buf [*IPtr] = 0;
     return 0;
 }
-
-
 
 static void LineMarkerOrComment ()
 /* Handle a line beginning with '#'. Possible interpretations are:
@@ -317,8 +290,6 @@ NotMarker:
 Last:
     SB_Done (&SrcNameBuf);
 }
-
-
 
 void InfoNextTok (void)
 // Read the next token from the input stream
@@ -495,8 +466,6 @@ Again:
     }
 }
 
-
-
 void InfoConsume (unsigned T, const char* Msg)
 // Skip a token, print an error message if not found
 {
@@ -506,15 +475,11 @@ void InfoConsume (unsigned T, const char* Msg)
     InfoNextTok ();
 }
 
-
-
 void InfoConsumeLCurly (void)
 // Consume a left curly brace
 {
     InfoConsume (INFOTOK_LCURLY, "'{' expected");
 }
-
-
 
 void InfoConsumeRCurly (void)
 // Consume a right curly brace
@@ -522,23 +487,17 @@ void InfoConsumeRCurly (void)
     InfoConsume (INFOTOK_RCURLY, "'}' expected");
 }
 
-
-
 void InfoConsumeSemi (void)
 // Consume a semicolon
 {
     InfoConsume (INFOTOK_SEMI, "';' expected");
 }
 
-
-
 void InfoConsumeColon (void)
 // Consume a colon
 {
     InfoConsume (INFOTOK_COLON, "':' expected");
 }
-
-
 
 void InfoOptionalComma (void)
 // Consume a comma if there is one
@@ -548,8 +507,6 @@ void InfoOptionalComma (void)
     }
 }
 
-
-
 void InfoOptionalAssign (void)
 // Consume an equal sign if there is one
 {
@@ -557,8 +514,6 @@ void InfoOptionalAssign (void)
         InfoNextTok ();
     }
 }
-
-
 
 void InfoAssureInt (void)
 // Make sure the next token is an integer
@@ -568,8 +523,6 @@ void InfoAssureInt (void)
     }
 }
 
-
-
 void InfoAssureStr (void)
 // Make sure the next token is a string constant
 {
@@ -577,8 +530,6 @@ void InfoAssureStr (void)
         InfoError ("String constant expected");
     }
 }
-
-
 
 void InfoAssureChar (void)
 // Make sure the next token is a char constant
@@ -588,8 +539,6 @@ void InfoAssureChar (void)
     }
 }
 
-
-
 void InfoAssureIdent (void)
 // Make sure the next token is an identifier
 {
@@ -598,8 +547,6 @@ void InfoAssureIdent (void)
     }
 }
 
-
-
 void InfoRangeCheck (const char* Attr, long Lo, long Hi)
 // Check the range of InfoIVal
 {
@@ -607,8 +554,6 @@ void InfoRangeCheck (const char* Attr, long Lo, long Hi)
         InfoError ("Range error for attribute %s", Attr);
     }
 }
-
-
 
 void InfoSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
 // Map an identifier to one of the special tokens in the table
@@ -639,8 +584,6 @@ void InfoSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
     InfoError ("%s expected", Name);
 }
 
-
-
 void InfoBoolToken (void)
 // Map an identifier or integer to a boolean token
 {
@@ -665,8 +608,6 @@ void InfoBoolToken (void)
     }
 }
 
-
-
 void InfoSetName (const char* Name)
 // Set a name for a config file
 {
@@ -675,15 +616,11 @@ void InfoSetName (const char* Name)
     InputSrcName = xstrdup (Name);
 }
 
-
-
 int InfoAvail ()
 // Return true if we have an info file given
 {
     return (InfoFile != 0);
 }
-
-
 
 void InfoOpenInput (void)
 // Open the input file
@@ -702,8 +639,6 @@ void InfoOpenInput (void)
     // Start the ball rolling ...
     InfoNextTok ();
 }
-
-
 
 void InfoCloseInput (void)
 // Close the input file if we have one

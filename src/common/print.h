@@ -31,41 +31,27 @@
 //
 //***************************************************************************
 
-
-
 #ifndef PRINT_H
 #define PRINT_H
-
-
 
 #include <stdio.h>
 
 // common
 #include "attrib.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 extern unsigned char Verbosity;         // Verbose operation flag
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 void Print (FILE* F, unsigned V, const char* Format, ...)
         attribute ((format (printf, 3, 4)));
 // Output according to Verbosity
-
-
 
 // End of print.h
 

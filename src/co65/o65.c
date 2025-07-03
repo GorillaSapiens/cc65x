@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -46,13 +44,9 @@
 #include "fileio.h"
 #include "o65.h"
 
-
-
 //***************************************************************************
 //                              struct O65Data
 //***************************************************************************
-
-
 
 static O65Data* NewO65Data (void)
 // Create, initialize and return a new O65Data struct
@@ -73,13 +67,9 @@ static O65Data* NewO65Data (void)
     return D;
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static unsigned long ReadO65Size (FILE* F, const O65Header* H)
 /* Read a size variable (16 or 32 bit, depending on the mode word in the
@@ -94,8 +84,6 @@ static unsigned long ReadO65Size (FILE* F, const O65Header* H)
     }
     return Size;
 }
-
-
 
 static void ReadO65Header (FILE* F, O65Header* H)
 /* Read an o65 header from the given file. The function will call Error if
@@ -141,8 +129,6 @@ static void ReadO65Header (FILE* F, O65Header* H)
     H->stack = ReadO65Size (F, H);
 }
 
-
-
 static O65Option* ReadO65Option (FILE* F)
 /* Read the next O65 option from the given file. The option is stored into a
 ** dynamically allocated O65Option struct which is returned. On end of options,
@@ -173,8 +159,6 @@ static O65Option* ReadO65Option (FILE* F)
     return O;
 }
 
-
-
 static O65Import* ReadO65Import (FILE* F)
 // Read an o65 import from the file
 {
@@ -202,8 +186,6 @@ static O65Import* ReadO65Import (FILE* F)
     // Return the new struct
     return I;
 }
-
-
 
 static void ReadO65RelocInfo (FILE* F, const O65Data* D, Collection* Reloc)
 // Read relocation data for one segment
@@ -268,8 +250,6 @@ static void ReadO65RelocInfo (FILE* F, const O65Data* D, Collection* Reloc)
     }
 }
 
-
-
 static O65Export* ReadO65Export (FILE* F, const O65Header* H)
 // Read an o65 export from the file
 {
@@ -299,8 +279,6 @@ static O65Export* ReadO65Export (FILE* F, const O65Header* H)
     // Return the new struct
     return E;
 }
-
-
 
 static O65Data* ReadO65Data (FILE* F)
 /* Read a complete o65 file into dynamically allocated memory and return the
@@ -349,8 +327,6 @@ static O65Data* ReadO65Data (FILE* F)
     return D;
 }
 
-
-
 O65Data* ReadO65File (const char* Name)
 /* Read a complete o65 file into dynamically allocated memory and return the
 ** created O65Data struct.
@@ -374,8 +350,6 @@ O65Data* ReadO65File (const char* Name)
     return D;
 }
 
-
-
 const char* GetO65OSName (unsigned char OS)
 // Return the name of the operating system given by OS
 {
@@ -386,8 +360,6 @@ const char* GetO65OSName (unsigned char OS)
         default:                        return "unknown";
     }
 }
-
-
 
 const char* GetO65OptionText (const O65Option* O)
 /* Return the data of the given option as a readable text. The function returns

@@ -31,31 +31,21 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ERROR_H
 #define ERROR_H
-
-
 
 #if defined( __MINGW32__)
 #  pragma GCC diagnostic ignored "-Wformat"
 #endif
-
-
 
 // common
 #include "attrib.h"
 #include "coll.h"
 #include "filepos.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Warning levels
 extern unsigned WarnLevel;
@@ -64,13 +54,9 @@ extern unsigned WarnLevel;
 extern unsigned ErrorCount;
 extern unsigned WarningCount;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void Warning (unsigned Level, const char* Format, ...) attribute ((format (printf, 2, 3)));
 // Print warning message.
@@ -98,8 +84,6 @@ void Fatal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 
 void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 // Print a message about an internal assembler error and die.
-
-
 
 // End of error.h
 

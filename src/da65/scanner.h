@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SCANNER_H
 #define SCANNER_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Info file tokens
 typedef enum token_t {
@@ -120,7 +114,6 @@ typedef enum token_t {
     INFOTOK_FALSE
 } token_t;
 
-
 // Mapping table entry, special identifier --> token
 typedef struct IdentTok IdentTok;
 struct IdentTok {
@@ -128,8 +121,6 @@ struct IdentTok {
     token_t             Tok;            // Token for identifier
 };
 #define ENTRY_COUNT(s)  (sizeof (s) / sizeof (s [0]))
-
-
 
 // Current token and attributes
 #define CFG_MAX_IDENT_LEN  255
@@ -141,13 +132,9 @@ extern long             InfoIVal;
 extern unsigned         InfoErrorLine;
 extern unsigned         InfoErrorCol;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void InfoWarning (const char* Format, ...);
 // Print a warning message adding file name and line number of the config file
@@ -214,8 +201,6 @@ void InfoOpenInput (void);
 
 void InfoCloseInput (void);
 // Close the input file if we have one
-
-
 
 // End of scanner.h
 

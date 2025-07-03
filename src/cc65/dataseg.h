@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef DATASEG_H
 #define DATASEG_H
-
-
 
 #include <stdarg.h>
 
@@ -47,13 +43,9 @@
 // cc65
 #include "symentry.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 typedef struct DataSeg DataSeg;
 struct DataSeg {
@@ -62,13 +54,9 @@ struct DataSeg {
     Collection          Lines;          // List of code lines
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 DataSeg* NewDataSeg (const char* SegName, SymEntry* Func);
 // Create a new data segment, initialize and return it
@@ -84,8 +72,6 @@ void DS_AddLine (DataSeg* S, const char* Format, ...) attribute ((format(printf,
 
 void DS_Output (const DataSeg* S);
 // Output the data segment data to the output file
-
-
 
 // End of dataseg.h
 

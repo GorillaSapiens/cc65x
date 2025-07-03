@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 
 // common
@@ -46,13 +44,9 @@
 #include "error.h"
 #include "output.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Different types of output formats
 enum OutputFormat {
@@ -98,13 +92,9 @@ static const FileId FormatTable[] = {
 // END SORTED.SH
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void WriteOutputFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
 /* Write the contents of Data to a file. Format, file name etc. must be given

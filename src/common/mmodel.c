@@ -31,21 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
 #include "addrsize.h"
 #include "mmodel.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Memory model in use
 mmodel_t MemoryModel = MMODEL_UNKNOWN;
@@ -62,13 +56,9 @@ unsigned char CodeAddrSize = ADDR_SIZE_ABS;
 unsigned char DataAddrSize = ADDR_SIZE_ABS;
 unsigned char ZpAddrSize   = ADDR_SIZE_ZP;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 mmodel_t FindMemoryModel (const char* Name)
 // Find a memory model by name. Return MMODEL_UNKNOWN for an unknown name.
@@ -85,8 +75,6 @@ mmodel_t FindMemoryModel (const char* Name)
     // Not found
     return MMODEL_UNKNOWN;
 }
-
-
 
 void SetMemoryModel (mmodel_t Model)
 /* Set the memory model updating the MemoryModel variables and the address

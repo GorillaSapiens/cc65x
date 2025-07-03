@@ -31,22 +31,14 @@
 //
 //***************************************************************************
 
-
-
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-
-
 #include <stdint.h>
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // File stuff
 extern const char*      InFile;         // Name of input file
@@ -114,8 +106,6 @@ extern unsigned         TCol;
 #define MIN_BYTESPERLINE        1
 #define MAX_BYTESPERLINE        127
 extern unsigned         BytesPerLine;
-
-
 
 // End of global.h
 

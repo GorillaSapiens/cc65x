@@ -31,16 +31,12 @@
 //
 //***************************************************************************
 
-
-
 /* This module works around bugs in the time conversion code supplied by
 ** Microsoft. The problem described here:
 **   http://www.codeproject.com/KB/datetime/dstbugs.aspx
 ** is also true when setting file times via utime(), so we need a
 ** replacement
 */
-
-
 
 #if defined(_WIN32)
 #  include <errno.h>
@@ -50,21 +46,14 @@
 #  include <utime.h>
 #endif
 
-
 // common
 #include "filetime.h"
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 #if defined(_WIN32)
-
-
 
 static FILETIME* UnixTimeToFileTime (time_t T, FILETIME* FT)
 /* Calculate a FILETIME value from a time_t. FILETIME contains a 64 bit
@@ -84,8 +73,6 @@ static FILETIME* UnixTimeToFileTime (time_t T, FILETIME* FT)
     return FT;
 }
 
-
-
 int SetFileTimes (const char* Path, time_t T)
 /* Set the time of last modification and the time of last access of a file to
 ** the given time T. This calls utime() for system where it works, and applies
@@ -95,7 +82,6 @@ int SetFileTimes (const char* Path, time_t T)
     HANDLE   H;
     FILETIME FileTime;
     int      Error = EACCES;                    // Assume an error
-
 
     // Open the file
     H = CreateFile (Path,
@@ -121,11 +107,7 @@ int SetFileTimes (const char* Path, time_t T)
     return Error;
 }
 
-
-
 #else
-
-
 
 int SetFileTimes (const char* Path, time_t T)
 /* Set the time of last modification and the time of last access of a file to
@@ -140,7 +122,5 @@ int SetFileTimes (const char* Path, time_t T)
     U.modtime = T;
     return utime (Path, &U);
 }
-
-
 
 #endif

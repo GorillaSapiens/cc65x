@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "hashfunc.h"
 #include "hashtab.h"
@@ -45,13 +43,9 @@
 #include "span.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
-
-
 
 static unsigned HT_GenHash (const void* Key);
 // Generate the hash over a key.
@@ -65,13 +59,9 @@ static int HT_Compare (const void* Key1, const void* Key2);
 ** than zero if Key1 is greater then Key2.
 */
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Hash table functions
 static const HashFunctions HashFunc = {
@@ -83,13 +73,9 @@ static const HashFunctions HashFunc = {
 // Span hash table
 static HashTable SpanTab = STATIC_HASHTABLE_INITIALIZER (1051, &HashFunc);
 
-
-
 //***************************************************************************
 //                           Hash table functions
 //***************************************************************************
-
-
 
 static unsigned HT_GenHash (const void* Key)
 // Generate the hash over a key.
@@ -101,15 +87,11 @@ static unsigned HT_GenHash (const void* Key)
     return HashInt ((S->Seg->Num << 28) ^ (S->Start << 14) ^ S->End);
 }
 
-
-
 static const void* HT_GetKey (const void* Entry)
 // Given a pointer to the user entry data, return a pointer to the key
 {
     return Entry;
 }
-
-
 
 static int HT_Compare (const void* Key1, const void* Key2)
 /* Compare two keys. The function must return a value less than zero if
@@ -134,13 +116,9 @@ static int HT_Compare (const void* Key1, const void* Key2)
     return Res;
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static Span* NewSpan (Segment* Seg, unsigned long Start, unsigned long End)
 /* Create a new span. The segment is set to Seg, Start and End are set to the
@@ -162,15 +140,11 @@ static Span* NewSpan (Segment* Seg, unsigned long Start, unsigned long End)
     return S;
 }
 
-
-
 static void FreeSpan (Span* S)
 // Free a span
 {
     xfree (S);
 }
-
-
 
 static Span* MergeSpan (Span* S)
 /* Check if we have a span with the same data as S already. If so, free S and
@@ -200,8 +174,6 @@ static Span* MergeSpan (Span* S)
     }
 }
 
-
-
 void SetSpanType (Span* S, const StrBuf* Type)
 // Set the generic type of the span to Type
 {
@@ -211,15 +183,11 @@ void SetSpanType (Span* S, const StrBuf* Type)
     }
 }
 
-
-
 Span* OpenSpan (void)
 // Open a span for the active segment and return it.
 {
     return NewSpan (ActiveSeg, ActiveSeg->PC, ActiveSeg->PC);
 }
-
-
 
 Span* CloseSpan (Span* S)
 /* Close the given span. Be sure to replace the passed span by the one
@@ -243,8 +211,6 @@ Span* CloseSpan (Span* S)
         return MergeSpan (S);
     }
 }
-
-
 
 void OpenSpanList (Collection* Spans)
 /* Open a list of spans for all existing segments to the given collection of
@@ -270,8 +236,6 @@ void OpenSpanList (Collection* Spans)
         }
     }
 }
-
-
 
 void CloseSpanList (Collection* Spans)
 /* Close a list of spans. This will add new segments to the list, mark the end
@@ -315,8 +279,6 @@ void CloseSpanList (Collection* Spans)
     Spans->Count = J;
 }
 
-
-
 void WriteSpanList (const Collection* Spans)
 // Write a list of spans to the output file
 {
@@ -338,8 +300,6 @@ void WriteSpanList (const Collection* Spans)
     }
 }
 
-
-
 static int CollectSpans (void* Entry, void* Data)
 // Collect all spans in a collection sorted by id
 {
@@ -353,8 +313,6 @@ static int CollectSpans (void* Entry, void* Data)
     // Keep the span
     return 0;
 }
-
-
 
 void WriteSpans (void)
 // Write all spans to the object file

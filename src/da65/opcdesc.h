@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef OPCDESC_H
 #define OPCDESC_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Constants for Flags
 enum {
@@ -70,8 +64,6 @@ struct OpcDesc {
     unsigned char       Flags;          // Flags
     OpcHandler          Handler;        // Handler routine
 };
-
-
 
 // End of opcdesc.h
 

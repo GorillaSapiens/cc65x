@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -81,13 +79,9 @@
 #include "symbol.h"
 #include "symtab.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Keyword we're about to handle
 static StrBuf Keyword = STATIC_STRBUF_INITIALIZER;
@@ -99,13 +93,9 @@ static IntStack CPUStack = STATIC_INTSTACK_INITIALIZER;
 #define MAX_PUSHED_SEGMENTS     16
 static Collection SegStack = STATIC_COLLECTION_INITIALIZER;
 
-
-
 //***************************************************************************
 //                               Forwards
 //***************************************************************************
-
-
 
 static void DoUnexpected (void);
 // Got an unexpected keyword
@@ -119,13 +109,9 @@ static void DoInvalid (void);
 ** an error in the assembler itself, while DoInvalid is.
 */
 
-
-
 //***************************************************************************
 //                              Helper functions
 //***************************************************************************
-
-
 
 static unsigned char OptionalAddrSize (void)
 /* If a colon follows, parse an optional address size spec and return it.
@@ -145,8 +131,6 @@ static unsigned char OptionalAddrSize (void)
     }
     return AddrSize;
 }
-
-
 
 static void SetBoolOption (unsigned char* Flag)
 // Read a on/off/+/- option and set flag accordingly
@@ -177,8 +161,6 @@ static void SetBoolOption (unsigned char* Flag)
     }
 }
 
-
-
 static void ExportWithAssign (SymEntry* Sym, unsigned char AddrSize, unsigned Flags)
 // Allow to assign the value of an export in an .export statement
 {
@@ -203,8 +185,6 @@ static void ExportWithAssign (SymEntry* Sym, unsigned char AddrSize, unsigned Fl
     // Now export the symbol
     SymExport (Sym, AddrSize, Flags);
 }
-
-
 
 static void ExportImport (void (*Func) (SymEntry*, unsigned char, unsigned),
                           unsigned char DefAddrSize, unsigned Flags)
@@ -245,8 +225,6 @@ static void ExportImport (void (*Func) (SymEntry*, unsigned char, unsigned),
     }
 }
 
-
-
 static long IntArg (long Min, long Max)
 /* Read an integer argument and check a range. Accept the token "unlimited"
 ** and return -1 in this case.
@@ -265,13 +243,10 @@ static long IntArg (long Min, long Max)
     }
 }
 
-
-
 static void ConDes (const StrBuf* Name, unsigned Type)
 // Parse remaining line for constructor/destructor of the remaining type
 {
     long Prio;
-
 
     // Find the symbol table entry, allocate a new one if necessary
     SymEntry* Sym = SymFind (CurrentScope, Name, SYM_ALLOC_NEW);
@@ -294,8 +269,6 @@ static void ConDes (const StrBuf* Name, unsigned Type)
     // Define the symbol
     SymConDes (Sym, ADDR_SIZE_DEFAULT, Type, (unsigned) Prio);
 }
-
-
 
 static StrBuf* GenArrayType (StrBuf* Type, unsigned SpanSize,
                              const char* ElementType,
@@ -322,13 +295,9 @@ static StrBuf* GenArrayType (StrBuf* Type, unsigned SpanSize,
     return Type;
 }
 
-
-
 //***************************************************************************
 //                             Handler functions
 //***************************************************************************
-
-
 
 static void DoA16 (void)
 // Switch the accu to 16 bit mode (assembler only)
@@ -341,8 +310,6 @@ static void DoA16 (void)
     }
 }
 
-
-
 static void DoA8 (void)
 // Switch the accu to 8 bit mode (assembler only)
 {
@@ -353,8 +320,6 @@ static void DoA8 (void)
         ExtBytes [AM65I_IMM_ACCU] = 1;
     }
 }
-
-
 
 static void DoAddr (void)
 // Define addresses
@@ -389,8 +354,6 @@ static void DoAddr (void)
     SB_Done (&Type);
 }
 
-
-
 static void DoAlign (void)
 // Align the PC to some boundary
 {
@@ -421,8 +384,6 @@ static void DoAlign (void)
     SegAlign (Alignment, (int) FillVal);
 }
 
-
-
 static void DoASCIIZ (void)
 // Define text with a zero terminator
 {
@@ -445,8 +406,6 @@ static void DoASCIIZ (void)
     }
     Emit0 (0);
 }
-
-
 
 static void DoAssert (void)
 // Add an assertion
@@ -534,14 +493,11 @@ static void DoAssert (void)
     AddAssertion (Expr, (AssertAction) Action, Msg);
 }
 
-
-
 static void DoAutoImport (void)
 // Mark unresolved symbols as imported
 {
     SetBoolOption (&AutoImport);
 }
-
 
 static void DoBankBytes (void)
 // Define bytes, extracting the bank byte from each expression in the list
@@ -556,15 +512,11 @@ static void DoBankBytes (void)
     }
 }
 
-
-
 static void DoBss (void)
 // Switch to the BSS segment
 {
     UseSeg (&BssSegDef);
 }
-
-
 
 static void DoByteBase (int EnableTranslation)
 // Define bytes or literals
@@ -615,15 +567,11 @@ static void DoByteBase (int EnableTranslation)
     SB_Done (&Type);
 }
 
-
-
 static void DoByte (void)
 // Define bytes with translation
 {
     DoByteBase (1);
 }
-
-
 
 static void DoCase (void)
 // Switch the IgnoreCase option
@@ -631,8 +579,6 @@ static void DoCase (void)
     SetBoolOption (&IgnoreCase);
     IgnoreCase = !IgnoreCase;
 }
-
-
 
 static void DoCharMap (void)
 // Allow custom character mappings
@@ -663,15 +609,11 @@ static void DoCharMap (void)
     TgtTranslateSet ((unsigned) Index, (unsigned char) Code);
 }
 
-
-
 static void DoCode (void)
 // Switch to the code segment
 {
     UseSeg (&CodeSegDef);
 }
-
-
 
 static void DoConDes (void)
 // Export a symbol as constructor/destructor
@@ -726,8 +668,6 @@ ExitPoint:
     SB_Done (&Name);
 }
 
-
-
 static void DoConstructor (void)
 // Export a symbol as constructor
 {
@@ -748,15 +688,11 @@ static void DoConstructor (void)
     SB_Done (&Name);
 }
 
-
-
 static void DoData (void)
 // Switch to the data segment
 {
     UseSeg (&DataSegDef);
 }
-
-
 
 static void DoDbg (void)
 // Add debug information from high level code
@@ -768,7 +704,6 @@ static void DoDbg (void)
         "SYM",
     };
     int Key;
-
 
     // We expect a subkey
     if (CurTok.Tok != TOK_IDENT) {
@@ -791,8 +726,6 @@ static void DoDbg (void)
         default:    ErrorSkip ("Syntax error"); break;
     }
 }
-
-
 
 static void DoDByt (void)
 // Output double bytes
@@ -822,15 +755,11 @@ static void DoDByt (void)
     SB_Done (&Type);
 }
 
-
-
 static void DoDebugInfo (void)
 // Switch debug info on or off
 {
     SetBoolOption (&DbgSyms);
 }
-
-
 
 static void DoDefine (void)
 // Define a one-line macro
@@ -847,8 +776,6 @@ static void DoDefine (void)
     MacDef (MAC_STYLE_DEFINE);
 }
 
-
-
 static void DoDelMac (void)
 // Delete a classic macro
 {
@@ -860,8 +787,6 @@ static void DoDelMac (void)
         NextTok ();
     }
 }
-
-
 
 static void DoDestructor (void)
 // Export a symbol as destructor
@@ -883,8 +808,6 @@ static void DoDestructor (void)
     SB_Done (&Name);
 }
 
-
-
 static void DoDWord (void)
 // Define dwords
 {
@@ -898,16 +821,12 @@ static void DoDWord (void)
     }
 }
 
-
-
 static void DoEnd (void)
 // End of assembly
 {
     ForcedEnd = 1;
     NextTok ();
 }
-
-
 
 static void DoEndProc (void)
 // Leave a lexical level
@@ -920,8 +839,6 @@ static void DoEndProc (void)
     }
 }
 
-
-
 static void DoEndScope (void)
 // Leave a lexical level
 {
@@ -932,8 +849,6 @@ static void DoEndScope (void)
         SymLeaveLevel ();
     }
 }
-
-
 
 static void DoError (void)
 // User error
@@ -946,8 +861,6 @@ static void DoError (void)
     }
 }
 
-
-
 static void DoExitMacro (void)
 // Exit a macro expansion
 {
@@ -959,23 +872,17 @@ static void DoExitMacro (void)
     }
 }
 
-
-
 static void DoExport (void)
 // Export a symbol
 {
     ExportImport (ExportWithAssign, ADDR_SIZE_DEFAULT, SF_NONE);
 }
 
-
-
 static void DoExportZP (void)
 // Export a zeropage symbol
 {
     ExportImport (ExportWithAssign, ADDR_SIZE_ZP, SF_NONE);
 }
-
-
 
 static void DoFarAddr (void)
 // Define far addresses (24 bit)
@@ -1005,8 +912,6 @@ static void DoFarAddr (void)
     SB_Done (&Type);
 }
 
-
-
 static void DoFatal (void)
 // Fatal user error
 {
@@ -1017,8 +922,6 @@ static void DoFatal (void)
         SkipUntilSep ();
     }
 }
-
-
 
 static void DoFeature (void)
 // Switch the Feature option
@@ -1067,8 +970,6 @@ static void DoFeature (void)
         }
     }
 }
-
-
 
 static void DoFileOpt (void)
 // Insert a file option
@@ -1155,15 +1056,11 @@ static void DoFileOpt (void)
     }
 }
 
-
-
 static void DoForceImport (void)
 // Do a forced import on a symbol
 {
     ExportImport (SymImport, ADDR_SIZE_DEFAULT, SF_FORCED);
 }
-
-
 
 static void DoGlobal (void)
 // Declare a global symbol
@@ -1171,14 +1068,11 @@ static void DoGlobal (void)
     ExportImport (SymGlobal, ADDR_SIZE_DEFAULT, SF_NONE);
 }
 
-
-
 static void DoGlobalZP (void)
 // Declare a global zeropage symbol
 {
     ExportImport (SymGlobal, ADDR_SIZE_ZP, SF_NONE);
 }
-
 
 static void DoHiBytes (void)
 // Define bytes, extracting the hi byte from each expression in the list
@@ -1193,8 +1087,6 @@ static void DoHiBytes (void)
     }
 }
 
-
-
 static void DoI16 (void)
 // Switch the index registers to 16 bit mode (assembler only)
 {
@@ -1205,8 +1097,6 @@ static void DoI16 (void)
         ExtBytes [AM65I_IMM_INDEX] = 2;
     }
 }
-
-
 
 static void DoI8 (void)
 // Switch the index registers to 16 bit mode (assembler only)
@@ -1219,23 +1109,17 @@ static void DoI8 (void)
     }
 }
 
-
-
 static void DoImport (void)
 // Import a symbol
 {
     ExportImport (SymImport, ADDR_SIZE_DEFAULT, SF_NONE);
 }
 
-
-
 static void DoImportZP (void)
 // Import a zero page symbol
 {
     ExportImport (SymImport, ADDR_SIZE_ZP, SF_NONE);
 }
-
-
 
 static void DoIncBin (void)
 // Include a binary file
@@ -1361,8 +1245,6 @@ ExitPoint:
     SB_Done (&Name);
 }
 
-
-
 static void DoInclude (void)
 // Include another file
 {
@@ -1377,8 +1259,6 @@ static void DoInclude (void)
         }
     }
 }
-
-
 
 static void DoInterruptor (void)
 // Export a symbol as interruptor
@@ -1400,8 +1280,6 @@ static void DoInterruptor (void)
     SB_Done (&Name);
 }
 
-
-
 static void DoInvalid (void)
 /* Handle a token that is invalid here, since it should have been handled on
 ** a much lower level of the expression hierarchy. Getting this sort of token
@@ -1414,15 +1292,11 @@ static void DoInvalid (void)
     Internal ("Unexpected token: %m%p", &Keyword);
 }
 
-
-
 static void DoLineCont (void)
 // Switch the use of line continuations
 {
     SetBoolOption (&LineCont);
 }
-
-
 
 static void DoList (void)
 // Enable/disable the listing
@@ -1439,15 +1313,11 @@ static void DoList (void)
     }
 }
 
-
-
 static void DoLiteral (void)
 // Define bytes without translation
 {
     DoByteBase (0);
 }
-
-
 
 static void DoLoBytes (void)
 // Define bytes, extracting the lo byte from each expression in the list
@@ -1462,14 +1332,11 @@ static void DoLoBytes (void)
     }
 }
 
-
 static void DoListBytes (void)
 // Set maximum number of bytes to list for one line
 {
     SetListBytes (IntArg (MIN_LIST_BYTES, MAX_LIST_BYTES));
 }
-
-
 
 static void DoLocalChar (void)
 // Define the character that starts local labels
@@ -1485,8 +1352,6 @@ static void DoLocalChar (void)
         NextTok ();
     }
 }
-
-
 
 static void DoMacPack (void)
 // Insert a macro package
@@ -1504,23 +1369,17 @@ static void DoMacPack (void)
     }
 }
 
-
-
 static void DoMacro (void)
 // Start a macro definition
 {
     MacDef (MAC_STYLE_CLASSIC);
 }
 
-
-
 static void DoNull (void)
 // Switch to the NULL segment
 {
     UseSeg (&NullSegDef);
 }
-
-
 
 static void DoOrg (void)
 // Start absolute code
@@ -1532,8 +1391,6 @@ static void DoOrg (void)
     }
     EnterAbsoluteMode (PC);
 }
-
-
 
 static void DoOut (void)
 // Output a string
@@ -1552,15 +1409,11 @@ static void DoOut (void)
     }
 }
 
-
-
 static void DoP02 (void)
 // Switch to 6502 CPU
 {
     SetCPU (CPU_6502);
 }
-
-
 
 static void DoP02X (void)
 // Switch to 6502X CPU
@@ -1568,15 +1421,11 @@ static void DoP02X (void)
     SetCPU (CPU_6502X);
 }
 
-
-
 static void DoPC02 (void)
 // Switch to 65C02 CPU
 {
     SetCPU (CPU_65C02);
 }
-
-
 
 static void DoPWC02 (void)
 // Switch to W65C02 CPU
@@ -1584,15 +1433,11 @@ static void DoPWC02 (void)
     SetCPU (CPU_W65C02);
 }
 
-
-
 static void DoPCE02 (void)
 // Switch to 65CE02 CPU
 {
     SetCPU (CPU_65CE02);
 }
-
-
 
 static void DoP4510 (void)
 // Switch to 4510 CPU
@@ -1600,15 +1445,11 @@ static void DoP4510 (void)
     SetCPU (CPU_4510);
 }
 
-
-
 static void DoP45GS02 (void)
 // Switch to 45GS02 CPU
 {
     SetCPU (CPU_45GS02);
 }
-
-
 
 static void DoP6280 (void)
 // Switch to HuC6280 CPU
@@ -1616,15 +1457,11 @@ static void DoP6280 (void)
     SetCPU (CPU_HUC6280);
 }
 
-
-
 static void DoP816 (void)
 // Switch to 65816 CPU
 {
     SetCPU (CPU_65816);
 }
-
-
 
 static void DoPDTV (void)
 // Switch to C64DTV CPU
@@ -1632,23 +1469,17 @@ static void DoPDTV (void)
     SetCPU (CPU_6502DTV);
 }
 
-
-
 static void DoPM740 (void)
 // Switch to M740 CPU
 {
     SetCPU (CPU_M740);
 }
 
-
-
 static void DoPageLength (void)
 // Set the page length for the listing
 {
     PageLength = IntArg (MIN_PAGE_LEN, MAX_PAGE_LEN);
 }
-
-
 
 static void DoPopCharmap (void)
 // Restore a charmap
@@ -1660,8 +1491,6 @@ static void DoPopCharmap (void)
 
     TgtTranslatePop ();
 }
-
-
 
 static void DoPopCPU (void)
 // Pop an old CPU setting from the CPU stack
@@ -1675,8 +1504,6 @@ static void DoPopCPU (void)
     // Set the CPU to the value popped from stack
     SetCPU (IS_Pop (&CPUStack));
 }
-
-
 
 static void DoPopSeg (void)
 // Pop an old segment from the segment stack
@@ -1699,15 +1526,12 @@ static void DoPopSeg (void)
     FreeSegDef (Def);
 }
 
-
-
 static void DoProc (void)
 // Start a new lexical scope
 {
     StrBuf Name = STATIC_STRBUF_INITIALIZER;
     unsigned char AddrSize;
     SymEntry* Sym = 0;
-
 
     if (CurTok.Tok == TOK_IDENT) {
 
@@ -1742,23 +1566,17 @@ static void DoProc (void)
     SB_Done (&Name);
 }
 
-
-
 static void DoPSC02 (void)
 // Switch to 65SC02 CPU
 {
     SetCPU (CPU_65SC02);
 }
 
-
-
 static void DoPSweet16 (void)
 // Switch to Sweet16 CPU
 {
     SetCPU (CPU_SWEET16);
 }
-
-
 
 static void DoPushCharmap (void)
 // Save the current charmap
@@ -1767,8 +1585,6 @@ static void DoPushCharmap (void)
         ErrorSkip ("Charmap stack overflow");
     }
 }
-
-
 
 static void DoPushCPU (void)
 // Push the current CPU setting onto the CPU stack
@@ -1783,8 +1599,6 @@ static void DoPushCPU (void)
     IS_Push (&CPUStack, GetCPU ());
 }
 
-
-
 static void DoPushSeg (void)
 // Push the current segment onto the segment stack
 {
@@ -1798,8 +1612,6 @@ static void DoPushSeg (void)
     CollAppend (&SegStack, DupSegDef (GetCurrentSegDef ()));
 }
 
-
-
 static void DoReferTo (void)
 // Mark given symbol as referenced
 {
@@ -1809,23 +1621,17 @@ static void DoReferTo (void)
     }
 }
 
-
-
 static void DoReloc (void)
 // Enter relocatable mode
 {
     EnterRelocMode ();
 }
 
-
-
 static void DoRepeat (void)
 // Repeat some instruction block
 {
     ParseRepeat ();
 }
-
-
 
 static void DoRes (void)
 // Reserve some number of storage bytes
@@ -1858,22 +1664,17 @@ static void DoRes (void)
     }
 }
 
-
-
 static void DoROData (void)
 // Switch to the r/o data segment
 {
     UseSeg (&RODataSegDef);
 }
 
-
-
 static void DoScope (void)
 // Start a local scope
 {
     StrBuf Name = STATIC_STRBUF_INITIALIZER;
     unsigned char AddrSize;
-
 
     if (CurTok.Tok == TOK_IDENT) {
 
@@ -1897,8 +1698,6 @@ static void DoScope (void)
     // Free memory for Name
     SB_Done (&Name);
 }
-
-
 
 static void DoSegment (void)
 // Switch to another segment
@@ -1929,8 +1728,6 @@ static void DoSegment (void)
     SB_Done (&Name);
 }
 
-
-
 static void DoSetCPU (void)
 // Switch the CPU instruction set
 {
@@ -1954,15 +1751,11 @@ static void DoSetCPU (void)
     }
 }
 
-
-
 static void DoSmart (void)
 // Smart mode on/off
 {
     SetBoolOption (&SmartMode);
 }
-
-
 
 static void DoTag (void)
 // Allocate space for a struct
@@ -2009,8 +1802,6 @@ static void DoTag (void)
     EmitFill (Size);
 }
 
-
-
 static void DoUnDef (void)
 // Undefine a define-style macro
 {
@@ -2032,16 +1823,12 @@ static void DoUnDef (void)
     }
 }
 
-
-
 static void DoUnexpected (void)
 // Got an unexpected keyword
 {
     Error ("Unexpected '%m%p'", &Keyword);
     SkipUntilSep ();
 }
-
-
 
 static void DoWarning (void)
 // User warning
@@ -2053,8 +1840,6 @@ static void DoWarning (void)
         SkipUntilSep ();
     }
 }
-
-
 
 static void DoWord (void)
 // Define words
@@ -2084,21 +1869,15 @@ static void DoWord (void)
     SB_Done (&Type);
 }
 
-
-
 static void DoZeropage (void)
 // Switch to the zeropage segment
 {
     UseSeg (&ZeropageSegDef);
 }
 
-
-
 //***************************************************************************
 //                                Table data
 //***************************************************************************
-
-
 
 // Control commands flags
 enum {
@@ -2280,13 +2059,9 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoZeropage      },      // .ZEROPAGE
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void HandlePseudo (void)
 // Handle a pseudo instruction
@@ -2315,8 +2090,6 @@ void HandlePseudo (void)
     // Call the handler
     D->Handler ();
 }
-
-
 
 void CheckPseudo (void)
 // Check if the stacks are empty at end of assembly

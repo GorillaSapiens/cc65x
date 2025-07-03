@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -51,13 +49,9 @@
 #include "global.h"
 #include "output.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 static FILE*    F       = 0;            // Output stream
 static unsigned Col     = 1;            // Current column
@@ -66,13 +60,9 @@ static unsigned Page    = 1;            // Current output page
 
 static const char* SegmentName = 0;     // Name of current segment
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void PageHeader (void)
 // Print a page header
@@ -87,8 +77,6 @@ static void PageHeader (void)
              InFile,
              Page);
 }
-
-
 
 void OpenOutput (const char* Name)
 // Open the given file for output
@@ -109,8 +97,6 @@ void OpenOutput (const char* Name)
     Col  = 1;
 }
 
-
-
 void CloseOutput (void)
 // Close the output file
 {
@@ -118,8 +104,6 @@ void CloseOutput (void)
         Error ("Error closing output file: %s", strerror (errno));
     }
 }
-
-
 
 void Output (const char* Format, ...)
 // Write to the output file
@@ -132,8 +116,6 @@ void Output (const char* Format, ...)
     }
 }
 
-
-
 void Indent (unsigned N)
 // Make sure the current line column is at position N (zero based)
 {
@@ -144,8 +126,6 @@ void Indent (unsigned N)
         }
     }
 }
-
-
 
 void LineFeed (void)
 // Add a linefeed to the output file
@@ -164,8 +144,6 @@ void LineFeed (void)
     }
 }
 
-
-
 void DefLabel (const char* Name)
 // Define a label with the given name
 {
@@ -177,8 +155,6 @@ void DefLabel (const char* Name)
         LineFeed ();
     }
 }
-
-
 
 void DefForward (const char* Name, const char* Comment, unsigned Offs)
 /* Define a label as "* + x", where x is the offset relative to the
@@ -207,8 +183,6 @@ void DefForward (const char* Name, const char* Comment, unsigned Offs)
     }
 }
 
-
-
 void DefConst (const char* Name, const char* Comment, uint32_t Addr)
 // Define an address constant
 {
@@ -223,8 +197,6 @@ void DefConst (const char* Name, const char* Comment, uint32_t Addr)
         LineFeed ();
     }
 }
-
-
 
 void DataByteLine (uint32_t ByteCount)
 // Output a line with bytes
@@ -245,8 +217,6 @@ void DataByteLine (uint32_t ByteCount)
     LineFeed ();
 }
 
-
-
 void DataDByteLine (uint32_t ByteCount)
 // Output a line with dbytes
 {
@@ -265,8 +235,6 @@ void DataDByteLine (uint32_t ByteCount)
     LineComment (PC, ByteCount);
     LineFeed ();
 }
-
-
 
 void DataWordLine (uint32_t ByteCount)
 // Output a line with words
@@ -287,8 +255,6 @@ void DataWordLine (uint32_t ByteCount)
     LineFeed ();
 }
 
-
-
 void DataDWordLine (uint32_t ByteCount)
 // Output a line with dwords
 {
@@ -308,8 +274,6 @@ void DataDWordLine (uint32_t ByteCount)
     LineFeed ();
 }
 
-
-
 void SeparatorLine (void)
 // Print a separator line
 {
@@ -318,8 +282,6 @@ void SeparatorLine (void)
         LineFeed ();
     }
 }
-
-
 
 void StartSegment (const char* Name, unsigned AddrSize)
 // Start a segment
@@ -338,8 +300,6 @@ void StartSegment (const char* Name, unsigned AddrSize)
     }
 }
 
-
-
 void EndSegment (void)
 // End a segment
 {
@@ -352,16 +312,12 @@ void EndSegment (void)
     LineFeed ();
 }
 
-
-
 void UserComment (const char* Comment)
 // Output a comment line
 {
     Output ("; %s", Comment);
     LineFeed ();
 }
-
-
 
 void LineComment (unsigned PC, unsigned Count)
 // Add a line comment with the PC and data bytes
@@ -389,8 +345,6 @@ void LineComment (unsigned PC, unsigned Count)
     }
 }
 
-
-
 void OutputSettings (void)
 // Output CPU and other settings
 {
@@ -403,8 +357,6 @@ void OutputSettings (void)
     LineFeed ();
 }
 
-
-
 void OutputMFlag (unsigned char enabled)
 // Output the 65816 M-flag state
 {
@@ -412,8 +364,6 @@ void OutputMFlag (unsigned char enabled)
     Output (enabled ? ".a8" : ".a16");
     LineFeed ();
 }
-
-
 
 void OutputXFlag (unsigned char enabled)
 // Output the 65816 X-flag state

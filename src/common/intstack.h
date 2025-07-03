@@ -31,22 +31,14 @@
 //
 //***************************************************************************
 
-
-
 #ifndef INTSTACK_H
 #define INTSTACK_H
 
-
-
 #include "inline.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 typedef struct IntStack IntStack;
 struct IntStack {
@@ -60,13 +52,9 @@ struct IntStack {
 // Declare an int stack with the given value as first element
 #define INTSTACK(Val)   { 1, { Val, 0, 0, 0, 0, 0, 0, 0 } }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 #if defined(HAVE_INLINE)
 INLINE int IS_IsFull (const IntStack* S)
@@ -112,8 +100,6 @@ void IS_Push (IntStack* S, long Val);
 
 long IS_Pop (IntStack* S);
 // Pop a value from an int stack
-
-
 
 // End of intstack.h
 

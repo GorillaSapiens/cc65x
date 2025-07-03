@@ -31,28 +31,19 @@
 //
 //***************************************************************************
 
-
-
 #ifndef OBJDATA_H
 #define OBJDATA_H
-
-
 
 // common
 #include "coll.h"
 #include "objdefs.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Values for the Flags field
 #define OBJ_HAVEDATA    0x0001          // The object data is in the tmp file
-
 
 // Internal structure holding object file data
 typedef struct ObjData ObjData;
@@ -73,18 +64,12 @@ struct ObjData {
     Collection          Exports;        // Exports list from object file
 };
 
-
-
 // Collection with all object files
 extern Collection       ObjPool;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 ObjData* NewObjData (void);
 // Allocate a new structure on the heap, insert it into the list, return it
@@ -102,8 +87,6 @@ ObjData* FindObjData (const char* Module);
 
 void DelObjData (const char* Module);
 // Delete the object module from the list
-
-
 
 // End of objdata.h
 

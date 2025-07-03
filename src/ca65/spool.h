@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SPOOL_H
 #define SPOOL_H
-
-
 
 // common
 #include "strpool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // The index for an empty string
 #define EMPTY_STRING_ID         0U
@@ -55,13 +47,9 @@
 // The string pool
 extern StringPool* StrPool;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 #if defined(HAVE_INLINE)
 INLINE unsigned GetStrBufId (const StrBuf* S)
@@ -108,8 +96,6 @@ void WriteStrPool (void);
 
 void InitStrPool (void);
 // Initialize the string pool
-
-
 
 // End of spool.h
 

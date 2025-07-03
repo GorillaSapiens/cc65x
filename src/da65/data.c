@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // da65
 #include "attrtab.h"
 #include "code.h"
@@ -42,13 +40,9 @@
 #include "output.h"
 #include "data.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static uint32_t GetSpan (attr_t Style)
 // Get the number of bytes for a given style
@@ -79,8 +73,6 @@ static uint32_t GetSpan (attr_t Style)
     // Return the number of bytes
     return Count;
 }
-
-
 
 static unsigned DoTable (attr_t Style, unsigned MemberSize, void (*TableFunc) (unsigned))
 // Output a table of bytes
@@ -127,16 +119,12 @@ static unsigned DoTable (attr_t Style, unsigned MemberSize, void (*TableFunc) (u
     return Count;
 }
 
-
-
 uint32_t ByteTable (void)
 // Output a table of bytes
 {
     // Call the low level function
     return DoTable (atByteTab, 1, DataByteLine);
 }
-
-
 
 uint32_t DByteTable (void)
 // Output a table of dbytes
@@ -145,8 +133,6 @@ uint32_t DByteTable (void)
     return DoTable (atDByteTab, 2, DataDByteLine);
 }
 
-
-
 uint32_t WordTable (void)
 // Output a table of words
 {
@@ -154,16 +140,12 @@ uint32_t WordTable (void)
     return DoTable (atWordTab, 2, DataWordLine);
 }
 
-
-
 uint32_t DWordTable (void)
 // Output a table of double words
 {
     // Call the low level function
     return DoTable (atDWordTab, 4, DataDWordLine);
 }
-
-
 
 uint32_t AddrTable (void)
 // Output a table of addresses
@@ -229,8 +211,6 @@ uint32_t AddrTable (void)
     return PC - Start;
 }
 
-
-
 uint32_t RtsTable (void)
 // Output a table of RTS addresses (address - 1)
 {
@@ -294,8 +274,6 @@ uint32_t RtsTable (void)
     // Return the number of bytes output
     return PC - Start;
 }
-
-
 
 uint32_t TextTable (void)
 // Output a table of text messages

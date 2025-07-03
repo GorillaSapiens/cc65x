@@ -31,29 +31,19 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CONDASM_H
 #define CONDASM_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // The overall .IF condition
 extern int IfCond;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void DoConditionals (void);
 // Catch all for conditional directives
@@ -74,8 +64,6 @@ unsigned GetIfStack (void);
 
 void CleanupIfStack (unsigned SP);
 // Cleanup the .IF stack, remove anything above the given stack pointer
-
-
 
 // End of condasm.h
 

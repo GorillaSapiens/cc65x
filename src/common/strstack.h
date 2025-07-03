@@ -31,22 +31,14 @@
 //
 //***************************************************************************
 
-
-
 #ifndef STRSTACK_H
 #define STRSTACK_H
 
-
-
 #include "inline.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 typedef struct StrStack StrStack;
 struct StrStack {
@@ -57,13 +49,9 @@ struct StrStack {
 // Declare an empty string stack
 #define STRSTACK()      { 0 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 #if defined(HAVE_INLINE)
 INLINE int SS_IsFull (const StrStack* S)
@@ -96,8 +84,6 @@ void SS_Drop (StrStack* S);
 
 void SS_Push (StrStack* S, const char* Val);
 // Push a value onto a string stack
-
-
 
 // End of strstack.h
 

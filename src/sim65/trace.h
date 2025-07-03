@@ -28,13 +28,10 @@
 //
 //***************************************************************************
 
-
 #ifndef TRACE_H
 #define TRACE_H
 
-
 #include <stdint.h>
-
 
 #include "6502.h"
 
@@ -81,8 +78,6 @@ void PrintTraceIRQ(void);
 
 void PrintTraceInstruction (void);
 // Print trace line for the instruction at the currrent program counter.
-
-
 
 // End of trace.h
 

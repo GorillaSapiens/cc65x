@@ -41,13 +41,9 @@
 #include "global.h"
 #include "loadexpr.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void LoadAddress (unsigned Flags, ExprDesc* Expr)
 // Load the primary register with some address value.
@@ -106,8 +102,6 @@ static void LoadAddress (unsigned Flags, ExprDesc* Expr)
             Internal ("Unknown address type: %04X", Expr->Flags);
     }
 }
-
-
 
 void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
 /* Load an expression into the primary register if it is not already there.

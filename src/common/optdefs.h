@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef OPTDEFS_H
 #define OPTDEFS_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Type of options
 #define OPT_ARGMASK     0xC0            // Mask for argument
@@ -57,8 +51,6 @@
 
 #define OPT_DATETIME    (OPT_ARGNUM+0)  // Date/time of translation
 
-
-
 // Structure to encode options
 typedef struct Option Option;
 struct Option {
@@ -66,8 +58,6 @@ struct Option {
     unsigned char       Type;           // Type of option
     unsigned long       Val;            // Value attribute or string index
 };
-
-
 
 // End of optdefs.h
 

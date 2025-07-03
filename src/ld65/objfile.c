@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -53,13 +51,9 @@
 #include "segments.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static unsigned GetModule (const char* Name)
 // Get a module name index from the file name
@@ -71,8 +65,6 @@ static unsigned GetModule (const char* Name)
     }
     return GetStringId (Module);
 }
-
-
 
 static void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
 // Read the header of the object file checking the signature
@@ -107,8 +99,6 @@ static void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
     H->SpanSize     = Read32 (Obj);
 }
 
-
-
 void ObjReadFiles (FILE* F, unsigned long Pos, ObjData* O)
 // Read the files list from a file at the given position
 {
@@ -125,8 +115,6 @@ void ObjReadFiles (FILE* F, unsigned long Pos, ObjData* O)
         CollAppend (&O->Files, ReadFileInfo (F, O));
     }
 }
-
-
 
 void ObjReadSections (FILE* F, unsigned long Pos, ObjData* O)
 // Read the section data from a file at the given position
@@ -145,8 +133,6 @@ void ObjReadSections (FILE* F, unsigned long Pos, ObjData* O)
     }
 }
 
-
-
 void ObjReadImports (FILE* F, unsigned long Pos, ObjData* O)
 // Read the imports from a file at the given position
 {
@@ -164,8 +150,6 @@ void ObjReadImports (FILE* F, unsigned long Pos, ObjData* O)
     }
 }
 
-
-
 void ObjReadExports (FILE* F, unsigned long Pos, ObjData* O)
 // Read the exports from a file at the given position
 {
@@ -182,8 +166,6 @@ void ObjReadExports (FILE* F, unsigned long Pos, ObjData* O)
         CollAppend (&O->Exports, ReadExport (F, O));
     }
 }
-
-
 
 void ObjReadDbgSyms (FILE* F, unsigned long Pos, ObjData* O)
 // Read the debug symbols from a file at the given position
@@ -209,8 +191,6 @@ void ObjReadDbgSyms (FILE* F, unsigned long Pos, ObjData* O)
     }
 }
 
-
-
 void ObjReadLineInfos (FILE* F, unsigned long Pos, ObjData* O)
 // Read the line infos from a file at the given position
 {
@@ -228,8 +208,6 @@ void ObjReadLineInfos (FILE* F, unsigned long Pos, ObjData* O)
     }
 }
 
-
-
 void ObjReadStrPool (FILE* F, unsigned long Pos, ObjData* O)
 // Read the string pool from a file at the given position
 {
@@ -245,8 +223,6 @@ void ObjReadStrPool (FILE* F, unsigned long Pos, ObjData* O)
         O->Strings[I] = ReadStr (F);
     }
 }
-
-
 
 void ObjReadAssertions (FILE* F, unsigned long Pos, ObjData* O)
 // Read the assertions from a file at the given offset
@@ -265,8 +241,6 @@ void ObjReadAssertions (FILE* F, unsigned long Pos, ObjData* O)
     }
 }
 
-
-
 void ObjReadScopes (FILE* F, unsigned long Pos, ObjData* O)
 // Read the scope table from a file at the given offset
 {
@@ -284,8 +258,6 @@ void ObjReadScopes (FILE* F, unsigned long Pos, ObjData* O)
     }
 }
 
-
-
 void ObjReadSpans (FILE* F, unsigned long Pos, ObjData* O)
 // Read the span table from a file at the given offset
 {
@@ -302,8 +274,6 @@ void ObjReadSpans (FILE* F, unsigned long Pos, ObjData* O)
         CollAppend (&O->Spans,  ReadSpan (F, O, I));
     }
 }
-
-
 
 void ObjAdd (FILE* Obj, const char* Name)
 // Add an object file to the module list

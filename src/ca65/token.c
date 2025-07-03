@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 // ca65
 #include "token.h"
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int TokHasSVal (token_t Tok)
 // Return true if the given token has an attached SVal
@@ -50,15 +44,11 @@ int TokHasSVal (token_t Tok)
     return (Tok == TOK_IDENT || Tok == TOK_LOCAL_IDENT || Tok == TOK_STRCON);
 }
 
-
-
 int TokHasIVal (token_t Tok)
 // Return true if the given token has an attached IVal
 {
     return (Tok == TOK_INTCON || Tok == TOK_CHARCON || Tok == TOK_REG);
 }
-
-
 
 void CopyToken (Token* Dst, const Token* Src)
 /* Copy a token from Src to Dst. The current value of Dst.SVal is free'd,

@@ -28,42 +28,28 @@
 //
 //***************************************************************************
 
-
-
 // cc65
 #include "error.h"
 #include "scanner.h"
 #include "ppexpr.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // PP expression parser status
 static int PPEvaluationEnabled = 0;
 static int PPEvaluationFailed  = 0;
 
-
-
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 static void PPhie1 (PPExpr* Expr);
-
-
 
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 static token_t PPFindTok (token_t Tok, const token_t* Table)
 // Find a token in a generator table
@@ -77,16 +63,12 @@ static token_t PPFindTok (token_t Tok, const token_t* Table)
     return TOK_INVALID;
 }
 
-
-
 static void PPExprInit (PPExpr* Expr)
 // Initialize the expression
 {
     Expr->IVal  = 0;
     Expr->Flags = PPEXPR_NONE;
 }
-
-
 
 static void PPErrorSkipLine (void)
 /* Set the expression parser error flag, skip the remain tokens till the end
@@ -99,13 +81,9 @@ static void PPErrorSkipLine (void)
     NextTok.Tok = TOK_CEOF;
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void PPhiePrimary (PPExpr* Expr)
 // This is the lowest level of the PP expression parser
@@ -161,8 +139,6 @@ static void PPhiePrimary (PPExpr* Expr)
             break;
     }
 }
-
-
 
 static void PPhie11 (PPExpr* Expr)
 // Handle compound types (structs and arrays) etc which are invalid in PP
@@ -223,8 +199,6 @@ static void PPhie11 (PPExpr* Expr)
     }
 }
 
-
-
 void PPhie10 (PPExpr* Expr)
 // Handle prefixing unary operators
 {
@@ -280,8 +254,6 @@ void PPhie10 (PPExpr* Expr)
             break;
     }
 }
-
-
 
 static void PPhie_internal (const token_t* Ops,   // List of generators
                             PPExpr* Expr,
@@ -364,8 +336,6 @@ static void PPhie_internal (const token_t* Ops,   // List of generators
     }
 }
 
-
-
 static void PPhie_compare (const token_t* Ops,    // List of generators
                            PPExpr* Expr,
                            void (*hienext) (PPExpr*))
@@ -430,8 +400,6 @@ static void PPhie_compare (const token_t* Ops,    // List of generators
     }
 }
 
-
-
 static void PPhie9 (PPExpr* Expr)
 // Handle "*", "/" and "%" operators
 {
@@ -445,8 +413,6 @@ static void PPhie9 (PPExpr* Expr)
     PPhie_internal (PPhie9_ops, Expr, PPhie10);
 }
 
-
-
 static void PPhie8 (PPExpr* Expr)
 // Handle "+" and "-" binary operators
 {
@@ -458,8 +424,6 @@ static void PPhie8 (PPExpr* Expr)
 
     PPhie_internal (PPhie8_ops, Expr, PPhie9);
 }
-
-
 
 static void PPhie7 (PPExpr* Expr)
 // Handle the "<<" and ">>" shift operators
@@ -530,8 +494,6 @@ static void PPhie7 (PPExpr* Expr)
     }
 }
 
-
-
 static void PPhie6 (PPExpr* Expr)
 // Handle greater-than type relational operators
 {
@@ -546,8 +508,6 @@ static void PPhie6 (PPExpr* Expr)
     PPhie_compare (PPhie6_ops, Expr, PPhie7);
 }
 
-
-
 static void PPhie5 (PPExpr* Expr)
 // Handle "==" and "!=" relational operators
 {
@@ -560,8 +520,6 @@ static void PPhie5 (PPExpr* Expr)
     PPhie_compare (PPhie5_ops, Expr, PPhie6);
 }
 
-
-
 static void PPhie4 (PPExpr* Expr)
 // Handle the bitwise AND "&" operator
 {
@@ -572,8 +530,6 @@ static void PPhie4 (PPExpr* Expr)
 
     PPhie_internal (PPhie4_ops, Expr, PPhie5);
 }
-
-
 
 static void PPhie3 (PPExpr* Expr)
 // Handle the bitwise exclusive OR "^" operator
@@ -586,8 +542,6 @@ static void PPhie3 (PPExpr* Expr)
     PPhie_internal (PPhie3_ops, Expr, PPhie4);
 }
 
-
-
 static void PPhie2 (PPExpr* Expr)
 // Handle the bitwise OR "|" operator
 {
@@ -598,8 +552,6 @@ static void PPhie2 (PPExpr* Expr)
 
     PPhie_internal (PPhie2_ops, Expr, PPhie3);
 }
-
-
 
 static void PPhieAnd (PPExpr* Expr)
 // Handle the logical AND "expr1 && expr2" operator
@@ -643,8 +595,6 @@ static void PPhieAnd (PPExpr* Expr)
     }
 }
 
-
-
 static void PPhieOr (PPExpr* Expr)
 // Handle the logical OR "||" operator
 {
@@ -686,8 +636,6 @@ static void PPhieOr (PPExpr* Expr)
         PPEvaluationEnabled = PPEvaluationEnabledPrev;
     }
 }
-
-
 
 static void PPhieQuest (PPExpr* Expr)
 // Handle the ternary "expr1 ? expr2 : expr3 " operator
@@ -732,8 +680,6 @@ static void PPhieQuest (PPExpr* Expr)
         PPEvaluationEnabled = PPEvaluationEnabledPrev;
     }
 }
-
-
 
 static void PPhie1 (PPExpr* Expr)
 // Handle first level of expression hierarchy
@@ -806,8 +752,6 @@ static void PPhie1 (PPExpr* Expr)
             break;
     }
 }
-
-
 
 void ParsePPExprInLine (PPExpr* Expr)
 // Parse a line for PP expression

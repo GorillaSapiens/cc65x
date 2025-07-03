@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 // ld65
 #include "filepath.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 SearchPaths*     LibSearchPath;         // Library path
 SearchPaths*     ObjSearchPath;         // Object file path
@@ -52,13 +46,9 @@ SearchPaths*     LibDefaultPath;        // Default Library path
 SearchPaths*     ObjDefaultPath;        // Default Object file path
 SearchPaths*     CfgDefaultPath;        // Default Config file path
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void InitSearchPaths (void)
 // Initialize the path search list

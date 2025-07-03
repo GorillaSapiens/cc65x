@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef BITMAP_H
 #define BITMAP_H
-
-
 
 // common
 #include "strbuf.h"
@@ -45,13 +41,9 @@
 #include "palette.h"
 #include "pixel.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Safety limit for the bitmap sizes
 #define BM_MAX_WIDTH    4096U
@@ -85,13 +77,9 @@ struct Bitmap {
     Pixel       Data[1];
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Bitmap* NewBitmap (unsigned Width, unsigned Height);
 // Create a new bitmap. The type is set to unknown and the palette to NULL
@@ -192,8 +180,6 @@ INLINE unsigned GetBitmapBPP (const Bitmap* B)
 #else
 # define GetBitmapBPP(B)     ((B)->BPP
 #endif
-
-
 
 // End of bitmap.h
 

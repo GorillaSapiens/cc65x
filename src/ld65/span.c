@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "gentype.h"
 #include "xmalloc.h"
@@ -44,13 +42,9 @@
 #include "span.h"
 #include "tpool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Definition of a span
 struct Span {
@@ -61,13 +55,9 @@ struct Span {
     unsigned            Type;           // Generic type of the data
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static Span* NewSpan (unsigned Id)
 // Create and return a new span
@@ -81,8 +71,6 @@ static Span* NewSpan (unsigned Id)
     // Return the result
     return S;
 }
-
-
 
 Span* ReadSpan (FILE* F, ObjData* O, unsigned Id)
 // Read a Span from a file and return it
@@ -106,8 +94,6 @@ Span* ReadSpan (FILE* F, ObjData* O, unsigned Id)
     // Return the new span
     return S;
 }
-
-
 
 unsigned* ReadSpanList (FILE* F)
 /* Read a list of span ids from a file. The list is returned as an array of
@@ -137,8 +123,6 @@ unsigned* ReadSpanList (FILE* F)
     return Spans;
 }
 
-
-
 unsigned* DupSpanList (const unsigned* S)
 // Duplicate a span list
 {
@@ -154,16 +138,12 @@ unsigned* DupSpanList (const unsigned* S)
     return memcpy (xmalloc (Size), S, Size);
 }
 
-
-
 void FreeSpan (Span* S)
 // Free a span structure
 {
     // Just free the structure
     xfree (S);
 }
-
-
 
 unsigned SpanCount (void)
 // Return the total number of spans
@@ -183,8 +163,6 @@ unsigned SpanCount (void)
     return Count;
 }
 
-
-
 void PrintDbgSpanList (FILE* F, const ObjData* O, const unsigned* List)
 /* Output a string ",span=x[+y...]" for the given list. If the list is empty
 ** or NULL, output nothing. This is a helper function for other modules to
@@ -201,14 +179,11 @@ void PrintDbgSpanList (FILE* F, const ObjData* O, const unsigned* List)
     }
 }
 
-
-
 void PrintDbgSpans (FILE* F)
 // Output the spans to a debug info file
 {
     unsigned I, J;
     StrBuf SpanType = STATIC_STRBUF_INITIALIZER;
-
 
     // Walk over all object files
     for (I = 0; I < CollCount (&ObjDataList); ++I) {

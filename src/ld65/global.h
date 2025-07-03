@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef GLOBAL_H
 #define GLOBAL_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 extern const char*      OutputName;        // Name of output file
 extern unsigned         OutputNameUsed;    // Output name was used by %O
@@ -60,8 +54,6 @@ extern unsigned char    WarningsAsErrors;  // Error if any warnings
 extern const char*      MapFileName;       // Name of the map file
 extern const char*      LabelFileName;     // Name of the label file
 extern const char*      DbgFileName;       // Name of the debug file
-
-
 
 // End of global.h
 

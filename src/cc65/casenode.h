@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CASENODE_H
 #define CASENODE_H
-
-
 
 // common
 #include "coll.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 typedef struct CaseNode CaseNode;
 struct CaseNode {
@@ -56,13 +48,9 @@ struct CaseNode {
     Collection*   Nodes;
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 CaseNode* NewCaseNode (unsigned char Value);
 // Create and initialize a new CaseNode
@@ -124,8 +112,6 @@ unsigned InsertCaseValue (Collection* Nodes, unsigned long Val, unsigned Depth);
 /* Insert a new case value into a CaseNode tree with the given depth. Return
 ** the code label for the value.
 */
-
-
 
 // End of casenode.h
 

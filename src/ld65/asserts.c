@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "assertion.h"
 #include "coll.h"
@@ -47,13 +45,9 @@
 #include "objdata.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Assertion struct decl
 struct Assertion {
@@ -67,13 +61,9 @@ struct Assertion {
 // List with all assertions
 static Collection Assertions = STATIC_COLLECTION_INITIALIZER;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Assertion* ReadAssertion (FILE* F, struct ObjData* O)
 // Read an assertion from the given file
@@ -97,8 +87,6 @@ Assertion* ReadAssertion (FILE* F, struct ObjData* O)
     // Return the new struct
     return A;
 }
-
-
 
 void CheckAssertions (void)
 // Check all assertions

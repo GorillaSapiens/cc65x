@@ -31,21 +31,13 @@
 //
 //***************************************************************************
 
-
-
 #ifndef VA_COPY_H
 #define VA_COPY_H
 
-
-
 #include <stdarg.h>
-
-
 
 // No action if we have a working va_copy
 #if !defined(va_copy)
-
-
 
 // The watcom compiler doesn't have va_copy and a problematic va_list definition
 #if defined(__WATCOMC__)
@@ -67,11 +59,7 @@
 #error "Need a working va_copy!"
 #endif
 
-
-
 #endif
-
-
 
 // End of va_copy.h
 

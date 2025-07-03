@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 #include <errno.h>
 
@@ -59,13 +57,9 @@
 #include "studyexpr.h"
 #include "symtab.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 /* If OrgPerSeg is false, all segments share the RelocMode flag and a PC
 ** used when in absolute mode. OrgPerSeg may be set by .feature org_per_seg
@@ -87,13 +81,9 @@ Collection SegmentList = STATIC_COLLECTION_INITIALIZER;
 // Currently active segment
 Segment* ActiveSeg;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static Segment* NewSegFromDef (SegDef* Def)
 /* Create a new segment from a segment definition. Used only internally, no
@@ -122,8 +112,6 @@ static Segment* NewSegFromDef (SegDef* Def)
     return S;
 }
 
-
-
 static Segment* NewSegment (const char* Name, unsigned char AddrSize)
 // Create a new segment, insert it into the global list and return it
 {
@@ -140,8 +128,6 @@ static Segment* NewSegment (const char* Name, unsigned char AddrSize)
     // Create a new segment and return it
     return NewSegFromDef (NewSegDef (Name, AddrSize));
 }
-
-
 
 Fragment* GenFragment (unsigned char Type, unsigned short Len)
 // Generate a new fragment, add it to the current segment and return it.
@@ -186,8 +172,6 @@ Fragment* GenFragment (unsigned char Type, unsigned short Len)
     return F;
 }
 
-
-
 void UseSeg (const SegDef* D)
 // Use the segment with the given name
 {
@@ -215,8 +199,6 @@ void UseSeg (const SegDef* D)
     }
 }
 
-
-
 unsigned long GetPC (void)
 // Get the program counter of the current segment
 {
@@ -228,8 +210,6 @@ unsigned long GetPC (void)
         return RelocMode? ActiveSeg->PC : AbsPC;
     }
 }
-
-
 
 void EnterAbsoluteMode (unsigned long PC)
 /* Enter absolute (non relocatable mode). Depending on the OrgPerSeg flag,
@@ -247,8 +227,6 @@ void EnterAbsoluteMode (unsigned long PC)
     }
 }
 
-
-
 int GetRelocMode (void)
 // Return true if we're currently in relocatable mode
 {
@@ -260,8 +238,6 @@ int GetRelocMode (void)
         return RelocMode;
     }
 }
-
-
 
 void EnterRelocMode (void)
 /* Enter relocatable mode. Depending on the OrgPerSeg flag, this will either
@@ -276,8 +252,6 @@ void EnterRelocMode (void)
         RelocMode = 1;
     }
 }
-
-
 
 void SegAlign (unsigned long Alignment, int FillVal)
 /* Align the PC segment to Alignment. If FillVal is -1, emit fill fragments
@@ -316,7 +290,6 @@ void SegAlign (unsigned long Alignment, int FillVal)
 
     }
 
-
     // Emit the data or a fill fragment
     if (FillVal != -1) {
         // User defined fill value
@@ -336,8 +309,6 @@ void SegAlign (unsigned long Alignment, int FillVal)
     }
 }
 
-
-
 unsigned char GetSegAddrSize (unsigned SegNum)
 // Return the address size of the segment with the given number
 {
@@ -349,8 +320,6 @@ unsigned char GetSegAddrSize (unsigned SegNum)
     // Return the address size
     return ((Segment*) CollAtUnchecked (&SegmentList, SegNum))->Def->AddrSize;
 }
-
-
 
 void SegDone (void)
 // Check the segments for range and other errors. Do cleanup.
@@ -429,8 +398,6 @@ void SegDone (void)
     }
 }
 
-
-
 void SegDump (void)
 // Dump the contents of all segments
 {
@@ -476,8 +443,6 @@ void SegDump (void)
     printf ("\n");
 }
 
-
-
 void SegInit (void)
 // Initialize segments
 {
@@ -489,8 +454,6 @@ void SegInit (void)
     NewSegFromDef (&ZeropageSegDef);
     NewSegFromDef (&NullSegDef);
 }
-
-
 
 void SetSegmentSizes (void)
 // Set the default segment sizes according to the memory model
@@ -519,8 +482,6 @@ void SetSegmentSizes (void)
             Internal ("Invalid memory model: %d", MemoryModel);
     }
 }
-
-
 
 static void WriteOneSeg (Segment* Seg)
 // Write one segment to the object file
@@ -604,8 +565,6 @@ static void WriteOneSeg (Segment* Seg)
     ObjWrite32 (DataSize);              // Write the size
     ObjSetFilePos (EndPos);             // Seek back to the end
 }
-
-
 
 void WriteSegments (void)
 // Write the segment data to the object file

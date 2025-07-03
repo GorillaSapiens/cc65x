@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 #include <time.h>
 
@@ -54,13 +52,9 @@
 #include "fileio.h"
 #include "dump.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void DestroyStrPool (Collection* C)
 /* Free all strings in the given pool plus the item pointers. Note: The
@@ -74,8 +68,6 @@ static void DestroyStrPool (Collection* C)
     DoneCollection (C);
 }
 
-
-
 static const char* GetString (const Collection* C, unsigned Index)
 /* Get a string from a collection. In fact, this function calls CollConstAt,
 ** but will print a somewhat more readable error message if the index is out
@@ -88,8 +80,6 @@ static const char* GetString (const Collection* C, unsigned Index)
     return CollConstAt (C, Index);
 }
 
-
-
 static void DumpObjHeaderSection (const char* Name,
                                   unsigned long Offset,
                                   unsigned long Size)
@@ -99,8 +89,6 @@ static void DumpObjHeaderSection (const char* Name,
     printf ("      Offset:%24lu\n", Offset);
     printf ("      Size:  %24lu\n", Size);
 }
-
-
 
 static char* TimeToStr (unsigned long Time)
 // Convert the time into a string and return it
@@ -119,8 +107,6 @@ static char* TimeToStr (unsigned long Time)
     return S;
 }
 
-
-
 static void SkipLineInfoList (FILE* F)
 // Skip a line info list from the given file
 {
@@ -133,8 +119,6 @@ static void SkipLineInfoList (FILE* F)
     }
 }
 
-
-
 static void SkipSpanList (FILE* F)
 // Skip a span list from the given file
 {
@@ -146,8 +130,6 @@ static void SkipSpanList (FILE* F)
         (void) ReadVar (F);
     }
 }
-
-
 
 static void SkipExpr (FILE* F)
 // Skip an expression from the given file
@@ -190,8 +172,6 @@ static void SkipExpr (FILE* F)
     }
 }
 
-
-
 static const char* GetExportFlags (unsigned Flags, const unsigned char* ConDes)
 // Get the export flags as a (static) string
 {
@@ -226,7 +206,6 @@ static const char* GetExportFlags (unsigned Flags, const unsigned char* ConDes)
         strcat (TypeDesc, ",SYM_SIZE");
     }
 
-
     // Constructor/destructor declarations
     T = TypeDesc + strlen (TypeDesc);
     Count = SYM_GET_CONDES_COUNT (Flags);
@@ -246,8 +225,6 @@ static const char* GetExportFlags (unsigned Flags, const unsigned char* ConDes)
     return TypeDesc;
 }
 
-
-
 static const char* GetScopeType (unsigned Type)
 // Return the name of a scope type
 {
@@ -261,8 +238,6 @@ static const char* GetScopeType (unsigned Type)
         default:                return "Unknown scope type";
     }
 }
-
-
 
 void DumpObjHeader (FILE* F, unsigned long Offset)
 // Dump the header of the given object file
@@ -323,8 +298,6 @@ void DumpObjHeader (FILE* F, unsigned long Offset)
     // Scopes
     DumpObjHeaderSection ("Scopes", H.ScopeOffs, H.ScopeSize);
 }
-
-
 
 void DumpObjOptions (FILE* F, unsigned long Offset)
 // Dump the file options
@@ -412,8 +385,6 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
     DestroyStrPool (&StrPool);
 }
 
-
-
 void DumpObjFiles (FILE* F, unsigned long Offset)
 // Dump the source files
 {
@@ -461,8 +432,6 @@ void DumpObjFiles (FILE* F, unsigned long Offset)
     // Destroy the string pool
     DestroyStrPool (&StrPool);
 }
-
-
 
 void DumpObjSegments (FILE* F, unsigned long Offset)
 // Dump the segments in the object file
@@ -524,8 +493,6 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
     DestroyStrPool (&StrPool);
 }
 
-
-
 void DumpObjImports (FILE* F, unsigned long Offset)
 // Dump the imports in the object file
 {
@@ -577,8 +544,6 @@ void DumpObjImports (FILE* F, unsigned long Offset)
     DestroyStrPool (&StrPool);
 }
 
-
-
 void DumpObjExports (FILE* F, unsigned long Offset)
 // Dump the exports in the object file
 {
@@ -613,7 +578,6 @@ void DumpObjExports (FILE* F, unsigned long Offset)
         unsigned char   ConDes[CD_TYPE_COUNT];
         const char*     Name;
         unsigned        Len;
-
 
         // Read the data for one export
         unsigned Type          = ReadVar (F);
@@ -653,8 +617,6 @@ void DumpObjExports (FILE* F, unsigned long Offset)
     // Destroy the string pool
     DestroyStrPool (&StrPool);
 }
-
-
 
 void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 // Dump the debug symbols from an object file
@@ -749,8 +711,6 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
     DestroyStrPool (&StrPool);
 }
 
-
-
 void DumpObjLineInfo (FILE* F, unsigned long Offset)
 // Dump the line info from an object file
 {
@@ -813,8 +773,6 @@ void DumpObjLineInfo (FILE* F, unsigned long Offset)
     // Destroy the string pool
     DestroyStrPool (&StrPool);
 }
-
-
 
 void DumpObjScopes (FILE* F, unsigned long Offset)
 // Dump the scopes from an object file
@@ -894,8 +852,6 @@ void DumpObjScopes (FILE* F, unsigned long Offset)
     // Destroy the string pool
     DestroyStrPool (&StrPool);
 }
-
-
 
 void DumpObjSegSize (FILE* F, unsigned long Offset)
 // Dump the sizes of the segment in the object file

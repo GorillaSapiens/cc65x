@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -51,13 +49,9 @@
 #include "stmt.h"
 #include "error.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Count of errors/warnings
 unsigned PPErrorCount     = 0;  // Pre-parser errors
@@ -113,13 +107,9 @@ static WarnMapEntry WarnMap[] = {
 
 Collection DiagnosticStrBufs;
 
-
-
 //***************************************************************************
 //                                  Helpers
 //***************************************************************************
-
-
 
 void PrintFileInclusionInfo (const LineInfo* LI)
 // Print hierarchy of file inclusion
@@ -140,8 +130,6 @@ void PrintFileInclusionInfo (const LineInfo* LI)
     }
 }
 
-
-
 static LineInfo* GetDiagnosticLI (void)
 // Get the line info where the diagnostic info refers to
 {
@@ -151,8 +139,6 @@ static LineInfo* GetDiagnosticLI (void)
         return GetCurLineInfo ();
     }
 }
-
-
 
 static const char* GetDiagnosticFileName (void)
 // Get the source file name where the diagnostic info refers to
@@ -164,8 +150,6 @@ static const char* GetDiagnosticFileName (void)
     }
 }
 
-
-
 static unsigned GetDiagnosticLineNum (void)
 // Get the source line number where the diagnostic info refers to
 {
@@ -176,13 +160,9 @@ static unsigned GetDiagnosticLineNum (void)
     }
 }
 
-
-
 //***************************************************************************
 //                         Handling of fatal errors
 //***************************************************************************
-
-
 
 void Fatal_ (const char *file, int line, const char* Format, ...)
 // Print a message about a fatal error and die
@@ -205,8 +185,6 @@ void Fatal_ (const char *file, int line, const char* Format, ...)
     }
     exit (EXIT_FAILURE);
 }
-
-
 
 void Internal_ (const char *file, int line, const char* Format, ...)
 // Print a message about an internal compiler error and die
@@ -233,13 +211,9 @@ void Internal_ (const char *file, int line, const char* Format, ...)
     abort ();
 }
 
-
-
 //***************************************************************************
 //                            Handling of errors
 //***************************************************************************
-
-
 
 static void IntError (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
 // Print an error message - internal function
@@ -277,8 +251,6 @@ static void IntError (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
     }
 }
 
-
-
 void LIError_ (const char *file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...)
 // Print an error message with the line info given explicitly
 {
@@ -292,8 +264,6 @@ void LIError_ (const char *file, int line, errcat_t EC, LineInfo* LI, const char
     IntError (EC, LI, Format, ap);
     va_end (ap);
 }
-
-
 
 void Error_ (const char *file, int line, const char* Format, ...)
 // Print an error message
@@ -309,8 +279,6 @@ void Error_ (const char *file, int line, const char* Format, ...)
     va_end (ap);
 }
 
-
-
 void PPError_ (const char *file, int line, const char* Format, ...)
 // Print an error message. For use within the preprocessor
 {
@@ -325,13 +293,9 @@ void PPError_ (const char *file, int line, const char* Format, ...)
     va_end (ap);
 }
 
-
-
 //***************************************************************************
 //                           Handling of warnings
 //***************************************************************************
-
-
 
 static void IntWarning (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
 // Print a warning message - internal function
@@ -368,8 +332,6 @@ static void IntWarning (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
     }
 }
 
-
-
 void LIWarning_ (const char *file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...)
 // Print a warning message with the line info given explicitly
 {
@@ -383,8 +345,6 @@ void LIWarning_ (const char *file, int line, errcat_t EC, LineInfo* LI, const ch
     IntWarning (EC, LI, Format, ap);
     va_end (ap);
 }
-
-
 
 void Warning_ (const char *file, int line, const char* Format, ...)
 // Print a warning message
@@ -400,8 +360,6 @@ void Warning_ (const char *file, int line, const char* Format, ...)
     va_end (ap);
 }
 
-
-
 void PPWarning_ (const char *file, int line, const char* Format, ...)
 // Print a warning message. For use within the preprocessor
 {
@@ -416,8 +374,6 @@ void PPWarning_ (const char *file, int line, const char* Format, ...)
     va_end (ap);
 }
 
-
-
 void UnreachableCodeWarning (void)
 /* Print a warning about unreachable code at the current location if these
 ** warnings are enabled.
@@ -427,8 +383,6 @@ void UnreachableCodeWarning (void)
         Warning ("Unreachable code");
     }
 }
-
-
 
 IntStack* FindWarning (const char* Name)
 /* Search for a warning in the WarnMap table and return a pointer to the
@@ -446,8 +400,6 @@ IntStack* FindWarning (const char* Name)
     return 0;
 }
 
-
-
 void ListWarnings (FILE* F)
 // Print a list of warning types/names to the given file
 {
@@ -457,13 +409,9 @@ void ListWarnings (FILE* F)
     }
 }
 
-
-
 //***************************************************************************
 //                          Handling of other infos
 //***************************************************************************
-
-
 
 static void IntNote (const LineInfo* LI, const char* Msg, va_list ap)
 // Print a note message - internal function
@@ -472,8 +420,6 @@ static void IntNote (const LineInfo* LI, const char* Msg, va_list ap)
     vfprintf (stderr, Msg, ap);
     fprintf (stderr, "\n");
 }
-
-
 
 void LINote_ (const char *file, int line, const LineInfo* LI, const char* Format, ...)
 // Print a note message with the line info given explicitly
@@ -489,8 +435,6 @@ void LINote_ (const char *file, int line, const LineInfo* LI, const char* Format
     va_end (ap);
 }
 
-
-
 void Note_ (const char *file, int line, const char* Format, ...)
 // Print a note message
 {
@@ -504,8 +448,6 @@ void Note_ (const char *file, int line, const char* Format, ...)
     IntNote (GetDiagnosticLI (), Format, ap);
     va_end (ap);
 }
-
-
 
 void PPNote_ (const char *file, int line, const char* Format, ...)
 // Print a note message. For use within the preprocessor
@@ -521,13 +463,9 @@ void PPNote_ (const char *file, int line, const char* Format, ...)
     va_end (ap);
 }
 
-
-
 //***************************************************************************
 //                               Error summary
 //***************************************************************************
-
-
 
 unsigned GetTotalErrors (void)
 // Get total count of errors of all categories
@@ -535,15 +473,11 @@ unsigned GetTotalErrors (void)
     return PPErrorCount + ErrorCount;
 }
 
-
-
 unsigned GetTotalWarnings (void)
 // Get total count of warnings of all categories
 {
     return PPWarningCount + WarningCount;
 }
-
-
 
 void ErrorReport (void)
 // Report errors (called at end of compile)
@@ -554,21 +488,15 @@ void ErrorReport (void)
     Print (stdout, V, "%u errors and %u warnings generated.\n", TotalErrors, TotalWarnings);
 }
 
-
-
 //***************************************************************************
 //                              Tracked StrBufs
 //***************************************************************************
-
-
 
 void InitDiagnosticStrBufs (void)
 // Init tracking string buffers used for diagnostics
 {
     InitCollection (&DiagnosticStrBufs);
 }
-
-
 
 void DoneDiagnosticStrBufs (void)
 // Done with tracked string buffers used for diagnostics
@@ -579,8 +507,6 @@ void DoneDiagnosticStrBufs (void)
     }
     DoneCollection (&DiagnosticStrBufs);
 }
-
-
 
 struct StrBuf* NewDiagnosticStrBuf (void)
 // Get a new tracked string buffer

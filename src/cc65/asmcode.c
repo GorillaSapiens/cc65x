@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "check.h"
 
@@ -44,13 +42,9 @@
 #include "stackptr.h"
 #include "symtab.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void GetCodePos (CodeMark* M)
 // Get a marker pointing to the current output position
@@ -58,8 +52,6 @@ void GetCodePos (CodeMark* M)
     M->Pos = CS_GetEntryCount (CS->Code);
     M->SP  = StackPtr;
 }
-
-
 
 void RemoveCodeRange (const CodeMark* Start, const CodeMark* End)
 // Remove all code between two code markers
@@ -73,16 +65,12 @@ void RemoveCodeRange (const CodeMark* Start, const CodeMark* End)
     CS_DelCodeRange (CS->Code, Start->Pos, End->Pos-1);
 }
 
-
-
 void RemoveCode (const CodeMark* M)
 // Remove all code after the given code marker
 {
     CS_DelCodeAfter (CS->Code, M->Pos);
     StackPtr = M->SP;
 }
-
-
 
 void ErrorOnNonDefinition (const CodeMark* Start, const CodeMark* End)
 // Error on an non definition between the given code markers
@@ -100,7 +88,6 @@ void CleanupSwitch (const CodeMark* location) {
     CS_CleanupSwitch(CS->Code, location->Pos);
 }
 
-
 void MoveCode (const CodeMark* Start, const CodeMark* End, const CodeMark* Target)
 /* Move the code between Start (inclusive) and End (exclusive) to
 ** (before) Target. The code marks aren't updated.
@@ -108,8 +95,6 @@ void MoveCode (const CodeMark* Start, const CodeMark* End, const CodeMark* Targe
 {
     CS_MoveEntries (CS->Code, Start->Pos, End->Pos - Start->Pos, Target->Pos);
 }
-
-
 
 int CodeRangeIsEmpty (const CodeMark* Start, const CodeMark* End)
 // Return true if the given code range is empty (no code between Start and End)
@@ -123,8 +108,6 @@ int CodeRangeIsEmpty (const CodeMark* Start, const CodeMark* End)
     }
     return Empty;
 }
-
-
 
 void WriteAsmOutput (void)
 // Write the final assembler output to the output file

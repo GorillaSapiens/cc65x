@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 
 // common
@@ -44,13 +42,9 @@
 #include "error.h"
 #include "lynxsprite.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Sprite mode
 enum Mode {
@@ -60,12 +54,9 @@ enum Mode {
     smShaped
 };
 
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static enum Mode GetMode (const Collection* A)
 // Return the sprite mode from the attribute collection A
@@ -87,7 +78,6 @@ static enum Mode GetMode (const Collection* A)
     return smAuto;
 }
 
-
 static unsigned GetActionPointX (const Bitmap* B, const Collection* A)
 // Return the sprite mode from the attribute collection A
 {
@@ -105,7 +95,6 @@ static unsigned GetActionPointX (const Bitmap* B, const Collection* A)
         return 0;
     }
 }
-
 
 static unsigned GetActionPointY (const Bitmap* B, const Collection* A)
 // Return the sprite mode from the attribute collection A

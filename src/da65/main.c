@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -66,15 +64,11 @@
 #include "scanner.h"
 #include "segment.h"
 
-
 static unsigned PrevAddrMode;
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void Usage (void)
 // Print usage information and exit
@@ -116,8 +110,6 @@ static void Usage (void)
             ProgName);
 }
 
-
-
 static void RangeCheck (const char* Opt, unsigned long Val,
                         unsigned long Min, unsigned long Max)
 /* Do a range check for the given option and abort if there's a range
@@ -128,8 +120,6 @@ static void RangeCheck (const char* Opt, unsigned long Val,
         Error ("Argument for %s outside valid range (%ld-%ld)", Opt, Min, Max);
     }
 }
-
-
 
 static unsigned long CvtNumber (const char* Arg, const char* Number)
 /* Convert a number from a string. Allow '$' and '0x' prefixes for hex
@@ -157,8 +147,6 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
     return Val;
 }
 
-
-
 static void OptArgumentColumn (const char* Opt, const char* Arg)
 // Handle the --argument-column option
 {
@@ -171,8 +159,6 @@ static void OptArgumentColumn (const char* Opt, const char* Arg)
     // Use the value
     ACol = (unsigned char) Val;
 }
-
-
 
 static void OptBytesPerLine (const char* Opt, const char* Arg)
 // Handle the --bytes-per-line option
@@ -187,8 +173,6 @@ static void OptBytesPerLine (const char* Opt, const char* Arg)
     BytesPerLine = (unsigned char) Val;
 }
 
-
-
 static void OptCommentColumn (const char* Opt, const char* Arg)
 // Handle the --comment-column option
 {
@@ -201,8 +185,6 @@ static void OptCommentColumn (const char* Opt, const char* Arg)
     // Use the value
     CCol = (unsigned char) Val;
 }
-
-
 
 static void OptComments (const char* Opt, const char* Arg)
 // Handle the --comments option
@@ -217,8 +199,6 @@ static void OptComments (const char* Opt, const char* Arg)
     Comments = (unsigned char) Val;
 }
 
-
-
 static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --cpu option
 {
@@ -227,16 +207,12 @@ static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
     SetOpcTable (CPU);
 }
 
-
-
 static void OptDebug (const char* Opt attribute ((unused)),
                       const char* Arg attribute ((unused)))
 // Disassembler debug mode
 {
     ++Debug;
 }
-
-
 
 static void OptDebugInfo (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
@@ -245,16 +221,12 @@ static void OptDebugInfo (const char* Opt attribute ((unused)),
     DebugInfo = 1;
 }
 
-
-
 static void OptFormFeeds (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
 // Add form feeds to the output
 {
     FormFeeds = 1;
 }
-
-
 
 static void OptHelp (const char* Opt attribute ((unused)),
                      const char* Arg attribute ((unused)))
@@ -264,8 +236,6 @@ static void OptHelp (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
-
-
 static void OptHexOffs (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 // Handle the --hexoffs option
@@ -273,15 +243,11 @@ static void OptHexOffs (const char* Opt attribute ((unused)),
     UseHexOffs = 1;
 }
 
-
-
 static void OptInfo (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --info option
 {
     InfoSetName (Arg);
 }
-
-
 
 static void OptLabelBreak (const char* Opt, const char* Arg)
 // Handle the --label-break option
@@ -296,8 +262,6 @@ static void OptLabelBreak (const char* Opt, const char* Arg)
     LBreak = (unsigned char) Val;
 }
 
-
-
 static void OptMnemonicColumn (const char* Opt, const char* Arg)
 // Handle the --mnemonic-column option
 {
@@ -311,16 +275,12 @@ static void OptMnemonicColumn (const char* Opt, const char* Arg)
     MCol = (unsigned char) Val;
 }
 
-
-
 static void OptMultiPass (const char* Opt attribute ((unused)),
                          const char* Arg attribute ((unused)))
 // Handle the --multi-pass option
 {
     MultiPass = 1;
 }
-
-
 
 static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --pagelength option
@@ -332,8 +292,6 @@ static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg
     PageLength = Len;
 }
 
-
-
 static void OptStartAddr (const char* Opt, const char* Arg)
 // Set the default start address
 {
@@ -341,16 +299,12 @@ static void OptStartAddr (const char* Opt, const char* Arg)
     HaveStartAddr = 1;
 }
 
-
-
 static void OptSyncLines (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
 // Handle the --sync-lines option
 {
     SyncLines = 1;
 }
-
-
 
 static void OptTextColumn (const char* Opt, const char* Arg)
 // Handle the --text-column option
@@ -365,16 +319,12 @@ static void OptTextColumn (const char* Opt, const char* Arg)
     TCol = (unsigned char) Val;
 }
 
-
-
 static void OptVerbose (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 // Increase verbosity
 {
     ++Verbosity;
 }
-
-
 
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
@@ -383,8 +333,6 @@ static void OptVersion (const char* Opt attribute ((unused)),
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
     exit (EXIT_SUCCESS);
 }
-
-
 
 static unsigned HandleChangedLength(const OpcDesc* D, unsigned PC)
 /* Instructions that have flSizeChanges set may use a different size than what
@@ -428,8 +376,6 @@ static unsigned HandleChangedLength(const OpcDesc* D, unsigned PC)
     }
     return PC;
 }
-
-
 
 static void OneOpcode (unsigned RemainingBytes)
 // Disassemble one opcode
@@ -594,8 +540,6 @@ static void OneOpcode (unsigned RemainingBytes)
     }
 }
 
-
-
 static void OnePass (void)
 // Make one pass through the code
 {
@@ -608,8 +552,6 @@ static void OnePass (void)
         OneOpcode (Count);
     }
 }
-
-
 
 static void Disassemble (void)
 // Disassemble the code
@@ -650,8 +592,6 @@ static void Disassemble (void)
     DefOutOfRangeLabels ();
     OnePass ();
 }
-
-
 
 int main (int argc, char* argv [])
 // Assembler main program

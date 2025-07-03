@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "attrib.h"
 #include "print.h"
@@ -42,13 +40,9 @@
 #include "error.h"
 #include "raw.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 StrBuf* GenRaw (const Bitmap* B, const Collection* A attribute ((unused)))
 /* Generate binary output in raw format. The output is stored in a string
@@ -57,7 +51,6 @@ StrBuf* GenRaw (const Bitmap* B, const Collection* A attribute ((unused)))
 {
     StrBuf* D;
     unsigned X, Y;
-
 
     // Output the image properties
     Print (stdout, 1, "Image is %ux%u with %u colors%s\n",

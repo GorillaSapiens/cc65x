@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -69,13 +67,9 @@
 #include "spool.h"
 #include "tpool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 static unsigned         ObjFiles   = 0; // Count of object files linked
 static unsigned         LibFiles   = 0; // Count of library files linked
@@ -98,13 +92,9 @@ static unsigned                InputFilesCount = 0;
 static const char              *CmdlineCfgFile = NULL,
                                *CmdlineTarget = NULL;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void Usage (void)
 // Print usage information and exit
@@ -150,8 +140,6 @@ static void Usage (void)
             ProgName);
 }
 
-
-
 static unsigned long CvtNumber (const char* Arg, const char* Number)
 /* Convert a number from a string. Allow '$' and '0x' prefixes for hex
 ** numbers.
@@ -177,15 +165,12 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
     return Val;
 }
 
-
-
 static void LinkFile (const char* Name, FILETYPE Type)
 // Handle one file
 {
     char*         PathName;
     FILE*         F;
     unsigned long Magic;
-
 
     // If we don't know the file type, determine it from the extension
     if (Type == FILETYPE_UNKNOWN) {
@@ -256,15 +241,12 @@ static void LinkFile (const char* Name, FILETYPE Type)
     xfree (PathName);
 }
 
-
-
 static void DefineSymbol (const char* Def)
 // Define a symbol from the command line
 {
     const char* P;
     long Val;
     StrBuf SymName = AUTO_STRBUF_INITIALIZER;
-
 
     // The symbol must start with a character or underline
     if (Def [0] != '_' && !IsAlpha (Def [0])) {
@@ -300,15 +282,11 @@ static void DefineSymbol (const char* Def)
     CreateConstExport (GetStringId (SB_GetConstBuf (&SymName)), Val);
 }
 
-
-
 static void OptCfgPath (const char* Opt attribute ((unused)), const char* Arg)
 // Specify a config file search path
 {
     AddSearchPath (CfgSearchPath, Arg);
 }
-
-
 
 static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
 // Define the config file
@@ -332,15 +310,11 @@ static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
     CfgRead ();
 }
 
-
-
 static void OptDbgFile (const char* Opt attribute ((unused)), const char* Arg)
 // Give the name of the debug file
 {
     DbgFileName = Arg;
 }
-
-
 
 static void OptDefine (const char* Opt attribute ((unused)), const char* Arg)
 // Define a symbol on the command line
@@ -348,16 +322,12 @@ static void OptDefine (const char* Opt attribute ((unused)), const char* Arg)
     DefineSymbol (Arg);
 }
 
-
-
 static void OptEndGroup (const char* Opt attribute ((unused)),
                          const char* Arg attribute ((unused)))
 // End a library group
 {
     LibEndGroup ();
 }
-
-
 
 static void OptForceImport (const char* Opt attribute ((unused)), const char* Arg)
 // Force an import of a symbol
@@ -395,8 +365,6 @@ static void OptForceImport (const char* Opt attribute ((unused)), const char* Ar
     }
 }
 
-
-
 static void OptHelp (const char* Opt attribute ((unused)),
                      const char* Arg attribute ((unused)))
 // Print usage information and exit
@@ -405,15 +373,12 @@ static void OptHelp (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
-
-
 static void OptLargeAlignment (const char* Opt attribute ((unused)),
                                const char* Arg attribute ((unused)))
 // Don't warn about large alignments
 {
     LargeAlignment = 1;
 }
-
 
 static void OptLib (const char* Opt attribute ((unused)), const char* Arg)
 // Link a library
@@ -424,15 +389,11 @@ static void OptLib (const char* Opt attribute ((unused)), const char* Arg)
         Error ("Too many input files");
 }
 
-
-
 static void OptLibPath (const char* Opt attribute ((unused)), const char* Arg)
 // Specify a library file search path
 {
     AddSearchPath (LibSearchPath, Arg);
 }
-
-
 
 static void OptMapFile (const char* Opt attribute ((unused)), const char* Arg)
 // Give the name of the map file
@@ -442,8 +403,6 @@ static void OptMapFile (const char* Opt attribute ((unused)), const char* Arg)
     }
     MapFileName = Arg;
 }
-
-
 
 static void OptModuleId (const char* Opt, const char* Arg)
 // Specify a module id
@@ -455,8 +414,6 @@ static void OptModuleId (const char* Opt, const char* Arg)
     ModuleId = (unsigned) Id;
 }
 
-
-
 static void OptObj (const char* Opt attribute ((unused)), const char* Arg)
 // Link an object file
 {
@@ -466,15 +423,11 @@ static void OptObj (const char* Opt attribute ((unused)), const char* Arg)
         Error ("Too many input files");
 }
 
-
-
 static void OptObjPath (const char* Opt attribute ((unused)), const char* Arg)
 // Specify an object file search path
 {
     AddSearchPath (ObjSearchPath, Arg);
 }
-
-
 
 static void OptOutputName (const char* Opt attribute ((unused)), const char* Arg)
 // Give the name of the output file
@@ -487,8 +440,6 @@ static void OptOutputName (const char* Opt attribute ((unused)), const char* Arg
     OutputName = Arg;
 }
 
-
-
 static void OptStartAddr (const char* Opt, const char* Arg)
 // Set the default start address
 {
@@ -499,16 +450,12 @@ static void OptStartAddr (const char* Opt, const char* Arg)
     HaveStartAddr = 1;
 }
 
-
-
 static void OptStartGroup (const char* Opt attribute ((unused)),
                            const char* Arg attribute ((unused)))
 // Start a library group
 {
     LibStartGroup ();
 }
-
-
 
 static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 // Set the target system
@@ -547,8 +494,6 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
     CfgRead ();
 }
 
-
-
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 // Print the assembler version
@@ -557,8 +502,6 @@ static void OptVersion (const char* Opt attribute ((unused)),
     exit(EXIT_SUCCESS);
 }
 
-
-
 static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
                                  const char* Arg attribute ((unused)))
 // Generate an error if any warnings occur
@@ -566,16 +509,12 @@ static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
     WarningsAsErrors = 1;
 }
 
-
-
 static void OptMultDef (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 // Set flag to allow multiple definitions of a global symbol
 {
     AllowMultDef = 1;
 }
-
-
 
 static void CmdlOptStartGroup (const char* Opt attribute ((unused)),
                                const char* Arg attribute ((unused)))
@@ -587,8 +526,6 @@ static void CmdlOptStartGroup (const char* Opt attribute ((unused)),
         Error ("Too many input files");
 }
 
-
-
 static void CmdlOptEndGroup (const char* Opt attribute ((unused)),
                              const char* Arg attribute ((unused)))
 // Remember 'end group' occurrence in input files array
@@ -599,8 +536,6 @@ static void CmdlOptEndGroup (const char* Opt attribute ((unused)),
         Error ("Too many input files");
 }
 
-
-
 static void CmdlOptConfig (const char* Opt attribute ((unused)), const char* Arg)
 // Set 'config file' command line parameter
 {
@@ -610,8 +545,6 @@ static void CmdlOptConfig (const char* Opt attribute ((unused)), const char* Arg
     CmdlineCfgFile = Arg;
 }
 
-
-
 static void CmdlOptTarget (const char* Opt attribute ((unused)), const char* Arg)
 // Set 'target' command line parameter
 {
@@ -620,8 +553,6 @@ static void CmdlOptTarget (const char* Opt attribute ((unused)), const char* Arg
     }
     CmdlineTarget = Arg;
 }
-
-
 
 static void ParseCommandLine(void)
 {
@@ -792,8 +723,6 @@ static void ParseCommandLine(void)
     // Free memory used for input file array
     xfree (InputFiles);
 }
-
-
 
 int main (int argc, char* argv [])
 // Linker main program

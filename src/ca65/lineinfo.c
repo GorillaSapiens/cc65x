@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 
@@ -49,13 +47,9 @@
 #include "scanner.h"
 #include "span.h"
 
-
-
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
-
-
 
 static unsigned HT_GenHash (const void* Key);
 // Generate the hash over a key.
@@ -69,13 +63,9 @@ static int HT_Compare (const void* Key1, const void* Key2);
 ** than zero if Key1 is greater then Key2.
 */
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Structure that holds the key for a line info
 typedef struct LineInfoKey LineInfoKey;
@@ -93,8 +83,6 @@ struct LineInfo {
     Collection      Spans;              // Segment spans for this line info
     Collection      OpenSpans;          // List of currently open spans
 };
-
-
 
 // Collection containing all line infos
 static Collection LineInfoList = STATIC_COLLECTION_INITIALIZER;
@@ -115,13 +103,9 @@ static HashTable LineInfoTab = STATIC_HASHTABLE_INITIALIZER (1051, &HashFunc);
 // The current assembler input line
 static LineInfo* AsmLineInfo = 0;
 
-
-
 //***************************************************************************
 //                           Hash table functions
 //***************************************************************************
-
-
 
 static unsigned HT_GenHash (const void* Key)
 // Generate the hash over a key.
@@ -133,15 +117,11 @@ static unsigned HT_GenHash (const void* Key)
     return HashInt ((K->Type << 21) ^ (K->Pos.Name << 14) ^ K->Pos.Line);
 }
 
-
-
 static const void* HT_GetKey (const void* Entry)
 // Given a pointer to the user entry data, return a pointer to the key
 {
     return &((const LineInfo*)Entry)->Key;
 }
-
-
 
 static int HT_Compare (const void* Key1, const void* Key2)
 /* Compare two keys. The function must return a value less than zero if
@@ -166,13 +146,9 @@ static int HT_Compare (const void* Key1, const void* Key2)
     return Res;
 }
 
-
-
 //***************************************************************************
 //                              struct LineInfo
 //***************************************************************************
-
-
 
 static LineInfo* NewLineInfo (const LineInfoKey* Key)
 // Create and return a new line info. Usage will be zero.
@@ -195,8 +171,6 @@ static LineInfo* NewLineInfo (const LineInfoKey* Key)
     return LI;
 }
 
-
-
 static void FreeLineInfo (LineInfo* LI)
 // Free a LineInfo structure
 {
@@ -208,8 +182,6 @@ static void FreeLineInfo (LineInfo* LI)
     // Free the structure itself
     xfree (LI);
 }
-
-
 
 static int CheckLineInfo (void* Entry, void* Data attribute ((unused)))
 // Called from HT_Walk. Remembers used line infos and assigns them an id
@@ -228,13 +200,9 @@ static int CheckLineInfo (void* Entry, void* Data attribute ((unused)))
     }
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 #if 0
 static void DumpLineInfos (const char* Title, const Collection* C)
@@ -261,8 +229,6 @@ static void DumpLineInfos (const char* Title, const Collection* C)
 }
 #endif
 
-
-
 void InitLineInfo (void)
 // Initialize the line infos
 {
@@ -276,8 +242,6 @@ void InitLineInfo (void)
     */
     AsmLineInfo = StartLine (&DefaultPos, LI_TYPE_ASM, 0);
 }
-
-
 
 void DoneLineInfo (void)
 // Close down line infos
@@ -294,8 +258,6 @@ void DoneLineInfo (void)
     */
     HT_Walk (&LineInfoTab, CheckLineInfo, 0);
 }
-
-
 
 void EndLine (LineInfo* LI)
 // End a line that is tracked by the given LineInfo structure
@@ -314,8 +276,6 @@ void EndLine (LineInfo* LI)
     */
     CollDeleteItem (&CurLineInfo, LI);
 }
-
-
 
 LineInfo* StartLine (const FilePos* Pos, unsigned Type, unsigned Count)
 // Start line info for a new line
@@ -345,8 +305,6 @@ LineInfo* StartLine (const FilePos* Pos, unsigned Type, unsigned Count)
     // Return the new info
     return LI;
 }
-
-
 
 void NewAsmLine (void)
 /* Start a new assembler input line. Use this function when generating new
@@ -378,8 +336,6 @@ void NewAsmLine (void)
     }
 }
 
-
-
 LineInfo* GetAsmLineInfo (void)
 /* Return the line info for the current assembler file. The function will
 ** bump the reference counter before returning the line info.
@@ -389,8 +345,6 @@ LineInfo* GetAsmLineInfo (void)
     return AsmLineInfo;
 }
 
-
-
 void ReleaseLineInfo (LineInfo* LI)
 // Decrease the reference count for a line info
 {
@@ -398,8 +352,6 @@ void ReleaseLineInfo (LineInfo* LI)
     CHECK (LI->RefCount > 0);
     ++LI->RefCount;
 }
-
-
 
 void GetFullLineInfo (Collection* LineInfos)
 /* Return full line infos, that is line infos for currently active Slots. The
@@ -418,8 +370,6 @@ void GetFullLineInfo (Collection* LineInfos)
     CollTransfer (LineInfos, &CurLineInfo);
 }
 
-
-
 void ReleaseFullLineInfo (Collection* LineInfos)
 /* Decrease the reference count for a collection full of LineInfos, then clear
 ** the collection.
@@ -437,23 +387,17 @@ void ReleaseFullLineInfo (Collection* LineInfos)
     CollDeleteAll (LineInfos);
 }
 
-
-
 const FilePos* GetSourcePos (const LineInfo* LI)
 // Return the source file position from the given line info
 {
     return &LI->Key.Pos;
 }
 
-
-
 unsigned GetLineInfoType (const LineInfo* LI)
 // Return the type of a line info
 {
     return LI_GET_TYPE (LI->Key.Type);
 }
-
-
 
 void WriteLineInfo (const Collection* LineInfos)
 // Write a list of line infos to the object file.
@@ -476,8 +420,6 @@ void WriteLineInfo (const Collection* LineInfos)
         ObjWriteVar (LI->Id);
     }
 }
-
-
 
 void WriteLineInfos (void)
 // Write a list of all line infos to the object file.

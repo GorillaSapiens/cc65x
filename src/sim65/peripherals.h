@@ -28,8 +28,6 @@
 //
 //***************************************************************************
 
-
-
 #ifndef PERIPHERALS_H
 #define PERIPHERALS_H
 
@@ -105,20 +103,14 @@ extern Sim65Peripherals Peripherals;
 //                                   Code
 //***************************************************************************
 
-
-
 void PeripheralsWriteByte (uint8_t Addr, uint8_t Val);
 // Write a byte to a memory location in the peripheral address aperture.
-
 
 uint8_t PeripheralsReadByte (uint8_t Addr);
 // Read a byte from a memory location in the peripheral address aperture.
 
-
 void PeripheralsInit (void);
 // Initialize the peripherals.
-
-
 
 // End of peripherals.h
 

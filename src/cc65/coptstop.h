@@ -31,28 +31,18 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COPTSTOP_H
 #define COPTSTOP_H
 
-
-
 // cc65
 #include "codeseg.h"
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 unsigned OptStackOps (CodeSeg* S);
 // Optimize operations that take operands via the stack
-
-
 
 // End of coptstop.h
 

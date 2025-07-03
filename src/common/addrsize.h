@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ADDRSIZE_H
 #define ADDRSIZE_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 #define ADDR_SIZE_INVALID       0xFF
 #define ADDR_SIZE_DEFAULT       0x00
@@ -51,13 +45,9 @@
 #define ADDR_SIZE_FAR           0x03
 #define ADDR_SIZE_LONG          0x04
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 const char* AddrSizeToStr (unsigned char AddrSize);
 // Return the name for an address size specifier
@@ -66,8 +56,6 @@ unsigned char AddrSizeFromStr (const char* Str);
 /* Return the address size for a given string. Returns ADDR_SIZE_INVALID if
 ** the string cannot be mapped to an address size.
 */
-
-
 
 // End of addrsize.h
 

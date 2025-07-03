@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
@@ -59,13 +57,9 @@
 #include "output.h"
 #include "symentry.h"
 
-
-
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 static void CS_PrintFunctionHeader (const CodeSeg* S)
 // Print a comment with the function signature to the output file
@@ -83,8 +77,6 @@ static void CS_PrintFunctionHeader (const CodeSeg* S)
                      "\n");
     }
 }
-
-
 
 static void CS_MoveLabelsToEntry (CodeSeg* S, CodeEntry* E)
 /* Move all labels from the label pool to the given entry and remove them
@@ -107,8 +99,6 @@ static void CS_MoveLabelsToEntry (CodeSeg* S, CodeEntry* E)
     CollDeleteAll (&S->Labels);
 }
 
-
-
 static void CS_MoveLabelsToPool (CodeSeg* S, CodeEntry* E)
 // Move the labels of the code entry E to the label pool of the code segment
 {
@@ -120,8 +110,6 @@ static void CS_MoveLabelsToPool (CodeSeg* S, CodeEntry* E)
     }
     CollDeleteAll (&E->Labels);
 }
-
-
 
 static CodeLabel* CS_FindLabel (CodeSeg* S, const char* Name, unsigned Hash)
 // Find the label with the given name. Return the label or NULL if not found
@@ -140,8 +128,6 @@ static CodeLabel* CS_FindLabel (CodeSeg* S, const char* Name, unsigned Hash)
     return L;
 }
 
-
-
 static CodeLabel* CS_NewCodeLabel (CodeSeg* S, const char* Name, unsigned Hash)
 // Create a new label and insert it into the label hash table
 {
@@ -155,8 +141,6 @@ static CodeLabel* CS_NewCodeLabel (CodeSeg* S, const char* Name, unsigned Hash)
     // Return the new label
     return L;
 }
-
-
 
 static void CS_RemoveLabelFromHash (CodeSeg* S, CodeLabel* L)
 // Remove the given code label from the hash list
@@ -181,8 +165,6 @@ static void CS_RemoveLabelFromHash (CodeSeg* S, CodeLabel* L)
         List->Next = L->Next;
     }
 }
-
-
 
 static CodeLabel* PickRefLab (CodeEntry* E)
 // Pick a reference label and move it to index 0 in E.
@@ -213,13 +195,9 @@ static CodeLabel* PickRefLab (CodeEntry* E)
     return L0;
 }
 
-
-
 //***************************************************************************
 //                    Functions for parsing instructions
 //***************************************************************************
-
-
 
 static const char* SkipSpace (const char* S)
 // Skip white space and return an updated pointer
@@ -229,8 +207,6 @@ static const char* SkipSpace (const char* S)
     }
     return S;
 }
-
-
 
 static const char* ReadToken (const char* L, const char* Term,
                               char* Buf, unsigned BufSize)
@@ -265,8 +241,6 @@ static const char* ReadToken (const char* L, const char* Term,
     // Return the updated line pointer
     return L;
 }
-
-
 
 static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 /* Parse an instruction nnd generate a code entry from it. If the line contains
@@ -493,13 +467,9 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
     return E;
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func)
 // Create a new code segment, initialize and return it
@@ -540,8 +510,6 @@ CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func)
     return S;
 }
 
-
-
 void CS_AddEntry (CodeSeg* S, struct CodeEntry* E)
 // Add an entry to the given code segment
 {
@@ -551,8 +519,6 @@ void CS_AddEntry (CodeSeg* S, struct CodeEntry* E)
     // Add the entry to the list of code entries in this segment
     CollAppend (&S->Entries, E);
 }
-
-
 
 void CS_AddVLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
 // Add a line to the given code segment
@@ -600,8 +566,6 @@ void CS_AddVLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
     SB_Done (&Buf);
 }
 
-
-
 void CS_AddLine (CodeSeg* S, LineInfo* LI, const char* Format, ...)
 // Add a line to the given code segment
 {
@@ -611,8 +575,6 @@ void CS_AddLine (CodeSeg* S, LineInfo* LI, const char* Format, ...)
     va_end (ap);
 }
 
-
-
 void CS_InsertEntry (CodeSeg* S, struct CodeEntry* E, unsigned Index)
 /* Insert the code entry at the index given. Following code entries will be
 ** moved to slots with higher indices.
@@ -621,8 +583,6 @@ void CS_InsertEntry (CodeSeg* S, struct CodeEntry* E, unsigned Index)
     // Insert the entry into the collection
     CollInsert (&S->Entries, E, Index);
 }
-
-
 
 void CS_DelEntry (CodeSeg* S, unsigned Index)
 /* Delete an entry from the code segment. This includes moving any associated
@@ -678,8 +638,6 @@ void CS_DelEntry (CodeSeg* S, unsigned Index)
     FreeCodeEntry (E);
 }
 
-
-
 void CS_DelEntries (CodeSeg* S, unsigned Start, unsigned Count)
 /* Delete a range of code entries. This includes removing references to labels,
 ** labels attached to the entries and so on.
@@ -692,8 +650,6 @@ void CS_DelEntries (CodeSeg* S, unsigned Start, unsigned Count)
         CS_DelEntry (S, Start + Count);
     }
 }
-
-
 
 void CS_MoveEntries (CodeSeg* S, unsigned Start, unsigned Count, unsigned NewPos)
 /* Move a range of entries from one position to another. Start is the index
@@ -722,8 +678,6 @@ void CS_MoveEntries (CodeSeg* S, unsigned Start, unsigned Count, unsigned NewPos
     CollMoveMultiple (&S->Entries, Start, Count, NewPos);
 }
 
-
-
 struct CodeEntry* CS_GetPrevEntry (CodeSeg* S, unsigned Index)
 /* Get the code entry preceeding the one with the index Index. If there is no
 ** preceeding code entry, return NULL.
@@ -738,8 +692,6 @@ struct CodeEntry* CS_GetPrevEntry (CodeSeg* S, unsigned Index)
     }
 }
 
-
-
 struct CodeEntry* CS_GetNextEntry (CodeSeg* S, unsigned Index)
 /* Get the code entry following the one with the index Index. If there is no
 ** following code entry, return NULL.
@@ -753,8 +705,6 @@ struct CodeEntry* CS_GetNextEntry (CodeSeg* S, unsigned Index)
         return CollAtUnchecked (&S->Entries, Index+1);
     }
 }
-
-
 
 int CS_GetEntries (CodeSeg* S, struct CodeEntry** List,
                    unsigned Start, unsigned Count)
@@ -776,8 +726,6 @@ int CS_GetEntries (CodeSeg* S, struct CodeEntry** List,
     return 1;
 }
 
-
-
 unsigned CS_GetEntryIndex (CodeSeg* S, struct CodeEntry* E)
 // Return the index of a code entry
 {
@@ -785,8 +733,6 @@ unsigned CS_GetEntryIndex (CodeSeg* S, struct CodeEntry* E)
     CHECK (Index >= 0);
     return Index;
 }
-
-
 
 int CS_RangeHasLabel (CodeSeg* S, unsigned Start, unsigned Count)
 /* Return true if any of the code entries in the given range has a label
@@ -815,8 +761,6 @@ int CS_RangeHasLabel (CodeSeg* S, unsigned Start, unsigned Count)
     // No label in the complete range
     return 0;
 }
-
-
 
 CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name)
 // Add a code label for the next instruction to follow
@@ -852,8 +796,6 @@ CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name)
     return L;
 }
 
-
-
 CodeLabel* CS_GenLabel (CodeSeg* S, struct CodeEntry* E)
 /* If the code entry E does already have a label, return it. Otherwise
 ** create a new label, attach it to E and return it.
@@ -886,8 +828,6 @@ CodeLabel* CS_GenLabel (CodeSeg* S, struct CodeEntry* E)
     return L;
 }
 
-
-
 void CS_DelLabel (CodeSeg* S, CodeLabel* L)
 // Remove references from this label and delete it.
 {
@@ -918,8 +858,6 @@ void CS_DelLabel (CodeSeg* S, CodeLabel* L)
     // All references removed, delete the label itself
     FreeCodeLabel (L);
 }
-
-
 
 void CS_MergeLabels (CodeSeg* S)
 /* Merge code labels. That means: For each instruction, remove all labels but
@@ -1017,8 +955,6 @@ void CS_MergeLabels (CodeSeg* S)
     }
 }
 
-
-
 void CS_MoveLabels (CodeSeg* S, struct CodeEntry* Old, struct CodeEntry* New)
 /* Move all labels from Old to New. The routine will move the labels itself
 ** if New does not have any labels, and move references if there is at least
@@ -1060,8 +996,6 @@ void CS_MoveLabels (CodeSeg* S, struct CodeEntry* Old, struct CodeEntry* New)
     }
 }
 
-
-
 void CS_RemoveLabelRef (CodeSeg* S, struct CodeEntry* E)
 /* Remove the reference between E and the label it jumps to. The reference
 ** will be removed on both sides and E->JumpTo will be 0 after that. If
@@ -1084,8 +1018,6 @@ void CS_RemoveLabelRef (CodeSeg* S, struct CodeEntry* E)
         CS_DelLabel (S, L);
     }
 }
-
-
 
 void CS_MoveLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L)
 /* Change the reference of E to L instead of the current one. If this
@@ -1110,8 +1042,6 @@ void CS_MoveLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L)
     // Use the new label
     CL_AddRef (L, E);
 }
-
-
 
 void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last)
 /* Delete all entries between first and last, both inclusive. The function
@@ -1190,8 +1120,6 @@ void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last)
         FreeCodeEntry (E);
     }
 }
-
-
 
 void CS_ErrorOnNonDefinition (CodeSeg* S, unsigned First, unsigned Last)
 // emit an Error on anything other variable definition.
@@ -1283,7 +1211,6 @@ void CS_CleanupSwitch (CodeSeg* S, unsigned location) {
    }
 }
 
-
 void CS_DelCodeAfter (CodeSeg* S, unsigned Last)
 // Delete all entries including the given one
 {
@@ -1342,8 +1269,6 @@ void CS_DelCodeAfter (CodeSeg* S, unsigned Last)
     }
 }
 
-
-
 void CS_ResetMarks (CodeSeg* S, unsigned First, unsigned Last)
 // Remove all user marks from the entries in the given range
 {
@@ -1351,8 +1276,6 @@ void CS_ResetMarks (CodeSeg* S, unsigned First, unsigned Last)
         CE_ResetMark (CS_GetEntry (S, First++));
     }
 }
-
-
 
 int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last)
 /* Check if the given code segment range is a basic block. That is, check if
@@ -1462,8 +1385,6 @@ int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last)
     return 1;
 }
 
-
-
 void CS_OutputPrologue (const CodeSeg* S)
 /* If the given code segment is a code segment for a function, output the
 ** assembler prologue into the file. That is: Output a comment header, switch
@@ -1492,8 +1413,6 @@ void CS_OutputPrologue (const CodeSeg* S)
 
 }
 
-
-
 void CS_OutputEpilogue (const CodeSeg* S)
 /* If the given code segment is a code segment for a function, output the
 ** assembler epilogue into the file. That is: Close the local function scope.
@@ -1503,8 +1422,6 @@ void CS_OutputEpilogue (const CodeSeg* S)
         WriteOutput (".endproc\n\n");
     }
 }
-
-
 
 void CS_Output (CodeSeg* S)
 // Output the code segment data to the output file
@@ -1582,8 +1499,6 @@ void CS_Output (CodeSeg* S)
     CS_FreeRegInfo (S);
 }
 
-
-
 void CS_FreeRegInfo (CodeSeg* S)
 // Free register infos for all instructions
 {
@@ -1592,8 +1507,6 @@ void CS_FreeRegInfo (CodeSeg* S)
         CE_FreeRegInfo (CS_GetEntry(S, I));
     }
 }
-
-
 
 void CS_GenRegInfo (CodeSeg* S)
 // Generate register infos for all instructions

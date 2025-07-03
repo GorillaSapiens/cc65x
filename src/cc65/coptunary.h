@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COPTUNARY_H
 #define COPTUNARY_H
-
-
 
 // cc65
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //                            negax optimizations
 //***************************************************************************
-
-
 
 unsigned OptNegAX1 (CodeSeg* S);
 /* Search for a call to negax and replace it by
@@ -73,13 +65,9 @@ unsigned OptNegAX2 (CodeSeg* S);
 ** if X is known and zero on entry.
 */
 
-
-
 //***************************************************************************
 //                           complax optimizations
 //***************************************************************************
-
-
 
 unsigned OptComplAX1 (CodeSeg* S);
 /* Search for a call to complax and replace it by
@@ -88,8 +76,6 @@ unsigned OptComplAX1 (CodeSeg* S);
 **
 ** if X isn't used later.
 */
-
-
 
 // End of coptunary.h
 

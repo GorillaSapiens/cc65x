@@ -31,19 +31,13 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "alignment.h"
 #include "check.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 /* To factorize an alignment, we will use the following prime table. It lists
 ** all primes up to 256, which means we're able to factorize alignments up to
@@ -60,8 +54,6 @@ static const unsigned char Primes[] = {
 #define PRIME_COUNT     (sizeof (Primes) / sizeof (Primes[0]))
 #define LAST_PRIME      ((unsigned long)Primes[PRIME_COUNT-1])
 
-
-
 // A number together with its prime factors
 typedef struct FactorizedNumber FactorizedNumber;
 struct FactorizedNumber {
@@ -70,13 +62,9 @@ struct FactorizedNumber {
     unsigned char       Powers[PRIME_COUNT];    // Powers of the factors
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void Initialize (FactorizedNumber* F, unsigned long Value)
 // Initialize a FactorizedNumber structure
@@ -89,8 +77,6 @@ static void Initialize (FactorizedNumber* F, unsigned long Value)
         F->Powers[I] = 0;
     }
 }
-
-
 
 static void Factorize (unsigned long Value, FactorizedNumber* F)
 // Factorize a value between 1 and 0x10000 that is in F
@@ -134,8 +120,6 @@ static void Factorize (unsigned long Value, FactorizedNumber* F)
     F->Remainder = Value;
 }
 
-
-
 unsigned long LeastCommonMultiple (unsigned long Left, unsigned long Right)
 /* Calculate the least common multiple of two numbers and return
 ** the result.
@@ -167,15 +151,11 @@ unsigned long LeastCommonMultiple (unsigned long Left, unsigned long Right)
     return Res;
 }
 
-
-
 unsigned long AlignAddr (unsigned long Addr, unsigned long Alignment)
 // Align an address to the given alignment
 {
     return ((Addr + Alignment - 1) / Alignment) * Alignment;
 }
-
-
 
 unsigned long AlignCount (unsigned long Addr, unsigned long Alignment)
 // Calculate how many bytes must be inserted to align Addr to Alignment

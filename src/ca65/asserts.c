@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "coll.h"
 #include "xmalloc.h"
@@ -45,13 +43,9 @@
 #include "objfile.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // An assertion entry
 typedef struct Assertion Assertion;
@@ -65,13 +59,9 @@ struct Assertion {
 // Collection with all assertions for a module
 static Collection Assertions = STATIC_COLLECTION_INITIALIZER;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static Assertion* NewAssertion (ExprNode* Expr, AssertAction Action, unsigned Msg)
 // Create a new Assertion struct and return it
@@ -90,16 +80,12 @@ static Assertion* NewAssertion (ExprNode* Expr, AssertAction Action, unsigned Ms
     return A;
 }
 
-
-
 void AddAssertion (ExprNode* Expr, AssertAction Action, unsigned Msg)
 // Add an assertion to the assertion table
 {
     // Add an assertion object to the table
     CollAppend (&Assertions, NewAssertion (Expr, Action, Msg));
 }
-
-
 
 void CheckAssertions (void)
 // Check all assertions and evaluate the ones we can evaluate here.
@@ -143,8 +129,6 @@ void CheckAssertions (void)
         }
     }
 }
-
-
 
 void WriteAssertions (void)
 // Write the assertion table to the object file

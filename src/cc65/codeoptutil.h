@@ -31,24 +31,16 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CODEOPTUTIL_H
 #define CODEOPTUTIL_H
-
-
 
 // cc65
 #include "codeent.h"
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //                            Load tracking data
 //***************************************************************************
-
-
 
 // LoadRegInfo flags set by DirectOp
 typedef enum {
@@ -134,13 +126,9 @@ struct StackOpData {
     unsigned    IP;             // Insertion point used by some routines
 };
 
-
-
 //***************************************************************************
 //                            Load tracking code
 //***************************************************************************
-
-
 
 void ClearLoadRegInfo (LoadRegInfo* LRI);
 // Clear a LoadRegInfo struct
@@ -200,13 +188,9 @@ void ResetDontRemoveEntryFlags (StackOpData* D);
 void ResetStackOpData (StackOpData* Data);
 // Reset the given data structure
 
-
-
 //***************************************************************************
 //                                  Helpers
 //***************************************************************************
-
-
 
 void InsertEntry (StackOpData* D, CodeEntry* E, int Index);
 /* Insert a new entry. Depending on Index, D->PushIndex and D->OpIndex will
@@ -257,7 +241,6 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult);
 void RemoveRegLoads (StackOpData* D, LoadInfo* LI);
 // Remove register load insns
 
-
 void RemoveRemainders (StackOpData* D);
 // Remove the code that is unnecessary after translation of the sequence
 
@@ -266,13 +249,9 @@ int HarmlessCall (const CodeEntry* E, int PushedBytes);
 ** the pushax/op sequence when encountered.
 */
 
-
-
 //***************************************************************************
 //                                  Helpers
 //***************************************************************************
-
-
 
 // Backup location types
 #define BU_UNKNOWN      0x00000000U   // Unknown
@@ -297,8 +276,6 @@ typedef struct {
         unsigned char*  Bytes;  // Pointer to backed-up value
     };
 } BackupInfo;
-
-
 
 const char* GetZPName (unsigned ZPLoc);
 // Get the name strings of certain known ZP Regs

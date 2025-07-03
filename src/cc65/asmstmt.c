@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -53,21 +51,15 @@
 #include "symtab.h"
 #include "asmstmt.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void AsmRangeError (unsigned Arg)
 // Print a diagnostic about a range error in the argument with the given number
 {
     Error ("Range error in argument %u", Arg);
 }
-
-
 
 static void AsmErrorSkip (void)
 /* Called in case of an error, skips tokens until the closing paren or a
@@ -77,8 +69,6 @@ static void AsmErrorSkip (void)
     static const token_t TokenList[] = { TOK_RPAREN, TOK_SEMI };
     SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
 }
-
-
 
 static SymEntry* AsmGetSym (unsigned Arg, int OnStack)
 /* Find the symbol with the name currently in NextTok. The symbol must be on
@@ -124,8 +114,6 @@ static SymEntry* AsmGetSym (unsigned Arg, int OnStack)
     return Sym;
 }
 
-
-
 static void ParseByteArg (StrBuf* T, unsigned Arg)
 // Parse the %b format specifier
 {
@@ -156,8 +144,6 @@ static void ParseByteArg (StrBuf* T, unsigned Arg)
     // Add the number to the target buffer
     SB_AppendStr (T, Buf);
 }
-
-
 
 static void ParseWordArg (StrBuf* T, unsigned Arg)
 // Parse the %w format specifier
@@ -190,8 +176,6 @@ static void ParseWordArg (StrBuf* T, unsigned Arg)
     SB_AppendStr (T, Buf);
 }
 
-
-
 static void ParseLongArg (StrBuf* T, unsigned Arg attribute ((unused)))
 // Parse the %l format specifier
 {
@@ -209,8 +193,6 @@ static void ParseLongArg (StrBuf* T, unsigned Arg attribute ((unused)))
     // Add the number to the target buffer
     SB_AppendStr (T, Buf);
 }
-
-
 
 static void ParseGVarArg (StrBuf* T, unsigned Arg)
 /* Parse the %v format specifier.
@@ -239,8 +221,6 @@ static void ParseGVarArg (StrBuf* T, unsigned Arg)
         SB_AppendStr (T, LocalDataLabelName (Sym->V.L.Label));
     }
 }
-
-
 
 static void ParseLVarArg (StrBuf* T, unsigned Arg)
 // Parse the %o format specifier
@@ -273,8 +253,6 @@ static void ParseLVarArg (StrBuf* T, unsigned Arg)
     SB_AppendStr (T, Buf);
 }
 
-
-
 static void ParseLabelArg (StrBuf* T, unsigned Arg attribute ((unused)))
 // Parse the %g format specifier
 {
@@ -297,8 +275,6 @@ static void ParseLabelArg (StrBuf* T, unsigned Arg attribute ((unused)))
 
     }
 }
-
-
 
 static void ParseStrArg (StrBuf* T, unsigned Arg attribute ((unused)))
 // Parse the %s format specifier
@@ -331,8 +307,6 @@ static void ParseStrArg (StrBuf* T, unsigned Arg attribute ((unused)))
             break;
     }
 }
-
-
 
 static void ParseAsm (void)
 // Parse the contents of the ASM statement
@@ -409,8 +383,6 @@ Done:
     SB_Done (&S);
     SB_Done (&T);
 }
-
-
 
 void AsmStatement (void)
 /* This function parses ASM statements. The syntax of the ASM directive

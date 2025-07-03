@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #ifndef FUNCTION_H
 #define FUNCTION_H
 
@@ -41,7 +39,6 @@
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
 
 // Enumeration for function flags
 typedef enum {
@@ -73,13 +70,9 @@ struct FuncDesc;
 // Function activation data for current function (or NULL)
 extern Function* CurrentFunc;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int F_CheckParamList (FuncDesc* D, int RequireAll);
 /* Check and set the parameter sizes.
@@ -152,8 +145,6 @@ int F_AllocRegVar (Function* F, const Type* Type);
 
 void NewFunc (struct SymEntry* Func, struct FuncDesc* D);
 // Parse argument declarations and function body.
-
-
 
 // End of function.h
 

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -54,13 +52,9 @@
 #include "objfile.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Library data structure
 typedef struct Library Library;
@@ -81,13 +75,9 @@ static Collection LibraryList = STATIC_COLLECTION_INITIALIZER;
 // Flag for library grouping
 static int Grouping = 0;
 
-
-
 //***************************************************************************
 //                              struct Library
 //***************************************************************************
-
-
 
 static Library* NewLibrary (FILE* F, const char* Name)
 // Create a new Library structure and return it
@@ -105,8 +95,6 @@ static Library* NewLibrary (FILE* F, const char* Name)
     return L;
 }
 
-
-
 static void CloseLibrary (Library* L)
 // Close a library file and remove the list of modules
 {
@@ -116,8 +104,6 @@ static void CloseLibrary (Library* L)
     }
     L->F = 0;
 }
-
-
 
 static void FreeLibrary (Library* L)
 // Free a library structure
@@ -132,13 +118,9 @@ static void FreeLibrary (Library* L)
     xfree (L);
 }
 
-
-
 //***************************************************************************
 //                       Reading file data structures
 //***************************************************************************
-
-
 
 static void LibSeek (Library* L, unsigned long Offs)
 // Do a seek in the library checking for errors
@@ -148,8 +130,6 @@ static void LibSeek (Library* L, unsigned long Offs)
                GetString (L->Name), Offs, strerror (errno));
     }
 }
-
-
 
 static void LibReadHeader (Library* L)
 // Read a library header
@@ -163,8 +143,6 @@ static void LibReadHeader (Library* L)
     L->Header.Flags   = Read16 (L->F);
     L->Header.IndexOffs = Read32 (L->F);
 }
-
-
 
 static void LibReadObjHeader (Library* L, ObjData* O)
 // Read the header of the object file checking the signature
@@ -204,8 +182,6 @@ static void LibReadObjHeader (Library* L, ObjData* O)
     O->Header.SpanSize     = Read32 (L->F);
 }
 
-
-
 static ObjData* ReadIndexEntry (Library* L)
 // Read one entry in the index
 {
@@ -227,8 +203,6 @@ static ObjData* ReadIndexEntry (Library* L)
     // Done
     return O;
 }
-
-
 
 static void ReadBasicData (Library* L, ObjData* O)
 /* Read basic data for an object file that is necessary to resolve external
@@ -255,8 +229,6 @@ static void ReadBasicData (Library* L, ObjData* O)
     ObjReadExports (L->F, O->Start + O->Header.ExportOffs, O);
 }
 
-
-
 static void LibReadIndex (Library* L)
 // Read the index of a library file
 {
@@ -282,13 +254,9 @@ static void LibReadIndex (Library* L)
     }
 }
 
-
-
 //***************************************************************************
 //                             High level stuff
 //***************************************************************************
-
-
 
 static void LibCheckExports (ObjData* O)
 /* Check if the exports from this file can satisfy any import requests. If so,
@@ -309,8 +277,6 @@ static void LibCheckExports (ObjData* O)
     }
 }
 
-
-
 static void LibOpen (FILE* F, const char* Name)
 // Open the library for use
 {
@@ -326,8 +292,6 @@ static void LibOpen (FILE* F, const char* Name)
     // Add the library to the list of open libraries
     CollAppend (&OpenLibs, L);
 }
-
-
 
 static void LibResolve (void)
 // Resolve all externals from the list of all currently open libraries
@@ -449,8 +413,6 @@ static void LibResolve (void)
     CollDeleteAll (&OpenLibs);
 }
 
-
-
 void LibAdd (FILE* F, const char* Name)
 /* Add files from the library to the list if there are references that could
 ** be satisfied.
@@ -468,8 +430,6 @@ void LibAdd (FILE* F, const char* Name)
     }
 }
 
-
-
 void LibStartGroup (void)
 /* Start a library group. Objects within a library group may reference each
 ** other, and libraries are searched repeatedly until all references are
@@ -484,8 +444,6 @@ void LibStartGroup (void)
     // Start a new group
     Grouping = 1;
 }
-
-
 
 void LibEndGroup (void)
 /* End a library group and resolve all open references. Objects within a
@@ -503,8 +461,6 @@ void LibEndGroup (void)
     Grouping = 0;
 }
 
-
-
 void LibCheckGroup (void)
 // Check if there are open library groups
 {
@@ -513,15 +469,11 @@ void LibCheckGroup (void)
     }
 }
 
-
-
 const char* GetLibFileName (const Library* L)
 // Get the name of a library
 {
     return GetString (L->Name);
 }
-
-
 
 unsigned GetLibId (const Library* L)
 // Get the id of a library file.
@@ -529,15 +481,11 @@ unsigned GetLibId (const Library* L)
     return L->Id;
 }
 
-
-
 unsigned LibraryCount (void)
 // Return the total number of libraries
 {
     return CollCount (&LibraryList);
 }
-
-
 
 void PrintDbgLibraries (FILE* F)
 // Output the libraries to a debug info file

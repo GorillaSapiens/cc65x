@@ -31,19 +31,13 @@
 //
 //***************************************************************************
 
-
-
 // da65
 #include "handler.h"
 #include "opc6502dtv.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 /* Descriptions for all opcodes. Base table from opc6502x.c with DTV opcodes,
 ** where illegal opcodes are filtered based on their support on DTV.

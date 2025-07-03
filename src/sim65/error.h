@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ERROR_H
 #define ERROR_H
-
-
 
 // common
 #include "attrib.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 #define SIM65_ERROR         -1
 /* An error result for errors that are not part of the simulated test.
@@ -60,13 +52,9 @@
 extern int PrintCycles;
 // flag to print cycles at program termination
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void Warning (const char* Format, ...) attribute((format(printf,1,2)));
 // Print a warning message
@@ -82,8 +70,6 @@ void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2))
 
 void SimExit (int Code);
 // Exit the simulation with an exit code
-
-
 
 // End of error.h
 

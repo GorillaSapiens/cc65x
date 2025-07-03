@@ -31,19 +31,13 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "addrsize.h"
 #include "strutil.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 const char* AddrSizeToStr (unsigned char AddrSize)
 // Return the name for an address size specifier
@@ -57,8 +51,6 @@ const char* AddrSizeToStr (unsigned char AddrSize)
         default:                        return "unknown";
     }
 }
-
-
 
 unsigned char AddrSizeFromStr (const char* Str)
 /* Return the address size for a given string. Returns ADDR_SIZE_INVALID if

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -44,24 +42,16 @@
 #include "library.h"
 #include "objdata.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Collection with object files
 Collection       ObjPool        = STATIC_COLLECTION_INITIALIZER;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 ObjData* NewObjData (void)
 // Allocate a new structure on the heap, insert it into the list, return it
@@ -87,8 +77,6 @@ ObjData* NewObjData (void)
     return O;
 }
 
-
-
 void FreeObjData (ObjData* O)
 // Free a complete struct
 {
@@ -103,8 +91,6 @@ void FreeObjData (ObjData* O)
     xfree (O);
 }
 
-
-
 void ClearObjData (ObjData* O)
 // Remove any data stored in O
 {
@@ -117,8 +103,6 @@ void ClearObjData (ObjData* O)
     CollDeleteAll (&O->Strings);
     CollDeleteAll (&O->Exports);
 }
-
-
 
 ObjData* FindObjData (const char* Module)
 /* Search for the module with the given name and return it. Return NULL if the
@@ -140,8 +124,6 @@ ObjData* FindObjData (const char* Module)
     }
     return 0;
 }
-
-
 
 void DelObjData (const char* Module)
 // Delete the object module from the list

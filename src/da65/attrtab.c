@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <inttypes.h>
 
 // common
@@ -43,13 +41,9 @@
 #include "error.h"
 #include "attrtab.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Attribute structure how it is found in the attribute table
 typedef struct Attribute Attribute;
@@ -66,13 +60,9 @@ struct Attribute {
 #define ATTR_HASH_SIZE          8192u   // Must be power of two
 static Attribute* AttributeTab[ATTR_HASH_SIZE];
 
-
-
 //***************************************************************************
 //                             struct Attribute
 //***************************************************************************
-
-
 
 static Attribute* NewAttribute (uint32_t Addr, attr_t Attr)
 // Create a new attribute structure and return it
@@ -89,15 +79,11 @@ static Attribute* NewAttribute (uint32_t Addr, attr_t Attr)
     return A;
 }
 
-
-
 static uint32_t GetAttributeHash (uint32_t Addr)
 // Get the hash for an attribute at the given address
 {
     return (Addr & (ATTR_HASH_SIZE - 1));
 }
-
-
 
 static Attribute* FindAttribute (uint32_t Addr)
 /* Search for an attribute for the given address and return it. Returns NULL
@@ -114,8 +100,6 @@ static Attribute* FindAttribute (uint32_t Addr)
     return A;
 }
 
-
-
 static void InsertAttribute (Attribute* A)
 // Insert an attribute into the hash table
 {
@@ -124,13 +108,9 @@ static void InsertAttribute (Attribute* A)
     AttributeTab[Hash] = A;
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void AddrCheck (uint32_t Addr)
 // Check if the given address has a valid range
@@ -139,8 +119,6 @@ void AddrCheck (uint32_t Addr)
         Error ("Address out of range: $%04" PRIX32, Addr);
     }
 }
-
-
 
 attr_t GetAttr (uint32_t Addr)
 // Return the attribute for the given address
@@ -162,8 +140,6 @@ attr_t GetAttr (uint32_t Addr)
     return A? A->Attr : atDefault;
 }
 
-
-
 int SegmentDefined (uint32_t Start, uint32_t End)
 // Return true if the atSegment bit is set somewhere in the given range
 {
@@ -175,23 +151,17 @@ int SegmentDefined (uint32_t Start, uint32_t End)
     return 0;
 }
 
-
-
 int IsSegmentEnd (uint32_t Addr)
 // Return true if a segment ends at the given address
 {
     return (GetAttr (Addr) & atSegmentEnd) != 0x0000;
 }
 
-
-
 int IsSegmentStart (uint32_t Addr)
 // Return true if a segment starts at the given address
 {
     return (GetAttr (Addr) & atSegmentStart) != 0x0000;
 }
-
-
 
 unsigned GetGranularity (attr_t Style)
 // Get the granularity for the given style
@@ -214,8 +184,6 @@ unsigned GetGranularity (attr_t Style)
     }
 }
 
-
-
 void MarkRange (uint32_t Start, uint32_t End, attr_t Attr)
 // Mark a range with the given attribute
 {
@@ -224,8 +192,6 @@ void MarkRange (uint32_t Start, uint32_t End, attr_t Attr)
         MarkAddr (Start++, Attr);
     }
 }
-
-
 
 void MarkAddr (uint32_t Addr, attr_t Attr)
 // Mark an address with an attribute
@@ -251,8 +217,6 @@ void MarkAddr (uint32_t Addr, attr_t Attr)
     }
 }
 
-
-
 attr_t GetStyleAttr (uint32_t Addr)
 // Return the style attribute for the given address
 {
@@ -262,8 +226,6 @@ attr_t GetStyleAttr (uint32_t Addr)
     // Return the attribute
     return (GetAttr (Addr) & atStyleMask);
 }
-
-
 
 attr_t GetLabelAttr (uint32_t Addr)
 // Return the label attribute for the given address

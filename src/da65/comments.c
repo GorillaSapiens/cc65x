@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <inttypes.h>
 #include <string.h>
 
@@ -44,13 +42,9 @@
 #include "comments.h"
 #include "error.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Comment structure how it is found in the comment table
 typedef struct Comment Comment;
@@ -68,13 +62,9 @@ struct Comment {
 #define COMMENT_HASH_SIZE       256u    // Must be power of two
 static Comment* CommentTab[COMMENT_HASH_SIZE];
 
-
-
 //***************************************************************************
 //                              struct Comment
 //***************************************************************************
-
-
 
 static Comment* NewComment (uint32_t Addr, const char* Text)
 // Create a new comment structure and return it
@@ -94,15 +84,11 @@ static Comment* NewComment (uint32_t Addr, const char* Text)
     return C;
 }
 
-
-
 static uint32_t GetCommentHash (uint32_t Addr)
 // Get the hash for a comment at the given address
 {
     return (Addr & (COMMENT_HASH_SIZE - 1));
 }
-
-
 
 static Comment* FindComment (uint32_t Addr)
 /* Search for a comment for the given address and return it. Returns NULL if
@@ -119,8 +105,6 @@ static Comment* FindComment (uint32_t Addr)
     return C;
 }
 
-
-
 static void InsertComment (Comment* C)
 // Insert a comment into the hash table
 {
@@ -129,13 +113,9 @@ static void InsertComment (Comment* C)
     CommentTab[Hash] = C;
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void SetComment (uint32_t Addr, const char* Text)
 // Set a comment for the given address
@@ -151,8 +131,6 @@ void SetComment (uint32_t Addr, const char* Text)
         InsertComment (NewComment (Addr, Text));
     }
 }
-
-
 
 const char* GetComment (uint32_t Addr)
 // Return the comment for an address

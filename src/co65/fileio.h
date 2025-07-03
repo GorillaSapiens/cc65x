@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef FILEIO_H
 #define FILEIO_H
-
-
 
 #include <stdio.h>
 
 // common
 #include "filepos.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned Read8 (FILE* F);
 // Read an 8 bit value from the file
@@ -65,8 +57,6 @@ unsigned long Read32 (FILE* F);
 
 void* ReadData (FILE* F, void* Data, unsigned Size);
 // Read data from the file
-
-
 
 // End of fileio.h
 

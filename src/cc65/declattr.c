@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -46,19 +44,13 @@
 #include "symtab.h"
 #include "typecmp.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Forwards for attribute handlers
 static void NoReturnAttr (Declarator* D);
 static void UnusedAttr (Declarator* D);
-
-
 
 // Attribute table
 typedef struct AttrDesc AttrDesc;
@@ -73,13 +65,9 @@ static const AttrDesc AttrTable [] = {
     { "unused",         UnusedAttr      },
 };
 
-
-
 //***************************************************************************
 //                              Struct DeclAttr
 //***************************************************************************
-
-
 
 static DeclAttr* NewDeclAttr (DeclAttrType AttrType)
 // Create a new DeclAttr struct and return it
@@ -94,13 +82,9 @@ static DeclAttr* NewDeclAttr (DeclAttrType AttrType)
     return A;
 }
 
-
-
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 static const AttrDesc* FindAttribute (const char* Attr)
 /* Search the attribute and return the corresponding attribute descriptor.
@@ -121,8 +105,6 @@ static const AttrDesc* FindAttribute (const char* Attr)
     return 0;
 }
 
-
-
 static void ErrorSkip (void)
 {
     // List of tokens to skip
@@ -139,8 +121,6 @@ static void ErrorSkip (void)
     }
 }
 
-
-
 static void AddAttr (Declarator* D, DeclAttr* A)
 // Add an attribute to a declarator
 {
@@ -151,13 +131,9 @@ static void AddAttr (Declarator* D, DeclAttr* A)
     CollAppend (D->Attributes, A);
 }
 
-
-
 //***************************************************************************
 //                          Attribute handling code
 //***************************************************************************
-
-
 
 static void NoReturnAttr (Declarator* D)
 // Parse the "noreturn" attribute
@@ -166,16 +142,12 @@ static void NoReturnAttr (Declarator* D)
     AddAttr (D, NewDeclAttr (atNoReturn));
 }
 
-
-
 static void UnusedAttr (Declarator* D)
 // Parse the "unused" attribute
 {
     // Add the noreturn attribute
     AddAttr (D, NewDeclAttr (atUnused));
 }
-
-
 
 void ParseAttribute (Declarator* D)
 // Parse an additional __attribute__ modifier

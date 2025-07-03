@@ -31,22 +31,14 @@
 //
 //***************************************************************************
 
-
-
 #ifndef FILEIO_H
 #define FILEIO_H
 
-
-
 #include <stdio.h>
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void Write8 (FILE* F, unsigned char Val);
 // Write an 8 bit value to the file
@@ -83,8 +75,6 @@ char* ReadStr (FILE* F);
 
 void* ReadData (FILE* F, void* Data, unsigned Size);
 // Read data from the file
-
-
 
 // End of fileio.h
 

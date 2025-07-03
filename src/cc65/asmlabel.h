@@ -31,28 +31,18 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ASMLABEL_H
 #define ASMLABEL_H
-
-
 
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 struct SegContext;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void UseLabelPoolFromSegments (struct SegContext* Seg);
 // Use the info in segments for generating new label numbers
@@ -84,8 +74,6 @@ const char* PooledLiteralLabelName (unsigned L);
 /* Make a litral label name from the given label number. The label name will be
 ** created in static storage and overwritten when calling the function again.
 */
-
-
 
 // End of asmlabel.h
 

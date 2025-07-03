@@ -31,20 +31,14 @@
 //
 //***************************************************************************
 
-
-
 // cc65
 #include "codeent.h"
 #include "codeinfo.h"
 #include "coptbool.h"
 
-
-
 //***************************************************************************
 //                            negax optimizations
 //***************************************************************************
-
-
 
 unsigned OptNegAX1 (CodeSeg* S)
 /* Search for a call to negax and replace it by
@@ -99,8 +93,6 @@ unsigned OptNegAX1 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptNegAX2 (CodeSeg* S)
 /* Search for a call to negax and replace it by
@@ -184,13 +176,9 @@ unsigned OptNegAX2 (CodeSeg* S)
     return Changes;
 }
 
-
-
 //***************************************************************************
 //                           complax optimizations
 //***************************************************************************
-
-
 
 unsigned OptComplAX1 (CodeSeg* S)
 /* Search for a call to complax and replace it by

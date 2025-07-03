@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "addrsize.h"
 #include "strbuf.h"
@@ -46,13 +44,9 @@
 #include "scanner.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static ExprNode* Factor (void)
 // Read and return a factor
@@ -60,7 +54,6 @@ static ExprNode* Factor (void)
     ExprNode* N = 0;            // Initialize to avoid compiler warnings
     Export*   E;
     unsigned  Name;
-
 
     switch (CfgTok) {
 
@@ -117,8 +110,6 @@ static ExprNode* Factor (void)
     return N;
 }
 
-
-
 static ExprNode* Term (void)
 // Multiplicative operators: * and /
 {
@@ -154,8 +145,6 @@ static ExprNode* Term (void)
     // Return the expression tree we've created
     return Root;
 }
-
-
 
 static ExprNode* SimpleExpr (void)
 // Additive operators: + and -
@@ -193,15 +182,11 @@ static ExprNode* SimpleExpr (void)
     return Root;
 }
 
-
-
 ExprNode* CfgExpr (void)
 // Full expression
 {
     return SimpleExpr ();
 }
-
-
 
 long CfgConstExpr (void)
 // Read an integer expression, make sure its constant and return its value
@@ -225,8 +210,6 @@ long CfgConstExpr (void)
     // Return the value
     return Val;
 }
-
-
 
 long CfgCheckedConstExpr (long Min, long Max)
 /* Read an expression, make sure it's an int and in range, then return its

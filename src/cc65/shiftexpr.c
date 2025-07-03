@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // cc65
 #include "asmcode.h"
 #include "codegen.h"
@@ -44,19 +42,13 @@
 #include "scanner.h"
 #include "shiftexpr.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void ShiftExpr (struct ExprDesc* Expr)
 // Parse the << and >> operators.
@@ -70,7 +62,6 @@ void ShiftExpr (struct ExprDesc* Expr)
     unsigned ltype;
     int lconst;                         // Operand is a constant
     int rconst;                         // Operand is a constant
-
 
     // Evaluate the lhs
     ExprWithCheck (hie8, Expr);

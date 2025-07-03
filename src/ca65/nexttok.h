@@ -31,22 +31,14 @@
 //
 //***************************************************************************
 
-
-
 #ifndef NEXTTOK_H
 #define NEXTTOK_H
 
-
-
 #include "scanner.h"
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void NextTok (void);
 // Get next token and handle token level functions
@@ -84,8 +76,6 @@ void EnterRawTokenMode (void);
 
 void LeaveRawTokenMode (void);
 // Leave raw token mode.
-
-
 
 // End of nexttok.h
 

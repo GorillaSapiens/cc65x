@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -46,13 +44,9 @@
 #include "lineinfo.h"
 #include "nexttok.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Warning level
 unsigned WarnLevel      = 1;
@@ -64,13 +58,9 @@ unsigned WarningCount   = 0;
 // Maximum number of additional notifications
 #define MAX_NOTES       8
 
-
-
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 static void VPrintMsg (const FilePos* Pos, const char* Desc,
                        const char* Format, va_list ap)
@@ -106,8 +96,6 @@ static void VPrintMsg (const FilePos* Pos, const char* Desc,
     SB_Done (&S);
 }
 
-
-
 static void PrintMsg (const FilePos* Pos, const char* Desc,
                       const char* Format, ...)
 // Format and output an error/warning message.
@@ -117,8 +105,6 @@ static void PrintMsg (const FilePos* Pos, const char* Desc,
     VPrintMsg (Pos, Desc, Format, ap);
     va_end (ap);
 }
-
-
 
 static void AddNotifications (const Collection* LineInfos)
 // Output additional notifications for an error or warning
@@ -181,13 +167,9 @@ static void AddNotifications (const Collection* LineInfos)
     }
 }
 
-
-
 //***************************************************************************
 //                                 Warnings
 //***************************************************************************
-
-
 
 static void WarningMsg (const Collection* LineInfos, const char* Format, va_list ap)
 // Print warning message.
@@ -204,8 +186,6 @@ static void WarningMsg (const Collection* LineInfos, const char* Format, va_list
     // Count warnings
     ++WarningCount;
 }
-
-
 
 void Warning (unsigned Level, const char* Format, ...)
 // Print warning message.
@@ -229,8 +209,6 @@ void Warning (unsigned Level, const char* Format, ...)
     }
 }
 
-
-
 void PWarning (const FilePos* Pos, unsigned Level, const char* Format, ...)
 // Print warning message giving an explicit file and position.
 {
@@ -245,8 +223,6 @@ void PWarning (const FilePos* Pos, unsigned Level, const char* Format, ...)
     }
 }
 
-
-
 void LIWarning (const Collection* LineInfos, unsigned Level, const char* Format, ...)
 // Print warning message using the given line infos
 {
@@ -259,13 +235,9 @@ void LIWarning (const Collection* LineInfos, unsigned Level, const char* Format,
     }
 }
 
-
-
 //***************************************************************************
 //                                  Errors
 //***************************************************************************
-
-
 
 void ErrorMsg (const Collection* LineInfos, const char* Format, va_list ap)
 // Print an error message
@@ -282,8 +254,6 @@ void ErrorMsg (const Collection* LineInfos, const char* Format, va_list ap)
     // Count errors
     ++ErrorCount;
 }
-
-
 
 void Error (const char* Format, ...)
 // Print an error message
@@ -304,8 +274,6 @@ void Error (const char* Format, ...)
     DoneCollection (&LineInfos);
 }
 
-
-
 void PError (const FilePos* Pos, const char* Format, ...)
 // Print an error message giving an explicit file and position.
 {
@@ -318,8 +286,6 @@ void PError (const FilePos* Pos, const char* Format, ...)
     ++ErrorCount;
 }
 
-
-
 void LIError (const Collection* LineInfos, const char* Format, ...)
 // Print an error message using the given line infos.
 {
@@ -329,8 +295,6 @@ void LIError (const Collection* LineInfos, const char* Format, ...)
     ErrorMsg (LineInfos, Format, ap);
     va_end (ap);
 }
-
-
 
 void ErrorSkip (const char* Format, ...)
 // Print an error message and skip the rest of the line
@@ -354,13 +318,9 @@ void ErrorSkip (const char* Format, ...)
     SkipUntilSep ();
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void Fatal (const char* Format, ...)
 // Print a message about a fatal error and die
@@ -380,8 +340,6 @@ void Fatal (const char* Format, ...)
     // And die...
     exit (EXIT_FAILURE);
 }
-
-
 
 void Internal (const char* Format, ...)
 // Print a message about an internal assembler error and die.

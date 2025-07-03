@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "check.h"
 #include "xmalloc.h"
@@ -43,13 +41,9 @@
 #include "error.h"
 #include "output.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 DataSeg* NewDataSeg (const char* Name, SymEntry* Func)
 // Create a new data segment, initialize and return it
@@ -66,8 +60,6 @@ DataSeg* NewDataSeg (const char* Name, SymEntry* Func)
     return S;
 }
 
-
-
 void DS_Append (DataSeg* Target, const DataSeg* Source)
 // Append the data from Source to Target
 {
@@ -80,8 +72,6 @@ void DS_Append (DataSeg* Target, const DataSeg* Source)
     }
 }
 
-
-
 void DS_AddVLine (DataSeg* S, const char* Format, va_list ap)
 // Add a line to the given data segment
 {
@@ -93,8 +83,6 @@ void DS_AddVLine (DataSeg* S, const char* Format, va_list ap)
     CollAppend (&S->Lines, xstrdup (Buf));
 }
 
-
-
 void DS_AddLine (DataSeg* S, const char* Format, ...)
 // Add a line to the given data segment
 {
@@ -103,8 +91,6 @@ void DS_AddLine (DataSeg* S, const char* Format, ...)
     DS_AddVLine (S, Format, ap);
     va_end (ap);
 }
-
-
 
 void DS_Output (const DataSeg* S)
 // Output the data segment data to the output file

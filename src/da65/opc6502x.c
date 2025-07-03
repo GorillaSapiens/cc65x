@@ -31,19 +31,13 @@
 //
 //***************************************************************************
 
-
-
 // da65
 #include "handler.h"
 #include "opc6502x.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 /* Descriptions for all opcodes. Base table from opc6502.c with illegal
 ** opcodes from http://www.oxyron.de/html/opcodes02.html

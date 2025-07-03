@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -63,8 +61,6 @@
 #include "typeconv.h"
 #include "wrappedcall.h"
 #include "symtab.h"
-
-
 
 //***************************************************************************
 //                                   Data
@@ -105,8 +101,6 @@ static FILE* DebugTableFile = 0;
 //                              struct SymTable
 //***************************************************************************
 
-
-
 static SymTable* NewSymTable (unsigned Size)
 // Create and return a symbol table for the given lexical level
 {
@@ -129,8 +123,6 @@ static SymTable* NewSymTable (unsigned Size)
     return S;
 }
 
-
-
 static void FreeSymTable (SymTable* S)
 // Free the given symbo table including all symbols
 {
@@ -146,12 +138,9 @@ static void FreeSymTable (SymTable* S)
     xfree (S);
 }
 
-
 //***************************************************************************
 //                         Check symbols in a table
 //***************************************************************************
-
-
 
 static void CheckSymTable (SymTable* Tab)
 // Check a symbol table for open references, unused symbols ...
@@ -208,21 +197,15 @@ static void CheckSymTable (SymTable* Tab)
     }
 }
 
-
-
 //***************************************************************************
 //                        Handling of lexical levels
 //***************************************************************************
-
-
 
 unsigned GetLexicalLevelDepth (void)
 // Return the current lexical level depth
 {
     return LexLevelDepth;
 }
-
-
 
 unsigned GetLexicalLevel (void)
 // Return the current lexical level
@@ -233,8 +216,6 @@ unsigned GetLexicalLevel (void)
     return LEX_LEVEL_NONE;
 }
 
-
-
 void PushLexicalLevel (unsigned NewLevel)
 // Enter the specified lexical level
 {
@@ -244,8 +225,6 @@ void PushLexicalLevel (unsigned NewLevel)
     CurrentLex->CurrentLevel = NewLevel;
     ++LexLevelDepth;
 }
-
-
 
 void PopLexicalLevel (void)
 // Exit the current lexical level
@@ -351,8 +330,6 @@ void LeaveGlobalLevel (void)
     PopLexicalLevel ();
 }
 
-
-
 void EnterFunctionLevel (void)
 // Enter function lexical level
 {
@@ -377,8 +354,6 @@ void EnterFunctionLevel (void)
     LabelTab = S;
 }
 
-
-
 void RememberFunctionLevel (struct FuncDesc* F)
 // Remember the symbol tables for the level and leave the level without checks
 {
@@ -398,8 +373,6 @@ void RememberFunctionLevel (struct FuncDesc* F)
     LabelTab = LabelTab->PrevTab;
 }
 
-
-
 void ReenterFunctionLevel (struct FuncDesc* F)
 // Reenter the function lexical level using the existing tables from F
 {
@@ -416,8 +389,6 @@ void ReenterFunctionLevel (struct FuncDesc* F)
     // Create and assign a new label table
     LabelTab = NewSymTable (SYMTAB_SIZE_LABEL);
 }
-
-
 
 void LeaveFunctionLevel (void)
 // Leave function lexical level
@@ -455,8 +426,6 @@ void LeaveFunctionLevel (void)
     LabelTab  = 0;
 }
 
-
-
 void EnterBlockLevel (void)
 // Enter a nested block in a function
 {
@@ -476,8 +445,6 @@ void EnterBlockLevel (void)
     TagTab     = S;
 }
 
-
-
 void LeaveBlockLevel (void)
 // Leave a nested block in a function
 {
@@ -494,8 +461,6 @@ void LeaveBlockLevel (void)
     SymTab = SymTab->PrevTab;
     TagTab = TagTab->PrevTab;
 }
-
-
 
 void EnterStructLevel (void)
 // Enter a nested block for a struct definition
@@ -514,8 +479,6 @@ void EnterStructLevel (void)
     FieldTab    = S;
 }
 
-
-
 void LeaveStructLevel (void)
 // Leave a nested block for a struct definition
 {
@@ -529,13 +492,9 @@ void LeaveStructLevel (void)
     FieldTab = FieldTab->PrevTab;
 }
 
-
-
 //***************************************************************************
 //                              Find functions
 //***************************************************************************
-
-
 
 static SymEntry* FindSymInTable (const SymTable* T, const char* Name, unsigned Hash)
 // Search for an entry in one table
@@ -555,8 +514,6 @@ static SymEntry* FindSymInTable (const SymTable* T, const char* Name, unsigned H
     // Not found
     return 0;
 }
-
-
 
 static SymEntry* FindVisibleSymInTree (const SymTable* Tab, const char* Name)
 /* Find the visible symbol with the given name in the table tree that starts
@@ -589,15 +546,11 @@ static SymEntry* FindVisibleSymInTree (const SymTable* Tab, const char* Name)
     return 0;
 }
 
-
-
 SymEntry* FindSym (const char* Name)
 // Find with the given name the symbol visible in the current scope
 {
     return FindVisibleSymInTree (SymTab, Name);
 }
-
-
 
 SymEntry* FindGlobalSym (const char* Name)
 // Find the symbol with the given name in the global symbol table only
@@ -605,23 +558,17 @@ SymEntry* FindGlobalSym (const char* Name)
     return FindSymInTable (SymTab0, Name, HashStr (Name));
 }
 
-
-
 SymEntry* FindLocalSym (const char* Name)
 // Find the symbol with the given name in the current symbol table only
 {
     return FindSymInTable (SymTab, Name, HashStr (Name));
 }
 
-
-
 SymEntry* FindTagSym (const char* Name)
 // Find with the given name the tag symbol visible in the current scope
 {
     return FindVisibleSymInTree (TagTab, Name);
 }
-
-
 
 SymEntry FindStructField (const Type* T, const char* Name)
 /* Find a struct/union field in the fields list.
@@ -672,13 +619,9 @@ SymEntry FindStructField (const Type* T, const char* Name)
     return Res;
 }
 
-
-
 //***************************************************************************
 //                       Add stuff to the symbol table
 //***************************************************************************
-
-
 
 static int IsDistinctRedef (const Type* lhst, const Type* rhst, typecmpcode_t Code, typecmpflag_t Flags)
 /* Return if type compatibility result is "worse" than Code or if any bit of
@@ -691,7 +634,6 @@ static int IsDistinctRedef (const Type* lhst, const Type* rhst, typecmpcode_t Co
     }
     return 0;
 }
-
 
 static int HandleSymRedefinition (SymEntry* Sym, const Type* T, unsigned Flags)
 /* Check and handle redefinition of existing symbols.
@@ -805,8 +747,6 @@ static int HandleSymRedefinition (SymEntry* Sym, const Type* T, unsigned Flags)
     return Sym == 0;
 }
 
-
-
 static void AddSymEntry (SymTable* T, SymEntry* S)
 // Add a symbol to a symbol table
 {
@@ -832,8 +772,6 @@ static void AddSymEntry (SymTable* T, SymEntry* S)
     // Tell the symbol in which table it is
     S->Owner = T;
 }
-
-
 
 SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTable* Tab, unsigned* DSFlags)
 // Add an enum tag entry and return it
@@ -909,8 +847,6 @@ SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTab
     // Return the entry
     return TagEntry;
 }
-
-
 
 SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTable* Tab, unsigned* DSFlags)
 // Add a struct/union tag entry and return it
@@ -1000,8 +936,6 @@ SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTabl
     return TagEntry;
 }
 
-
-
 SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
                        unsigned BitOffs, unsigned BitWidth, int SignednessSpecified)
 // Add a bit field to the local symbol table and return the symbol entry
@@ -1046,8 +980,6 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
     return Entry;
 }
 
-
-
 SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val)
 // Add an constant symbol to the symbol table and return it
 {
@@ -1079,8 +1011,6 @@ SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val
     return Entry;
 }
 
-
-
 DefOrRef* AddDefOrRef (SymEntry* E, unsigned Flags)
 // Add definition or reference to the SymEntry and preserve its attributes
 {
@@ -1098,8 +1028,6 @@ DefOrRef* AddDefOrRef (SymEntry* E, unsigned Flags)
     return DOR;
 }
 
-
-
 unsigned short FindSPAdjustment (const char* Name)
 // Search for an entry in the table of SP adjustments
 {
@@ -1111,8 +1039,6 @@ unsigned short FindSPAdjustment (const char* Name)
 
     return Entry->V.SPAdjustment;
 }
-
-
 
 SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 // Add a C goto label to the label table
@@ -1160,7 +1086,6 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
                     GetCurrentLineNum (), Name);
                 }
             }
-
 
             if ((DOR->Flags & SC_REF) && (DOR->Flags & (SC_GOTO | SC_GOTO_IND)) && (Flags & SC_DEF)) {
                 /* We're processing a label, let's update all gotos encountered
@@ -1224,8 +1149,6 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
     // Return the entry
     return Entry;
 }
-
-
 
 SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs)
 // Add a local or struct/union field symbol and return the symbol entry
@@ -1325,8 +1248,6 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
     // Return the entry
     return Entry;
 }
-
-
 
 SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
 // Add an external or global symbol to the symbol table and return the entry
@@ -1486,13 +1407,9 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
     return Entry;
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 SymTable* GetSymTab (void)
 // Return the current symbol table
@@ -1500,15 +1417,11 @@ SymTable* GetSymTab (void)
     return SymTab;
 }
 
-
-
 SymTable* GetGlobalSymTab (void)
 // Return the global symbol table
 {
     return SymTab0;
 }
-
-
 
 SymTable* GetFieldSymTab (void)
 // Return the current field symbol table
@@ -1516,15 +1429,11 @@ SymTable* GetFieldSymTab (void)
     return FieldTab;
 }
 
-
-
 SymTable* GetLabelSymTab (void)
 // Return the global symbol table
 {
     return LabelTab;
 }
-
-
 
 int SymIsLocal (const SymEntry* Sym)
 // Return true if the symbol is declared in the highest lexical level
@@ -1532,15 +1441,11 @@ int SymIsLocal (const SymEntry* Sym)
     return (Sym->Owner == SymTab || Sym->Owner == TagTab);
 }
 
-
-
 int SymIsGlobal (const SymEntry* Sym)
 // Return true if the symbol is declared in the file scope level
 {
     return (Sym->Owner == SymTab0 || Sym->Owner == TagTab0);
 }
-
-
 
 void MakeZPSym (const char* Name)
 // Mark the given symbol as zero page symbol
@@ -1555,8 +1460,6 @@ void MakeZPSym (const char* Name)
         Error ("Undeclared symbol: '%s'", Name);
     }
 }
-
-
 
 void PrintSymTable (const SymTable* Tab, FILE* F, const char* Header, ...)
 // Write the symbol table to the given file
@@ -1591,8 +1494,6 @@ void PrintSymTable (const SymTable* Tab, FILE* F, const char* Header, ...)
     fprintf (F, "\n\n\n");
 }
 
-
-
 void EmitExternals (void)
 // Write import/export statements for external symbols
 {
@@ -1616,8 +1517,6 @@ void EmitExternals (void)
         Entry = Entry->NextSym;
     }
 }
-
-
 
 void EmitDebugInfo (void)
 // Emit debug infos for the locals of the current scope

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include "asmlabel.h"
 #include "codeent.h"
 #include "codegen.h"
@@ -48,13 +46,9 @@
 #include "symtab.h"
 #include "goto.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void GotoStatement (void)
 // Process a goto statement.
@@ -166,8 +160,6 @@ void GotoStatement (void)
         Error ("Label name expected");
     }
 }
-
-
 
 void DoLabel (void)
 // Define a label.

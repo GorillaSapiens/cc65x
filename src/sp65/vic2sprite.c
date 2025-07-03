@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "attrib.h"
 #include "print.h"
@@ -42,13 +40,9 @@
 #include "error.h"
 #include "vic2sprite.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Sprite mode
 enum Mode {
@@ -62,13 +56,9 @@ enum Mode {
 #define WIDTH_MC        12U
 #define HEIGHT          21U
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static enum Mode GetMode (const Collection* A)
 // Return the sprite mode from the attribute collection A
@@ -88,8 +78,6 @@ static enum Mode GetMode (const Collection* A)
     return smAuto;
 }
 
-
-
 StrBuf* GenVic2Sprite (const Bitmap* B, const Collection* A)
 /* Generate binary output in VICII sprite format for the bitmap B. The output
 ** is stored in a string buffer (which is actually a dynamic char array) and
@@ -99,7 +87,6 @@ StrBuf* GenVic2Sprite (const Bitmap* B, const Collection* A)
     enum Mode M;
     StrBuf* D;
     unsigned X, Y;
-
 
     // Output the image properties
     Print (stdout, 1, "Image is %ux%u with %u colors%s\n",

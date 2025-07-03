@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -44,13 +42,9 @@
 #include "scanner.h"
 #include "symbol.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
 /* Parse a (possibly scoped) identifer. The scope of the name must exist and
@@ -149,8 +143,6 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
     }
 }
 
-
-
 SymEntry* ParseScopedSymName (SymFindAction Action)
 /* Parse a (possibly scoped) symbol name, search for it in the symbol table
 ** and return the symbol table entry.
@@ -201,8 +193,6 @@ SymEntry* ParseScopedSymName (SymFindAction Action)
     return Sym;
 }
 
-
-
 SymTable* ParseScopedSymTable (void)
 /* Parse a (possibly scoped) symbol table (scope) name, search for it in the
 ** symbol space and return the symbol table struct.
@@ -211,7 +201,6 @@ SymTable* ParseScopedSymTable (void)
     StrBuf    ScopeName = STATIC_STRBUF_INITIALIZER;
     StrBuf    Name = STATIC_STRBUF_INITIALIZER;
     int       NoScope;
-
 
     // Parse the scoped symbol name
     SymTable* Scope = ParseScopedIdent (&Name, &ScopeName);
@@ -241,8 +230,6 @@ SymTable* ParseScopedSymTable (void)
     // Return the scope found
     return Scope;
 }
-
-
 
 SymEntry* ParseAnySymName (SymFindAction Action)
 /* Parse a cheap local symbol or a a (possibly scoped) symbol name, search

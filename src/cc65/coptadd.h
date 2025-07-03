@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COPTADD_H
 #define COPTADD_H
-
-
 
 // cc65
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //                            Optimize additions
 //***************************************************************************
-
-
 
 unsigned OptAdd1 (CodeSeg* S);
 /* Search for the sequence
@@ -147,8 +139,6 @@ unsigned OptAdd6 (CodeSeg* S);
 **
 ** and remove the handling of the high byte if X is not used later.
 */
-
-
 
 // End of coptadd.h
 

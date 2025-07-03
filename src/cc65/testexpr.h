@@ -31,30 +31,20 @@
 //
 //***************************************************************************
 
-
-
 #ifndef TESTEXPR_H
 #define TESTEXPR_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 #define TESTEXPR_UNKNOWN        -1      // Result of expression unknown
 #define TESTEXPR_TRUE           1       // Expression yields true
 #define TESTEXPR_FALSE          0       // Expression yields false
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned Test (unsigned Label, int Invert);
 /* Evaluate a boolean test expression and jump depending on the result of
@@ -68,8 +58,6 @@ unsigned TestInParens (unsigned Label, int Invert);
 ** TESTEXPR_xx codes defined above. If the jump is always true, a warning is
 ** output.
 */
-
-
 
 // End of testexpr.h
 

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -51,13 +49,9 @@
 #include "symentry.h"
 #include "symtab.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // List of all symbol table entries
 SymEntry* SymList = 0;
@@ -65,13 +59,9 @@ SymEntry* SymList = 0;
 // Pointer to last defined symbol
 SymEntry* SymLast = 0;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags)
 // Allocate a symbol table entry, initialize and return it
@@ -111,8 +101,6 @@ SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags)
     return S;
 }
 
-
-
 int SymSearchTree (SymEntry* T, const StrBuf* Name, SymEntry** E)
 /* Search in the given tree for a name. If we find the symbol, the function
 ** will return 0 and put the entry pointer into E. If we did not find the
@@ -148,8 +136,6 @@ int SymSearchTree (SymEntry* T, const StrBuf* Name, SymEntry** E)
     }
 }
 
-
-
 void SymTransferExprRefs (SymEntry* From, SymEntry* To)
 // Transfer all expression references from one symbol to another.
 {
@@ -173,8 +159,6 @@ void SymTransferExprRefs (SymEntry* From, SymEntry* To)
     // Remove all symbol references from the old symbol
     CollDeleteAll (&From->ExprRefs);
 }
-
-
 
 static void SymReplaceExprRefs (SymEntry* S)
 // Replace the references to this symbol by a copy of the symbol expression
@@ -205,8 +189,6 @@ static void SymReplaceExprRefs (SymEntry* S)
     // Remove all symbol references from the symbol
     CollDeleteAll (&S->ExprRefs);
 }
-
-
 
 void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags)
 // Define a new symbol
@@ -302,8 +284,6 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
     }
 }
 
-
-
 void SymRef (SymEntry* S)
 // Mark the given symbol as referenced
 {
@@ -313,8 +293,6 @@ void SymRef (SymEntry* S)
     // Remember the current location
     CollAppend (&S->RefLines, GetAsmLineInfo ());
 }
-
-
 
 void SymImport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
 // Mark the given symbol as an imported symbol
@@ -365,8 +343,6 @@ void SymImport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     */
     GetFullLineInfo (&S->DefLines);
 }
-
-
 
 void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
 // Mark the given symbol as an exported symbol
@@ -429,8 +405,6 @@ void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     // Remember line info for this reference
     CollAppend (&S->RefLines, GetAsmLineInfo ());
 }
-
-
 
 void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
 /* Mark the given symbol as a global symbol, that is, as a symbol that is
@@ -524,8 +498,6 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     }
 }
 
-
-
 void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Prio)
 /* Mark the given symbol as a module constructor/destructor. This will also
 ** mark the symbol as an export. Initializers may never be zero page symbols.
@@ -592,8 +564,6 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
     CollAppend (&S->RefLines, GetAsmLineInfo ());
 }
 
-
-
 void SymGuessedAddrSize (SymEntry* Sym, unsigned char AddrSize)
 /* Mark the address size of the given symbol as guessed. The address size
 ** passed as argument is the one NOT used, because the actual address size
@@ -618,8 +588,6 @@ void SymGuessedAddrSize (SymEntry* Sym, unsigned char AddrSize)
     Sym->GuessedUse[AddrSize-1] = xdup (&CurTok.Pos, sizeof (CurTok.Pos));
 }
 
-
-
 void SymExportFromGlobal (SymEntry* S)
 /* Called at the end of assembly. Converts a global symbol that is defined
 ** into an export.
@@ -629,8 +597,6 @@ void SymExportFromGlobal (SymEntry* S)
     S->Flags &= ~SF_GLOBAL;
     S->Flags |= SF_EXPORT;
 }
-
-
 
 void SymImportFromGlobal (SymEntry* S)
 /* Called at the end of assembly. Converts a global symbol that is undefined
@@ -642,8 +608,6 @@ void SymImportFromGlobal (SymEntry* S)
     S->Flags |= SF_IMPORT;
 }
 
-
-
 int SymIsConst (const SymEntry* S, long* Val)
 /* Return true if the given symbol has a constant value. If Val is not NULL
 ** and the symbol has a constant value, store it's value there.
@@ -652,8 +616,6 @@ int SymIsConst (const SymEntry* S, long* Val)
     // Check for constness
     return (SymHasExpr (S) && IsConstExpr (S->Expr, Val));
 }
-
-
 
 SymTable* GetSymParentScope (SymEntry* S)
 /* Get the parent scope of the symbol (not the one it is defined in). Return
@@ -674,16 +636,12 @@ SymTable* GetSymParentScope (SymEntry* S)
     }
 }
 
-
-
 struct ExprNode* GetSymExpr (SymEntry* S)
 // Get the expression for a non-const symbol
 {
     PRECONDITION (S != 0 && SymHasExpr (S));
     return S->Expr;
 }
-
-
 
 const struct ExprNode* SymResolve (const SymEntry* S)
 /* Helper function for DumpExpr. Resolves a symbol into an expression or return
@@ -692,8 +650,6 @@ const struct ExprNode* SymResolve (const SymEntry* S)
 {
     return SymHasExpr (S)? S->Expr : 0;
 }
-
-
 
 long GetSymVal (SymEntry* S)
 /* Return the value of a symbol assuming it's constant. FAIL will be called
@@ -705,8 +661,6 @@ long GetSymVal (SymEntry* S)
     return Val;
 }
 
-
-
 unsigned GetSymImportId (const SymEntry* S)
 // Return the import id for the given symbol
 {
@@ -714,16 +668,12 @@ unsigned GetSymImportId (const SymEntry* S)
     return S->ImportId;
 }
 
-
-
 unsigned GetSymExportId (const SymEntry* S)
 // Return the export id for the given symbol
 {
     PRECONDITION (S != 0 && (S->Flags & SF_EXPORT) && S->ExportId != ~0U);
     return S->ExportId;
 }
-
-
 
 unsigned GetSymInfoFlags (const SymEntry* S, long* ConstVal)
 /* Return a set of flags used when writing symbol information into a file.

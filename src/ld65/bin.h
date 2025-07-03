@@ -31,33 +31,21 @@
 //
 //***************************************************************************
 
-
-
 #ifndef BIN_H
 #define BIN_H
 
-
-
 #include "config.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Structure describing the format
 typedef struct BinDesc BinDesc;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 BinDesc* NewBinDesc (void);
 // Create a new binary format descriptor
@@ -67,8 +55,6 @@ void FreeBinDesc (BinDesc* D);
 
 void BinWriteTarget (BinDesc* D, File* F);
 // Write a binary output file
-
-
 
 // End of bin.h
 

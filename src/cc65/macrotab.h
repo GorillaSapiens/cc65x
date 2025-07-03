@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef MACROTAB_H
 #define MACROTAB_H
-
-
 
 // common
 #include "coll.h"
 #include "inline.h"
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   data
 //***************************************************************************
-
-
 
 // Structure describing a macro
 typedef struct Macro Macro;
@@ -63,13 +55,9 @@ struct Macro {
     char          Name[1];      // Name, dynamically allocated
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Macro* NewMacro (const char* Name, unsigned char Predefined);
 /* Allocate a macro structure with the given name. The structure is not
@@ -138,8 +126,6 @@ void OutputPredefMacros (void);
 
 void OutputUserMacros (void);
 // Output all user defined macros to the output file
-
-
 
 // End of macrotab.h
 

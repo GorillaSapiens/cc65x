@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -59,13 +57,9 @@
 #include "segments.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Hash table
 #define HASHTAB_MASK    0x3FU
@@ -75,13 +69,9 @@ static Segment*         HashTab[HASHTAB_SIZE];
 // List of all segments
 static Collection       SegmentList = STATIC_COLLECTION_INITIALIZER;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
 // Create a new segment and initialize it
@@ -120,8 +110,6 @@ static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
     return S;
 }
 
-
-
 Segment* GetSegment (unsigned Name, unsigned char AddrSize, const char* ObjName)
 /* Search for a segment and return an existing one. If the segment does not
 ** exist, create a new one and return that. ObjName is only used for the error
@@ -153,8 +141,6 @@ Segment* GetSegment (unsigned Name, unsigned char AddrSize, const char* ObjName)
     return S;
 }
 
-
-
 Section* NewSection (Segment* Seg, unsigned long Alignment, unsigned char AddrSize)
 // Create a new section for the given segment
 {
@@ -185,8 +171,6 @@ Section* NewSection (Segment* Seg, unsigned long Alignment, unsigned char AddrSi
     return S;
 }
 
-
-
 Section* ReadSection (FILE* F, ObjData* O)
 // Read a section from a file
 {
@@ -206,7 +190,6 @@ Section* ReadSection (FILE* F, ObjData* O)
     Alignment = ReadVar (F);    // Alignment
     Type      = Read8 (F);      // Segment type
     FragCount = ReadVar (F);    // Number of fragments
-
 
     // Print some data
     Print (stdout, 2,
@@ -287,8 +270,6 @@ Section* ReadSection (FILE* F, ObjData* O)
     return Sec;
 }
 
-
-
 Segment* SegFind (unsigned Name)
 // Return the given segment or NULL if not found.
 {
@@ -303,8 +284,6 @@ Segment* SegFind (unsigned Name)
     // Not found
     return S;
 }
-
-
 
 int IsBSSType (Segment* S)
 /* Check if the given segment is a BSS style segment, that is, it does not
@@ -339,8 +318,6 @@ int IsBSSType (Segment* S)
     }
     return 1;
 }
-
-
 
 void SegDump (void)
 // Dump the segments and it's contents
@@ -401,8 +378,6 @@ void SegDump (void)
     }
 }
 
-
-
 unsigned SegWriteConstExpr (FILE* F, ExprNode* E, int Signed, unsigned Size)
 /* Write a supposedly constant expression to the target file. Do a range
 ** check and return one of the SEG_EXPR_xxx codes.
@@ -417,7 +392,6 @@ unsigned SegWriteConstExpr (FILE* F, ExprNode* E, int Signed, unsigned Size)
     static const long S_Lo[4] = {
         ~0x0000007FL, ~0x00007FFFL, ~0x007FFFFFL, ~0x7FFFFFFFL
     };
-
 
     // Get the expression value
     long Val = GetExprVal (E);
@@ -445,8 +419,6 @@ unsigned SegWriteConstExpr (FILE* F, ExprNode* E, int Signed, unsigned Size)
     return SEG_EXPR_OK;
 }
 
-
-
 void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void* Data)
 /* Write the data from the given segment to a file. For expressions, F is
 ** called (see description of SegWriteFunc above).
@@ -455,7 +427,6 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
     unsigned      I;
     int           Sign;
     unsigned long Offs = 0;
-
 
     // Remember the output file and offset for the segment
     S->OutputName = TgtName;
@@ -543,15 +514,11 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
     }
 }
 
-
-
 unsigned SegmentCount (void)
 // Return the total number of segments
 {
     return CollCount (&SegmentList);
 }
-
-
 
 static int CmpSegStart (const void* K1, const void* K2)
 // Compare function for qsort
@@ -570,8 +537,6 @@ static int CmpSegStart (const void* K1, const void* K2)
         return strcmp (GetString (S1->Name), GetString (S2->Name));
     }
 }
-
-
 
 void PrintSegmentMap (FILE* F)
 // Print a segment map to the given file
@@ -616,8 +581,6 @@ void PrintSegmentMap (FILE* F)
     xfree (SegPool);
 }
 
-
-
 void PrintDbgSegments (FILE* F)
 // Output the segments to the debug file
 {
@@ -648,8 +611,6 @@ void PrintDbgSegments (FILE* F)
         fputc ('\n', F);
     }
 }
-
-
 
 void CheckSegments (void)
 /* Walk through the segment list and check if there are segments that were

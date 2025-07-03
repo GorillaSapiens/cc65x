@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "check.h"
 #include "coll.h"
@@ -45,13 +43,9 @@
 #include "scanner.h"
 #include "ulabel.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Struct that describes an unnamed label
 typedef struct ULabel ULabel;
@@ -65,13 +59,9 @@ struct ULabel {
 static Collection ULabList      = STATIC_COLLECTION_INITIALIZER;
 static unsigned ULabDefCount    = 0;    // Number of defined labels
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static ULabel* NewULabel (ExprNode* Val)
 /* Create a new ULabel and insert it into the collection. The created label
@@ -93,8 +83,6 @@ static ULabel* NewULabel (ExprNode* Val)
     // Return the created label
     return L;
 }
-
-
 
 ExprNode* ULabRef (int Which)
 /* Get an unnamed label. If Which is negative, it is a backreference (a
@@ -152,8 +140,6 @@ ExprNode* ULabRef (int Which)
     }
 }
 
-
-
 void ULabDef (void)
 // Define an unnamed label at the current PC
 {
@@ -176,16 +162,12 @@ void ULabDef (void)
     ++ULabDefCount;
 }
 
-
-
 int ULabCanResolve (void)
 // Return true if we can resolve arbitrary ULabels.
 {
     // We can resolve labels if we don't have any undefineds
     return (ULabDefCount == CollCount (&ULabList));
 }
-
-
 
 ExprNode* ULabResolve (unsigned Index)
 /* Return a valid expression for the unnamed label with the given index. This
@@ -200,8 +182,6 @@ ExprNode* ULabResolve (unsigned Index)
     // Return the label value
     return CloneExpr (L->Val);
 }
-
-
 
 void ULabDone (void)
 /* Run through all unnamed labels, check for anomalies and errors and do

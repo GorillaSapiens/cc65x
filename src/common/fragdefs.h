@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef FRAGDEFS_H
 #define FRAGDEFS_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Masks for the fragment type byte
 #define FRAG_TYPEMASK   0x38            // Mask the type of the fragment
@@ -64,8 +58,6 @@
 #define FRAG_SEXPR32    (FRAG_SEXPR | 4)// 32 bit signed expression
 
 #define FRAG_FILL       0x20            // Fill bytes
-
-
 
 // End of fragdefs.h
 

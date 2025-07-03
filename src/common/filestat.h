@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 /* This module works around bugs in the time conversion code supplied by
 ** Microsoft. See here for a description of the problem:
 **   http://www.codeproject.com/KB/datetime/dstbugs.aspx
@@ -42,28 +40,18 @@
 ** has exactly the same problems as described in the article above.
 */
 
-
-
 #ifndef FILESTAT_H
 #define FILESTAT_H
 
-
-
 #include <sys/types.h>
 #include <sys/stat.h>
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 int FileStat (const char* Path, struct stat* Buf);
 // Replacement function for stat()
-
-
 
 // End of filestat.h
 

@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef STUDYEXPR_H
 #define STUDYEXPR_H
-
-
 
 // common
 #include "exprdefs.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Flags
 #define ED_OK           0x00            // Nothing special
@@ -87,13 +79,9 @@ struct ExprDesc {
     ED_SecRef*          SecRef;         // Section references
 };
 
-
-
 //***************************************************************************
 //                              struct ExprDesc
 //***************************************************************************
-
-
 
 ExprDesc* ED_Init (ExprDesc* ED);
 // Initialize an ExprDesc structure for use with StudyExpr
@@ -104,18 +92,12 @@ void ED_Done (ExprDesc* ED);
 int ED_IsConst (const ExprDesc* ED);
 // Return true if the expression is constant
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 void StudyExpr (ExprNode* Expr, ExprDesc* D);
 // Study an expression tree and place the contents into D
-
-
 
 // End of studyexpr.h
 

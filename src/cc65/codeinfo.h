@@ -31,28 +31,18 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CODEINFO_H
 #define CODEINFO_H
-
-
 
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 struct CodeSeg;
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Forward to struct RegContents
 struct RegContents;
@@ -116,8 +106,6 @@ struct RegContents;
 #define PSTATE_ALL      0xFF000000U
 #define REG_EVERYTHING  0xFFFFFFFFU
 
-
-
 // Zero page register info
 typedef struct ZPInfo ZPInfo;
 struct ZPInfo {
@@ -127,8 +115,6 @@ struct ZPInfo {
     unsigned short ByteUse;     // Register info for this symbol
     unsigned short WordUse;     // Register info for 16 bit access
 };
-
-
 
 // Defines for the conditions in a compare
 typedef enum {
@@ -148,8 +134,6 @@ typedef enum {
     CMP_END
 } cmp_t;
 
-
-
 // Defines for the conditions in a compare
 typedef enum {
     FNCLS_UNKNOWN = -1, // Unknown
@@ -158,13 +142,9 @@ typedef enum {
     FNCLS_NUMERIC       // A call to a numeric address
 } fncls_t;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int IsZPArg (const char* Arg);
 // Exam if the main part of the arg string indicates a ZP loc

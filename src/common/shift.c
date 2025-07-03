@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 /* According to the C standard, shifting a data type by the number of bits it
 ** has causes undefined behaviour. So
 **
@@ -45,20 +43,14 @@
 ** They are not a general purpose replacement for the shift operator!
 */
 
-
-
 #include <limits.h>
 
 // common
 #include "shift.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 long asl_l (long l, unsigned count)
 // Arithmetic shift left l by count.
@@ -75,8 +67,6 @@ long asl_l (long l, unsigned count)
     return l;
 }
 
-
-
 long asr_l (long l, unsigned count)
 // Arithmetic shift right l by count
 {
@@ -92,8 +82,6 @@ long asr_l (long l, unsigned count)
     return l;
 }
 
-
-
 unsigned long shl_l (unsigned long l, unsigned count)
 // Logical shift left l by count
 {
@@ -108,8 +96,6 @@ unsigned long shl_l (unsigned long l, unsigned count)
     }
     return l;
 }
-
-
 
 unsigned long shr_l (unsigned long l, unsigned count)
 // Logical shift right l by count

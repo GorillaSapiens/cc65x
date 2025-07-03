@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef FUNCDESC_H
 #define FUNCDESC_H
-
-
 
 //***************************************************************************
 //                              struct FuncDesc
 //***************************************************************************
-
-
 
 // Masks for the Flags field in FuncDesc
 #define FD_NONE                 0x0000U // No flags
@@ -72,21 +66,15 @@ struct FuncDesc {
     struct FuncDesc*    FuncDef;         // Descriptor used in definition
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 FuncDesc* NewFuncDesc (void);
 // Create a new symbol table with the given name
 
 void FreeFuncDesc (FuncDesc* D);
 // Free a function descriptor
-
-
 
 // End of funcdesc.h
 

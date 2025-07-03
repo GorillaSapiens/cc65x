@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 /* This module implements a specification for a "generic data type". It is
 ** called generic, because it doesn't mimic a high level language. Instead it
 ** tries to desrcibe the type as representation on the machine.
@@ -50,23 +48,15 @@
 ** used to remove duplicates and reference types using unique ids.
 */
 
-
-
 #ifndef GENTYPE_H
 #define GENTYPE_H
-
-
 
 // common
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Size of a data type
 #define GT_SIZE_1               0x00U
@@ -122,13 +112,9 @@
 #define GT_FAR_PTR      (GT_TYPE_PTR | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_3)
 #define GT_ARRAY(size)  (GT_TYPE_ARRAY | ((size) - 1))
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void GT_AddArray (StrBuf* Type, unsigned ArraySize);
 /* Add an array with the given size to the type string in Type. This will
@@ -146,8 +132,6 @@ const char* GT_AsString (const StrBuf* Type, StrBuf* String);
 /* Convert the type into a readable representation. The target string buffer
 ** will be zero terminated and a pointer to the contents are returned.
 */
-
-
 
 // End of gentype.h
 

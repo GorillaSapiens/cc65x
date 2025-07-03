@@ -31,22 +31,14 @@
 //
 //***************************************************************************
 
-
-
 // Object file tags for imports and exports
-
-
 
 #ifndef SYMDEFS_H
 #define SYMDEFS_H
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Number of module constructor/destructor declarations for an export
 #define SYM_CONDES_MASK         0x0007U
@@ -97,8 +89,6 @@
 #define SYM_MASK_IMPORT         0x0100U // Value mask
 
 #define SYM_IS_IMPORT(x)        (((x) & SYM_MASK_IMPORT) == SYM_IMPORT)
-
-
 
 // End of symdefs.h
 

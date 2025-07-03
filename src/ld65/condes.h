@@ -31,33 +31,21 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CONDES_H
 #define CONDES_H
 
-
-
 // common
 #include "filepos.h"
-
-
 
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 struct Export;
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Order of the tables
 typedef enum {
@@ -73,13 +61,9 @@ struct ConDesImport {
     unsigned    AddrSize;       // Address size of the symbol
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void ConDesAddExport (struct Export* E);
 // Add the given export to the list of constructors/destructor
@@ -115,8 +99,6 @@ void ConDesCreate (void);
 
 void ConDesDump (void);
 // Dump ConDes data to stdout for debugging
-
-
 
 // End of condes.h
 

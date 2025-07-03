@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // cc65
 #include "codegen.h"
 #include "error.h"
@@ -42,13 +40,9 @@
 #include "seqpoint.h"
 #include "testexpr.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned Test (unsigned Label, int Invert)
 /* Evaluate a boolean test expression and jump depending on the result of
@@ -119,8 +113,6 @@ unsigned Test (unsigned Label, int Invert)
     // Return the result
     return Result;
 }
-
-
 
 unsigned TestInParens (unsigned Label, int Invert)
 /* Evaluate a boolean test expression in parenthesis and jump depending on

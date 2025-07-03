@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SYMENTRY_H
 #define SYMENTRY_H
-
-
 
 // common
 #include "cddefs.h"
@@ -48,13 +44,9 @@
 // ca65
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Forwards
 struct HLLDbgSym;
@@ -117,13 +109,9 @@ extern SymEntry* SymList;
 // Pointer to last defined symbol
 extern SymEntry* SymLast;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags);
 // Allocate a symbol table entry, initialize and return it
@@ -353,8 +341,6 @@ unsigned GetSymInfoFlags (const SymEntry* Sym, long* ConstVal);
 ** of the symbol. The result does not include the condes count.
 ** See common/symdefs.h for more information.
 */
-
-
 
 // End of symentry.h
 

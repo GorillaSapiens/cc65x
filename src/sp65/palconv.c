@@ -28,8 +28,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 #include <stdlib.h>
 
@@ -43,11 +41,9 @@
 #include "palette.h"
 #include "lynxpalette.h"
 
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
 
 // Type of the entry in the palette table
 typedef struct PaletteMapEntry PaletteMapEntry;
@@ -64,20 +60,15 @@ static const PaletteMapEntry PaletteMap[] = {
 // END SORTED.SH
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
 
 static int Compare (const void* Key, const void* MapEntry)
 // Compare function for bsearch
 {
     return strcmp (Key, ((const PaletteMapEntry*) MapEntry)->Format);
 }
-
-
 
 StrBuf* PaletteTo (const Bitmap* B, const Collection* A)
 /* Convert the palette of bitmap B into some sort of other binary format.

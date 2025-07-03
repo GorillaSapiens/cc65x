@@ -31,20 +31,14 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "xsprintf.h"
 #include "searchpath.h"
 #include "version.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 #define VER_MAJOR       4U
 #define VER_MINOR       0U
@@ -85,8 +79,6 @@
 //                                   Code
 //***************************************************************************
 
-
-
 const char* GetVersionAsString (void)
 // Returns the version number as a string in a static buffer
 {
@@ -98,8 +90,6 @@ const char* GetVersionAsString (void)
 #endif
     return Buf;
 }
-
-
 
 unsigned GetVersionAsNumber (void)
 // Returns the version number as a combined unsigned for use in a #define

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -57,13 +55,9 @@
 #include "objdata.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Hash table
 #define HASHTAB_MASK    0x0FFFU
@@ -85,19 +79,13 @@ static Export**         ExpPool  = 0;           // Exports array
 #define EXP_INLIST      0x0001U                 // Export is in exports list
 #define EXP_USERMARK    0x0002U                 // User setable flag
 
-
-
 //***************************************************************************
 //                              Import handling
 //***************************************************************************
 
-
-
 static Export* NewExport (unsigned Type, unsigned char AddrSize,
                           unsigned Name, ObjData* Obj);
 // Create a new export and initialize it
-
-
 
 static Import* NewImport (unsigned char AddrSize, ObjData* Obj)
 // Create a new import and initialize it
@@ -119,8 +107,6 @@ static Import* NewImport (unsigned char AddrSize, ObjData* Obj)
     return I;
 }
 
-
-
 void FreeImport (Import* I)
 /* Free an import. NOTE: This won't remove the import from the exports table,
 ** so it may only be called for unused imports (imports from modules that
@@ -137,8 +123,6 @@ void FreeImport (Import* I)
     // Free the struct
     xfree (I);
 }
-
-
 
 Import* ReadImport (FILE* F, ObjData* Obj)
 // Read an import from a file and return it
@@ -183,8 +167,6 @@ Import* ReadImport (FILE* F, ObjData* Obj)
     return I;
 }
 
-
-
 Import* GenImport (unsigned Name, unsigned char AddrSize)
 // Generate a new import with the given name and address size and return it
 {
@@ -207,8 +189,6 @@ Import* GenImport (unsigned Name, unsigned char AddrSize)
     // Return the new import
     return I;
 }
-
-
 
 Import* InsertImport (Import* I)
 // Insert an import into the table, return I
@@ -265,8 +245,6 @@ Import* InsertImport (Import* I)
     return I;
 }
 
-
-
 const LineInfo* GetImportPos (const Import* Imp)
 // Return the basic line info of an import
 {
@@ -278,13 +256,9 @@ const LineInfo* GetImportPos (const Import* Imp)
     return LI;
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static Export* NewExport (unsigned Type, unsigned char AddrSize,
                           unsigned Name, ObjData* Obj)
@@ -317,8 +291,6 @@ static Export* NewExport (unsigned Type, unsigned char AddrSize,
     return E;
 }
 
-
-
 void FreeExport (Export* E)
 /* Free an export. NOTE: This won't remove the export from the exports table,
 ** so it may only be called for unused exports (exports from modules that
@@ -338,8 +310,6 @@ void FreeExport (Export* E)
     // Free the struct
     xfree (E);
 }
-
-
 
 Export* ReadExport (FILE* F, ObjData* O)
 // Read an export from a file
@@ -425,8 +395,6 @@ Export* ReadExport (FILE* F, ObjData* O)
     return E;
 }
 
-
-
 void InsertExport (Export* E)
 // Insert an exported identifier and check if it's already in the list
 {
@@ -499,8 +467,6 @@ void InsertExport (Export* E)
     }
 }
 
-
-
 const LineInfo* GetExportPos (const Export* E)
 // Return the basic line info of an export
 {
@@ -511,8 +477,6 @@ const LineInfo* GetExportPos (const Export* E)
     }
     return LI;
 }
-
-
 
 Export* CreateConstExport (unsigned Name, long Value)
 // Create an export for a literal date
@@ -530,8 +494,6 @@ Export* CreateConstExport (unsigned Name, long Value)
     return E;
 }
 
-
-
 Export* CreateExprExport (unsigned Name, ExprNode* Expr, unsigned char AddrSize)
 // Create an export for an expression
 {
@@ -547,8 +509,6 @@ Export* CreateExprExport (unsigned Name, ExprNode* Expr, unsigned char AddrSize)
     // Return the new export
     return E;
 }
-
-
 
 Export* CreateMemoryExport (unsigned Name, MemoryArea* Mem, unsigned long Offs)
 // Create an relative export for a memory area offset
@@ -566,8 +526,6 @@ Export* CreateMemoryExport (unsigned Name, MemoryArea* Mem, unsigned long Offs)
     return E;
 }
 
-
-
 Export* CreateSegmentExport (unsigned Name, Segment* Seg, unsigned long Offs)
 // Create a relative export to a segment
 {
@@ -584,8 +542,6 @@ Export* CreateSegmentExport (unsigned Name, Segment* Seg, unsigned long Offs)
     return E;
 }
 
-
-
 Export* CreateSectionExport (unsigned Name, Section* Sec, unsigned long Offs)
 // Create a relative export to a section
 {
@@ -601,8 +557,6 @@ Export* CreateSectionExport (unsigned Name, Section* Sec, unsigned long Offs)
     // Return the new export
     return E;
 }
-
-
 
 Export* FindExport (unsigned Name)
 /* Check for an identifier in the list. Return 0 if not found, otherwise
@@ -624,8 +578,6 @@ Export* FindExport (unsigned Name)
     return 0;
 }
 
-
-
 int IsUnresolved (unsigned Name)
 // Check if this symbol is an unresolved export
 {
@@ -633,16 +585,12 @@ int IsUnresolved (unsigned Name)
     return IsUnresolvedExport (FindExport (Name));
 }
 
-
-
 int IsUnresolvedExport (const Export* E)
 // Return true if the given export is unresolved
 {
     // Check if it's unresolved
     return E != 0 && E->Expr == 0;
 }
-
-
 
 int IsConstExport (const Export* E)
 // Return true if the expression associated with this export is const
@@ -655,8 +603,6 @@ int IsConstExport (const Export* E)
     }
 }
 
-
-
 long GetExportVal (const Export* E)
 // Get the value of this export
 {
@@ -666,8 +612,6 @@ long GetExportVal (const Export* E)
     }
     return GetExprVal (E->Expr);
 }
-
-
 
 static void CheckSymType (const Export* E)
 // Check the types for one export
@@ -742,8 +686,6 @@ static void CheckSymType (const Export* E)
     }
 }
 
-
-
 static void CheckSymTypes (void)
 // Check for symbol tape mismatches
 {
@@ -758,8 +700,6 @@ static void CheckSymTypes (void)
         }
     }
 }
-
-
 
 static void PrintUnresolved (ExpCheckFunc F, void* Data)
 /* Print a list of unresolved symbols. On unresolved symbols, F is
@@ -797,8 +737,6 @@ static void PrintUnresolved (ExpCheckFunc F, void* Data)
     }
 }
 
-
-
 static int CmpExpName (const void* K1, const void* K2)
 // Compare function for qsort
 {
@@ -806,16 +744,12 @@ static int CmpExpName (const void* K1, const void* K2)
                        GetStrBuf ((*(Export**)K2)->Name));
 }
 
-
-
 static int CmpExpValue (const void* K1, const void* K2)
 // Compare function for qsort
 {
     long Diff = GetExportVal (*(Export**)K1) - GetExportVal (*(Export**)K2);
     return Diff < 0? -1 : Diff > 0? 1 : 0;
 }
-
-
 
 static void CreateExportPool (void)
 // Create an array with pointer to all exports
@@ -842,8 +776,6 @@ static void CreateExportPool (void)
     qsort (ExpPool, ExpCount, sizeof (Export*), CmpExpName);
 }
 
-
-
 void CheckExports (void)
 /* Setup the list of all exports and check for export/import symbol type
 ** mismatches.
@@ -856,8 +788,6 @@ void CheckExports (void)
     CheckSymTypes ();
 }
 
-
-
 void CheckUnresolvedImports (ExpCheckFunc F, void* Data)
 /* Check if there are any unresolved imports. On unresolved imports, F is
 ** called (see the comments on ExpCheckFunc in the data section).
@@ -869,8 +799,6 @@ void CheckUnresolvedImports (ExpCheckFunc F, void* Data)
         PrintUnresolved (F, Data);
     }
 }
-
-
 
 static char GetAddrSizeCode (unsigned char AddrSize)
 // Get a one char code for the address size
@@ -886,8 +814,6 @@ static char GetAddrSizeCode (unsigned char AddrSize)
             return '-';
     }
 }
-
-
 
 static void PrintExportMap (Export** Pool, unsigned Count, FILE* F)
 // Print an export map to the given file
@@ -925,15 +851,11 @@ static void PrintExportMap (Export** Pool, unsigned Count, FILE* F)
     fprintf (F, "\n");
 }
 
-
-
 void PrintExportMapByName (FILE* F)
 // Print an export map, sorted by symbol name, to the given file
 {
     PrintExportMap (ExpPool, ExpCount, F);
 }
-
-
 
 void PrintExportMapByValue (FILE* F)
 // Print an export map, sorted by symbol value, to the given file
@@ -949,8 +871,6 @@ void PrintExportMapByValue (FILE* F)
     // Free the allocated buffer
     xfree (Pool);
 }
-
-
 
 void PrintImportMap (FILE* F)
 // Print an import map to the given file
@@ -1004,8 +924,6 @@ void PrintImportMap (FILE* F)
     fprintf (F, "\n");
 }
 
-
-
 void PrintExportLabels (FILE* F)
 // Print the exports in a VICE label file
 {
@@ -1018,15 +936,11 @@ void PrintExportLabels (FILE* F)
     }
 }
 
-
-
 void MarkExport (Export* E)
 // Mark the export
 {
     E->Flags |= EXP_USERMARK;
 }
-
-
 
 void UnmarkExport (Export* E)
 // Remove the mark from the export
@@ -1034,15 +948,11 @@ void UnmarkExport (Export* E)
     E->Flags &= ~EXP_USERMARK;
 }
 
-
-
 int ExportHasMark (Export* E)
 // Return true if the export has a mark
 {
     return (E->Flags & EXP_USERMARK) != 0;
 }
-
-
 
 void CircularRefError (const Export* E)
 // Print an error about a circular reference using to define the given export

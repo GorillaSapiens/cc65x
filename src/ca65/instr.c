@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -59,13 +57,9 @@
 #include "studyexpr.h"
 #include "symtab.h"
 
-
-
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
-
-
 
 static void PutPCRel8 (const InsDesc* Ins);
 // Handle branches with a 8 bit distance
@@ -166,13 +160,9 @@ static void PutSweet16 (const InsDesc* Ins);
 static void PutSweet16Branch (const InsDesc* Ins);
 // Handle a sweet16 branch instruction
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Empty instruction table
 static const struct {
@@ -1021,7 +1011,6 @@ static const struct {
     }
 };
 
-
 // Instruction table for the 45GS02
 static const struct {
     unsigned Count;
@@ -1183,7 +1172,6 @@ static const struct {
 // END SORTED.SH
     }
 };
-
 
 // Instruction table for the 65816
 static const struct {
@@ -1786,13 +1774,9 @@ static unsigned char Sweet16ExtBytes[AMSW16I_COUNT] = {
     0,          // AMSW16_REG
 };
 
-
-
 //***************************************************************************
 //                   Handler functions for 6502 derivates
 //***************************************************************************
-
-
 
 static int EvalEA (const InsDesc* Ins, EffAddr* A)
 /* Evaluate the effective address. All fields in A will be valid after calling
@@ -1911,8 +1895,6 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
     return 1;
 }
 
-
-
 static void EmitCode (EffAddr* A)
 // Output code for the data in A
 {
@@ -1950,7 +1932,6 @@ static void EmitCode (EffAddr* A)
     }
 }
 
-
 static void PutLDM_m740 (const InsDesc* Ins)
 {
     EffAddr A;
@@ -1964,7 +1945,6 @@ static void PutLDM_m740 (const InsDesc* Ins)
     Consume (TOK_HASH, "'#' expected");
     EmitByte (Expression ());
 }
-
 
 static long PutImmed8 (const InsDesc* Ins)
 /* Parse and emit an immediate 8 bit instruction. Return the value of the
@@ -2000,15 +1980,11 @@ static long PutImmed8 (const InsDesc* Ins)
     return Val;
 }
 
-
-
 static void PutPCRel8 (const InsDesc* Ins)
 // Handle branches with a 8 bit distance
 {
     EmitPCRel (Ins->BaseCode, GenBranchExpr (2), 1);
 }
-
-
 
 static void PutPCRel16 (const InsDesc* Ins)
 // Handle branches with an 16 bit distance and PER
@@ -2016,16 +1992,12 @@ static void PutPCRel16 (const InsDesc* Ins)
     EmitPCRel (Ins->BaseCode, GenBranchExpr (3), 2);
 }
 
-
-
 static void PutPCRel4510 (const InsDesc* Ins)
 // Handle branches with a 16 bit distance
 {
     // 16 bit branch opcode is 8 bit branch opcode or'ed with 0x03
     EmitPCRel (Ins->BaseCode, GenBranchExpr (2), 2);
 }
-
-
 
 static void PutBlockMove (const InsDesc* Ins)
 // Handle the blockmove instructions (65816)
@@ -2061,8 +2033,6 @@ static void PutBlockMove (const InsDesc* Ins)
     EmitByte (Arg1);
 }
 
-
-
 static void PutBlockTransfer (const InsDesc* Ins)
 // Handle the block transfer instructions (HuC6280)
 {
@@ -2073,8 +2043,6 @@ static void PutBlockTransfer (const InsDesc* Ins)
     ConsumeComma ();
     EmitWord (Expression ());
 }
-
-
 
 static void PutBitBranch (const InsDesc* Ins)
 // Handle 65C02 branch on bit condition
@@ -2122,7 +2090,6 @@ static void PutBitBranch_m740 (const InsDesc* Ins)
     }
 }
 
-
 static void PutREP (const InsDesc* Ins)
 // Emit a REP instruction, track register sizes
 {
@@ -2148,8 +2115,6 @@ static void PutREP (const InsDesc* Ins)
         }
     }
 }
-
-
 
 static void PutSEP (const InsDesc* Ins)
 // Emit a SEP instruction (65816), track register sizes
@@ -2177,8 +2142,6 @@ static void PutSEP (const InsDesc* Ins)
     }
 }
 
-
-
 static void PutTAMn (const InsDesc* Ins)
 /* Emit a TAMn instruction (HuC6280). Because this is a two-byte instruction with
 ** implicit addressing mode, the opcode byte in the table is actually the
@@ -2192,8 +2155,6 @@ static void PutTAMn (const InsDesc* Ins)
     // Emit the argument, which is the opcode from the table
     Emit0 (Ins->BaseCode);
 }
-
-
 
 static void PutTMA (const InsDesc* Ins)
 /* Emit a TMA instruction (HuC6280) with an immediate argument. Only one bit
@@ -2215,8 +2176,6 @@ static void PutTMA (const InsDesc* Ins)
     }
 }
 
-
-
 static void PutTMAn (const InsDesc* Ins)
 /* Emit a TMAn instruction (HuC6280). Because this is a two-byte instruction with
 ** implicit addressing mode, the opcode byte in the table is actually the
@@ -2229,8 +2188,6 @@ static void PutTMAn (const InsDesc* Ins)
     // Emit the argument, which is the opcode from the table
     Emit0 (Ins->BaseCode);
 }
-
-
 
 static void PutTST (const InsDesc* Ins)
 // Emit a TST instruction (HuC6280).
@@ -2269,8 +2226,6 @@ static void PutTST (const InsDesc* Ins)
     }
 }
 
-
-
 static void PutJMP (const InsDesc* Ins)
 /* Handle the jump instruction for the 6502. Problem is that these chips have
 ** a bug: If the address crosses a page, the upper byte gets not corrected and
@@ -2303,8 +2258,6 @@ static void PutJMP (const InsDesc* Ins)
     }
 }
 
-
-
 static void PutJMP816 (const InsDesc* Ins)
 /* Handle the JMP instruction for the 816.
 ** Allowing the long_jsr_jmp_rts feature to permit a long JMP.
@@ -2321,8 +2274,6 @@ static void PutJMP816 (const InsDesc* Ins)
     }
 }
 
-
-
 static void PutJSR816 (const InsDesc* Ins)
 /* Handle the JSR instruction for the 816.
 ** Allowing the long_jsr_jmp_rts feature to permit a long JSR.
@@ -2336,7 +2287,6 @@ static void PutJSR816 (const InsDesc* Ins)
         PutJMP (&InsAbs);
     }
 }
-
 
 static void PutJSR_m740 (const InsDesc* Ins)
 // Handle a JSR instruction for m740
@@ -2389,7 +2339,6 @@ static void PutJSR_m740 (const InsDesc* Ins)
 
 }
 
-
 static void PutRTS (const InsDesc* Ins attribute ((unused)))
 /* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
 ** the enclosing scope is FAR, but only if the long_jsr_jmp_rts feature applies.
@@ -2402,8 +2351,6 @@ static void PutRTS (const InsDesc* Ins attribute ((unused)))
     }
 }
 
-
-
 static void PutAll (const InsDesc* Ins)
 // Handle all other instructions
 {
@@ -2415,8 +2362,6 @@ static void PutAll (const InsDesc* Ins)
         EmitCode (&A);
     }
 }
-
-
 
 static void Emit4510 (EffAddr* A) {
     /* The 4510 uses all 256 possible opcodes, so the last ones were crammed
@@ -2476,8 +2421,6 @@ static void Emit4510 (EffAddr* A) {
     EmitCode (A);
 }
 
-
-
 static void Put4510 (const InsDesc* Ins)
 // Handle all other instructions, with modifications for 4510
 {
@@ -2488,8 +2431,6 @@ static void Put4510 (const InsDesc* Ins)
         Emit4510 (&A);
     }
 }
-
-
 
 static void Put45GS02 (const InsDesc* Ins)
 // Handle all other instructions, with modifications for 45GS02
@@ -2503,8 +2444,6 @@ static void Put45GS02 (const InsDesc* Ins)
         Emit4510 (&A);
     }
 }
-
-
 
 static void Put45GS02_Q (const InsDesc* Ins)
 {
@@ -2527,13 +2466,9 @@ static void Put45GS02_Q (const InsDesc* Ins)
     }
 }
 
-
-
 //***************************************************************************
 //                       Handler functions for SWEET16
 //***************************************************************************
-
-
 
 static void PutSweet16 (const InsDesc* Ins)
 // Handle a generic sweet16 instruction
@@ -2580,29 +2515,21 @@ static void PutSweet16 (const InsDesc* Ins)
     }
 }
 
-
-
 static void PutSweet16Branch (const InsDesc* Ins)
 // Handle a sweet16 branch instruction
 {
     EmitPCRel (Ins->BaseCode, GenBranchExpr (2), 1);
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static int CmpName (const void* Key, const void* Instr)
 // Compare function for bsearch
 {
     return strcmp ((const char*)Key, ((const InsDesc*) Instr)->Mnemonic);
 }
-
-
 
 void SetCPU (cpu_t NewCPU)
 // Set a new CPU
@@ -2619,15 +2546,11 @@ void SetCPU (cpu_t NewCPU)
     }
 }
 
-
-
 cpu_t GetCPU (void)
 // Return the current CPU
 {
     return CPU;
 }
-
-
 
 int FindInstruction (const StrBuf* Ident)
 /* Check if Ident is a valid mnemonic. If so, return the index in the
@@ -2671,8 +2594,6 @@ int FindInstruction (const StrBuf* Ident)
         return ID - InsTab->Ins;
     }
 }
-
-
 
 void HandleInstruction (unsigned Index)
 // Handle the mnemonic with the given index

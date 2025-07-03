@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COPTPTRSTORE_H
 #define COPTPTRSTORE_H
-
-
 
 // cc65
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned OptPtrStore1 (CodeSeg* S);
 /* Search for the sequence:
@@ -170,8 +162,6 @@ unsigned OptPtrStore3 (CodeSeg* S);
 ** In case a/x is loaded from the register bank before the pushax, we can even
 ** use the register bank instead of ptr1.
 */
-
-
 
 // End of coptptrstore.h
 

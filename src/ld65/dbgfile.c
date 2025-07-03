@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -50,13 +48,9 @@
 #include "span.h"
 #include "tpool.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void AssignIds (void)
 /* Assign the base ids for debug info output. Within each module, many of the
@@ -98,8 +92,6 @@ static void AssignIds (void)
     // Assign the ids to line infos
     AssignLineInfoIds ();
 }
-
-
 
 void CreateDbgFile (void)
 // Create a debug info file

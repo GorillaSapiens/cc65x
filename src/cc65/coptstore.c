@@ -31,28 +31,20 @@
 //
 //***************************************************************************
 
-
-
 // cc65
 #include "codeent.h"
 #include "codeinfo.h"
 #include "coptstore.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void InsertStore (CodeSeg* S, unsigned* IP, LineInfo* LI)
 {
     CodeEntry* X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "c_sp", 0, LI);
     CS_InsertEntry (S, X, (*IP)++);
 }
-
-
 
 unsigned OptStore1 (CodeSeg* S)
 /* Search for the sequence
@@ -103,8 +95,6 @@ unsigned OptStore1 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptStore2 (CodeSeg* S)
 /* Search for a call to staxysp. If the ax register is not used later, and
@@ -173,8 +163,6 @@ unsigned OptStore2 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptStore3 (CodeSeg* S)
 /* Search for a call to steaxysp. If the eax register is not used later, and
@@ -313,8 +301,6 @@ unsigned OptStore3 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptStore4 (CodeSeg* S)
 /* Search for the sequence
 **
@@ -369,8 +355,6 @@ unsigned OptStore4 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptStore5 (CodeSeg* S)
 /* Search for the sequence

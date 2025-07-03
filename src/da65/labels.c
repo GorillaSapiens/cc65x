@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
@@ -51,13 +49,9 @@
 #include "labels.h"
 #include "output.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Label structure how it is found in the label table
 typedef struct Label Label;
@@ -77,13 +71,9 @@ static Label* LabelTab[LABEL_HASH_SIZE];
 // Total number of labels
 static unsigned long LabelCount = 0;
 
-
-
 //***************************************************************************
 //                               struct Label
 //***************************************************************************
-
-
 
 static Label* NewLabel (uint32_t Addr, const char* Name)
 // Create a new label structure and return it
@@ -103,15 +93,11 @@ static Label* NewLabel (uint32_t Addr, const char* Name)
     return L;
 }
 
-
-
 static uint32_t GetLabelHash (uint32_t Addr)
 // Get the hash for a label at the given address
 {
     return (Addr & (LABEL_HASH_SIZE - 1));
 }
-
-
 
 static Label* FindLabel (uint32_t Addr)
 /* Search for a label for the given address and return it. Returns NULL if
@@ -128,8 +114,6 @@ static Label* FindLabel (uint32_t Addr)
     return L;
 }
 
-
-
 static void InsertLabel (Label* L)
 // Insert a label into the tables
 {
@@ -139,13 +123,9 @@ static void InsertLabel (Label* L)
     LabelTab[Hash] = L;
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static const char* MakeLabelName (uint32_t Addr)
 /* Make the default label name from the given address and return it in a
@@ -156,8 +136,6 @@ static const char* MakeLabelName (uint32_t Addr)
     xsprintf (LabelBuf, sizeof (LabelBuf), "L%04" PRIX32, Addr);
     return LabelBuf;
 }
-
-
 
 static void AddLabel (uint32_t Addr, attr_t Attr, const char* Name)
 // Add a label
@@ -195,15 +173,11 @@ static void AddLabel (uint32_t Addr, attr_t Attr, const char* Name)
     ++LabelCount;
 }
 
-
-
 void AddIntLabel (uint32_t Addr)
 // Add an internal label using the address to generate the name.
 {
     AddLabel (Addr, atIntLabel, MakeLabelName (Addr));
 }
-
-
 
 void AddExtLabel (uint32_t Addr, const char* Name)
 // Add an external label
@@ -211,15 +185,11 @@ void AddExtLabel (uint32_t Addr, const char* Name)
     AddLabel (Addr, atExtLabel, Name);
 }
 
-
-
 void AddUnnamedLabel (uint32_t Addr)
 // Add an unnamed label
 {
     AddLabel (Addr, atUnnamedLabel, 0);
 }
-
-
 
 void AddDepLabel (uint32_t Addr, attr_t Attr, const char* BaseName, unsigned Offs)
 /* Add a dependent label at the given address using "basename+Offs" as the new
@@ -240,8 +210,6 @@ void AddDepLabel (uint32_t Addr, attr_t Attr, const char* BaseName, unsigned Off
     // Free the name buffer
     SB_Done (&Name);
 
-
-
     // Allocate memory for the dependent label name
     unsigned NameLen = strlen (BaseName);
     char*    DepName = xmalloc (NameLen + 7);   // "+$ABCD\0"
@@ -259,8 +227,6 @@ void AddDepLabel (uint32_t Addr, attr_t Attr, const char* BaseName, unsigned Off
     // Free the name buffer
     xfree (DepName);
 }
-
-
 
 static void AddLabelRange (uint32_t Addr, attr_t Attr,
                            const char* Name, unsigned Count)
@@ -298,8 +264,6 @@ static void AddLabelRange (uint32_t Addr, attr_t Attr,
     }
 }
 
-
-
 void AddIntLabelRange (uint32_t Addr, const char* Name, unsigned Count)
 /* Add an internal label for a range. The first entry gets the label "Name"
 ** while the others get "Name+offs".
@@ -308,8 +272,6 @@ void AddIntLabelRange (uint32_t Addr, const char* Name, unsigned Count)
     // Define the label range
     AddLabelRange (Addr, atIntLabel, Name, Count);
 }
-
-
 
 void AddExtLabelRange (uint32_t Addr, const char* Name, unsigned Count)
 /* Add an external label for a range. The first entry gets the label "Name"
@@ -320,16 +282,12 @@ void AddExtLabelRange (uint32_t Addr, const char* Name, unsigned Count)
     AddLabelRange (Addr, atExtLabel, Name, Count);
 }
 
-
-
 int HaveLabel (uint32_t Addr)
 // Check if there is a label for the given address
 {
     // Check for a label
     return (GetLabelAttr (Addr) != atNoLabel);
 }
-
-
 
 int MustDefLabel (uint32_t Addr)
 /* Return true if we must define a label for this address, that is, if there
@@ -342,8 +300,6 @@ int MustDefLabel (uint32_t Addr)
     // Check for an internal, external, or unnamed label
     return (A == atExtLabel || A == atIntLabel || A == atUnnamedLabel);
 }
-
-
 
 const char* GetLabelName (uint32_t Addr)
 // Return the label name for an address
@@ -362,8 +318,6 @@ const char* GetLabelName (uint32_t Addr)
         return L? L->Name : 0;
     }
 }
-
-
 
 const char* GetLabel (uint32_t Addr, uint32_t RefFrom)
 /* Return the label name for an address, as it is used in a label reference.
@@ -436,8 +390,6 @@ const char* GetLabel (uint32_t Addr, uint32_t RefFrom)
     }
 }
 
-
-
 void ForwardLabel (uint32_t Offs)
 /* If necessary, output a forward label, one that is within the next few
 ** bytes and is therefore output as "label = * + x".
@@ -465,8 +417,6 @@ void ForwardLabel (uint32_t Offs)
     DefForward (GetLabelName (Addr), GetComment (Addr), Offs);
 }
 
-
-
 static int CompareLabels (void* Data attribute ((unused)),
                           const void* L1, const void* L2)
 // Compare functions for sorting the out-of-range labels
@@ -479,8 +429,6 @@ static int CompareLabels (void* Data attribute ((unused)),
         return 0;
     }
 }
-
-
 
 static void DefOutOfRangeLabel (const Label* L)
 // Define one label that is outside code range.
@@ -501,8 +449,6 @@ static void DefOutOfRangeLabel (const Label* L)
 
     }
 }
-
-
 
 void DefOutOfRangeLabels (void)
 // Output any labels that are out of the loaded code range
@@ -544,8 +490,6 @@ void DefOutOfRangeLabels (void)
     // Free allocated storage
     DoneCollection (&Labels);
 }
-
-
 
 unsigned long GetLabelCount (void)
 // Return the total number of labels defined so far

@@ -31,22 +31,14 @@
 //
 //***************************************************************************
 
-
-
 #ifndef XMALLOC_H
 #define XMALLOC_H
 
-
-
 #include <stddef.h>
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void* xmalloc (size_t Size);
 // Allocate memory, check for out of memory condition. Do some debugging
@@ -62,8 +54,6 @@ char* xstrdup (const char* S);
 
 void* xdup (const void* Buf, size_t Size);
 // Create a copy of Buf on the heap and return a pointer to it.
-
-
 
 // End of xmalloc.h
 

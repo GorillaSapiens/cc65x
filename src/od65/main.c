@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -49,23 +47,15 @@
 #include "fileio.h"
 #include "global.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 static unsigned FilesProcessed = 0;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void Usage (void)
 // Print usage information and exit
@@ -93,16 +83,12 @@ static void Usage (void)
             ProgName);
 }
 
-
-
 static void OptDumpAll (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 // Dump all object file information
 {
     What |= D_ALL;
 }
-
-
 
 static void OptDumpDbgSyms (const char* Opt attribute ((unused)),
                             const char* Arg attribute ((unused)))
@@ -111,16 +97,12 @@ static void OptDumpDbgSyms (const char* Opt attribute ((unused)),
     What |= D_DBGSYMS;
 }
 
-
-
 static void OptDumpExports (const char* Opt attribute ((unused)),
                             const char* Arg attribute ((unused)))
 // Dump the exported symbols
 {
     What |= D_EXPORTS;
 }
-
-
 
 static void OptDumpFiles (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
@@ -129,16 +111,12 @@ static void OptDumpFiles (const char* Opt attribute ((unused)),
     What |= D_FILES;
 }
 
-
-
 static void OptDumpHeader (const char* Opt attribute ((unused)),
                            const char* Arg attribute ((unused)))
 // Dump the object file header
 {
     What |= D_HEADER;
 }
-
-
 
 static void OptDumpImports (const char* Opt attribute ((unused)),
                             const char* Arg attribute ((unused)))
@@ -147,16 +125,12 @@ static void OptDumpImports (const char* Opt attribute ((unused)),
     What |= D_IMPORTS;
 }
 
-
-
 static void OptDumpLineInfo (const char* Opt attribute ((unused)),
                              const char* Arg attribute ((unused)))
 // Dump the line infos
 {
     What |= D_LINEINFO;
 }
-
-
 
 static void OptDumpOptions (const char* Opt attribute ((unused)),
                             const char* Arg attribute ((unused)))
@@ -165,16 +139,12 @@ static void OptDumpOptions (const char* Opt attribute ((unused)),
     What |= D_OPTIONS;
 }
 
-
-
 static void OptDumpScopes (const char* Opt attribute ((unused)),
                            const char* Arg attribute ((unused)))
 // Dump the scopes in the object file
 {
     What |= D_SCOPES;
 }
-
-
 
 static void OptDumpSegments (const char* Opt attribute ((unused)),
                              const char* Arg attribute ((unused)))
@@ -183,16 +153,12 @@ static void OptDumpSegments (const char* Opt attribute ((unused)),
     What |= D_SEGMENTS;
 }
 
-
-
 static void OptDumpSegSize (const char* Opt attribute ((unused)),
                             const char* Arg attribute ((unused)))
 // Dump the segments in the object file
 {
     What |= D_SEGSIZE;
 }
-
-
 
 static void OptHelp (const char* Opt attribute ((unused)),
                      const char* Arg attribute ((unused)))
@@ -202,8 +168,6 @@ static void OptHelp (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
-
-
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 // Print the assembler version
@@ -211,8 +175,6 @@ static void OptVersion (const char* Opt attribute ((unused)),
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
     exit(EXIT_SUCCESS);
 }
-
-
 
 static void DumpFile (const char* Name)
 // Dump information from the named file
@@ -280,8 +242,6 @@ static void DumpFile (const char* Name)
     // Close the file
     fclose (F);
 }
-
-
 
 int main (int argc, char* argv [])
 // Assembler main program

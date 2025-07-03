@@ -31,21 +31,15 @@
 //
 //***************************************************************************
 
-
-
 // cc65
 #include "codeent.h"
 #include "codeinfo.h"
 #include "error.h"
 #include "coptbool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Table used to invert a condition, indexed by condition
 static const unsigned char CmpInvertTab[] = {
@@ -54,13 +48,9 @@ static const unsigned char CmpInvertTab[] = {
     CMP_ULE, CMP_ULT, CMP_UGE, CMP_UGT
 };
 
-
-
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 static void ReplaceBranchCond (CodeSeg* S, unsigned I, cmp_t Cond)
 /* Helper function for the replacement of routines that return a boolean
@@ -164,13 +154,9 @@ static void ReplaceBranchCond (CodeSeg* S, unsigned I, cmp_t Cond)
 
 }
 
-
-
 //***************************************************************************
 //    Optimize bool comparison and transformer subroutines with branches
 //***************************************************************************
-
-
 
 unsigned OptBoolCmp (CodeSeg* S)
 /* Search for calls to compare subroutines followed by a conditional branch
@@ -232,8 +218,6 @@ unsigned OptBoolCmp (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptBoolTrans (CodeSeg* S)
 /* Try to remove the call to boolean transformer routines where the call is
 ** not really needed and change following branch condition accordingly.
@@ -289,8 +273,6 @@ unsigned OptBoolTrans (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptBoolUnary (CodeSeg* S)
 /* Try to remove the call to a bcastax/bnegax routines where the call is
 ** not really needed and change following branch condition accordingly.
@@ -345,13 +327,9 @@ unsigned OptBoolUnary (CodeSeg* S)
     return Changes;
 }
 
-
-
 //***************************************************************************
 //           Remove calls to the boolean cast/negation subroutines
 //***************************************************************************
-
-
 
 unsigned OptBoolUnary1 (CodeSeg* S)
 /* Search for and remove cmp #0/bcastax/boolne following a bcastax/bnegax.
@@ -424,8 +402,6 @@ unsigned OptBoolUnary1 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptBoolUnary2 (CodeSeg* S)
 /* Search for and remove cmp #0/bcastax/boolne following a boolean transformer.
 ** Or search for and remove cmp #1/bnegax/booleq following a boolean transformer
@@ -492,8 +468,6 @@ unsigned OptBoolUnary2 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptBoolUnary3 (CodeSeg* S)
 /* If A == 0, replace bcastax/bnegax with
@@ -566,13 +540,9 @@ unsigned OptBoolUnary3 (CodeSeg* S)
     return Changes;
 }
 
-
-
 //***************************************************************************
 //                            bnega optimizations
 //***************************************************************************
-
-
 
 unsigned OptBNegA1 (CodeSeg* S)
 /* Check for
@@ -623,8 +593,6 @@ unsigned OptBNegA1 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptBNegA2 (CodeSeg* S)
 /* Check for
@@ -686,13 +654,9 @@ unsigned OptBNegA2 (CodeSeg* S)
     return Changes;
 }
 
-
-
 //***************************************************************************
 //                            bnegax optimizations
 //***************************************************************************
-
-
 
 unsigned OptBNegAX1 (CodeSeg* S)
 /* On a call to bnegax, if X is zero, the result depends only on the value in
@@ -729,8 +693,6 @@ unsigned OptBNegAX1 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptBNegAX2 (CodeSeg* S)
 /* Search for the sequence:
@@ -804,8 +766,6 @@ unsigned OptBNegAX2 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptBNegAX3 (CodeSeg* S)
 /* Search for the sequence:
 **
@@ -865,8 +825,6 @@ unsigned OptBNegAX3 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptBNegAX4 (CodeSeg* S)
 /* Search for the sequence:

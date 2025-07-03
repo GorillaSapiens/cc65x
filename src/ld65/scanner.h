@@ -31,24 +31,16 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SCANNER_H
 #define SCANNER_H
-
-
 
 // common
 #include "filepos.h"
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Config file tokens
 typedef enum {
@@ -152,8 +144,6 @@ typedef enum {
 
 } cfgtok_t;
 
-
-
 // Mapping table entry, special identifier --> token
 typedef struct IdentTok IdentTok;
 struct IdentTok {
@@ -161,8 +151,6 @@ struct IdentTok {
     cfgtok_t    Tok;            // Token for identifier
 };
 #define ENTRY_COUNT(s)  (sizeof (s) / sizeof (s [0]))
-
-
 
 // Current token and attributes
 extern cfgtok_t         CfgTok;
@@ -178,13 +166,9 @@ extern unsigned long    CfgIVal;
 */
 extern FilePos          CfgErrorPos;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void CfgWarning (const FilePos* Pos, const char* Format, ...) attribute((format(printf,2,3)));
 // Print a warning message adding file name and line number of the config file
@@ -239,8 +223,6 @@ void CfgOpenInput (void);
 
 void CfgCloseInput (void);
 // Close the input file if we have one
-
-
 
 // End of scanner.h
 

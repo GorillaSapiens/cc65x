@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 #include <string.h>
 #if defined(_WIN32)
@@ -58,13 +56,9 @@
 #include "strbuf.h"
 #include "xmalloc.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static char* CleanupPath (const char* Path)
 // Prepare and return a clean copy of Path
@@ -89,8 +83,6 @@ static char* CleanupPath (const char* Path)
     return NewPath;
 }
 
-
-
 static void Add (SearchPaths* P, const char* New)
 // Cleanup a new search path and add it to the list
 {
@@ -98,15 +90,11 @@ static void Add (SearchPaths* P, const char* New)
     CollAppend (P, CleanupPath (New));
 }
 
-
-
 SearchPaths* NewSearchPath (void)
 // Create a new, empty search path list
 {
     return NewCollection ();
 }
-
-
 
 void AddSearchPath (SearchPaths* P, const char* NewPath)
 // Add a new search path to the end of an existing list
@@ -117,8 +105,6 @@ void AddSearchPath (SearchPaths* P, const char* NewPath)
     }
 }
 
-
-
 void AddSearchPathFromEnv (SearchPaths* P, const char* EnvVar)
 /* Add a search path from an environment variable to the end of an existing
 ** list.
@@ -126,8 +112,6 @@ void AddSearchPathFromEnv (SearchPaths* P, const char* EnvVar)
 {
     AddSearchPath (P, getenv (EnvVar));
 }
-
-
 
 void AddSubSearchPathFromEnv (SearchPaths* P, const char* EnvVar, const char* SubDir)
 /* Add a search path from an environment variable, adding a subdirectory to
@@ -170,8 +154,6 @@ void AddSubSearchPathFromEnv (SearchPaths* P, const char* EnvVar, const char* Su
 #else
 #define PATHSEP "/"
 
-
-
 /*
    on POSIX-compatible operating system, a binary can be started in
    3 distinct ways:
@@ -193,8 +175,6 @@ void AddSubSearchPathFromEnv (SearchPaths* P, const char* EnvVar, const char* Su
 >  are implementation-defined.
 
 */
-
-
 
 static int SearchPathBin(const char* bin, char* buf, size_t buflen)
 /* search colon-separated list of paths in PATH environment variable
@@ -229,8 +209,6 @@ static int SearchPathBin(const char* bin, char* buf, size_t buflen)
     }
     return 0;
 }
-
-
 
 static char* GetProgPath(char* pathbuf, char* a0)
 /* search for the full path of the binary using the argv[0] parameter
@@ -309,7 +287,6 @@ void AddSubSearchPathFromBin (SearchPaths* P, const char* SubDir)
     AddSearchPath (P, Dir);
 }
 
-
 int PushSearchPath (SearchPaths* P, const char* NewPath)
 /* Add a new search path to the head of an existing search path list, provided
 ** that it's not already there. If the path is already at the first position,
@@ -331,8 +308,6 @@ int PushSearchPath (SearchPaths* P, const char* NewPath)
     return 1;
 }
 
-
-
 void PopSearchPath (SearchPaths* P)
 // Remove a search path from the head of an existing search path list
 {
@@ -340,8 +315,6 @@ void PopSearchPath (SearchPaths* P)
     xfree (CollAt (P, 0));
     CollDelete (P, 0);
 }
-
-
 
 char* GetSearchPath (SearchPaths* P, unsigned Index)
 /* Return the search path at the given index, if the index is valid, return an
@@ -352,8 +325,6 @@ char* GetSearchPath (SearchPaths* P, unsigned Index)
         return CollAtUnchecked (P, Index);
     return "";
 }
-
-
 
 char* SearchFile (const SearchPaths* P, const char* File)
 /* Search for a file in a list of directories. Return a pointer to a malloced

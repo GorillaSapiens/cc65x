@@ -31,24 +31,16 @@
 //
 //***************************************************************************
 
-
-
 #ifndef INSTR_H
 #define INSTR_H
-
-
 
 // common
 #include "cpu.h"
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                       Data for 6502 and successors
 //***************************************************************************
-
-
 
 /* Constants for the addressing mode. If an opcode is available in zero page
 ** and absolut adressing mode, both bits are set. When checking for valid
@@ -144,8 +136,6 @@
 #define AM65I_Q                  31
 #define AM65I_COUNT              32
 
-
-
 // Description for one instruction
 typedef struct InsDesc InsDesc;
 struct InsDesc {
@@ -169,13 +159,9 @@ extern const InsTable* InsTab;
 // Table that encodes the additional bytes for each instruction
 extern unsigned char ExtBytes[AM65I_COUNT];
 
-
-
 //***************************************************************************
 //                      Data for the SWEET16 pseudo CPU
 //***************************************************************************
-
-
 
 // SWEET16 addressing modes
 #define AMSW16_IMP      0x0001          // Implicit
@@ -186,13 +172,9 @@ extern unsigned char ExtBytes[AM65I_COUNT];
 
 #define AMSW16I_COUNT   5               // Number of addressing modes
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void SetCPU (cpu_t NewCPU);
 // Set a new CPU
@@ -207,8 +189,6 @@ int FindInstruction (const StrBuf* Ident);
 
 void HandleInstruction (unsigned Index);
 // Handle the mnemonic with the given index
-
-
 
 // End of instr.h
 

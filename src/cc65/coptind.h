@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COPTIND_H
 #define COPTIND_H
-
-
 
 // cc65
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned OptUnusedLoads (CodeSeg* S);
 /* Remove loads of or operations with registers where the value loaded or
@@ -133,8 +125,6 @@ unsigned OptSignExtended (CodeSeg* S);
 **
 ** provided the C flag isn't used later.
 */
-
-
 
 // End of coptind.h
 

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -51,13 +49,9 @@
 #include "ident.h"
 #include "symtab.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Predefined type strings
 const Type type_char[]      = { TYPE(T_CHAR),   TYPE(T_END) };
@@ -81,13 +75,9 @@ const Type type_c_char_p[]  = { TYPE(T_PTR),    TYPE(T_C_CHAR), TYPE(T_END) };
 const Type type_void_p[]    = { TYPE(T_PTR),    TYPE(T_VOID),   TYPE(T_END) };
 const Type type_c_void_p[]  = { TYPE(T_PTR),    TYPE(T_C_VOID), TYPE(T_END) };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned TypeLen (const Type* T)
 // Return the length of the type string
@@ -98,8 +88,6 @@ unsigned TypeLen (const Type* T)
     }
     return T - Start;
 }
-
-
 
 Type* TypeCopy (Type* Dest, const Type* Src)
 // Copy a type string
@@ -116,16 +104,12 @@ Type* TypeCopy (Type* Dest, const Type* Src)
     return Orig;
 }
 
-
-
 Type* TypeDup (const Type* T)
 // Create a copy of the given type on the heap
 {
     unsigned Len = (TypeLen (T) + 1) * sizeof (Type);
     return memcpy (xmalloc (Len), T, Len);
 }
-
-
 
 Type* TypeAlloc (unsigned Len)
 /* Allocate memory for a type string of length Len. Len *must* include the
@@ -135,21 +119,15 @@ Type* TypeAlloc (unsigned Len)
     return xmalloc (Len * sizeof (Type));
 }
 
-
-
 void TypeFree (Type* T)
 // Free a type string
 {
     xfree (T);
 }
 
-
-
 //***************************************************************************
 //                           Type info extraction
 //***************************************************************************
-
-
 
 int SignExtendChar (int C)
 // Do correct sign extension of a character to an int
@@ -160,8 +138,6 @@ int SignExtendChar (int C)
         return C & 0xFF;
     }
 }
-
-
 
 long GetIntegerTypeMin (const Type* Type)
 /* Get the smallest possible value of the integer type.
@@ -179,8 +155,6 @@ long GetIntegerTypeMin (const Type* Type)
         return 0;
     }
 }
-
-
 
 unsigned long GetIntegerTypeMax (const Type* Type)
 /* Get the largest possible value of the integer type.
@@ -203,15 +177,11 @@ unsigned long GetIntegerTypeMax (const Type* Type)
     }
 }
 
-
-
 unsigned BitSizeOf (const Type* T)
 // Return the size (in bit-width) of a data type
 {
     return IsTypeBitField (T) ? T->A.B.Width : CHAR_BITS * SizeOf (T);
 }
-
-
 
 unsigned SizeOf (const Type* T)
 // Compute size (in bytes) of object represented by type array
@@ -284,8 +254,6 @@ unsigned SizeOf (const Type* T)
     }
 }
 
-
-
 unsigned PSizeOf (const Type* T)
 // Compute size (in bytes) of pointee object
 {
@@ -296,8 +264,6 @@ unsigned PSizeOf (const Type* T)
     return SizeOf (T + 1);
 }
 
-
-
 unsigned CheckedBitSizeOf (const Type* T)
 /* Return the size (in bit-width) of a data type. If the size is zero, emit an
 ** error and return some valid size instead (so the rest of the compiler
@@ -306,8 +272,6 @@ unsigned CheckedBitSizeOf (const Type* T)
 {
     return IsTypeBitField (T) ? T->A.B.Width : CHAR_BITS * CheckedSizeOf (T);
 }
-
-
 
 unsigned CheckedSizeOf (const Type* T)
 /* Return the size (in bytes) of a data type. If the size is zero, emit an
@@ -327,8 +291,6 @@ unsigned CheckedSizeOf (const Type* T)
     return Size;
 }
 
-
-
 unsigned CheckedPSizeOf (const Type* T)
 /* Return the size (in bytes) of a data type that is pointed to by a pointer.
 ** If the size is zero, emit an error and return some valid size instead (so
@@ -347,8 +309,6 @@ unsigned CheckedPSizeOf (const Type* T)
     return Size;
 }
 
-
-
 static unsigned GetMinimalTypeSizeByBitWidth (unsigned BitWidth)
 // Return the size of the smallest integer type that may have BitWidth bits
 {
@@ -365,8 +325,6 @@ static unsigned GetMinimalTypeSizeByBitWidth (unsigned BitWidth)
     // Return the result size
     return V + 1U;
 }
-
-
 
 TypeCode GetUnderlyingTypeCode (const Type* Type)
 /* Get the type code of the unqualified underlying type of Type.
@@ -423,13 +381,9 @@ TypeCode GetUnderlyingTypeCode (const Type* Type)
     return Underlying;
 }
 
-
-
 //***************************************************************************
 //                             Type manipulation
 //***************************************************************************
-
-
 
 Type* GetImplicitFuncType (void)
 // Return a type string for an implicitly declared function
@@ -455,8 +409,6 @@ Type* GetImplicitFuncType (void)
     return T;
 }
 
-
-
 Type* GetCharArrayType (unsigned Len)
 // Return the type for a char array of the given length
 {
@@ -472,8 +424,6 @@ Type* GetCharArrayType (unsigned Len)
     // Return the new type
     return T;
 }
-
-
 
 Type* NewPointerTo (const Type* T)
 /* Return a type string that is "pointer to T". The type string is allocated
@@ -493,8 +443,6 @@ Type* NewPointerTo (const Type* T)
     // ...and return it
     return P;
 }
-
-
 
 Type* NewBitFieldOf (const Type* T, unsigned BitOffs, unsigned BitWidth)
 /* Return a type string that is "unqualified T : BitWidth" aligned on BitOffs.
@@ -525,8 +473,6 @@ Type* NewBitFieldOf (const Type* T, unsigned BitOffs, unsigned BitWidth)
     return P;
 }
 
-
-
 const Type* AddressOf (const Type* T)
 /* Return a type string that is "address of T". The type string is allocated
 ** on the heap and may be freed after use.
@@ -546,8 +492,6 @@ const Type* AddressOf (const Type* T)
     return P;
 }
 
-
-
 const Type* Indirect (const Type* T)
 /* Do one indirection for the given type, that is, return the type where the
 ** given type points to.
@@ -560,16 +504,12 @@ const Type* Indirect (const Type* T)
     return T + 1;
 }
 
-
-
 Type* ArrayToPtr (const Type* T)
 // Convert an array to a pointer to it's first element
 {
     // Return pointer to first element
     return NewPointerTo (GetElementType (T));
 }
-
-
 
 const Type* PtrConversion (const Type* T)
 /* If the type is a function, convert it to pointer to function. If the
@@ -585,8 +525,6 @@ const Type* PtrConversion (const Type* T)
         return T;
     }
 }
-
-
 
 const Type* StdConversion (const Type* T)
 /* If the type is a function, convert it to pointer to function. If the
@@ -604,8 +542,6 @@ const Type* StdConversion (const Type* T)
         return T;
     }
 }
-
-
 
 const Type* IntPromotion (const Type* T)
 /* Apply the integer promotions to T and return the result. The returned type
@@ -656,8 +592,6 @@ const Type* IntPromotion (const Type* T)
         return type_int;
     }
 }
-
-
 
 const Type* ArithmeticConvert (const Type* lhst, const Type* rhst)
 // Perform the usual arithmetic conversions for binary operators.
@@ -729,8 +663,6 @@ const Type* ArithmeticConvert (const Type* lhst, const Type* rhst)
     return type_int;
 }
 
-
-
 const Type* GetSignedType (const Type* T)
 // Get signed counterpart of the integral type
 {
@@ -753,8 +685,6 @@ const Type* GetSignedType (const Type* T)
     }
 }
 
-
-
 const Type* GetUnsignedType (const Type* T)
 // Get unsigned counterpart of the integral type
 {
@@ -776,8 +706,6 @@ const Type* GetUnsignedType (const Type* T)
             return T;
     }
 }
-
-
 
 const Type* GetUnderlyingType (const Type* Type)
 // Get the underlying type of an enum or other integer class type
@@ -810,8 +738,6 @@ const Type* GetUnderlyingType (const Type* Type)
     return Type;
 }
 
-
-
 const Type* GetStructReplacementType (const Type* SType)
 // Get a replacement type for passing a struct/union by value in the primary
 {
@@ -829,15 +755,11 @@ const Type* GetStructReplacementType (const Type* SType)
     return NewType;
 }
 
-
-
 const Type* GetBitFieldDeclType (const Type* Type)
 // Get the original integer type used to declare the bit-field
 {
     return Type + 1;
 }
-
-
 
 const Type* GetBitFieldChunkType (const Type* Type)
 // Get the type needed to operate on the byte chunk containing the bit-field
@@ -870,13 +792,9 @@ const Type* GetBitFieldChunkType (const Type* Type)
     return Type + 1;
 }
 
-
-
 //***************************************************************************
 //                              Type Predicates
 //***************************************************************************
-
-
 
 int IsTypeFragBitField (const Type* T)
 // Return true if this is a bit-field that shares byte space with other fields
@@ -884,8 +802,6 @@ int IsTypeFragBitField (const Type* T)
     return IsTypeBitField (T) &&
            (T->A.B.Offs != 0 || T->A.B.Width != CHAR_BITS * SizeOf (T));
 }
-
-
 
 #if !defined(HAVE_INLINE)
 int IsTypeFuncLike (const Type* T)
@@ -895,15 +811,11 @@ int IsTypeFuncLike (const Type* T)
 }
 #endif
 
-
-
 int IsObjectType (const Type* T)
 // Return true if this is a fully described object type
 {
     return !IsTypeFunc (T) && !IsIncompleteType (T);
 }
-
-
 
 int IsIncompleteType (const Type* T)
 // Return true if this is an object type lacking size info
@@ -914,15 +826,11 @@ int IsIncompleteType (const Type* T)
     return IsTypeVoid (T) || IsIncompleteESUType (T);
 }
 
-
-
 int IsArithmeticType (const Type* T)
 // Return true if this is an integer or floating type
 {
     return IsClassInt (T) || IsClassFloat (T);
 }
-
-
 
 int IsBasicType (const Type* T)
 // Return true if this is a character, integer or floating type
@@ -930,15 +838,11 @@ int IsBasicType (const Type* T)
     return IsDeclRankChar (T) || IsClassInt (T) || IsClassFloat (T);
 }
 
-
-
 int IsScalarType (const Type* T)
 // Return true if this is an arithmetic or pointer type
 {
     return IsArithmeticType (T) || IsTypePtr (T);
 }
-
-
 
 int IsDerivedType (const Type* T)
 // Return true if this is an array, struct, union, function or pointer type
@@ -946,15 +850,11 @@ int IsDerivedType (const Type* T)
     return IsTypeArray (T) || IsClassStruct (T) || IsClassFunc (T) || IsTypePtr (T);
 }
 
-
-
 int IsAggregateType (const Type* T)
 // Return true if this is an array or struct type
 {
     return IsTypeArray (T) || IsTypeStruct (T);
 }
-
-
 
 int IsDerivedDeclaratorType (const Type* T)
 // Return true if this is an array, function or pointer type
@@ -962,15 +862,11 @@ int IsDerivedDeclaratorType (const Type* T)
     return IsTypeArray (T) || IsTypeFunc (T) || IsTypePtr (T);
 }
 
-
-
 int IsRelationType (const Type* T)
 // Return true if this is an arithmetic, array or pointer type
 {
     return IsArithmeticType (T) || IsClassPtr (T);
 }
-
-
 
 int IsCastType (const Type* T)
 // Return true if this type can be used for casting
@@ -978,15 +874,11 @@ int IsCastType (const Type* T)
     return IsScalarType (T) || IsTypeVoid (T);
 }
 
-
-
 int IsESUType (const Type* T)
 // Return true if this is an enum/struct/union type
 {
     return IsClassStruct (T) || IsTypeEnum (T);
 }
-
-
 
 int IsIncompleteESUType (const Type* T)
 // Return true if this is an incomplete ESU type
@@ -996,8 +888,6 @@ int IsIncompleteESUType (const Type* T)
     return TagSym != 0 && !SymIsDef (TagSym);
 }
 
-
-
 int IsAnonESUType (const Type* T)
 // Return true if this is an anonymous ESU type
 {
@@ -1006,15 +896,11 @@ int IsAnonESUType (const Type* T)
     return TagSym != 0 && SymHasAnonName (TagSym);
 }
 
-
-
 int IsAnonStructClass (const Type* T)
 // Return true if this is an anonymous struct or union type
 {
     return IsClassStruct (T) && IsAnonESUType (T);
 }
-
-
 
 int IsPassByRefType (const Type* T)
 /* Return true if this is a large struct/union type that doesn't fit in the
@@ -1025,15 +911,11 @@ int IsPassByRefType (const Type* T)
     return IsClassStruct (T) && GetStructReplacementType (T) == T;
 }
 
-
-
 int IsEmptiableObjectType (const Type* T)
 // Return true if this is a struct/union/void type that can have zero size
 {
     return IsClassStruct (T) || IsTypeVoid (T);
 }
-
-
 
 int HasUnknownSize (const Type* T)
 // Return true if this is an incomplete ESU type or an array of unknown size
@@ -1043,8 +925,6 @@ int HasUnknownSize (const Type* T)
     }
     return IsIncompleteESUType (T);
 }
-
-
 
 int TypeHasAttrData (const Type* T)
 // Return true if the given type has attribute data
@@ -1056,13 +936,9 @@ int TypeHasAttrData (const Type* T)
            IsTypeBitField (T);
 }
 
-
-
 //***************************************************************************
 //                             Qualifier helpers
 //***************************************************************************
-
-
 
 TypeCode AddrSizeQualifier (unsigned AddrSize)
 // Return T_QUAL_NEAR or T_QUAL_FAR depending on the address size
@@ -1082,13 +958,9 @@ TypeCode AddrSizeQualifier (unsigned AddrSize)
     }
 }
 
-
-
 //***************************************************************************
 //                           Function type helpers
 //***************************************************************************
-
-
 
 int IsVariadicFunc (const Type* T)
 /* Return true if this is a function type or pointer to function type with
@@ -1098,8 +970,6 @@ int IsVariadicFunc (const Type* T)
 {
     return (GetFuncDesc (T)->Flags & FD_VARIADIC) != 0;
 }
-
-
 
 int IsFastcallFunc (const Type* T)
 /* Return true if this is a function type or pointer to function type by
@@ -1113,8 +983,6 @@ int IsFastcallFunc (const Type* T)
     }
     return !IsVariadicFunc (T) && (AutoCDecl ? IsQualFastcall (T) : !IsQualCDecl (T));
 }
-
-
 
 FuncDesc* GetFuncDesc (const Type* T)
 // Get the FuncDesc pointer from a function or pointer-to-function type
@@ -1131,8 +999,6 @@ FuncDesc* GetFuncDesc (const Type* T)
     return T->A.F;
 }
 
-
-
 void SetFuncDesc (Type* T, FuncDesc* F)
 // Set the FuncDesc pointer in a function or pointer-to-function type
 {
@@ -1147,8 +1013,6 @@ void SetFuncDesc (Type* T, FuncDesc* F)
     // Set the function descriptor
     T->A.F = F;
 }
-
-
 
 const Type* GetFuncReturnType (const Type* T)
 // Return a pointer to the return type of a function or pointer-to-function type
@@ -1165,8 +1029,6 @@ const Type* GetFuncReturnType (const Type* T)
     return T + 1;
 }
 
-
-
 Type* GetFuncReturnTypeModifiable (Type* T)
 // Return a non-const pointer to the return type of a function or pointer-to-function type
 {
@@ -1182,8 +1044,6 @@ Type* GetFuncReturnTypeModifiable (Type* T)
     return T + 1;
 }
 
-
-
 const FuncDesc* GetFuncDefinitionDesc (const Type* T)
 // Get the function descriptor of the function definition
 {
@@ -1196,13 +1056,9 @@ const FuncDesc* GetFuncDefinitionDesc (const Type* T)
     return D->FuncDef != 0 ? D->FuncDef : D;
 }
 
-
-
 //***************************************************************************
 //                            Array type helpers
 //***************************************************************************
-
-
 
 long GetElementCount (const Type* T)
 /* Get the element count of the array specified in T (which must be of
@@ -1213,8 +1069,6 @@ long GetElementCount (const Type* T)
     return T->A.L;
 }
 
-
-
 void SetElementCount (Type* T, long Count)
 /* Set the element count of the array specified in T (which must be of
 ** array type).
@@ -1224,8 +1078,6 @@ void SetElementCount (Type* T, long Count)
     T->A.L = Count;
 }
 
-
-
 const Type* GetElementType (const Type* T)
 // Return the element type of the given array type
 {
@@ -1233,16 +1085,12 @@ const Type* GetElementType (const Type* T)
     return T + 1;
 }
 
-
-
 Type* GetElementTypeModifiable (Type* T)
 // Return the element type of the given array type
 {
     CHECK (IsTypeArray (T));
     return T + 1;
 }
-
-
 
 const Type* GetBaseElementType (const Type* T)
 /* Return the base element type of a given type. If T is not an array, this
@@ -1256,13 +1104,9 @@ const Type* GetBaseElementType (const Type* T)
     return T;
 }
 
-
-
 //***************************************************************************
 //                             ESU types helpers
 //***************************************************************************
-
-
 
 struct SymEntry* GetESUTagSym (const Type* T)
 /* Get the tag symbol entry of the enum/struct/union type.
@@ -1275,8 +1119,6 @@ struct SymEntry* GetESUTagSym (const Type* T)
     return 0;
 }
 
-
-
 void SetESUTagSym (Type* T, struct SymEntry* S)
 // Set the tag symbol entry of the enum/struct/union type
 {
@@ -1287,13 +1129,9 @@ void SetESUTagSym (Type* T, struct SymEntry* S)
     T->A.S = S;
 }
 
-
-
 //***************************************************************************
 //                                  Helpers
 //***************************************************************************
-
-
 
 const char* GetBasicTypeName (const Type* T)
 /* Return a const name string of the basic type.
@@ -1350,8 +1188,6 @@ const char* GetBasicTypeName (const Type* T)
     return "<type>";
 }
 
-
-
 static const char* GetTagSymName (const Type* T)
 /* Return a name string of the type or the symbol name if it is an ESU type.
 ** Note: This may use a static buffer that could be overwritten by other calls.
@@ -1370,8 +1206,6 @@ static const char* GetTagSymName (const Type* T)
     return TypeName;
 }
 
-
-
 const char* GetFullTypeName (const Type* T)
 // Return the full name string of the given type
 {
@@ -1380,8 +1214,6 @@ const char* GetFullTypeName (const Type* T)
 
     return SB_GetConstBuf (Buf);
 }
-
-
 
 static void GetParameterList (StrBuf* ParamList, StrBuf* Buf, const FuncDesc* D, int Detailed)
 {
@@ -1439,8 +1271,6 @@ static void GetParameterList (StrBuf* ParamList, StrBuf* Buf, const FuncDesc* D,
     }
     SB_Terminate (ParamList);
 }
-
-
 
 static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBuf* East, const Type* T)
 /* Return the name string of the given type split into a western part and an
@@ -1574,8 +1404,6 @@ static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBu
     return West;
 }
 
-
-
 struct StrBuf* GetFullTypeNameBuf (struct StrBuf* S, const Type* T)
 // Return the full name string of the given type
 {
@@ -1589,8 +1417,6 @@ struct StrBuf* GetFullTypeNameBuf (struct StrBuf* S, const Type* T)
 
     return S;
 }
-
-
 
 int GetQualifierTypeCodeNameBuf (struct StrBuf* S, TypeCode Qual, TypeCode IgnoredQual)
 /* Return the names of the qualifiers of the type.
@@ -1655,8 +1481,6 @@ int GetQualifierTypeCodeNameBuf (struct StrBuf* S, TypeCode Qual, TypeCode Ignor
     return Count;
 }
 
-
-
 void PrintType (FILE* F, const Type* T)
 // Print fulle name of the type
 {
@@ -1664,8 +1488,6 @@ void PrintType (FILE* F, const Type* T)
     fprintf (F, "%s", SB_GetConstBuf (GetFullTypeNameBuf (&Buf, T)));
     SB_Done (&Buf);
 }
-
-
 
 void PrintFuncSig (FILE* F, const char* Name, const Type* T)
 // Print a function signature
@@ -1731,8 +1553,6 @@ void PrintFuncSig (FILE* F, const char* Name, const Type* T)
     SB_Done (&East);
     SB_Done (&West);
 }
-
-
 
 void PrintRawType (FILE* F, const Type* T)
 // Print a type string in raw hex format (for debugging)

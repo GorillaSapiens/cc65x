@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef STANDARD_H
 #define STANDARD_H
-
-
 
 // common
 #include "intstack.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Supported standards.
 typedef enum standard_t {
@@ -64,20 +56,14 @@ typedef enum standard_t {
 // Current language standard
 extern IntStack         Standard;               // Language standard
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 standard_t FindStandard (const char* Name);
 /* Find a standard by name. Returns one of the constants defined above.
 ** STD_UNKNOWN is returned if Name doesn't match a standard.
 */
-
-
 
 // End of standard.h
 

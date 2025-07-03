@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ASSERTS_H
 #define ASSERTS_H
-
-
 
 #include <stdio.h>
 
 // common
 #include "filepos.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Assertion object forward decl
 typedef struct Assertion Assertion;
@@ -57,21 +49,15 @@ typedef struct Assertion Assertion;
 // ObjData forward decl
 struct ObjData;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Assertion* ReadAssertion (FILE* F, struct ObjData* O);
 // Read an assertion from the given file
 
 void CheckAssertions (void);
 // Check all assertions
-
-
 
 // End of asserts.h
 

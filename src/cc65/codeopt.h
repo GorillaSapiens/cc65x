@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CODEOPT_H
 #define CODEOPT_H
-
-
 
 // cc65
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void DisableOpt (const char* Name);
 // Disable the optimization with the given name
@@ -60,8 +52,6 @@ void ListOptSteps (FILE* F);
 
 void RunOpt (CodeSeg* S);
 // Run the optimizer
-
-
 
 // End of codeopt.h
 

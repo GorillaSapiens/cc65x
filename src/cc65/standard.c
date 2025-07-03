@@ -31,20 +31,14 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // cc65
 #include "standard.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Current language standard, will be set to STD_DEFAULT on startup
 IntStack Standard           = INTSTACK(STD_UNKNOWN);
@@ -54,13 +48,9 @@ static const char* const StdNames[STD_COUNT] = {
     "c89", "c99", "cc65"
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 standard_t FindStandard (const char* Name)
 /* Find a standard by name. Returns one of the constants defined above.

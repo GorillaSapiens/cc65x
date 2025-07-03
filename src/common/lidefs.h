@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef LIDEFS_H
 #define LIDEFS_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Types of line infos.
 #define LI_TYPE_ASM             0U      // Normal assembler source
@@ -56,8 +50,6 @@
 // Extract type and count from a type field
 #define LI_GET_TYPE(T)          ((T) & 0x03U)
 #define LI_GET_COUNT(T)         ((unsigned)(T) >> 2)
-
-
 
 // End of lidefs.h
 

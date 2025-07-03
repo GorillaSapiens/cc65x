@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 
 // common
@@ -44,13 +42,9 @@
 #include "coptsize.h"
 #include "reginfo.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Flags for CallDesc
 #define F_NONE          0x0000U // No extra flags
@@ -808,13 +802,9 @@ static const CallDesc CallTable [] = {
 };
 #define CALL_COUNT (sizeof(CallTable) / sizeof(CallTable[0]))
 
-
-
 //***************************************************************************
 //                                  Helpers
 //***************************************************************************
-
-
 
 static const CallDesc* FindCall (const char* Name)
 /* Find the function with the given name. Return a pointer to the table entry
@@ -850,8 +840,6 @@ static const CallDesc* FindCall (const char* Name)
     return Found? &CallTable[First] : 0;
 }
 
-
-
 static int RegMatch (short Expected, short Actual)
 /* Check for a register match. If Expected has a value, it must be identical
 ** to Actual.
@@ -860,13 +848,9 @@ static int RegMatch (short Expected, short Actual)
     return RegValIsUnknown (Expected) || (Expected == Actual);
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned OptSize1 (CodeSeg* S)
 /* Do size optimization by calling special subroutines that preload registers.
@@ -942,8 +926,6 @@ unsigned OptSize1 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptSize2 (CodeSeg* S)
 /* Do size optimization by using shorter code sequences, even if this

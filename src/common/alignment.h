@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ALIGNMENT_H
 #define ALIGNMENT_H
-
-
 
 // common
 #include "inline.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 /* Maximum possible alignment. Beware: To increase the possible alignment it
 ** is not enough to bump this value. Check the code inside.
@@ -59,13 +51,9 @@
 */
 #define LARGE_ALIGNMENT 0x101UL
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned long LeastCommonMultiple (unsigned long Left, unsigned long Right);
 /* Calculate the least common multiple of two numbers and return
@@ -77,8 +65,6 @@ unsigned long AlignAddr (unsigned long Addr, unsigned long Alignment);
 
 unsigned long AlignCount (unsigned long Addr, unsigned long Alignment);
 // Calculate how many bytes must be inserted to align Addr to Alignment
-
-
 
 // End of alignment.h
 

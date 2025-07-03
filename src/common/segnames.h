@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SEGNAMES_H
 #define SEGNAMES_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Default segment names
 #define SEGNAME_NULL     "NULL"
@@ -52,18 +46,12 @@
 #define SEGNAME_RODATA   "RODATA"
 #define SEGNAME_CODE     "CODE"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 int ValidSegName (const char* Name);
 // Return true if the given segment name is valid, return false otherwise
-
-
 
 // End of segnames.h
 

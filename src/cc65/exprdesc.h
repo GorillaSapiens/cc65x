@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef EXPRDESC_H
 #define EXPRDESC_H
-
-
 
 #include <inttypes.h>
 #include <string.h>
@@ -49,13 +45,9 @@
 #include "asmcode.h"
 #include "datatype.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Defines for the flags field of the expression descriptor
 enum {
@@ -216,24 +208,16 @@ struct ExprDesc {
     CodeMark            End;
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 ExprDesc* ED_Init (ExprDesc* Expr);
 // Initialize an ExprDesc
-
-
 
 //***************************************************************************
 //                              Info Extraction
 //***************************************************************************
-
-
 
 #if defined(HAVE_INLINE)
 INLINE int ED_GetLoc (const ExprDesc* Expr)
@@ -266,13 +250,9 @@ int ED_GetStackOffs (const ExprDesc* Expr, int Offs);
 ** an additional offset in Offs.
 */
 
-
-
 //***************************************************************************
 //                                Predicates
 //***************************************************************************
-
-
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLocNone (const ExprDesc* Expr)
@@ -603,13 +583,9 @@ int ED_IsBool (const ExprDesc* Expr);
 ** be an operand to a compare operation with 0/NULL.
 */
 
-
-
 //***************************************************************************
 //                               Manipulation
 //***************************************************************************
-
-
 
 ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, const Type* Type);
 // Replace Expr with an absolute const with the given value and type
@@ -714,13 +690,9 @@ INLINE void ED_PropagateFrom (ExprDesc* Expr, const ExprDesc* SubExpr)
 const Type* ReplaceType (ExprDesc* Expr, const Type* NewType);
 // Replace the type of Expr by a copy of Newtype and return the old type string
 
-
-
 //***************************************************************************
 //                               Other Helpers
 //***************************************************************************
-
-
 
 void PrintExprDesc (FILE* F, ExprDesc* Expr);
 // Print an ExprDesc
@@ -730,8 +702,6 @@ void ED_SetCodeRange (ExprDesc* Expr, const CodeMark* Start, const CodeMark* End
 
 int ED_CodeRangeIsEmpty (const ExprDesc* Expr);
 // Return true if no code was output for this expression
-
-
 
 // End of exprdesc.h
 

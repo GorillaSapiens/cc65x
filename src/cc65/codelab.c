@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "check.h"
 #include "xmalloc.h"
@@ -42,13 +40,9 @@
 #include "codelab.h"
 #include "output.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 CodeLabel* NewCodeLabel (const char* Name, unsigned Hash)
 // Create a new code label, initialize and return it
@@ -67,8 +61,6 @@ CodeLabel* NewCodeLabel (const char* Name, unsigned Hash)
     return L;
 }
 
-
-
 void FreeCodeLabel (CodeLabel* L)
 // Free the given code label
 {
@@ -81,8 +73,6 @@ void FreeCodeLabel (CodeLabel* L)
     // Delete the struct
     xfree (L);
 }
-
-
 
 void CL_AddRef (CodeLabel* L, struct CodeEntry* E)
 // Let the CodeEntry E reference the label L
@@ -100,8 +90,6 @@ void CL_AddRef (CodeLabel* L, struct CodeEntry* E)
     // Remember that in the label
     CollAppend (&L->JumpFrom, E);
 }
-
-
 
 void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel)
 /* Move all references to OldLabel to point to NewLabel. OldLabel will have no
@@ -125,8 +113,6 @@ void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel)
     // There are no more references to the old label
     CollDeleteAll (&OldLabel->JumpFrom);
 }
-
-
 
 void CL_Output (const CodeLabel* L)
 // Output the code label to the output file

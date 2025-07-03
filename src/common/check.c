@@ -31,28 +31,20 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 
 #include "abend.h"
 #include "check.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Predefined messages
 const char* MsgInternalError    = "Internal error: ";
 const char* MsgPrecondition     = "Precondition violated: ";
 const char* MsgCheckFailed      = "Check failed: ";
 const char* MsgProgramAborted   = "Program aborted: ";
-
-
 
 static void DefaultCheckFailed (const char* msg, const char* cond,
                                 const char* file, unsigned line)
@@ -63,13 +55,9 @@ void (*CheckFailed) (const char* Msg, const char* Cond,
                 = DefaultCheckFailed;
 // Function pointer that is called from check if the condition code is true.
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void DefaultCheckFailed (const char* Msg, const char* Cond,
                                 const char* File, unsigned Line)

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 #include <errno.h>
 
@@ -43,13 +41,9 @@
 #include "error.h"
 #include "fileio.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void FileSetPos (FILE* F, unsigned long Pos)
 // Seek to the given absolute position, fail on errors
@@ -58,8 +52,6 @@ void FileSetPos (FILE* F, unsigned long Pos)
         Error ("Cannot seek: %s", strerror (errno));
     }
 }
-
-
 
 unsigned long FileGetPos (FILE* F)
 // Return the current file position, fail on errors
@@ -71,8 +63,6 @@ unsigned long FileGetPos (FILE* F)
     return Pos;
 }
 
-
-
 unsigned Read8 (FILE* F)
 // Read an 8 bit value from the file
 {
@@ -83,8 +73,6 @@ unsigned Read8 (FILE* F)
     return C;
 }
 
-
-
 unsigned Read16 (FILE* F)
 // Read a 16 bit value from the file
 {
@@ -92,8 +80,6 @@ unsigned Read16 (FILE* F)
     unsigned Hi = Read8 (F);
     return (Hi << 8) | Lo;
 }
-
-
 
 unsigned long Read24 (FILE* F)
 // Read a 24 bit value from the file
@@ -103,8 +89,6 @@ unsigned long Read24 (FILE* F)
     return (Hi << 16) | Lo;
 }
 
-
-
 unsigned long Read32 (FILE* F)
 // Read a 32 bit value from the file
 {
@@ -112,8 +96,6 @@ unsigned long Read32 (FILE* F)
     unsigned long Hi = Read16 (F);
     return (Hi << 16) | Lo;
 }
-
-
 
 long Read32Signed (FILE* F)
 // Read a 32 bit value from the file. Sign extend the value.
@@ -130,8 +112,6 @@ long Read32Signed (FILE* F)
     // Return it as a long
     return (long) V;
 }
-
-
 
 unsigned long ReadVar (FILE* F)
 // Read a variable size value from the file
@@ -155,8 +135,6 @@ unsigned long ReadVar (FILE* F)
     return V;
 }
 
-
-
 char* ReadStr (FILE* F)
 // Read a string from the file into a malloced area
 {
@@ -174,8 +152,6 @@ char* ReadStr (FILE* F)
     return Str;
 }
 
-
-
 FilePos* ReadFilePos (FILE* F, FilePos* Pos)
 // Read a file position from the file
 {
@@ -185,8 +161,6 @@ FilePos* ReadFilePos (FILE* F, FilePos* Pos)
     Pos->Name = ReadVar (F);
     return Pos;
 }
-
-
 
 void* ReadData (FILE* F, void* Data, unsigned Size)
 // Read data from the file
@@ -199,8 +173,6 @@ void* ReadData (FILE* F, void* Data, unsigned Size)
     }
     return Data;
 }
-
-
 
 void ReadObjHeader (FILE* F, ObjHeader* H)
 // Read an object file header from the file
@@ -232,8 +204,6 @@ void ReadObjHeader (FILE* F, ObjHeader* H)
     H->SpanOffs     = Read32 (F);
     H->SpanSize     = Read32 (F);
 }
-
-
 
 void ReadStrPool (FILE* F, Collection* C)
 // Read a string pool from the current position into C.

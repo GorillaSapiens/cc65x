@@ -4,8 +4,6 @@
 ** 2020-11-20, Greg King
 */
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -41,13 +39,9 @@
 #include "typeconv.h"
 #include "expr.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Descriptors for the operations
 static GenDesc GenPASGN  = { TOK_PLUS_ASSIGN,   GEN_NOPUSH,     g_add };
@@ -61,25 +55,17 @@ static GenDesc GenAASGN  = { TOK_AND_ASSIGN,    GEN_NOPUSH,     g_and };
 static GenDesc GenXOASGN = { TOK_XOR_ASSIGN,    GEN_NOPUSH,     g_xor };
 static GenDesc GenOASGN  = { TOK_OR_ASSIGN,     GEN_NOPUSH,     g_or  };
 
-
-
 //***************************************************************************
 //                           Forward declarations
 //***************************************************************************
-
-
 
 static void parseadd (ExprDesc* Expr, int DoArrayRef);
 static void PostInc (ExprDesc* Expr);
 static void PostDec (ExprDesc* Expr);
 
-
-
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 unsigned CG_AddrModeFlags (const ExprDesc* Expr)
 // Return the addressing mode flags for the given expression
@@ -102,8 +88,6 @@ unsigned CG_AddrModeFlags (const ExprDesc* Expr)
     }
 }
 
-
-
 static unsigned CG_TypeOfBySize (unsigned Size)
 // Get the code generator replacement type of the object by its size
 {
@@ -121,8 +105,6 @@ static unsigned CG_TypeOfBySize (unsigned Size)
 
     return CG_Type;
 }
-
-
 
 unsigned CG_TypeOf (const Type* T)
 // Get the code generator base type of the object
@@ -183,8 +165,6 @@ unsigned CG_TypeOf (const Type* T)
     }
 }
 
-
-
 unsigned CG_CallFlags (const Type* T)
 // Get the code generator flags for calling the function
 {
@@ -195,8 +175,6 @@ unsigned CG_CallFlags (const Type* T)
         return 0;
     }
 }
-
-
 
 void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr)
 // Call an expression function with checks.
@@ -221,8 +199,6 @@ void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr)
     }
 }
 
-
-
 void MarkedExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr)
 /* Call an expression function with checks and record start and end of the
 ** generated code.
@@ -234,8 +210,6 @@ void MarkedExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr)
     GetCodePos (&End);
     ED_SetCodeRange (Expr, &Start, &End);
 }
-
-
 
 static unsigned typeadjust (ExprDesc* lhs, const ExprDesc* rhs, int NoPush)
 /* Adjust the two values for a binary operation. lhs is expected on stack or
@@ -286,8 +260,6 @@ static unsigned typeadjust (ExprDesc* lhs, const ExprDesc* rhs, int NoPush)
     return flags;
 }
 
-
-
 void LimitExprValue (ExprDesc* Expr, int WarnOverflow)
 // Limit the constant value of the expression to the range of its type
 {
@@ -337,8 +309,6 @@ void LimitExprValue (ExprDesc* Expr, int WarnOverflow)
     }
 }
 
-
-
 static const GenDesc* FindGen (token_t Tok, const GenDesc* Table)
 // Find a token in a generator table
 {
@@ -350,8 +320,6 @@ static const GenDesc* FindGen (token_t Tok, const GenDesc* Table)
     }
     return 0;
 }
-
-
 
 static int TypeSpecAhead (void)
 /* Return true if some sort of type is waiting (helper for cast and sizeof()
@@ -375,8 +343,6 @@ static int TypeSpecAhead (void)
            SymIsTypeDef (Entry)));
 }
 
-
-
 static unsigned ExprCheckedSizeOf (const Type* T)
 // Specially checked SizeOf() used in 'sizeof' expressions
 {
@@ -390,8 +356,6 @@ static unsigned ExprCheckedSizeOf (const Type* T)
     }
     return Size;
 }
-
-
 
 void PushAddr (const ExprDesc* Expr)
 /* If the expression contains an address that was somehow evaluated,
@@ -407,8 +371,6 @@ void PushAddr (const ExprDesc* Expr)
     }
 }
 
-
-
 static void WarnConstCompareResult (const ExprDesc* Expr)
 // If the result of a comparison is constant, this is suspicious
 {
@@ -417,19 +379,14 @@ static void WarnConstCompareResult (const ExprDesc* Expr)
     }
 }
 
-
-
 //***************************************************************************
 //                                   code
 //***************************************************************************
-
-
 
 typedef enum {
     DOT_INC,
     DOT_DEC,
 } DeferredOpType;
-
 
 typedef struct {
     ExprDesc        Expr;
@@ -438,23 +395,17 @@ typedef struct {
 
 Collection DeferredOps;
 
-
-
 void InitDeferredOps (void)
 // Init the collection for storing deferred ops
 {
     InitCollection (&DeferredOps);
 }
 
-
-
 void DoneDeferredOps (void)
 // Deinit the collection for storing deferred ops
 {
     DoneCollection (&DeferredOps);
 }
-
-
 
 static void DeferInc (const ExprDesc* Expr)
 // Defer the post-inc and put it in a queue
@@ -468,8 +419,6 @@ static void DeferInc (const ExprDesc* Expr)
     CollAppend (&DeferredOps, Op);
 }
 
-
-
 static void DeferDec (const ExprDesc* Expr)
 // Defer the post-dec and put it in a queue
 {
@@ -481,8 +430,6 @@ static void DeferDec (const ExprDesc* Expr)
     Op->OpType = DOT_DEC;
     CollAppend (&DeferredOps, Op);
 }
-
-
 
 static void DoInc (ExprDesc* Expr, unsigned KeepResult)
 // Do increment
@@ -569,8 +516,6 @@ static void DoInc (ExprDesc* Expr, unsigned KeepResult)
     }
 }
 
-
-
 static void DoDec (ExprDesc* Expr, unsigned KeepResult)
 // Do decrement
 {
@@ -656,15 +601,11 @@ static void DoDec (ExprDesc* Expr, unsigned KeepResult)
     }
 }
 
-
-
 int GetDeferredOpCount (void)
 // Return how many deferred operations are still waiting in the queque
 {
     return (int)CollCount (&DeferredOps);
 }
-
-
 
 void CheckDeferredOpAllDone (void)
 /* Check if all deferred operations are done at sequence points.
@@ -675,8 +616,6 @@ void CheckDeferredOpAllDone (void)
         Internal ("Code generation messed up: missing operations past sequence points.");
     }
 }
-
-
 
 void DoDeferred (unsigned Flags, ExprDesc* Expr)
 // Do deferred operations such as post-inc/dec at sequence points
@@ -760,8 +699,6 @@ void DoDeferred (unsigned Flags, ExprDesc* Expr)
     // Expression has had side effects
     Expr->Flags |= E_SIDE_EFFECTS;
 }
-
-
 
 static unsigned FunctionArgList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
 /* Parse the argument list of the called function and pass the arguments to it.
@@ -972,8 +909,6 @@ static unsigned FunctionArgList (FuncDesc* Func, int IsFastcall, ExprDesc* ED)
     return PushedSize + FrameSize;
 }
 
-
-
 static void FunctionCall (ExprDesc* Expr)
 // Perform a function call.
 {
@@ -1181,8 +1116,6 @@ static void FunctionCall (ExprDesc* Expr)
     // We assume all function calls had side effects
     Expr->Flags |= E_SIDE_EFFECTS;
 }
-
-
 
 static void Primary (ExprDesc* E)
 // This is the lowest level of the expression parser.
@@ -1449,8 +1382,6 @@ static void Primary (ExprDesc* E)
     E->Flags |= Flags;
 }
 
-
-
 static void StructRef (ExprDesc* Expr)
 // Process struct/union field after . or ->.
 {
@@ -1598,8 +1529,6 @@ static void StructRef (ExprDesc* Expr)
     }
 }
 
-
-
 static void hie11 (ExprDesc *Expr)
 // Handle compound types (structs and arrays)
 {
@@ -1670,8 +1599,6 @@ static void hie11 (ExprDesc *Expr)
     }
 }
 
-
-
 void Store (ExprDesc* Expr, const Type* StoreType)
 /* Store the primary register into the location denoted by Expr. If StoreType
 ** is given, use this type when storing instead of Expr->Type. If StoreType
@@ -1733,8 +1660,6 @@ void Store (ExprDesc* Expr, const Type* StoreType)
     ED_MarkAsUntested (Expr);
 }
 
-
-
 static void PreInc (ExprDesc* Expr)
 // Handle the preincrement operators
 {
@@ -1763,8 +1688,6 @@ static void PreInc (ExprDesc* Expr)
     Expr->Flags |= E_SIDE_EFFECTS;
 }
 
-
-
 static void PreDec (ExprDesc* Expr)
 // Handle the predecrement operators
 {
@@ -1792,8 +1715,6 @@ static void PreDec (ExprDesc* Expr)
     // Expression has had side effects
     Expr->Flags |= E_SIDE_EFFECTS;
 }
-
-
 
 static void PostInc (ExprDesc* Expr)
 // Handle the postincrement operator
@@ -1854,8 +1775,6 @@ static void PostInc (ExprDesc* Expr)
     ED_FinalizeRValLoad (Expr);
 }
 
-
-
 static void PostDec (ExprDesc* Expr)
 // Handle the postdecrement operator
 {
@@ -1909,8 +1828,6 @@ static void PostDec (ExprDesc* Expr)
     // The result is always an expression, no reference
     ED_FinalizeRValLoad (Expr);
 }
-
-
 
 static void UnaryOp (ExprDesc* Expr)
 // Handle unary -/+ and ~
@@ -1987,8 +1904,6 @@ static void UnaryOp (ExprDesc* Expr)
         ED_FinalizeRValLoad (Expr);
     }
 }
-
-
 
 void hie10 (ExprDesc* Expr)
 // Handle ++, --, !, unary - etc.
@@ -2136,8 +2051,6 @@ void hie10 (ExprDesc* Expr)
             break;
     }
 }
-
-
 
 static void hie_internal (const GenDesc* Ops,   // List of generators
                           ExprDesc* Expr,
@@ -2474,8 +2387,6 @@ static void hie_internal (const GenDesc* Ops,   // List of generators
         ED_PropagateFrom (Expr, &Expr2);
     }
 }
-
-
 
 static void hie_compare (const GenDesc* Ops,    // List of generators
                          ExprDesc* Expr,
@@ -3007,8 +2918,6 @@ Done:   Expr->Type = type_bool;
     }
 }
 
-
-
 static void hie9 (ExprDesc *Expr)
 // Process * and / operators.
 {
@@ -3022,8 +2931,6 @@ static void hie9 (ExprDesc *Expr)
 
     hie_internal (hie9_ops, Expr, hie10, &UsedGen);
 }
-
-
 
 static void parseadd (ExprDesc* Expr, int DoArrayRef)
 /* Parse an expression with the binary plus or subscript operator. Expr contains
@@ -3539,8 +3446,6 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
     ED_PropagateFrom (Expr, &Expr2);
 }
 
-
-
 static void parsesub (ExprDesc* Expr)
 /* Parse an expression with the binary minus operator. Expr contains the
 ** unprocessed left hand side of the expression and will contain the
@@ -3923,8 +3828,6 @@ static void parsesub (ExprDesc* Expr)
     ED_PropagateFrom (Expr, &Expr2);
 }
 
-
-
 void hie8 (ExprDesc* Expr)
 // Process + and - binary operators.
 {
@@ -3937,8 +3840,6 @@ void hie8 (ExprDesc* Expr)
         }
     }
 }
-
-
 
 static void hie6 (ExprDesc* Expr)
 // Handle greater-than type comparators
@@ -3953,8 +3854,6 @@ static void hie6 (ExprDesc* Expr)
     hie_compare (hie6_ops, Expr, ShiftExpr);
 }
 
-
-
 static void hie5 (ExprDesc* Expr)
 // Handle == and !=
 {
@@ -3965,8 +3864,6 @@ static void hie5 (ExprDesc* Expr)
     };
     hie_compare (hie5_ops, Expr, hie6);
 }
-
-
 
 static void hie4 (ExprDesc* Expr)
 // Handle & (bitwise and)
@@ -3980,8 +3877,6 @@ static void hie4 (ExprDesc* Expr)
     hie_internal (hie4_ops, Expr, hie5, &UsedGen);
 }
 
-
-
 static void hie3 (ExprDesc* Expr)
 // Handle ^ (bitwise exclusive or)
 {
@@ -3994,8 +3889,6 @@ static void hie3 (ExprDesc* Expr)
     hie_internal (hie3_ops, Expr, hie4, &UsedGen);
 }
 
-
-
 static void hie2 (ExprDesc* Expr)
 // Handle | (bitwise or)
 {
@@ -4007,8 +3900,6 @@ static void hie2 (ExprDesc* Expr)
 
     hie_internal (hie2_ops, Expr, hie3, &UsedGen);
 }
-
-
 
 static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
 /* Process "exp && exp". This should only be called within hieOr.
@@ -4180,8 +4071,6 @@ static int hieAnd (ExprDesc* Expr, unsigned* TrueLab, int* TrueLabAllocated)
     return 0;
 }
 
-
-
 static void hieOr (ExprDesc *Expr)
 // Process "exp || exp".
 {
@@ -4342,8 +4231,6 @@ static void hieOr (ExprDesc *Expr)
         ED_TestDone (Expr);
     }
 }
-
-
 
 static void hieQuest (ExprDesc* Expr)
 // Parse the ternary operator
@@ -4511,7 +4398,6 @@ static void hieQuest (ExprDesc* Expr)
             CodeMark    CvtCodeStart;
             CodeMark    CvtCodeEnd;
 
-
             // Get common type
             ResultType = TypeDup (ArithmeticConvert (Expr2.Type, Expr3.Type));
 
@@ -4610,8 +4496,6 @@ static void hieQuest (ExprDesc* Expr)
     }
 }
 
-
-
 void hie1 (ExprDesc* Expr)
 // Parse first level of expression hierarchy.
 {
@@ -4667,8 +4551,6 @@ void hie1 (ExprDesc* Expr)
     }
 }
 
-
-
 void hie0 (ExprDesc *Expr)
 // Parse comma operator.
 {
@@ -4720,8 +4602,6 @@ void hie0 (ExprDesc *Expr)
     }
 }
 
-
-
 void Expression0 (ExprDesc* Expr)
 /* Evaluate an expression via hie0 and put the result into the primary register.
 ** The expression is completely evaluated and all side effects complete.
@@ -4744,8 +4624,6 @@ void Expression0 (ExprDesc* Expr)
     DoDeferred (SQP_KEEP_EXPR, Expr);
 }
 
-
-
 void BoolExpr (void (*Func) (ExprDesc*), ExprDesc* Expr)
 /* Will evaluate an expression via the given function. If the result is not
 ** something that may be evaluated in a boolean context, a diagnostic will be
@@ -4760,8 +4638,6 @@ void BoolExpr (void (*Func) (ExprDesc*), ExprDesc* Expr)
         ED_MakeConstBool (Expr, 1);
     }
 }
-
-
 
 ExprDesc NoCodeConstExpr (void (*Func) (ExprDesc*))
 /* Get an expression evaluated via the given function. If the result is not a
@@ -4790,8 +4666,6 @@ ExprDesc NoCodeConstExpr (void (*Func) (ExprDesc*))
     // Return by value
     return Expr;
 }
-
-
 
 ExprDesc NoCodeConstAbsIntExpr (void (*Func) (ExprDesc*))
 /* Get an expression evaluated via the given function. If the result is not a

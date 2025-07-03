@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "chartype.h"
 
@@ -41,13 +39,9 @@
 #include "codeinfo.h"
 #include "coptadd.h"
 
-
-
 //***************************************************************************
 //                            Optimize additions
 //***************************************************************************
-
-
 
 unsigned OptAdd1 (CodeSeg* S)
 /* Search for the sequence
@@ -168,8 +162,6 @@ unsigned OptAdd1 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptAdd2 (CodeSeg* S)
 /* Search for the sequence
 **
@@ -284,8 +276,6 @@ unsigned OptAdd2 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptAdd3 (CodeSeg* S)
 /* Search for the sequence
 **
@@ -359,8 +349,6 @@ unsigned OptAdd3 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptAdd4 (CodeSeg* S)
 /* Search for the sequence
@@ -449,8 +437,6 @@ unsigned OptAdd4 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptAdd5 (CodeSeg* S)
 /* Search for a call to incaxn and replace it by an 8 bit add if the X register
 ** is not used later.
@@ -501,8 +487,6 @@ unsigned OptAdd5 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptAdd6 (CodeSeg* S)
 /* Search for the sequence

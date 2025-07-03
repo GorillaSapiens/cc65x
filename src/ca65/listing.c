@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -52,13 +50,9 @@
 #include "listing.h"
 #include "segment.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Single linked list of lines
 ListLine*       LineList = 0;           // List of listing lines
@@ -74,13 +68,9 @@ static unsigned ListBytes  = 12;        // Number of bytes to list for one line
 // Switch the listing on/off
 static int      ListingEnabled = 1;     // Enabled if > 0
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void NewListingLine (const StrBuf* Line, unsigned char File, unsigned char Depth)
 // Create a new ListLine struct and insert it
@@ -124,8 +114,6 @@ void NewListingLine (const StrBuf* Line, unsigned char File, unsigned char Depth
     }
 }
 
-
-
 void EnableListing (void)
 // Enable output of lines to the listing
 {
@@ -138,8 +126,6 @@ void EnableListing (void)
         }
     }
 }
-
-
 
 void DisableListing (void)
 // Disable output of lines to the listing
@@ -154,8 +140,6 @@ void DisableListing (void)
     }
 }
 
-
-
 void SetListBytes (int Bytes)
 // Set the maximum number of bytes listed for one line
 {
@@ -164,8 +148,6 @@ void SetListBytes (int Bytes)
     }
     ListBytes = Bytes;
 }
-
-
 
 void InitListingLine (void)
 // Initialize the current listing line
@@ -198,8 +180,6 @@ void InitListingLine (void)
     }
 }
 
-
-
 static char* AddHex (char* S, unsigned Val)
 // Add a hex byte in ASCII to the given string and return the new pointer
 {
@@ -212,8 +192,6 @@ static char* AddHex (char* S, unsigned Val)
 
     return S;
 }
-
-
 
 static void PrintPageHeader (FILE* F, const ListLine* L)
 /* Print the header for a new page. It is assumed that the given line is the
@@ -238,8 +216,6 @@ static void PrintPageHeader (FILE* F, const ListLine* L)
     PageLines = 4;
 }
 
-
-
 static void PrintLine (FILE* F, const char* Header, const char* Line, const ListLine* L)
 // Print one line to the listing file, adding a newline and counting lines
 {
@@ -260,16 +236,12 @@ static void PrintLine (FILE* F, const char* Header, const char* Line, const List
     }
 }
 
-
-
 static char* AddMult (char* S, char C, unsigned Count)
 // Add multiple instances of character C to S, return updated S.
 {
     memset (S, C, Count);
     return S + Count;
 }
-
-
 
 static char* MakeLineHeader (char* H, const ListLine* L)
 // Prepare the line header
@@ -290,8 +262,6 @@ static char* MakeLineHeader (char* H, const ListLine* L)
     // Return the buffer
     return H;
 }
-
-
 
 void CreateListing (void)
 // Create the listing

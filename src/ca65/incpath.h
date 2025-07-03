@@ -31,42 +31,28 @@
 //
 //***************************************************************************
 
-
-
 #ifndef INCPATH_H
 #define INCPATH_H
 
-
-
 // common
 #include "searchpath.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 extern SearchPaths*     IncSearchPath;          // Standard include path
 extern SearchPaths*     BinSearchPath;          // Binary include path
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void InitIncludePaths (void);
 // Initialize the include path search list
 
 void FinishIncludePaths (void);
 // Finish creating the include path search list.
-
-
 
 // End of incpath.h
 

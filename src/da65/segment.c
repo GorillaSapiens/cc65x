@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -43,13 +41,9 @@
 #include "attrtab.h"
 #include "segment.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Hash definitions
 #define HASH_SIZE       53
@@ -68,13 +62,9 @@ struct Segment {
 */
 static Segment* StartTab[HASH_SIZE];    // Table containing segment starts
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void AddAbsSegment (uint32_t Start, uint32_t End, const char* Name)
 // Add an absolute segment to the segment table
@@ -102,8 +92,6 @@ void AddAbsSegment (uint32_t Start, uint32_t End, const char* Name)
     MarkRange (Start, End, atSegment);
 }
 
-
-
 char* GetSegmentStartName (uint32_t Addr)
 // Return the name of the segment which starts at the given address
 {
@@ -119,8 +107,6 @@ char* GetSegmentStartName (uint32_t Addr)
 
     return 0;
 }
-
-
 
 unsigned GetSegmentAddrSize (uint32_t Addr)
 // Return the address size of the segment which starts at the given address

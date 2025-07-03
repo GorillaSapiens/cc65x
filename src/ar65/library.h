@@ -31,33 +31,21 @@
 //
 //***************************************************************************
 
-
-
 #ifndef LIBRARY_H
 #define LIBRARY_H
 
-
-
 #include <stdio.h>
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Name of the library file
 extern const char* LibName;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void LibOpen (const char* Name, int MustExist, int NeedTemp);
 /* Open an existing library and a temporary copy. If MustExist is true, the
@@ -77,8 +65,6 @@ void LibClose (void);
 /* Write remaining data, close both files and copy the temp file to the old
 ** filename
 */
-
-
 
 // End of library.h
 

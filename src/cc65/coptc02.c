@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // cc65
@@ -41,25 +39,17 @@
 #include "error.h"
 #include "coptc02.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned Opt65C02Ind (CodeSeg* S)
 // Try to use the indirect addressing mode where possible
@@ -98,8 +88,6 @@ unsigned Opt65C02Ind (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned Opt65C02BitOps (CodeSeg* S)
 // Use special bit op instructions of the C02
@@ -170,8 +158,6 @@ unsigned Opt65C02BitOps (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned Opt65C02Stores (CodeSeg* S)
 // Use STZ where possible

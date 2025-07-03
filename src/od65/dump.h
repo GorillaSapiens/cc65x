@@ -31,22 +31,14 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
-
-
 
 #ifndef DUMP_H
 #define DUMP_H
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void DumpObjHeader (FILE* F, unsigned long Offset);
 // Dump the header of the given object file
@@ -77,8 +69,6 @@ void DumpObjScopes (FILE* F, unsigned long Offset);
 
 void DumpObjSegSize (FILE* F, unsigned long Offset);
 // Dump the sizes of the segment in the object file
-
-
 
 // End of dump.h
 

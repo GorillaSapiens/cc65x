@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "strutil.h"
 
@@ -40,13 +38,9 @@
 #include "error.h"
 #include "model.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Current model
 O65Model Model = O65_MODEL_NONE;
@@ -59,13 +53,9 @@ static const char* const NameTable[O65_MODEL_COUNT] = {
     "cc65-module"
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 const char* GetModelName (O65Model M)
 // Map the model to its name.
@@ -75,8 +65,6 @@ const char* GetModelName (O65Model M)
     }
     return NameTable[M];
 }
-
-
 
 O65Model FindModel (const char* ModelName)
 /* Map a model name to its identifier. Return O65_MODEL_INVALID if the name

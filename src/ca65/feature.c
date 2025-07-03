@@ -31,21 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // ca65
 #include "global.h"
 #include "feature.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Names of the features
 static const char* const FeatureKeys[FEAT_COUNT] = {
@@ -70,13 +64,9 @@ static const char* const FeatureKeys[FEAT_COUNT] = {
     "line_continuations",
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 feature_t FindFeature (const StrBuf* Key)
 /* Find the feature in a table and return the corresponding enum value. If the
@@ -96,8 +86,6 @@ feature_t FindFeature (const StrBuf* Key)
     // Not found
     return FEAT_UNKNOWN;
 }
-
-
 
 void SetFeature (feature_t Feature, unsigned char On)
 /* Set the corresponding feature flag if Feature is valid.

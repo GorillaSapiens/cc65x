@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 
@@ -43,23 +41,15 @@
 #include "anonname.h"
 #include "ident.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 static const char AnonTag[] = "$anon";
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 char* AnonFieldName (char* Buf, const char* Spec, int ANumber)
 /* Get a name for an anonymous field of a struct or union. The given buffer is
@@ -70,8 +60,6 @@ char* AnonFieldName (char* Buf, const char* Spec, int ANumber)
     return Buf;
 }
 
-
-
 char* AnonName (char* Buf, const char* Spec)
 /* Get a name for an anonymous variable or type. The given buffer is expected
 ** to be IDENTSIZE characters long. A pointer to the buffer is returned.
@@ -81,8 +69,6 @@ char* AnonName (char* Buf, const char* Spec)
     xsprintf (Buf, IDENTSIZE, "%s-%s-%04X", AnonTag, Spec, ++ACount);
     return Buf;
 }
-
-
 
 int IsAnonName (const char* Name)
 // Check if the given symbol name is that of an anonymous symbol

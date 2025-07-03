@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include "stdlib.h"
 #include <string.h>
 #include <ctype.h>
@@ -46,13 +44,9 @@
 #include "error.h"
 #include "opcodes.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Opcode description table
 // CAUTION: table must be sorted by mnemonic for bsearch
@@ -592,21 +586,15 @@ const OPCDesc OPCTable[OP65_COUNT] = {
 // END SORTED_OPCODES.SH
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static int FindCmp (const void* Key, const void* Desc)
 // Compare function for FindOpcode
 {
     return strcmp (Key, ((OPCDesc*)Desc)->Mnemo);
 }
-
-
 
 const OPCDesc* FindOP65 (const char* M)
 /* Find the given opcode and return the opcode number. If the opcode was not
@@ -634,8 +622,6 @@ const OPCDesc* FindOP65 (const char* M)
     return bsearch (Mnemo, OPCTable, OP65_COUNT,
                     sizeof (OPCTable[0]), FindCmp );
 }
-
-
 
 unsigned GetInsnSize (opc_t OPC, am_t AM)
 // Return the size of the given instruction
@@ -666,8 +652,6 @@ unsigned GetInsnSize (opc_t OPC, am_t AM)
     }
 }
 
-
-
 unsigned char GetAMUseInfo (am_t AM)
 /* Get usage info for the given addressing mode (addressing modes that use
 ** index registers return REG_r info for these registers).
@@ -684,8 +668,6 @@ unsigned char GetAMUseInfo (am_t AM)
         default:           return REG_NONE;
     }
 }
-
-
 
 opc_t GetInverseBranch (opc_t OPC)
 // Return a branch that reverse the condition of the branch given in OPC
@@ -712,8 +694,6 @@ opc_t GetInverseBranch (opc_t OPC)
             return 0;
     }
 }
-
-
 
 opc_t MakeShortBranch (opc_t OPC)
 /* Return the short version of the given branch. If the branch is already
@@ -745,8 +725,6 @@ opc_t MakeShortBranch (opc_t OPC)
     }
 }
 
-
-
 opc_t MakeLongBranch (opc_t OPC)
 /* Return the long version of the given branch. If the branch is already
 ** a long branch, return the opcode unchanged.
@@ -777,8 +755,6 @@ opc_t MakeLongBranch (opc_t OPC)
     }
 }
 
-
-
 bc_t GetBranchCond (opc_t OPC)
 // Get the condition for the conditional branch in OPC
 {
@@ -804,8 +780,6 @@ bc_t GetBranchCond (opc_t OPC)
             return 0;
     }
 }
-
-
 
 bc_t GetInverseCond (bc_t BC)
 // Return the inverse condition of the given one

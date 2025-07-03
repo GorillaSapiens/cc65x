@@ -31,21 +31,15 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "xmalloc.h"
 
 // ca65
 #include "segdef.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 SegDef* NewSegDef (const char* Name, unsigned char AddrSize)
 // Create a new segment definition and return it
@@ -61,16 +55,12 @@ SegDef* NewSegDef (const char* Name, unsigned char AddrSize)
     return D;
 }
 
-
-
 void FreeSegDef (SegDef* D)
 // Free a segment definition
 {
     xfree (D->Name);
     xfree (D);
 }
-
-
 
 SegDef* DupSegDef (const SegDef* Def)
 // Duplicate a segment definition and return it

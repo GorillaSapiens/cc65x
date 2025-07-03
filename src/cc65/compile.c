@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 #include <time.h>
 
@@ -68,13 +66,9 @@
 #include "typecmp.h"
 #include "symtab.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void Parse (void)
 // Top level parser routine.
@@ -386,8 +380,6 @@ EndOfDecl:
     DoneDeferredOps ();
 }
 
-
-
 void Compile (const char* FileName)
 // Top level compile routine. Will setup things and call the parser.
 {
@@ -587,8 +579,6 @@ void Compile (const char* FileName)
     // Print an error report
     ErrorReport ();
 }
-
-
 
 void FinishCompile (void)
 // Emit literals, debug info, do cleanup and optimizations

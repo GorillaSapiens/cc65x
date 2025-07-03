@@ -28,18 +28,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef PPEXPR_H
 #define PPEXPR_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // PPExpr data struct
 typedef struct PPExpr PPExpr;
@@ -58,18 +52,12 @@ struct PPExpr
 #define PPEXPR_UNSIGNED     1U
 #define PPEXPR_UNDEFINED    2U
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 void ParsePPExprInLine (PPExpr* Expr);
 // Parse a line for PP expression
-
-
 
 // End of ppexpr.h
 

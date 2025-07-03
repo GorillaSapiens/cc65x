@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CODEENT_H
 #define CODEENT_H
-
-
 
 #include <string.h>
 
@@ -50,13 +46,9 @@
 #include "opcodes.h"
 #include "reginfo.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Flags used
 #define CEF_USERMARK    0x0001U         // Generic mark by user functions
@@ -99,13 +91,9 @@ struct CodeEntry {
 #define AIF_WORD            (AIF_LOBYTE | AIF_HIBYTE)
 #define AIF_FAR             (AIF_LOBYTE | AIF_HIBYTE | AIF_BANKBYTE)
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Name, long* Offset);
 /* Break the opcode argument string into a symbol name/label part plus an offset.
@@ -296,8 +284,6 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs);
 
 void CE_Output (const CodeEntry* E);
 // Output the code entry to the output file
-
-
 
 // End of codeent.h
 

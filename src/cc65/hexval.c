@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "chartype.h"
 
@@ -40,13 +38,9 @@
 #include "error.h"
 #include "hexval.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned HexVal (int C)
 /* Convert a hex digit into a value. The function will emit an error for

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "cpu.h"
 
@@ -43,13 +41,9 @@
 #include "codeopt.h"
 #include "error.h"
 
-
-
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 static int MemAccess (CodeSeg* S, unsigned From, unsigned To, const CodeEntry* N)
 // Checks a range of code entries if there are any memory accesses to N->Arg
@@ -63,7 +57,6 @@ static int MemAccess (CodeSeg* S, unsigned From, unsigned To, const CodeEntry* N
         Base    = 0x01,         // Check for location without "+1"
         Word    = 0x02,         // Check for location with "+1" added
     } What = None;
-
 
     /* If the argument of N is a zero page location that ends with "+1", we
     ** must also check for word accesses to the location without +1.
@@ -122,8 +115,6 @@ static int MemAccess (CodeSeg* S, unsigned From, unsigned To, const CodeEntry* N
     return 0;
 }
 
-
-
 static short ZPRegVal (unsigned short Use, const RegContents* RC)
 // Return the contents of the given zeropage register
 {
@@ -142,13 +133,9 @@ static short ZPRegVal (unsigned short Use, const RegContents* RC)
     }
 }
 
-
-
 //***************************************************************************
 //                      Remove unused loads and stores
 //***************************************************************************
-
-
 
 unsigned OptUnusedLoads (CodeSeg* S)
 /* Remove loads of or operations with registers where the value loaded or
@@ -220,8 +207,6 @@ NextEntry:
     return Changes;
 }
 
-
-
 unsigned OptUnusedStores (CodeSeg* S)
 // Remove stores into zero page registers that aren't used later
 {
@@ -266,8 +251,6 @@ unsigned OptUnusedStores (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptLoad3 (CodeSeg* S)
 // Remove repeated loads from one and the same memory location
@@ -330,8 +313,6 @@ unsigned OptLoad3 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptDupLoads (CodeSeg* S)
 // Remove loads of registers where the value loaded is already in the register.
@@ -540,8 +521,6 @@ unsigned OptDupLoads (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptStoreLoad (CodeSeg* S)
 // Remove a store followed by a load from the same location.
 {
@@ -588,8 +567,6 @@ unsigned OptStoreLoad (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptLoadStore1 (CodeSeg* S)
 // Remove an 8 bit load followed by a store into the same location.
 {
@@ -630,8 +607,6 @@ unsigned OptLoadStore1 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptLoadStoreLoad (CodeSeg* S)
 /* Search for the sequence
@@ -684,8 +659,6 @@ unsigned OptLoadStoreLoad (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptTransfers1 (CodeSeg* S)
 // Remove transfers from one register to another and back
@@ -752,8 +725,6 @@ NextEntry:
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptTransfers2 (CodeSeg* S)
 /* Replace loads followed by a register transfer by a load with the second
@@ -828,8 +799,6 @@ unsigned OptTransfers2 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptTransfers3 (CodeSeg* S)
 /* Replace a register transfer followed by a store of the second register by a
@@ -1014,8 +983,6 @@ unsigned OptTransfers3 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptTransfers4 (CodeSeg* S)
 /* Replace a load of a register followed by a transfer insn of the same register
 ** by a load of the second register if possible.
@@ -1173,8 +1140,6 @@ unsigned OptTransfers4 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptPushPop1 (CodeSeg* S)
 // Remove a PHA/PLA sequence were A not used later
 {
@@ -1303,8 +1268,6 @@ unsigned OptPushPop1 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptPushPop2 (CodeSeg* S)
 // Remove a PHP/PLP sequence were no processor flags changed inside
 {
@@ -1392,8 +1355,6 @@ unsigned OptPushPop2 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptPushPop3 (CodeSeg* S)
 // Remove a pha/pla sequence where the contents of A are known
 {
@@ -1419,7 +1380,6 @@ unsigned OptPushPop3 (CodeSeg* S)
 
         // Get the input registers
         const RegInfo* RI = E->RI;
-
 
         const char* Arg;
         CodeEntry* X;
@@ -1482,8 +1442,6 @@ unsigned OptPushPop3 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptPrecalc (CodeSeg* S)
 /* Replace immediate operations with the accu where the current contents are
@@ -1672,8 +1630,6 @@ unsigned OptPrecalc (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptShiftBack (CodeSeg* S)
 /* Remove a pair of shifts to the opposite directions if none of the bits of
 ** the register A or the Z/N flags modified by these shifts are used later.
@@ -1723,7 +1679,6 @@ unsigned OptShiftBack (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
 
 unsigned OptSignExtended (CodeSeg* S)
 /* Change

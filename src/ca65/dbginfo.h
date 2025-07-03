@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef DBGINFO_H
 #define DBGINFO_H
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void DbgInfoFile (void);
 // Parse and handle FILE subcommand of the .dbg pseudo instruction
@@ -61,8 +55,6 @@ void DbgInfoCheck (void);
 
 void WriteHLLDbgSyms (void);
 // Write a list of all high level language symbols to the object file.
-
-
 
 // End of dbginfo.h
 

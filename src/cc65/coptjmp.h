@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COPTJMP_H
 #define COPTJMP_H
-
-
 
 // cc65
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned OptBranchDist (CodeSeg* S);
 // Change branches for the distance needed.
@@ -125,8 +117,6 @@ unsigned OptCondBranchC (CodeSeg* S);
 /* If on entry to a "rol a" instruction the accu is zero, and a beq/bne follows,
 ** we can remove the rol and branch on the state of the carry.
 */
-
-
 
 // End of coptjmp.h
 

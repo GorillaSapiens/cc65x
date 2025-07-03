@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -57,13 +55,9 @@
 #include "output.h"
 #include "preproc.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // The current input line
 StrBuf* Line;
@@ -104,13 +98,9 @@ static Collection* CurrentInputStack;
 static unsigned MainFileCounter;
 LineInfo* PrevDiagnosticLI;
 
-
-
 //***************************************************************************
 //                               struct IFile
 //***************************************************************************
-
-
 
 static IFile* NewIFile (const char* Name, InputType Type)
 // Create and return a new IFile
@@ -138,13 +128,9 @@ static IFile* NewIFile (const char* Name, InputType Type)
     return IF;
 }
 
-
-
 //***************************************************************************
 //                               struct AFile
 //***************************************************************************
-
-
 
 static AFile* NewAFile (IFile* IF, FILE* F)
 /* Create a new AFile, push it onto the stack, add the path of the file to
@@ -207,8 +193,6 @@ static AFile* NewAFile (IFile* IF, FILE* F)
     return AF;
 }
 
-
-
 static void FreeAFile (AFile* AF)
 // Free an AFile structure
 {
@@ -218,13 +202,9 @@ static void FreeAFile (AFile* AF)
     xfree (AF);
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static IFile* FindFile (const char* Name)
 /* Find the file with the given name in the list of all files. Since the list
@@ -247,13 +227,10 @@ static IFile* FindFile (const char* Name)
     return 0;
 }
 
-
-
 void OpenMainFile (const char* Name)
 // Open the main file. Will call Fatal() in case of failures.
 {
     AFile* MainFile;
-
 
     // Setup a new IFile structure for the main file
     IFile* IF = NewIFile (Name, IT_MAIN);
@@ -285,8 +262,6 @@ void OpenMainFile (const char* Name)
     // Initialize the __COUNTER__ counter
     MainFileCounter = 0;
 }
-
-
 
 void OpenIncludeFile (const char* Name, InputType IT)
 // Open an include file and insert it into the tables.
@@ -351,8 +326,6 @@ void OpenIncludeFile (const char* Name, InputType IT)
     PreprocessBegin (IF);
 }
 
-
-
 void CloseIncludeFile (void)
 /* Close an include file and switch to the higher level file. Set Input to
 ** NULL if this was the main file.
@@ -390,8 +363,6 @@ void CloseIncludeFile (void)
     }
 }
 
-
-
 static void GetInputChar (void)
 /* Read the next character from the input stream and make CurC and NextC
 ** valid. If end of line is reached, both are set to NUL, no more lines
@@ -413,8 +384,6 @@ static void GetInputChar (void)
 
 }
 
-
-
 void NextChar (void)
 /* Skip the current input character and read the next one from the input
 ** stream. CurC and NextC are valid after the call. If end of line is
@@ -428,8 +397,6 @@ void NextChar (void)
     GetInputChar ();
 }
 
-
-
 Collection* UseInputStack (Collection* InputStack)
 /* Use the provided input stack for incoming input. Return the previously used
 ** InputStack.
@@ -441,8 +408,6 @@ Collection* UseInputStack (Collection* InputStack)
     return OldInputStack;
 }
 
-
-
 void PushLine (StrBuf* L)
 // Save the current input line and use a new one
 {
@@ -452,15 +417,11 @@ void PushLine (StrBuf* L)
     GetInputChar ();
 }
 
-
-
 void ReuseInputLine (void)
 // Save and reuse the current line as the next line
 {
     CurReusedLine = Line;
 }
-
-
 
 void ClearLine (void)
 // Clear the current input line
@@ -470,8 +431,6 @@ void ClearLine (void)
     CurC    = '\0';
     NextC   = '\0';
 }
-
-
 
 StrBuf* InitLine (StrBuf* Buf)
 /* Initialize Line from Buf and read CurC and NextC from the new input line.
@@ -484,8 +443,6 @@ StrBuf* InitLine (StrBuf* Buf)
     NextC = SB_LookAt (Buf, SB_GetIndex (Buf) + 1);
     return OldLine;
 }
-
-
 
 int NextLine (void)
 /* Get a line from the current input. Returns 0 on end of file with no new
@@ -612,8 +569,6 @@ int NextLine (void)
     return C != EOF || SB_NotEmpty (Line);
 }
 
-
-
 int PreprocessNextLine (void)
 /* Get a line from opened input files and do preprocess. Returns 0 on end of
 ** main file.
@@ -644,8 +599,6 @@ int PreprocessNextLine (void)
     return 1;
 }
 
-
-
 static LineInfoFile* NewLineInfoFile (const AFile* AF)
 {
     const char* Name = AF->PName == 0 ? AF->Input->Name : AF->PName;
@@ -661,8 +614,6 @@ static LineInfoFile* NewLineInfoFile (const AFile* AF)
 
     return LIF;
 }
-
-
 
 void GetFileInclusionInfo (struct LineInfo* LI)
 // Get info about source file inclusion for LineInfo struct
@@ -705,8 +656,6 @@ void GetFileInclusionInfo (struct LineInfo* LI)
     }
 }
 
-
-
 void FreeFileInclusionInfo (struct LineInfo* LI)
 // Free info about source file inclusion for LineInfo struct
 {
@@ -725,8 +674,6 @@ void FreeFileInclusionInfo (struct LineInfo* LI)
     }
 }
 
-
-
 static int IsDifferentLineInfoFile (const LineInfoFile* Lhs, const LineInfoFile* Rhs)
 // Return true if the two files are different
 {
@@ -735,8 +682,6 @@ static int IsDifferentLineInfoFile (const LineInfoFile* Lhs, const LineInfoFile*
     */
     return Lhs->InputFile != Rhs->InputFile || Lhs->LineNum != Rhs->LineNum;
 }
-
-
 
 int HasFileInclusionChanged (const struct LineInfo* LI)
 // Return true if file inclusion has changed from last time
@@ -774,15 +719,11 @@ int HasFileInclusionChanged (const struct LineInfo* LI)
     return 0;
 }
 
-
-
 const char* GetInputFileName (const struct IFile* IF)
 // Return the name of the file from an IFile struct
 {
     return IF->Name;
 }
-
-
 
 const char* GetCurrentFileName (void)
 // Return the name of the current input file
@@ -797,8 +738,6 @@ const char* GetCurrentFileName (void)
     }
 }
 
-
-
 unsigned GetCurrentLineNum (void)
 // Return the line number in the current input file
 {
@@ -812,8 +751,6 @@ unsigned GetCurrentLineNum (void)
     }
 }
 
-
-
 void SetCurrentLineNum (unsigned LineNum)
 // Set the presumed line number in the current input file
 {
@@ -823,8 +760,6 @@ void SetCurrentLineNum (unsigned LineNum)
         AF->LineOffs = LineNum - AF->LineNum;
     }
 }
-
-
 
 void SetCurrentFileName (const char* Name)
 // Set the presumed name of the current input file
@@ -841,15 +776,11 @@ void SetCurrentFileName (const char* Name)
     }
 }
 
-
-
 unsigned GetCurrentCounter (void)
 // Return the counter number in the current input file
 {
     return MainFileCounter++;
 }
-
-
 
 static void WriteEscaped (FILE* F, const char* Name)
 // Write a file name to a dependency file escaping spaces
@@ -863,8 +794,6 @@ static void WriteEscaped (FILE* F, const char* Name)
         ++Name;
     }
 }
-
-
 
 static void WriteDep (FILE* F, InputType Types)
 // Helper function. Writes all file names that match Types to the output
@@ -892,8 +821,6 @@ static void WriteDep (FILE* F, InputType Types)
         WriteEscaped (F, IF->Name);
     }
 }
-
-
 
 static void CreateDepFile (const char* Name, InputType Types)
 /* Create a dependency file with the given name and place dependencies for
@@ -930,8 +857,6 @@ static void CreateDepFile (const char* Name, InputType Types)
         Fatal ("Cannot write to dependeny file (disk full?)");
     }
 }
-
-
 
 void CreateDependencies (void)
 // Create dependency files requested by the user

@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef DECLARE_H
 #define DECLARE_H
-
-
 
 // common
 #include "coll.h"
@@ -45,13 +41,9 @@
 #include "scanner.h"
 #include "symtab.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Type specifier parser flags
 typedef enum typespec_t typespec_t;
@@ -83,8 +75,6 @@ enum typespec_t {
 #define DS_EXPLICIT_SIGNEDNESS  0x0040U // Signedness specified
 #define DS_NO_EMPTY_DECL        0x0100U // Disallow empty declaration
 #define DS_ALLOW_BITFIELD       0x0200U // Allow anonymous bit-fields
-
-
 
 // Result of ParseDeclSpec
 typedef struct DeclSpec DeclSpec;
@@ -126,13 +116,9 @@ typedef enum {
     DM_ACCEPT_PARAM_IDENT,
 } declmode_t;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Type* ParseType (Type* Type);
 // Parse a complete type specification in parentheses
@@ -152,8 +138,6 @@ void CheckEmptyDecl (const DeclSpec* Spec);
 ** a variable). Checks if the declaration does really make sense and issues a
 ** warning if not.
 */
-
-
 
 // End of declare.h
 

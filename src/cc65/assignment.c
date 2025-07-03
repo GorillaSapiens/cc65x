@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // cc65
 #include "asmcode.h"
 #include "assignment.h"
@@ -48,13 +46,9 @@
 #include "typecmp.h"
 #include "typeconv.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
 // Copy the struct/union represented by RExpr to the one represented by LExpr
@@ -139,8 +133,6 @@ static void CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
     ED_MarkAsUntested (LExpr);
 }
 
-
-
 void DoIncDecBitField (ExprDesc* Expr, long Val, unsigned KeepResult)
 // Process inc/dec for bit-field
 {
@@ -220,8 +212,6 @@ void DoIncDecBitField (ExprDesc* Expr, long Val, unsigned KeepResult)
         g_restore (ChunkFlags | CF_FORCECHAR);
     }
 }
-
-
 
 static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
 // Parse an "=" (if 'Gen' is 0) or "op=" operation for bit-field lhs
@@ -446,8 +436,6 @@ Done:
     ED_FinalizeRValLoad (Expr);
 }
 
-
-
 static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
 // Parse an "=" (if 'Gen' is 0) or "op=" operation for arithmetic lhs
 {
@@ -612,8 +600,6 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
     ED_FinalizeRValLoad (Expr);
 }
 
-
-
 void OpAssign (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
 // Parse an "=" (if 'Gen' is 0) or "op=" operation
 {
@@ -673,8 +659,6 @@ void OpAssign (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
     // Propagate viral flags
     ED_PropagateFrom (Expr, &Expr2);
 }
-
-
 
 void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
 // Parse a "+=" or "-=" operation

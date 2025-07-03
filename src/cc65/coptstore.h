@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COPTSTORE_H
 #define COPTSTORE_H
-
-
 
 // cc65
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned OptStore1 (CodeSeg* S);
 /* Search for the sequence
@@ -103,8 +95,6 @@ unsigned OptStore5 (CodeSeg* S);
 ** if X is not used later. This replacement doesn't save any cycles or bytes,
 ** but it keeps the value of X, which may be reused later.
 */
-
-
 
 // End of coptstore.h
 

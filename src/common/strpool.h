@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 /* A string pool is used to store identifiers and other strings. Each string
 ** stored in the pool has a unique ID, which may be used to access the string
 ** in the pool. Identical strings are only stored once in the pool and have
@@ -40,24 +38,16 @@
 ** string pool IDs must be compared.
 */
 
-
-
 #ifndef STRPOOL_H
 #define STRPOOL_H
-
-
 
 // common
 #include "hashtab.h"
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                     Data
 //***************************************************************************
-
-
 
 // Opaque string pool entry
 typedef struct StringPoolEntry StringPoolEntry;
@@ -65,13 +55,9 @@ typedef struct StringPoolEntry StringPoolEntry;
 // A string pool
 typedef struct StringPool StringPool;
 
-
-
 //***************************************************************************
 //                                     Code
 //***************************************************************************
-
-
 
 StringPool* NewStringPool (unsigned HashSlots);
 // Allocate, initialize and return a new string pool
@@ -95,8 +81,6 @@ unsigned SP_AddStr (StringPool* P, const char* S);
 
 unsigned SP_GetCount (const StringPool* P);
 // Return the number of strings in the pool
-
-
 
 // End of strpool.h
 

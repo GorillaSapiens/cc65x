@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef GLOBAL_H
 #define GLOBAL_H
-
-
 
 // common
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // File names
 extern const char*      InFile;             // Name of input file
@@ -88,9 +80,6 @@ extern unsigned char    CComments;          // Allow C like comments
 extern unsigned char    ForceRange;         // Force values into expected range
 extern unsigned char    UnderlineInNumbers; // Allow underlines in numbers
 extern unsigned char    BracketAsIndirect;  // Use '[]' not '()' for indirection
-
-
-
 
 // End of global.h
 

@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "hashfunc.h"
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned HashInt (unsigned V)
 /* Return a hash value for the given integer. The function uses Robert
@@ -60,8 +54,6 @@ unsigned HashInt (unsigned V)
    return V;
 }
 
-
-
 unsigned HashStr (const char* S)
 // Return a hash value for the given string
 {
@@ -74,8 +66,6 @@ unsigned HashStr (const char* S)
     }
     return H;
 }
-
-
 
 unsigned HashBuf (const StrBuf* S)
 // Return a hash value for the given string buffer

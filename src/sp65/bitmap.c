@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "check.h"
 #include "xmalloc.h"
@@ -41,13 +39,9 @@
 #include "bitmap.h"
 #include "error.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Bitmap* NewBitmap (unsigned Width, unsigned Height)
 // Create a new bitmap. The type is set to unknown and the palette to NULL
@@ -73,8 +67,6 @@ Bitmap* NewBitmap (unsigned Width, unsigned Height)
     return B;
 }
 
-
-
 void FreeBitmap (Bitmap* B)
 // Free a dynamically allocated bitmap
 {
@@ -87,8 +79,6 @@ void FreeBitmap (Bitmap* B)
     }
 }
 
-
-
 int ValidBitmapSize (unsigned Width, unsigned Height)
 // Return true if this is a valid size for a bitmap
 {
@@ -99,8 +89,6 @@ int ValidBitmapSize (unsigned Width, unsigned Height)
     return (Size > 0 && Size <= BM_MAX_SIZE);
 }
 
-
-
 Bitmap* SliceBitmap (const Bitmap* O, unsigned OrigX, unsigned OrigY,
                      unsigned Width, unsigned Height)
 /* Create a slice of the given bitmap. The slice starts at position X/Y of
@@ -110,7 +98,6 @@ Bitmap* SliceBitmap (const Bitmap* O, unsigned OrigX, unsigned OrigY,
 {
     Bitmap*  B;
     unsigned Y;
-
 
     // Check the coordinates and size
     PRECONDITION (OrigX + Width <= O->Width && OrigY + Height <= O->Height);
@@ -136,8 +123,6 @@ Bitmap* SliceBitmap (const Bitmap* O, unsigned OrigX, unsigned OrigY,
     return B;
 }
 
-
-
 Color GetPixelColor (const Bitmap* B, unsigned X, unsigned Y)
 /* Get the color for a given pixel. For indexed bitmaps, the palette entry
 ** is returned.
@@ -161,8 +146,6 @@ Color GetPixelColor (const Bitmap* B, unsigned X, unsigned Y)
         return P.C;
     }
 }
-
-
 
 Pixel GetPixel (const Bitmap* B, unsigned X, unsigned Y)
 /* Return a pixel from the bitmap. The returned value may either be a color

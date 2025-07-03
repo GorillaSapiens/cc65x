@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // cc65
@@ -42,13 +40,9 @@
 #include "symtab.h"
 #include "typecmp.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static int EqualFuncParams (const FuncDesc* F1, const FuncDesc* F2)
 /* Compare two function symbol tables regarding function parameters. Return 1
@@ -104,8 +98,6 @@ static int EqualFuncParams (const FuncDesc* F1, const FuncDesc* F2)
            (Sym2 == 0 || (Sym2->Flags & SC_PARAM) == 0);
 }
 
-
-
 static void SetResult (typecmp_t* Result, typecmpcode_t Val)
 // Set a new result value if it is less than the existing one
 {
@@ -139,8 +131,6 @@ static void SetResult (typecmp_t* Result, typecmpcode_t Val)
         // printf ("SetResult = %d\n", Val);
     }
 }
-
-
 
 static typecmp_t* CmpQuals (const Type* lhst, const Type* rhst, typecmp_t* Result)
 // Compare the types regarding their qualifiers. Return via pointer *Result
@@ -237,8 +227,6 @@ static typecmp_t* CmpQuals (const Type* lhst, const Type* rhst, typecmp_t* Resul
     return Result;
 }
 
-
-
 static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
 // Recursively compare two types.
 {
@@ -248,7 +236,6 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
     FuncDesc*   F2;
     TypeCode    LeftRank, RightRank;
     long        LeftCount, RightCount;
-
 
     // Compare two types. Determine, where they differ
     while (lhs->C != T_END && rhs->C != T_END) {
@@ -447,8 +434,6 @@ Incompatible:
     SetResult (Result, TC_INCOMPATIBLE);
 }
 
-
-
 typecmp_t TypeCmp (const Type* lhs, const Type* rhs)
 // Compare two types and return the result
 {
@@ -468,8 +453,6 @@ typecmp_t TypeCmp (const Type* lhs, const Type* rhs)
     // Return the result
     return Result;
 }
-
-
 
 void TypeCompatibilityDiagnostic (const Type* NewType, const Type* OldType, int IsError, const char* Msg)
 /* Print error or warning message about type compatibility with proper type

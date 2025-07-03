@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -47,13 +45,9 @@
 #include "fileio.h"
 #include "pcx.h"
 
-
-
 //***************************************************************************
 //                                  Macros
 //***************************************************************************
-
-
 
 // Some PCX constants
 #define PCX_MAGIC_ID            0x0A
@@ -89,13 +83,9 @@ struct PCXHeader {
 // Read a little endian word from a byte array at offset O
 #define WORD(H, O)              ((H)[O] | ((H)[O+1] << 8))
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static PCXHeader* NewPCXHeader (void)
 // Allocate a new PCX header and return it
@@ -104,15 +94,11 @@ static PCXHeader* NewPCXHeader (void)
     return xmalloc (sizeof (PCXHeader));
 }
 
-
-
 static void FreePCXHeader (PCXHeader* H)
 // Free a PCX header structure
 {
     xfree (H);
 }
-
-
 
 static PCXHeader* ReadPCXHeader (FILE* F, const char* Name)
 // Read a structured PCX header from the given file and return it
@@ -177,8 +163,6 @@ static PCXHeader* ReadPCXHeader (FILE* F, const char* Name)
     return P;
 }
 
-
-
 static void DumpPCXHeader (const PCXHeader* P, const char* Name)
 // Dump the header of the PCX file in readable form to stdout
 {
@@ -199,8 +183,6 @@ static void DumpPCXHeader (const PCXHeader* P, const char* Name)
     printf ("Screen size:     %u/%u\n", P->ScreenWidth, P->ScreenHeight);
     printf ("Bytes per plane: %u\n", P->BytesPerPlane);
 }
-
-
 
 static void ReadPlane (FILE* F, PCXHeader* P, unsigned char* L)
 // Read one (possibly compressed) plane from the file
@@ -336,8 +318,6 @@ static void ReadPlane (FILE* F, PCXHeader* P, unsigned char* L)
     }
 }
 
-
-
 Bitmap* ReadPCXFile (const Collection* A)
 // Read a bitmap from a PCX file
 {
@@ -347,7 +327,6 @@ Bitmap* ReadPCXFile (const Collection* A)
     Pixel* Px;
     unsigned MaxIdx = 0;
     unsigned X, Y;
-
 
     // Get the file name
     const char* Name = NeedAttrVal (A, "name", "read pcx file");

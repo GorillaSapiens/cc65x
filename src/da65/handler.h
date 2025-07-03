@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef HANDLER_H
 #define HANDLER_H
-
-
 
 #include <stdint.h>
 
@@ -46,13 +42,9 @@
 // da65
 #include "opctable.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 // Generic handlers
 void OH_Illegal (const OpcDesc* D attribute ((unused)));
@@ -122,7 +114,6 @@ void OH_JmpAbsoluteXIndirect (const OpcDesc* D);
 void OH_JsrAbsolute (const OpcDesc*);
 
 void SetSubroutineParamSize (uint32_t Addr, unsigned Size);
-
 
 // End of handler.h
 

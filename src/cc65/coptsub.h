@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COPTSUB_H
 #define COPTSUB_H
-
-
 
 // cc65
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //                           Optimize subtractions
 //***************************************************************************
-
-
 
 unsigned OptSub1 (CodeSeg* S);
 /* Search for the sequence
@@ -82,8 +74,6 @@ unsigned OptSub3 (CodeSeg* S);
 /* Search for a call to decaxn and replace it by an 8 bit sub if the X register
 ** is not used later.
 */
-
-
 
 // End of coptsub.h
 

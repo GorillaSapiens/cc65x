@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 #include <errno.h>
 
@@ -44,13 +42,9 @@
 #include "fileio.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void FileSetPos (FILE* F, unsigned long Pos)
 // Seek to the given absolute position, fail on errors
@@ -59,8 +53,6 @@ void FileSetPos (FILE* F, unsigned long Pos)
         Error ("Cannot seek: %s", strerror (errno));
     }
 }
-
-
 
 unsigned long FileGetPos (FILE* F)
 // Return the current file position, fail on errors
@@ -72,8 +64,6 @@ unsigned long FileGetPos (FILE* F)
     return Pos;
 }
 
-
-
 void Write8 (FILE* F, unsigned Val)
 // Write an 8 bit value to the file
 {
@@ -82,16 +72,12 @@ void Write8 (FILE* F, unsigned Val)
     }
 }
 
-
-
 void Write16 (FILE* F, unsigned Val)
 // Write a 16 bit value to the file
 {
     Write8 (F, (unsigned char) Val);
     Write8 (F, (unsigned char) (Val >> 8));
 }
-
-
 
 void Write24 (FILE* F, unsigned long Val)
 // Write a 24 bit value to the file
@@ -101,8 +87,6 @@ void Write24 (FILE* F, unsigned long Val)
     Write8 (F, (unsigned char) (Val >> 16));
 }
 
-
-
 void Write32 (FILE* F, unsigned long Val)
 // Write a 32 bit value to the file
 {
@@ -111,8 +95,6 @@ void Write32 (FILE* F, unsigned long Val)
     Write8 (F, (unsigned char) (Val >> 16));
     Write8 (F, (unsigned char) (Val >> 24));
 }
-
-
 
 void WriteVal (FILE* F, unsigned long Val, unsigned Size)
 // Write a value of the given size to the output file
@@ -141,8 +123,6 @@ void WriteVal (FILE* F, unsigned long Val, unsigned Size)
     }
 }
 
-
-
 void WriteVar (FILE* F, unsigned long V)
 // Write a variable sized value to the file in special encoding
 {
@@ -161,8 +141,6 @@ void WriteVar (FILE* F, unsigned long V)
     } while (V != 0);
 }
 
-
-
 void WriteStr (FILE* F, const char* S)
 // Write a string to the file
 {
@@ -170,8 +148,6 @@ void WriteStr (FILE* F, const char* S)
     WriteVar (F, Len);
     WriteData (F, S, Len);
 }
-
-
 
 void WriteData (FILE* F, const void* Data, unsigned Size)
 // Write data to the file
@@ -181,8 +157,6 @@ void WriteData (FILE* F, const void* Data, unsigned Size)
     }
 }
 
-
-
 void WriteMult (FILE* F, unsigned char Val, unsigned long Count)
 // Write one byte several times to the file
 {
@@ -190,8 +164,6 @@ void WriteMult (FILE* F, unsigned char Val, unsigned long Count)
         Write8 (F, Val);
     }
 }
-
-
 
 unsigned Read8 (FILE* F)
 // Read an 8 bit value from the file
@@ -204,8 +176,6 @@ unsigned Read8 (FILE* F)
     return C;
 }
 
-
-
 unsigned Read16 (FILE* F)
 // Read a 16 bit value from the file
 {
@@ -213,8 +183,6 @@ unsigned Read16 (FILE* F)
     unsigned Hi = Read8 (F);
     return (Hi << 8) | Lo;
 }
-
-
 
 unsigned long Read24 (FILE* F)
 // Read a 24 bit value from the file
@@ -224,8 +192,6 @@ unsigned long Read24 (FILE* F)
     return (Hi << 16) | Lo;
 }
 
-
-
 unsigned long Read32 (FILE* F)
 // Read a 32 bit value from the file
 {
@@ -233,8 +199,6 @@ unsigned long Read32 (FILE* F)
     unsigned long Hi = Read16 (F);
     return (Hi << 16) | Lo;
 }
-
-
 
 long Read32Signed (FILE* F)
 // Read a 32 bit value from the file. Sign extend the value.
@@ -251,8 +215,6 @@ long Read32Signed (FILE* F)
     // Return it as a long
     return (long) V;
 }
-
-
 
 unsigned long ReadVar (FILE* F)
 // Read a variable size value from the file
@@ -275,8 +237,6 @@ unsigned long ReadVar (FILE* F)
     // Return the value read
     return V;
 }
-
-
 
 unsigned ReadStr (FILE* F)
 /* Read a string from the file, place it into the global string pool, and
@@ -306,8 +266,6 @@ unsigned ReadStr (FILE* F)
     return Id;
 }
 
-
-
 FilePos* ReadFilePos (FILE* F, FilePos* Pos)
 // Read a file position from the file
 {
@@ -317,8 +275,6 @@ FilePos* ReadFilePos (FILE* F, FilePos* Pos)
     Pos->Name = ReadVar (F);
     return Pos;
 }
-
-
 
 void* ReadData (FILE* F, void* Data, unsigned Size)
 // Read data from the file

@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COLOR_H
 #define COLOR_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Color structure
 typedef struct Color Color;
@@ -53,13 +47,9 @@ struct Color {
     unsigned char A;
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 #if defined(HAVE_INLINE)
 
@@ -88,8 +78,6 @@ Color RGBA (unsigned char R, unsigned char G, unsigned char B, unsigned char A);
 // Generate a color value
 
 #endif
-
-
 
 // End of color.h
 

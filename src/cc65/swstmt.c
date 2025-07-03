@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdbool.h>
 #include <limits.h>
 
@@ -54,13 +52,9 @@
 #include "stmt.h"
 #include "swstmt.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 typedef struct SwitchCtrl SwitchCtrl;
 struct SwitchCtrl {
@@ -71,20 +65,14 @@ struct SwitchCtrl {
     CodeMark    CaseCodeStart;     // Start of code marker
     bool        CaseCodeStartFlag; // flag to tell if we've done an override
 
-
-
 };
 
 // Pointer to current switch control struct
 static SwitchCtrl* Switch = 0;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void SwitchStatement (void)
 // Handle a switch statement for chars with a cmp cascade for the selector
@@ -230,8 +218,6 @@ void SwitchStatement (void)
     }
 }
 
-
-
 void CaseLabel (void)
 // Handle a case label
 {
@@ -313,8 +299,6 @@ void CaseLabel (void)
     // Skip the colon
     ConsumeColon ();
 }
-
-
 
 void DefaultLabel (void)
 // Handle a default label

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -41,13 +39,9 @@
 #include "check.h"
 #include "target.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Translation table with direct (no) translation
 static const unsigned char CTNone[256] = {
@@ -206,7 +200,6 @@ static const TargetEntry TargetMap[] = {
 };
 #define MAP_ENTRY_COUNT         (sizeof (TargetMap) / sizeof (TargetMap[0]))
 
-
 // Table with target properties by target ID
 static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "none",           CPU_6502,       BINFMT_BINARY,      CTNone  },
@@ -253,21 +246,15 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
 // Target system
 target_t Target = TGT_NONE;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static int Compare (const void* Key, const void* Entry)
 // Compare function for bsearch
 {
     return strcmp ((const char*) Key, ((const TargetEntry*)Entry)->Name);
 }
-
-
 
 target_t FindTarget (const char* Name)
 /* Find a target by name and return the target ID. TGT_UNKNOWN is returned if
@@ -282,8 +269,6 @@ target_t FindTarget (const char* Name)
     return (T == 0)? TGT_UNKNOWN : T->Id;
 }
 
-
-
 const TargetProperties* GetTargetProperties (target_t Target)
 // Return the properties for a target
 {
@@ -293,8 +278,6 @@ const TargetProperties* GetTargetProperties (target_t Target)
     // Return the array entry
     return &PropertyTable[Target];
 }
-
-
 
 const char* GetTargetName (target_t Target)
 // Return the name of a target

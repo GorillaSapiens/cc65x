@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 
@@ -44,31 +42,21 @@
 #include "error.h"
 #include "segments.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 static struct SegContext* CurrentFunctionSegment;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void UseLabelPoolFromSegments (struct SegContext* Seg)
 // Use the info in segments for generating new label numbers
 {
     CurrentFunctionSegment = Seg;
 }
-
-
 
 unsigned GetLocalLabel (void)
 // Get an unused assembler label for the function. Will never return zero.
@@ -84,8 +72,6 @@ unsigned GetLocalLabel (void)
     return ++CurrentFunctionSegment->NextLabel;
 }
 
-
-
 const char* LocalLabelName (unsigned L)
 /* Make a label name from the given label number. The label name will be
 ** created in static storage and overwritten when calling the function
@@ -96,8 +82,6 @@ const char* LocalLabelName (unsigned L)
     sprintf (Buf, "L%04X", L);
     return Buf;
 }
-
-
 
 int IsLocalLabelName (const char* Name)
 // Return true if Name is the name of a local label
@@ -117,8 +101,6 @@ int IsLocalLabelName (const char* Name)
     return 1;
 }
 
-
-
 unsigned GetLocalDataLabel (void)
 // Get an unused local data label. Will never return zero.
 {
@@ -133,8 +115,6 @@ unsigned GetLocalDataLabel (void)
     return ++CurrentFunctionSegment->NextDataLabel;
 }
 
-
-
 const char* LocalDataLabelName (unsigned L)
 /* Make a label name from the given data label number. The label name will be
 ** created in static storage and overwritten when calling the function again.
@@ -144,8 +124,6 @@ const char* LocalDataLabelName (unsigned L)
     sprintf (Buf, "M%04X", L);
     return Buf;
 }
-
-
 
 unsigned GetPooledLiteralLabel (void)
 // Get an unused literal label. Will never return zero.
@@ -161,8 +139,6 @@ unsigned GetPooledLiteralLabel (void)
     // Return the next label
     return ++NextLabel;
 }
-
-
 
 const char* PooledLiteralLabelName (unsigned L)
 /* Make a litral label name from the given label number. The label name will be

@@ -31,33 +31,21 @@
 //
 //***************************************************************************
 
-
-
 #ifndef LISTING_H
 #define LISTING_H
 
-
-
 // ca65
 #include "fragment.h"
-
-
 
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 struct StrBuf;
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Length of the header of a listing line
 #define LINE_HEADER_LEN         24
@@ -91,13 +79,9 @@ extern int              PageLength;     // Length of a listing page
 #define MIN_LIST_BYTES  4
 #define MAX_LIST_BYTES  255
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void NewListingLine (const struct StrBuf* Line, unsigned char File,
                      unsigned char Depth);
@@ -117,8 +101,6 @@ void InitListingLine (void);
 
 void CreateListing (void);
 // Create the listing
-
-
 
 // End of listing.h
 

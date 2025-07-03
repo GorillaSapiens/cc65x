@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -43,13 +41,9 @@
 #include "codeinfo.h"
 #include "coptptrload.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned OptPtrLoad1 (CodeSeg* S)
 /* Search for the sequence:
@@ -168,8 +162,6 @@ unsigned OptPtrLoad1 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptPtrLoad2 (CodeSeg* S)
 /* Search for the sequence:
 **
@@ -255,8 +247,6 @@ unsigned OptPtrLoad2 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptPtrLoad3 (CodeSeg* S)
 /* Search for the sequence:
@@ -349,8 +339,6 @@ unsigned OptPtrLoad3 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptPtrLoad4 (CodeSeg* S)
 /* Search for the sequence:
@@ -459,8 +447,6 @@ unsigned OptPtrLoad4 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptPtrLoad5 (CodeSeg* S)
 /* Search for the sequence:
 **
@@ -544,8 +530,6 @@ unsigned OptPtrLoad5 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptPtrLoad6 (CodeSeg* S)
 /* Search for the sequence:
@@ -646,8 +630,6 @@ unsigned OptPtrLoad6 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptPtrLoad7 (CodeSeg* S)
 /* Search for the sequence:
 **
@@ -712,7 +694,6 @@ unsigned OptPtrLoad7 (CodeSeg* S)
 
             // Track the insertion point
             unsigned IP = I + 10;
-
 
             /* If X is zero on entry to aslax1, we can generate:
             **
@@ -834,8 +815,6 @@ unsigned OptPtrLoad7 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptPtrLoad11 (CodeSeg* S)
 /* Search for the sequence:
 **
@@ -920,8 +899,6 @@ unsigned OptPtrLoad11 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptPtrLoad12 (CodeSeg* S)
 /* Search for the sequence:
@@ -1066,8 +1043,6 @@ unsigned OptPtrLoad12 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptPtrLoad13 (CodeSeg* S)
 /* Search for the sequence:
 **
@@ -1133,8 +1108,6 @@ unsigned OptPtrLoad13 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptPtrLoad14 (CodeSeg* S)
 /* Search for the sequence:
@@ -1206,8 +1179,6 @@ unsigned OptPtrLoad14 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptPtrLoad15 (CodeSeg* S)
 /* Search for the sequence:
@@ -1295,8 +1266,6 @@ unsigned OptPtrLoad15 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptPtrLoad16 (CodeSeg* S)
 /* Search for the sequence
 **
@@ -1369,8 +1338,6 @@ unsigned OptPtrLoad16 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptPtrLoad17 (CodeSeg* S)
 /* Search for the sequence
@@ -1457,8 +1424,6 @@ unsigned OptPtrLoad17 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptPtrLoad18 (CodeSeg* S)
 /* Search for the sequence:
@@ -1551,8 +1516,6 @@ unsigned OptPtrLoad18 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptPtrLoad19 (CodeSeg* S)
 /* Search for the sequence:

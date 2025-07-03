@@ -31,20 +31,14 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "check.h"
 #include "gentype.h"
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void GT_AddArray (StrBuf* Type, unsigned ArraySize)
 /* Add an array with the given size to the type string in Type. This will
@@ -71,8 +65,6 @@ void GT_AddArray (StrBuf* Type, unsigned ArraySize)
     SB_GetBuf (Type)[Pos] = GT_ARRAY (SizeBytes);
 }
 
-
-
 unsigned GT_GetElementCount (StrBuf* Type)
 /* Retrieve the element count of an array stored in Type at the current index
 ** position. Note: Index must point to the array token itself, since the size
@@ -94,8 +86,6 @@ unsigned GT_GetElementCount (StrBuf* Type)
     // Return it
     return Size;
 }
-
-
 
 const char* GT_AsString (const StrBuf* Type, StrBuf* String)
 /* Convert the type into a readable representation. The target string buffer

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 
@@ -64,13 +62,9 @@
 #include "testexpr.h"
 #include "typeconv.h"
 
-
-
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 static int CheckLabelWithoutStatement (void)
 /* Called from Statement() after a label definition. Will check for a
@@ -86,8 +80,6 @@ static int CheckLabelWithoutStatement (void)
     }
 }
 
-
-
 static void CheckTok (token_t Tok, const char* Msg, int* PendingToken)
 /* Helper function for Statement. Will check for Tok and print Msg if not
 ** found. If PendingToken is NULL, it will the skip the token, otherwise
@@ -102,8 +94,6 @@ static void CheckTok (token_t Tok, const char* Msg, int* PendingToken)
         NextToken ();
     }
 }
-
-
 
 static void CheckSemi (int* PendingToken)
 /* Helper function for Statement. Will check for a semicolon and print an
@@ -131,8 +121,6 @@ static void CheckSemi (int* PendingToken)
     }
 }
 
-
-
 static void SkipPending (int PendingToken)
 // Skip the pending token if we have one
 {
@@ -141,13 +129,9 @@ static void SkipPending (int PendingToken)
     }
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static int IfStatement (void)
 // Handle an 'if' statement
@@ -206,8 +190,6 @@ static int IfStatement (void)
     }
 }
 
-
-
 static void DoStatement (void)
 // Handle the 'do' statement
 {
@@ -242,8 +224,6 @@ static void DoStatement (void)
     // Remove the loop from the loop stack
     DelLoop ();
 }
-
-
 
 static void WhileStatement (void)
 // Handle the 'while' statement
@@ -305,8 +285,6 @@ static void WhileStatement (void)
     DelLoop ();
 }
 
-
-
 static void ReturnStatement (void)
 // Handle the 'return' statement
 {
@@ -359,8 +337,6 @@ static void ReturnStatement (void)
     g_jump (F_GetRetLab (CurrentFunc));
 }
 
-
-
 static void BreakStatement (void)
 // Handle the 'break' statement
 {
@@ -385,8 +361,6 @@ static void BreakStatement (void)
     // Jump to the exit label of the loop
     g_jump (L->BreakLabel);
 }
-
-
 
 static void ContinueStatement (void)
 // Handle the 'continue' statement
@@ -420,8 +394,6 @@ static void ContinueStatement (void)
     // Jump to next loop iteration
     g_jump (L->ContinueLabel);
 }
-
-
 
 static void ForStatement (void)
 // Handle a 'for' statement
@@ -522,8 +494,6 @@ static void ForStatement (void)
     DelLoop ();
 }
 
-
-
 static int CompoundStatement (int* PendingToken)
 /* Compound statement. Allow any number of statements inside braces. The
 ** function returns true if the last statement was a break or return.
@@ -579,8 +549,6 @@ static int CompoundStatement (int* PendingToken)
     return GotBreak;
 }
 
-
-
 static void Statement (int* PendingToken)
 // Single-line statement
 {
@@ -617,8 +585,6 @@ static void Statement (int* PendingToken)
     CheckSemi (PendingToken);
 }
 
-
-
 static int ParseAnyLabels (void)
 // Return -1 if there are any labels with a statement
 {
@@ -649,8 +615,6 @@ static int ParseAnyLabels (void)
 
     return 0;
 }
-
-
 
 int AnyStatement (int* PendingToken)
 /* Statement parser. Returns 1 if the statement does a return/break, returns

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
@@ -58,13 +56,9 @@
 #include "o65.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Header mode bits
 #define MF_CPU_65816    0x8000          // Executable is for 65816
@@ -183,13 +177,9 @@ struct ExprDesc {
     ExtSym*         ExtRef;             // External reference if any
 };
 
-
-
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 static ExprDesc* InitExprDesc (ExprDesc* ED, O65Desc* D)
 // Initialize an ExprDesc structure for use with O65ParseExpr
@@ -204,8 +194,6 @@ static ExprDesc* InitExprDesc (ExprDesc* ED, O65Desc* D)
     return ED;
 }
 
-
-
 static void WriteSize (const O65Desc* D, unsigned long Val)
 // Write a "size" word to the file
 {
@@ -215,8 +203,6 @@ static void WriteSize (const O65Desc* D, unsigned long Val)
         default:                Internal ("Invalid size in header: %04X", D->Header.Mode);
     }
 }
-
-
 
 static unsigned O65SegType (const SegDesc* S)
 // Map our own segment types into something o65 compatible
@@ -237,8 +223,6 @@ static unsigned O65SegType (const SegDesc* S)
         return O65SEG_DATA;
     }
 }
-
-
 
 static void CvtMemoryToSegment (ExprDesc* ED)
 /* Convert a memory area into a segment by searching the list of run segments
@@ -287,8 +271,6 @@ static void CvtMemoryToSegment (ExprDesc* ED)
     }
 }
 
-
-
 static const SegDesc* FindSeg (SegDesc** const List, unsigned Count, const Segment* S)
 /* Search for a segment in the given list of segment descriptors and return
 ** the descriptor for a segment if we found it, and NULL if not.
@@ -306,8 +288,6 @@ static const SegDesc* FindSeg (SegDesc** const List, unsigned Count, const Segme
     // Not found
     return 0;
 }
-
-
 
 static const SegDesc* O65FindSeg (const O65Desc* D, const Segment* S)
 // Search for a segment in the segment lists and return it's segment descriptor
@@ -331,13 +311,9 @@ static const SegDesc* O65FindSeg (const O65Desc* D, const Segment* S)
     return 0;
 }
 
-
-
 //***************************************************************************
 //                            Expression handling
 //***************************************************************************
-
-
 
 static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
 /* Extract and evaluate all constant factors in an subtree that has only
@@ -436,13 +412,9 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
     }
 }
 
-
-
 //***************************************************************************
 //                             Relocation tables
 //***************************************************************************
-
-
 
 static O65RelocTab* NewO65RelocTab (void)
 // Create a new relocation table
@@ -459,16 +431,12 @@ static O65RelocTab* NewO65RelocTab (void)
     return R;
 }
 
-
-
 static void FreeO65RelocTab (O65RelocTab* R)
 // Free a relocation table
 {
     xfree (R->Buf);
     xfree (R);
 }
-
-
 
 static void O65RelocPutByte (O65RelocTab* R, unsigned B)
 // Put the byte into the relocation table
@@ -488,8 +456,6 @@ static void O65RelocPutByte (O65RelocTab* R, unsigned B)
     R->Buf [R->Fill++] = (unsigned char) B;
 }
 
-
-
 static void O65RelocPutWord (O65RelocTab* R, unsigned W)
 // Put a word into the relocation table
 {
@@ -497,21 +463,15 @@ static void O65RelocPutWord (O65RelocTab* R, unsigned W)
     O65RelocPutByte (R, W >> 8);
 }
 
-
-
 static void O65WriteReloc (O65RelocTab* R, FILE* F)
 // Write the relocation table to the given file
 {
     WriteData (F, R->Buf, R->Fill);
 }
 
-
-
 //***************************************************************************
 //                              Option handling
 //***************************************************************************
-
-
 
 static O65Option* NewO65Option (unsigned Type, const void* Data, unsigned DataLen)
 // Allocate and initialize a new option struct
@@ -534,21 +494,15 @@ static O65Option* NewO65Option (unsigned Type, const void* Data, unsigned DataLe
     return O;
 }
 
-
-
 static void FreeO65Option (O65Option* O)
 // Free an O65Option struct
 {
     xfree (O);
 }
 
-
-
 //***************************************************************************
 //                     Subroutines to write o65 sections
 //***************************************************************************
-
-
 
 static void O65WriteHeader (O65Desc* D)
 // Write the header of the executable to the given file
@@ -587,8 +541,6 @@ static void O65WriteHeader (O65Desc* D)
     // Write the end-of-options byte
     Write8 (D->F, 0);
 }
-
-
 
 static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
                               unsigned long Offs, void* Data)
@@ -767,8 +719,6 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
     return SEG_EXPR_OK;
 }
 
-
-
 static void O65WriteSeg (O65Desc* D, SegDesc** Seg, unsigned Count, int DoWrite)
 // Write one segment to the o65 output file
 {
@@ -812,8 +762,6 @@ static void O65WriteSeg (O65Desc* D, SegDesc** Seg, unsigned Count, int DoWrite)
 
 }
 
-
-
 static void O65WriteTextSeg (O65Desc* D)
 // Write the code segment to the o65 output file
 {
@@ -827,8 +775,6 @@ static void O65WriteTextSeg (O65Desc* D)
     D->Header.TextSize = D->SegSize;
 }
 
-
-
 static void O65WriteDataSeg (O65Desc* D)
 // Write the data segment to the o65 output file
 {
@@ -841,8 +787,6 @@ static void O65WriteDataSeg (O65Desc* D)
     // Set the size of the segment
     D->Header.DataSize = D->SegSize;
 }
-
-
 
 static void O65WriteBssSeg (O65Desc* D)
 /* "Write" the bss segments to the o65 output file. This will only update
@@ -859,8 +803,6 @@ static void O65WriteBssSeg (O65Desc* D)
     D->Header.BssSize = D->SegSize;
 }
 
-
-
 static void O65WriteZPSeg (O65Desc* D)
 /* "Write" the zeropage segments to the o65 output file. This will only update
 ** the relevant header fields.
@@ -875,8 +817,6 @@ static void O65WriteZPSeg (O65Desc* D)
     // Set the size of the segment
     D->Header.ZPSize = D->SegSize;
 }
-
-
 
 static void O65WriteImports (O65Desc* D)
 // Write the list of imported symbols to the O65 file
@@ -898,23 +838,17 @@ static void O65WriteImports (O65Desc* D)
     }
 }
 
-
-
 static void O65WriteTextReloc (O65Desc* D)
 // Write the relocation for the text segment to the output file
 {
     O65WriteReloc (D->TextReloc, D->F);
 }
 
-
-
 static void O65WriteDataReloc (O65Desc* D)
 // Write the relocation for the data segment to the output file
 {
     O65WriteReloc (D->DataReloc, D->F);
 }
-
-
 
 static void O65WriteExports (O65Desc* D)
 // Write the list of exports
@@ -1002,13 +936,9 @@ static void O65WriteExports (O65Desc* D)
     }
 }
 
-
-
 //***************************************************************************
 //                                Public code
 //***************************************************************************
-
-
 
 O65Desc* NewO65Desc (void)
 // Create, initialize and return a new O65 descriptor struct
@@ -1051,8 +981,6 @@ O65Desc* NewO65Desc (void)
     return D;
 }
 
-
-
 void FreeO65Desc (O65Desc* D)
 // Delete the descriptor struct with cleanup
 {
@@ -1081,15 +1009,11 @@ void FreeO65Desc (O65Desc* D)
     xfree (D);
 }
 
-
-
 void O65Set6502 (O65Desc* D)
 // Enable 6502 mode
 {
     D->Header.Mode = (D->Header.Mode & ~MF_CPU_MASK) | MF_CPU_6502;
 }
-
-
 
 void O65Set65816 (O65Desc* D)
 // Enable 816 mode
@@ -1097,23 +1021,17 @@ void O65Set65816 (O65Desc* D)
     D->Header.Mode = (D->Header.Mode & ~MF_CPU_MASK) | MF_CPU_65816;
 }
 
-
-
 void O65SetSmallModel (O65Desc* D)
 // Enable a small memory model executable
 {
     D->Header.Mode = (D->Header.Mode & ~MF_SIZE_MASK) | MF_SIZE_16BIT;
 }
 
-
-
 void O65SetLargeModel (O65Desc* D)
 // Enable a large memory model executable
 {
     D->Header.Mode = (D->Header.Mode & ~MF_SIZE_MASK) | MF_SIZE_32BIT;
 }
-
-
 
 void O65SetAlignment (O65Desc* D, unsigned Alignment)
 // Set the executable alignment
@@ -1131,8 +1049,6 @@ void O65SetAlignment (O65Desc* D, unsigned Alignment)
     }
 }
 
-
-
 void O65SetOption (O65Desc* D, unsigned Type, const void* Data, unsigned DataLen)
 // Set an o65 header option
 {
@@ -1143,8 +1059,6 @@ void O65SetOption (O65Desc* D, unsigned Type, const void* Data, unsigned DataLen
     O->Next = D->Options;
     D->Options = O;
 }
-
-
 
 void O65SetOS (O65Desc* D, unsigned OS, unsigned Version, unsigned Id)
 // Set an option describing the target operating system
@@ -1172,16 +1086,12 @@ void O65SetOS (O65Desc* D, unsigned OS, unsigned Version, unsigned Id)
     }
 }
 
-
-
 ExtSym* O65GetImport (O65Desc* D, unsigned Ident)
 // Return the imported symbol or NULL if not found
 {
     // Retrieve the symbol from the table
     return GetExtSym (D->Imports, Ident);
 }
-
-
 
 void O65SetImport (O65Desc* D, unsigned Ident)
 // Set an imported identifier
@@ -1190,16 +1100,12 @@ void O65SetImport (O65Desc* D, unsigned Ident)
     NewExtSym (D->Imports, Ident);
 }
 
-
-
 ExtSym* O65GetExport (O65Desc* D, unsigned Ident)
 // Return the exported symbol or NULL if not found
 {
     // Retrieve the symbol from the table
     return GetExtSym (D->Exports, Ident);
 }
-
-
 
 void O65SetExport (O65Desc* D, unsigned Ident)
 // Set an exported identifier
@@ -1215,8 +1121,6 @@ void O65SetExport (O65Desc* D, unsigned Ident)
     // Insert the entry into the table
     NewExtSym (D->Exports, Ident);
 }
-
-
 
 static void O65SetupSegments (O65Desc* D, File* F)
 // Setup segment assignments
@@ -1284,8 +1188,6 @@ static void O65SetupSegments (O65Desc* D, File* F)
     }
 }
 
-
-
 static int O65Unresolved (unsigned Name, void* D)
 // Called if an unresolved symbol is encountered
 {
@@ -1299,8 +1201,6 @@ static int O65Unresolved (unsigned Name, void* D)
         return 0;
     }
 }
-
-
 
 static void O65SetupHeader (O65Desc* D)
 // Set additional stuff in the header
@@ -1324,8 +1224,6 @@ static void O65SetupHeader (O65Desc* D)
     }
 }
 
-
-
 static void O65UpdateHeader  (O65Desc* D)
 // Update mode word, currently only the "simple" bit
 {
@@ -1340,7 +1238,6 @@ static void O65UpdateHeader  (O65Desc* D)
         D->Header.Mode = (D->Header.Mode & ~MF_ADDR_MASK) | MF_ADDR_SIMPLE;
     }
 }
-
 
 void O65WriteTarget (O65Desc* D, File* F)
 // Write an o65 output file

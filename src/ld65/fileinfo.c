@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "coll.h"
 #include "xmalloc.h"
@@ -43,24 +41,16 @@
 #include "objdata.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // A list of all file infos without duplicates
 static Collection FileInfos = STATIC_COLLECTION_INITIALIZER;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static int FindFileInfo (unsigned Name, unsigned* Index)
 /* Find the FileInfo for a given file name. The function returns true if the
@@ -100,8 +90,6 @@ static int FindFileInfo (unsigned Name, unsigned* Index)
     return Found;
 }
 
-
-
 static FileInfo* NewFileInfo (unsigned Name, unsigned long MTime, unsigned long Size)
 // Allocate and initialize a new FileInfo struct and return it
 {
@@ -119,8 +107,6 @@ static FileInfo* NewFileInfo (unsigned Name, unsigned long MTime, unsigned long 
     return FI;
 }
 
-
-
 static void FreeFileInfo (FileInfo* FI)
 // Free a file info structure
 {
@@ -130,8 +116,6 @@ static void FreeFileInfo (FileInfo* FI)
     // Free memory for the structure
     xfree (FI);
 }
-
-
 
 FileInfo* ReadFileInfo (FILE* F, ObjData* O)
 // Read a file info from a file and return it
@@ -191,15 +175,11 @@ FileInfo* ReadFileInfo (FILE* F, ObjData* O)
     return FI;
 }
 
-
-
 unsigned FileInfoCount (void)
 // Return the total number of file infos
 {
     return CollCount (&FileInfos);
 }
-
-
 
 void AssignFileInfoIds (void)
 // Remove unused file infos and assign the ids to the remaining ones
@@ -224,8 +204,6 @@ void AssignFileInfoIds (void)
     // The new count is now in J
     FileInfos.Count = J;
 }
-
-
 
 void PrintDbgFileInfo (FILE* F)
 // Output the file info to a debug info file

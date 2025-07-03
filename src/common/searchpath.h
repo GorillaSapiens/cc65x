@@ -31,33 +31,21 @@
 //
 //***************************************************************************
 
-
-
 // Exports facilities to search files in a list of directories.
-
-
 
 #ifndef SEARCHPATH_H
 #define SEARCHPATH_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // A search path is a pointer to the list
 typedef struct Collection SearchPaths;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 SearchPaths* NewSearchPath (void);
 // Create a new, empty search path list
@@ -98,8 +86,6 @@ char* SearchFile (const SearchPaths* P, const char* File);
 /* Search for a file in a list of directories. Return a pointer to a malloced
 ** area that contains the complete path, if found, return 0 otherwise.
 */
-
-
 
 // End of searchpath.h
 

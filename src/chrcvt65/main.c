@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,8 +46,6 @@
 
 // chrcvt65
 #include "error.h"
-
-
 
 /*
 ** The following is a corrected doc from the BGI font editor toolkit:
@@ -118,8 +114,6 @@
 **         op1=1  op2=1  Draw from current pointer to (x,y)
 */
 
-
-
 /* The target file format is designed to be read by a cc65 compiled program
 ** more easily. It should not be necessary to load the whole file into a
 ** buffer to parse it, or seek within the file. Also using less memory if
@@ -158,23 +152,15 @@
 ** adding the character definition base pointer to each.
 */
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 static unsigned FilesProcessed = 0;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void Usage (void)
 // Print usage information and exit
@@ -193,8 +179,6 @@ static void Usage (void)
              ProgName);
 }
 
-
-
 static void OptHelp (const char* Opt attribute ((unused)),
                      const char* Arg attribute ((unused)))
 // Print usage information and exit
@@ -203,16 +187,12 @@ static void OptHelp (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
-
-
 static void OptVerbose (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 // Increase verbosity
 {
     ++Verbosity;
 }
-
-
 
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
@@ -222,8 +202,6 @@ static void OptVersion (const char* Opt attribute ((unused)),
              "%s V%s\n", ProgName, GetVersionAsString ());
     exit(EXIT_SUCCESS);
 }
-
-
 
 static void ConvertChar (StrBuf* Data, const unsigned char* Buf, int Remaining)
 /* Convert data for one character. Original data is in Buf, converted data
@@ -281,8 +259,6 @@ static void ConvertChar (StrBuf* Data, const unsigned char* Buf, int Remaining)
     }
 }
 
-
-
 static void ConvertFile (const char* Input, const char* Output)
 // Convert one vector font file
 {
@@ -320,7 +296,6 @@ static void ConvertFile (const char* Input, const char* Output)
     const unsigned char* VectorBuf;
     StrBuf         Offsets  = AUTO_STRBUF_INITIALIZER;
     StrBuf         VectorData = AUTO_STRBUF_INITIALIZER;
-
 
     // Try to open the file for reading
     FILE* F = fopen (Input, "rb");
@@ -467,8 +442,6 @@ static void ConvertFile (const char* Input, const char* Output)
     // Done
 }
 
-
-
 int main (int argc, char* argv [])
 // Assembler main program
 {
@@ -534,6 +507,4 @@ int main (int argc, char* argv [])
     // Success
     return EXIT_SUCCESS;
 }
-
-
 

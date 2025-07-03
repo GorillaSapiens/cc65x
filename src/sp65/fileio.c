@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 #include <errno.h>
 
@@ -40,13 +38,9 @@
 #include "error.h"
 #include "fileio.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void FileSetPos (FILE* F, unsigned long Pos)
 // Seek to the given absolute position, fail on errors
@@ -55,8 +49,6 @@ void FileSetPos (FILE* F, unsigned long Pos)
         Error ("Cannot seek: %s", strerror (errno));
     }
 }
-
-
 
 unsigned long FileGetPos (FILE* F)
 // Return the current file position, fail on errors
@@ -68,8 +60,6 @@ unsigned long FileGetPos (FILE* F)
     return Pos;
 }
 
-
-
 unsigned Read8 (FILE* F)
 // Read an 8 bit value from the file
 {
@@ -80,8 +70,6 @@ unsigned Read8 (FILE* F)
     return C;
 }
 
-
-
 unsigned Read16 (FILE* F)
 // Read a 16 bit value from the file
 {
@@ -89,8 +77,6 @@ unsigned Read16 (FILE* F)
     unsigned Hi = Read8 (F);
     return (Hi << 8) | Lo;
 }
-
-
 
 unsigned long Read24 (FILE* F)
 // Read a 24 bit value from the file
@@ -100,8 +86,6 @@ unsigned long Read24 (FILE* F)
     return (Hi << 16) | Lo;
 }
 
-
-
 unsigned long Read32 (FILE* F)
 // Read a 32 bit value from the file
 {
@@ -109,8 +93,6 @@ unsigned long Read32 (FILE* F)
     unsigned long Hi = Read16 (F);
     return (Hi << 16) | Lo;
 }
-
-
 
 void* ReadData (FILE* F, void* Data, unsigned Size)
 // Read data from the file

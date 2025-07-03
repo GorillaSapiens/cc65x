@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ULABEL_H
 #define ULABEL_H
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 ExprNode* ULabRef (int Which);
 /* Get an unnamed label. If Which is negative, it is a backreference (a
@@ -68,8 +62,6 @@ void ULabDone (void);
 /* Run through all unnamed labels, check for anomalies and errors and do
 ** necessary cleanups.
 */
-
-
 
 // End of ulabel.h
 

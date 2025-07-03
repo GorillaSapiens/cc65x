@@ -31,35 +31,23 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SCANNER_H
 #define SCANNER_H
 
-
-
 // ca65
 #include "token.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Scanner variables
 extern Token CurTok;            // Current input token incl. attributes
 extern int   ForcedEnd;         // Force end of assembly
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int IsIdChar (int C);
 // Return true if the character is a valid character for an identifier
@@ -102,8 +90,6 @@ void InitScanner (const char* InFile);
 
 void DoneScanner (void);
 // Release scanner resources
-
-
 
 // End of scanner.h
 

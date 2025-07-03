@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 
 // common
@@ -45,13 +43,9 @@
 #include "coptstop.h"
 #include "error.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Flags for the functions
 typedef enum {
@@ -86,13 +80,9 @@ struct OptFuncDesc {
     OP_FLAGS            Flags;          // Flags
 };
 
-
-
 //***************************************************************************
 //                                  Helpers
 //***************************************************************************
-
-
 
 static int SameRegAValue (StackOpData* D)
 // Check if Rhs Reg A == Lhs Reg A
@@ -116,8 +106,6 @@ static int SameRegAValue (StackOpData* D)
 
 }
 
-
-
 static int SameRegXValue (StackOpData* D)
 // Check if Rhs Reg X == Lhs Reg X
 {
@@ -139,13 +127,9 @@ static int SameRegXValue (StackOpData* D)
 
 }
 
-
-
 //***************************************************************************
 //                       Actual optimization functions
 //***************************************************************************
-
-
 
 static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer)
 // Optimize the toseqax and tosneax sequences.
@@ -257,8 +241,6 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
     return 1;
 }
 
-
-
 static unsigned Opt_tosshift (StackOpData* D, const char* Name)
 // Optimize shift sequences.
 {
@@ -327,8 +309,6 @@ static unsigned Opt_tosshift (StackOpData* D, const char* Name)
     // We changed the sequence
     return 1;
 }
-
-
 
 static unsigned Opt___bzero (StackOpData* D)
 // Optimize the __bzero sequence
@@ -422,8 +402,6 @@ static unsigned Opt___bzero (StackOpData* D)
     return 1;
 }
 
-
-
 static unsigned Opt_staspidx (StackOpData* D)
 // Optimize the staspidx sequence
 {
@@ -446,8 +424,6 @@ static unsigned Opt_staspidx (StackOpData* D)
     // We changed the sequence
     return 1;
 }
-
-
 
 static unsigned Opt_staxspidx (StackOpData* D)
 // Optimize the staxspidx sequence
@@ -508,8 +484,6 @@ static unsigned Opt_staxspidx (StackOpData* D)
     // We changed the sequence
     return 1;
 }
-
-
 
 static unsigned Opt_tosaddax (StackOpData* D)
 // Optimize the tosaddax sequence
@@ -649,8 +623,6 @@ static unsigned Opt_tosaddax (StackOpData* D)
     return 1;
 }
 
-
-
 static unsigned Opt_tosandax (StackOpData* D)
 // Optimize the tosandax sequence
 {
@@ -671,15 +643,11 @@ static unsigned Opt_tosandax (StackOpData* D)
     return 1;
 }
 
-
-
 static unsigned Opt_tosaslax (StackOpData* D)
 // Optimize the tosaslax sequence
 {
     return Opt_tosshift (D, "aslaxy");
 }
-
-
 
 static unsigned Opt_tosasrax (StackOpData* D)
 // Optimize the tosasrax sequence
@@ -687,15 +655,11 @@ static unsigned Opt_tosasrax (StackOpData* D)
     return Opt_tosshift (D, "asraxy");
 }
 
-
-
 static unsigned Opt_toseqax (StackOpData* D)
 // Optimize the toseqax sequence
 {
     return Opt_toseqax_tosneax (D, "booleq");
 }
-
-
 
 static unsigned Opt_tosgeax (StackOpData* D)
 // Optimize the tosgeax sequence
@@ -752,14 +716,11 @@ static unsigned Opt_tosgeax (StackOpData* D)
     return 1;
 }
 
-
-
 static unsigned Opt_tosltax (StackOpData* D)
 // Optimize the tosltax sequence
 {
     CodeEntry*  X;
     CodeLabel* L;
-
 
     // Inline the compare
     D->IP = D->OpIndex+1;
@@ -810,15 +771,11 @@ static unsigned Opt_tosltax (StackOpData* D)
     return 1;
 }
 
-
-
 static unsigned Opt_tosneax (StackOpData* D)
 // Optimize the tosneax sequence
 {
     return Opt_toseqax_tosneax (D, "boolne");
 }
-
-
 
 static unsigned Opt_tosorax (StackOpData* D)
 // Optimize the tosorax sequence
@@ -840,15 +797,11 @@ static unsigned Opt_tosorax (StackOpData* D)
     return 1;
 }
 
-
-
 static unsigned Opt_tosshlax (StackOpData* D)
 // Optimize the tosshlax sequence
 {
     return Opt_tosshift (D, "shlaxy");
 }
-
-
 
 static unsigned Opt_tosshrax (StackOpData* D)
 // Optimize the tosshrax sequence
@@ -856,13 +809,10 @@ static unsigned Opt_tosshrax (StackOpData* D)
     return Opt_tosshift (D, "shraxy");
 }
 
-
-
 static unsigned Opt_tossubax (StackOpData* D)
 // Optimize the tossubax sequence. Note: subtraction is not commutative!
 {
     CodeEntry*  X;
-
 
     // Inline the sbc
     D->IP = D->OpIndex+1;
@@ -891,13 +841,10 @@ static unsigned Opt_tossubax (StackOpData* D)
     return 1;
 }
 
-
-
 static unsigned Opt_tosugeax (StackOpData* D)
 // Optimize the tosugeax sequence
 {
     CodeEntry*  X;
-
 
     // Inline the sbc
     D->IP = D->OpIndex+1;
@@ -934,13 +881,10 @@ static unsigned Opt_tosugeax (StackOpData* D)
     return 1;
 }
 
-
-
 static unsigned Opt_tosugtax (StackOpData* D)
 // Optimize the tosugtax sequence
 {
     CodeEntry*  X;
-
 
     // Inline the sbc
     D->IP = D->OpIndex+1;
@@ -981,13 +925,10 @@ static unsigned Opt_tosugtax (StackOpData* D)
     return 1;
 }
 
-
-
 static unsigned Opt_tosuleax (StackOpData* D)
 // Optimize the tosuleax sequence
 {
     CodeEntry*  X;
-
 
     // Inline the sbc
     D->IP = D->OpIndex+1;
@@ -1028,13 +969,10 @@ static unsigned Opt_tosuleax (StackOpData* D)
     return 1;
 }
 
-
-
 static unsigned Opt_tosultax (StackOpData* D)
 // Optimize the tosultax sequence
 {
     CodeEntry*  X;
-
 
     // Inline the sbc
     D->IP = D->OpIndex+1;
@@ -1063,13 +1001,10 @@ static unsigned Opt_tosultax (StackOpData* D)
     return 1;
 }
 
-
-
 static unsigned Opt_tosxorax (StackOpData* D)
 // Optimize the tosxorax sequence
 {
     CodeEntry*  X;
-
 
     // Store the value into the zeropage instead of pushing it
     ReplacePushByStore (D);
@@ -1097,19 +1032,14 @@ static unsigned Opt_tosxorax (StackOpData* D)
     return 1;
 }
 
-
-
 //***************************************************************************
 //            Optimization functions when hi-bytes can be ignored
 //***************************************************************************
-
-
 
 static unsigned Opt_a_tosbitwise (StackOpData* D, opc_t OPC)
 // Optimize the tosandax/tosorax/tosxorax sequence.
 {
     CodeEntry*  X;
-
 
     // Inline the bitwise operation
     D->IP = D->OpIndex+1;
@@ -1158,8 +1088,6 @@ static unsigned Opt_a_tosbitwise (StackOpData* D, opc_t OPC)
     // We changed the sequence
     return 1;
 }
-
-
 
 static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
 // Optimize the TOS compare sequence with a bool transformer
@@ -1231,23 +1159,17 @@ static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
     return 1;
 }
 
-
-
 static unsigned Opt_a_tosand (StackOpData* D)
 // Optimize the tosandax sequence.
 {
     return Opt_a_tosbitwise (D, OP65_AND);
 }
 
-
-
 static unsigned Opt_a_toseq (StackOpData* D)
 // Optimize the toseqax sequence
 {
     return Opt_a_toscmpbool (D, "booleq");
 }
-
-
 
 static unsigned Opt_a_tosicmp (StackOpData* D)
 // Replace tosicmp with CMP
@@ -1346,15 +1268,11 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
     return 1;
 }
 
-
-
 static unsigned Opt_a_tosne (StackOpData* D)
 // Optimize the tosneax sequence
 {
     return Opt_a_toscmpbool (D, "boolne");
 }
-
-
 
 static unsigned Opt_a_tosor (StackOpData* D)
 // Optimize the tosorax sequence.
@@ -1362,13 +1280,10 @@ static unsigned Opt_a_tosor (StackOpData* D)
     return Opt_a_tosbitwise (D, OP65_ORA);
 }
 
-
-
 static unsigned Opt_a_tossub (StackOpData* D)
 // Optimize the tossubax sequence.
 {
     CodeEntry*  X;
-
 
     // Inline the sbc
     D->IP = D->OpIndex+1;
@@ -1414,15 +1329,11 @@ static unsigned Opt_a_tossub (StackOpData* D)
     return 1;
 }
 
-
-
 static unsigned Opt_a_tosuge (StackOpData* D)
 // Optimize the tosgeax and tosugeax sequences
 {
     return Opt_a_toscmpbool (D, "booluge");
 }
-
-
 
 static unsigned Opt_a_tosugt (StackOpData* D)
 // Optimize the tosgtax and tosugtax sequences
@@ -1430,15 +1341,11 @@ static unsigned Opt_a_tosugt (StackOpData* D)
     return Opt_a_toscmpbool (D, "boolugt");
 }
 
-
-
 static unsigned Opt_a_tosule (StackOpData* D)
 // Optimize the tosleax and tosuleax sequences
 {
     return Opt_a_toscmpbool (D, "boolule");
 }
-
-
 
 static unsigned Opt_a_tosult (StackOpData* D)
 // Optimize the tosltax and tosultax sequences
@@ -1446,21 +1353,15 @@ static unsigned Opt_a_tosult (StackOpData* D)
     return Opt_a_toscmpbool (D, "boolult");
 }
 
-
-
 static unsigned Opt_a_tosxor (StackOpData* D)
 // Optimize the tosxorax sequence.
 {
     return Opt_a_tosbitwise (D, OP65_EOR);
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 // The first column of these two tables must be sorted in lexical order
 
@@ -1513,15 +1414,11 @@ static const OptFuncDesc FuncRegATable[] = {
 
 #define FUNC_COUNT(Table) (sizeof(Table) / sizeof(Table[0]))
 
-
-
 static int CmpFunc (const void* Key, const void* Func)
 // Compare function for bsearch
 {
     return strcmp (Key, ((const OptFuncDesc*) Func)->Name);
 }
-
-
 
 static const OptFuncDesc* FindFunc (const OptFuncDesc FuncTable[], size_t Count, const char* Name)
 /* Find the function with the given name. Return a pointer to the table entry
@@ -1530,8 +1427,6 @@ static const OptFuncDesc* FindFunc (const OptFuncDesc FuncTable[], size_t Count,
 {
     return bsearch (Name, FuncTable, Count, sizeof(OptFuncDesc), CmpFunc);
 }
-
-
 
 static int PreCondOk (StackOpData* D)
 /* Check if the preconditions for a call to the optimizer subfunction are
@@ -1680,8 +1575,6 @@ static int PreCondOk (StackOpData* D)
     // Determine if we have a basic block
     return CS_IsBasicBlock (D->Code, D->PushIndex, D->OpIndex);
 }
-
-
 
 static int RegAPreCondOk (StackOpData* D)
 /* Check if the preconditions for a call to the RegA-only optimizer subfunction
@@ -1836,13 +1729,9 @@ static int RegAPreCondOk (StackOpData* D)
     return CS_IsBasicBlock (D->Code, D->PushIndex, D->OpIndex);
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned OptStackOps (CodeSeg* S)
 // Optimize operations that take operands via the stack
@@ -1863,7 +1752,6 @@ unsigned OptStackOps (CodeSeg* S)
         FoundPush,
         FoundOp
     } State = Initialize;
-
 
     // Remember the code segment in the info struct
     Data.Code = S;

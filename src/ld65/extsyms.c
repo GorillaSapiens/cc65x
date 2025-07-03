@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -44,13 +42,9 @@
 #include "extsyms.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Structure holding an external symbol
 struct ExtSym {
@@ -71,13 +65,9 @@ struct ExtSymTab {
     ExtSym*     HashTab[HASHTAB_SIZE];
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 ExtSym* NewExtSym (ExtSymTab* Tab, unsigned Name)
 // Create a new external symbol and insert it into the table
@@ -120,8 +110,6 @@ ExtSym* NewExtSym (ExtSymTab* Tab, unsigned Name)
     return E;
 }
 
-
-
 static void FreeExtSym (ExtSym* E)
 /* Free an external symbol structure. Will not unlink the entry, so internal
 ** use only.
@@ -129,8 +117,6 @@ static void FreeExtSym (ExtSym* E)
 {
     xfree (E);
 }
-
-
 
 ExtSymTab* NewExtSymTab (void)
 // Create a new external symbol table
@@ -152,8 +138,6 @@ ExtSymTab* NewExtSymTab (void)
     return Tab;
 }
 
-
-
 void FreeExtSymTab (ExtSymTab* Tab)
 // Free an external symbol structure
 {
@@ -167,8 +151,6 @@ void FreeExtSymTab (ExtSymTab* Tab)
     // Free the struct itself
     xfree (Tab);
 }
-
-
 
 ExtSym* GetExtSym (const ExtSymTab* Tab, unsigned Name)
 /* Return the entry for the external symbol with the given name. Return NULL
@@ -192,15 +174,11 @@ ExtSym* GetExtSym (const ExtSymTab* Tab, unsigned Name)
     return E;
 }
 
-
-
 unsigned ExtSymCount (const ExtSymTab* Tab)
 // Return the number of symbols in the table
 {
     return Tab->Count;
 }
-
-
 
 const ExtSym* ExtSymList (const ExtSymTab* Tab)
 /* Return the start of the symbol list sorted by symbol number. Call
@@ -210,23 +188,17 @@ const ExtSym* ExtSymList (const ExtSymTab* Tab)
     return Tab->Root;
 }
 
-
-
 unsigned ExtSymNum (const ExtSym* E)
 // Return the number of an external symbol
 {
     return E->Num;
 }
 
-
-
 unsigned ExtSymName (const ExtSym* E)
 // Return the symbol name index
 {
     return E->Name;
 }
-
-
 
 const ExtSym* ExtSymNext (const ExtSym* E)
 // Return the next symbol in the list

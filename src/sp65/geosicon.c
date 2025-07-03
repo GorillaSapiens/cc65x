@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "attrib.h"
 #include "print.h"
@@ -42,25 +40,17 @@
 #include "error.h"
 #include "geosicon.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Screen size of geos icon
 #define WIDTH           24U
 #define HEIGHT          21U
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 StrBuf* GenGeosIcon (const Bitmap* B, const Collection* A attribute ((unused)))
 /* Generate binary output in GEOS icon format for the bitmap B. The output
@@ -70,7 +60,6 @@ StrBuf* GenGeosIcon (const Bitmap* B, const Collection* A attribute ((unused)))
 {
     StrBuf* D;
     unsigned X, Y;
-
 
     // Output the image properties
     Print (stdout, 1, "Image is %ux%u with %u colors%s\n",

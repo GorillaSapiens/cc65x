@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ASMCODE_H
 #define ASMCODE_H
-
-
 
 #include <stdio.h>
 
 // common
 #include "attrib.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Marker for an assembler code position
 typedef struct {
@@ -57,13 +49,9 @@ typedef struct {
     int         SP;             // Stack pointer at this position
 } CodeMark;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void GetCodePos (CodeMark* M);
 // Get a marker pointing to the current output position
@@ -89,8 +77,6 @@ int CodeRangeIsEmpty (const CodeMark* Start, const CodeMark* End);
 
 void WriteAsmOutput (void);
 // Write the final assembler output to the output file
-
-
 
 // End of asmcode.h
 

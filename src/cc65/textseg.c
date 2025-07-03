@@ -31,13 +31,9 @@
 //
 //***************************************************************************
 
-
-
 /* Note: This is NOT some sort of code segment, it is used to store lines of
 ** output that are textual (not real code) instead.
 */
-
-
 
 // common
 #include "xmalloc.h"
@@ -47,13 +43,9 @@
 #include "output.h"
 #include "textseg.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 TextSeg* NewTextSeg (SymEntry* Func)
 // Create a new text segment, initialize and return it
@@ -69,8 +61,6 @@ TextSeg* NewTextSeg (SymEntry* Func)
     return S;
 }
 
-
-
 void TS_AddVLine (TextSeg* S, const char* Format, va_list ap)
 // Add a line to the given text segment
 {
@@ -82,8 +72,6 @@ void TS_AddVLine (TextSeg* S, const char* Format, va_list ap)
     CollAppend (&S->Lines, xstrdup (Buf));
 }
 
-
-
 void TS_AddLine (TextSeg* S, const char* Format, ...)
 // Add a line to the given text segment
 {
@@ -92,8 +80,6 @@ void TS_AddLine (TextSeg* S, const char* Format, ...)
     TS_AddVLine (S, Format, ap);
     va_end (ap);
 }
-
-
 
 void TS_Output (const TextSeg* S)
 // Output the text segment data to the output file

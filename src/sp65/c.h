@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef C_H
 #define C_H
-
-
 
 // common
 #include "coll.h"
@@ -45,18 +41,12 @@
 // sp65
 #include "bitmap.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 void WriteCFile (const StrBuf* Data, const Collection* A, const Bitmap* B);
 // Write the contents of Data to a file in C format
-
-
 
 // End of c.h
 

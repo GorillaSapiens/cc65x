@@ -31,22 +31,14 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ATTRTAB_H
 #define ATTRTAB_H
 
-
-
 #include <stdint.h>
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 typedef enum attr_t {
 
@@ -91,13 +83,9 @@ typedef enum attr_t {
 
 } attr_t;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void AddrCheck (uint32_t Addr);
 // Check if the given address has a valid range
@@ -131,8 +119,6 @@ attr_t GetStyleAttr (uint32_t Addr);
 
 attr_t GetLabelAttr (uint32_t Addr);
 // Return the label attribute for the given address
-
-
 
 // End of attrtab.h
 #endif

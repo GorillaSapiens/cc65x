@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SEGMENTS_H
 #define SEGMENTS_H
-
-
 
 #include <stdio.h>
 
@@ -44,13 +40,9 @@
 #include "coll.h"
 #include "exprdefs.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Forwards
 struct MemoryArea;
@@ -75,8 +67,6 @@ struct Segment {
     unsigned char       Dumped;         // Did we dump this segment?
 };
 
-
-
 // Section structure (a section is a part of a segment)
 typedef struct Section Section;
 struct Section {
@@ -92,8 +82,6 @@ struct Section {
     unsigned char       AddrSize;       // Address size of segment
 };
 
-
-
 /* Prototype for a function that is used to write expressions to the target
 ** file (used in SegWrite). It returns one of the following values:
 */
@@ -108,13 +96,9 @@ typedef unsigned (*SegWriteFunc) (ExprNode* E,        // The expression to write
                                   unsigned long Offs, // File offset
                                   void* Data);        // Callers data
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Segment* GetSegment (unsigned Name, unsigned char AddrSize, const char* ObjName);
 /* Search for a segment and return an existing one. If the segment does not
@@ -162,8 +146,6 @@ void CheckSegments (void);
 /* Walk through the segment list and check if there are segments that were
 ** not written to the output file. Output an error if this is the case.
 */
-
-
 
 // End of segments.h
 

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "chartype.h"
 #include "tgttrans.h"
@@ -44,13 +42,9 @@
 #include "ident.h"
 #include "scanstrbuf.h"
 
-
-
 //***************************************************************************
 //                               Helper functions
 //***************************************************************************
-
-
 
 static int ParseChar (StrBuf* B)
 // Parse a character. Converts \n into EOL, etc.
@@ -144,13 +138,9 @@ static int ParseChar (StrBuf* B)
     return C;
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void SB_SkipWhite (StrBuf* B)
 // Skip whitespace in the string buffer
@@ -159,8 +149,6 @@ void SB_SkipWhite (StrBuf* B)
         SB_Skip (B);
     }
 }
-
-
 
 int SB_GetSym (StrBuf* B, StrBuf* Ident, const char* SpecialChars)
 /* Get a symbol from the string buffer. If SpecialChars is not NULL, it
@@ -193,8 +181,6 @@ int SB_GetSym (StrBuf* B, StrBuf* Ident, const char* SpecialChars)
         return 0;
     }
 }
-
-
 
 int SB_GetString (StrBuf* B, StrBuf* S)
 /* Get a string from the string buffer. Returns 1 if a string was found and 0
@@ -246,8 +232,6 @@ int SB_GetString (StrBuf* B, StrBuf* S)
     }
 }
 
-
-
 int SB_GetNumber (StrBuf* B, long* Val)
 /* Get a number from the string buffer. Accepted formats are decimal, octal,
 ** hex and character constants. Numeric constants may be preceeded by a
@@ -259,7 +243,6 @@ int SB_GetNumber (StrBuf* B, long* Val)
     char     C;
     unsigned Base;
     unsigned DigitVal;
-
 
     // Initialize Val
     *Val = 0;

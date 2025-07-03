@@ -31,47 +31,31 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SPAN_H
 #define SPAN_H
-
-
 
 #include <stdio.h>
 
 // common
 #include "coll.h"
 
-
-
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 struct ObjData;
 struct Segment;
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Span is an opaque type
 typedef struct Span Span;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Span* ReadSpan (FILE* F, struct ObjData* O, unsigned Id);
 // Read a Span from a file and return it
@@ -99,8 +83,6 @@ void PrintDbgSpanList (FILE* F, const struct ObjData* O, const unsigned* List);
 
 void PrintDbgSpans (FILE* F);
 // Output the spans to a debug info file
-
-
 
 // End of span.h
 

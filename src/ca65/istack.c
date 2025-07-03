@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "check.h"
 #include "xmalloc.h"
@@ -41,13 +39,9 @@
 #include "error.h"
 #include "istack.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Size of the stack (== maximum nested macro or repeat count)
 #define ISTACK_MAX      256
@@ -65,13 +59,9 @@ struct IElement {
 static IElement* IStack = 0;    // Input stack pointer
 static unsigned  ICount = 0;    // Number of items on the stack
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void PushInput (int (*Func) (void*), void* Data, const char* Desc)
 // Push an input function onto the input stack
@@ -96,8 +86,6 @@ void PushInput (int (*Func) (void*), void* Data, const char* Desc)
     IStack  = E;
 }
 
-
-
 void PopInput (void)
 // Pop the current input function from the input stack
 {
@@ -115,8 +103,6 @@ void PopInput (void)
     // And delete it
     xfree (E);
 }
-
-
 
 int InputFromStack (void)
 /* Try to get input from the input stack. Return true if we had such input,
@@ -137,15 +123,11 @@ int InputFromStack (void)
     return 0;
 }
 
-
-
 int HavePushedInput (void)
 // Return true if we have stacked input available, return false if not
 {
     return (IStack != 0);
 }
-
-
 
 void CheckInputStack (void)
 /* Called from the scanner before closing an input file. Will check for any
@@ -156,8 +138,6 @@ void CheckInputStack (void)
         Error ("Open %s", IStack->Desc);
     }
 }
-
-
 
 InputStack RetrieveInputStack (void)
 /* Retrieve the current input stack. This will also clear it. Used when
@@ -172,8 +152,6 @@ InputStack RetrieveInputStack (void)
     IStack = 0;
     return S;
 }
-
-
 
 void RestoreInputStack (InputStack S)
 // Restore an old input stack that was retrieved by RetrieveInputStack().

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 /* This module works around bugs in the time conversion code supplied by
 ** Microsoft. See here for a description of the problem:
 **   http://www.codeproject.com/KB/datetime/dstbugs.aspx
@@ -41,8 +39,6 @@
 ** problems did even make it into .NET, where the DateTime builtin data type
 ** has exactly the same problems as described in the article above.
 */
-
-
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -54,17 +50,11 @@
 // common
 #include "filestat.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 #if defined(_WIN32)
-
-
 
 static time_t FileTimeToUnixTime (const FILETIME* T)
 /* Calculate a unix time_t value from a FILETIME. FILETIME contains a 64 bit
@@ -82,8 +72,6 @@ static time_t FileTimeToUnixTime (const FILETIME* T)
     V.HighPart = T->dwHighDateTime;
     return (V.QuadPart / 10000000U) - Offs.QuadPart;
 }
-
-
 
 int FileStat (const char* Path, struct stat* Buf)
 // Replacement function for stat()
@@ -127,11 +115,7 @@ int FileStat (const char* Path, struct stat* Buf)
     return Error;
 }
 
-
-
 #else
-
-
 
 int FileStat (const char* Path, struct stat* Buf)
 // Replacement function for stat()
@@ -139,7 +123,5 @@ int FileStat (const char* Path, struct stat* Buf)
     // Just call the function which works without errors
     return stat (Path, Buf);
 }
-
-
 
 #endif

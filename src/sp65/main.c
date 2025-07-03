@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -52,13 +50,9 @@
 #include "input.h"
 #include "output.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Bitmap first read
 static Bitmap* B;
@@ -72,13 +66,9 @@ static StrBuf* D;
 // Output data from palconv
 static StrBuf* E;
 
-
-
 //***************************************************************************
 //                                                             Code
 //***************************************************************************
-
-
 
 static void Usage (void)
 // Print usage information and exit
@@ -109,8 +99,6 @@ static void Usage (void)
             ProgName);
 }
 
-
-
 static void SetWorkBitmap (Bitmap* N)
 /* Delete an old working bitmap and set a new one. The new one may be NULL
 ** to clear it.
@@ -124,8 +112,6 @@ static void SetWorkBitmap (Bitmap* N)
     // Set the new one
     C = N;
 }
-
-
 
 static void SetOutputData (StrBuf* N)
 /* Delete the old output data and replace it by the given one. The new one
@@ -141,7 +127,6 @@ static void SetOutputData (StrBuf* N)
     D = N;
 }
 
-
 static void SetPalOutputData (StrBuf* N)
 /* Delete the old output data and replace it by the given one. The new one
 ** may be NULL to clear it.
@@ -155,8 +140,6 @@ static void SetPalOutputData (StrBuf* N)
     // Set the new one
     E = N;
 }
-
-
 
 static void OptConvertTo (const char* Opt attribute ((unused)), const char* Arg)
 // Convert the bitmap into a target format
@@ -180,8 +163,6 @@ static void OptConvertTo (const char* Opt attribute ((unused)), const char* Arg)
     FreeAttrList (A);
 }
 
-
-
 static void OptDumpPalette (const char* Opt attribute ((unused)),
                             const char* Arg attribute ((unused)))
 // Dump the palette of the current work bitmap
@@ -200,8 +181,6 @@ static void OptDumpPalette (const char* Opt attribute ((unused)),
     DumpPalette (stdout, GetBitmapPalette (C));
 }
 
-
-
 static void OptHelp (const char* Opt attribute ((unused)),
                      const char* Arg attribute ((unused)))
 // Print usage information and exit
@@ -210,8 +189,6 @@ static void OptHelp (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
-
-
 static void OptListConversions (const char* Opt attribute ((unused)),
                                 const char* Arg attribute ((unused)))
 // Print a list of all conversions
@@ -219,8 +196,6 @@ static void OptListConversions (const char* Opt attribute ((unused)),
     ListConversionTargets (stdout);
     exit (EXIT_SUCCESS);
 }
-
-
 
 static void OptPop (const char* Opt attribute ((unused)),
                     const char* Arg attribute ((unused)))
@@ -235,15 +210,12 @@ static void OptPop (const char* Opt attribute ((unused)),
     SetWorkBitmap (B);
 }
 
-
-
 static void OptRead (const char* Opt attribute ((unused)), const char* Arg)
 // Read an input file
 {
     static const char* const NameList[] = {
         "name", "format"
     };
-
 
     // Parse the argument
     Collection* A = ParseAttrList (Arg, NameList, 2);
@@ -260,8 +232,6 @@ static void OptRead (const char* Opt attribute ((unused)), const char* Arg)
     // Delete the attribute list
     FreeAttrList (A);
 }
-
-
 
 static void OptSlice (const char* Opt attribute ((unused)), const char* Arg)
 // Generate a slice of a bitmap
@@ -290,16 +260,12 @@ static void OptSlice (const char* Opt attribute ((unused)), const char* Arg)
     SetWorkBitmap (SliceBitmap (C, X, Y, W, H));
 }
 
-
-
 static void OptVerbose (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 // Increase verbosity
 {
     ++Verbosity;
 }
-
-
 
 static void OptVersion (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
@@ -308,15 +274,12 @@ static void OptVersion (const char* Opt attribute ((unused)),
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
 }
 
-
-
 static void OptPalette (const char* Opt attribute ((unused)), const char* Arg)
 // Write an output file
 {
     static const char* const NameList[] = {
         "target", "name", "format"
     };
-
 
     // Parse the argument
     Collection* A = ParseAttrList (Arg, NameList, 2);
@@ -348,7 +311,6 @@ static void OptWrite (const char* Opt attribute ((unused)), const char* Arg)
         "name", "format"
     };
 
-
     // Parse the argument
     Collection* A = ParseAttrList (Arg, NameList, 2);
 
@@ -363,8 +325,6 @@ static void OptWrite (const char* Opt attribute ((unused)), const char* Arg)
     // Delete the attribute list
     FreeAttrList (A);
 }
-
-
 
 int main (int argc, char* argv [])
 // sp65 main program

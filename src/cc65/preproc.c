@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -60,13 +58,9 @@
 #include "scanstrbuf.h"
 #include "standard.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Macro scanner mode flags
 #define MSM_NONE                0x00U   // Default
@@ -149,13 +143,9 @@ struct HiddenMacro {
     HideRange*      HS;
 };
 
-
-
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
-
-
 
 static void TranslationPhase3 (StrBuf* Source, StrBuf* Target);
 /* Mimic Translation Phase 3. Handle old and new style comments. Collapse
@@ -191,13 +181,9 @@ static void LazyCheckNextPPTok (const StrBuf* Prev, unsigned LastTokLen);
 ** concatenation.
 */
 
-
-
 //***************************************************************************
 //                   Low level preprocessor token handling
 //***************************************************************************
-
-
 
 // Types of preprocessor directives
 typedef enum {
@@ -216,8 +202,6 @@ typedef enum {
     PPD_UNDEF,
     PPD_WARNING,
 } ppdirective_t;
-
-
 
 // Preprocessor directive tokens mapping table
 // CAUTION: table must be sorted for bsearch
@@ -245,15 +229,11 @@ static const struct PPDType {
 // Number of preprocessor directive types
 #define PPDTOKEN_COUNT  (sizeof(PPDTypes) / sizeof(PPDTypes[0]))
 
-
-
 static int CmpToken (const void* Key, const void* Elem)
 // Compare function for bsearch
 {
     return strcmp ((const char*) Key, ((const struct PPDType*) Elem)->Tok);
 }
-
-
 
 static ppdirective_t FindPPDirectiveType (const char* Ident)
 /* Find a preprocessor directive type and return it. Return PPD_ILLEGAL if the
@@ -265,13 +245,9 @@ static ppdirective_t FindPPDirectiveType (const char* Ident)
     return P? P->Type : PPD_ILLEGAL;
 }
 
-
-
 //***************************************************************************
 //                             MacroExp helpers
 //***************************************************************************
-
-
 
 static HideRange* NewHideRange (unsigned Start, unsigned Len)
 // Create a hide range
@@ -285,15 +261,11 @@ static HideRange* NewHideRange (unsigned Start, unsigned Len)
     return HS;
 }
 
-
-
 static void FreeHideRange (HideRange* HS)
 // Free a hide range
 {
     xfree (HS);
 }
-
-
 
 static HiddenMacro* NewHiddenMacro (const Macro* M)
 // Create a new struct for the hidden macro
@@ -305,8 +277,6 @@ static HiddenMacro* NewHiddenMacro (const Macro* M)
 
     return MHS;
 }
-
-
 
 static void FreeHiddenMacro (HiddenMacro* MHS)
 // Free the struct and all ranges of the hidden macro
@@ -326,13 +296,9 @@ static void FreeHiddenMacro (HiddenMacro* MHS)
     xfree (MHS);
 }
 
-
-
 //***************************************************************************
 //                              struct MacroExp
 //***************************************************************************
-
-
 
 static HiddenMacro* ME_FindHiddenMacro (const MacroExp* E, const Macro* M)
 // Find the macro hide set
@@ -348,8 +314,6 @@ static HiddenMacro* ME_FindHiddenMacro (const MacroExp* E, const Macro* M)
 
     return 0;
 }
-
-
 
 static void ME_HideMacro (unsigned Idx, unsigned Count, MacroExp* E, const Macro* M)
 // Hide the macro from the Idx'th identifier
@@ -414,8 +378,6 @@ static void ME_HideMacro (unsigned Idx, unsigned Count, MacroExp* E, const Macro
     }
 }
 
-
-
 static int ME_CanExpand (unsigned Idx, const MacroExp* E, const Macro* M)
 // Return 1 if the macro can be expanded with the Idx'th identifier
 {
@@ -440,8 +402,6 @@ static int ME_CanExpand (unsigned Idx, const MacroExp* E, const Macro* M)
     return 1;
 }
 
-
-
 static void ME_OffsetHideSets (unsigned Idx, unsigned Offs, MacroExp* E)
 /* Adjust all macro hide set ranges for the macro expansion when the identifier
 ** at Idx is replaced with a count of Offs + 1 (if Offs > 0) of identifiers.
@@ -465,8 +425,6 @@ static void ME_OffsetHideSets (unsigned Idx, unsigned Offs, MacroExp* E)
         }
     }
 }
-
-
 
 static void ME_RemoveToken (unsigned Idx, unsigned Count, MacroExp* E)
 /* Remove the Idx'th identifier token from tracking and offset all hidden
@@ -516,8 +474,6 @@ static void ME_RemoveToken (unsigned Idx, unsigned Count, MacroExp* E)
     }
 }
 
-
-
 static void ME_HandleSemiNestedMacro (unsigned NameIdx, unsigned LastIdx, MacroExp* E)
 /* Unhide the macro name from all hidesets if it was expanded with an unhidden
 ** right parenthesis. This is unspecified but allowed behavior according to
@@ -550,8 +506,6 @@ static void ME_HandleSemiNestedMacro (unsigned NameIdx, unsigned LastIdx, MacroE
     }
 }
 
-
-
 static void ME_AddArgHideSets (unsigned Idx, const MacroExp* A, MacroExp* Parent)
 /* Propagate the macro hide sets of the substituted argument starting as the
 ** Idx'th identifier of the result.
@@ -570,8 +524,6 @@ static void ME_AddArgHideSets (unsigned Idx, const MacroExp* A, MacroExp* Parent
     }
 }
 
-
-
 static void ME_DoneHideSets (MacroExp* E)
 // Free all of hidden macros for the macro expansion
 {
@@ -584,8 +536,6 @@ static void ME_DoneHideSets (MacroExp* E)
     DoneCollection (&E->HideSets);
 }
 
-
-
 static void ME_SetTokLens (MacroExp* E, unsigned TokLen)
 // Set token lengths and flags for macro expansion struct
 {
@@ -597,8 +547,6 @@ static void ME_SetTokLens (MacroExp* E, unsigned TokLen)
         E->Flags |= MES_MULTIPLE_TOKEN;
     }
 }
-
-
 
 static MacroExp* ME_MakeReplaced (MacroExp* A)
 // Make a replaced version of the argument
@@ -625,23 +573,17 @@ static MacroExp* ME_MakeReplaced (MacroExp* A)
     return A->Replaced != 0 ? A->Replaced : A;
 }
 
-
-
 static MacroExp* ME_GetOriginalArg (const MacroExp* E, unsigned Index)
 // Return an actual macro argument with the given index
 {
     return CollAt (&E->Args, Index);
 }
 
-
-
 static MacroExp* ME_GetReplacedArg (const MacroExp* E, unsigned Index)
 // Return a replaced macro argument with the given index
 {
     return ME_MakeReplaced (CollAt (&E->Args, Index));
 }
-
-
 
 static MacroExp* ME_AppendArg (MacroExp* E, MacroExp* Arg)
 /* Add a copy of Arg to the list of actual macro arguments.
@@ -668,8 +610,6 @@ static MacroExp* ME_AppendArg (MacroExp* E, MacroExp* Arg)
     return A;
 }
 
-
-
 static void ME_ClearArgs (MacroExp* E)
 // Clear all read arguments for macro expansion
 {
@@ -690,16 +630,12 @@ static void ME_ClearArgs (MacroExp* E)
     InitCollection (&E->Args);
 }
 
-
-
 static int ME_IsNextArgVariadic (const MacroExp* E, const Macro* M)
 // Return true if the next actual argument we will add is a variadic one
 {
     return (M->Variadic &&
             M->ParamCount == (int) CollCount (&E->Args) + 1);
 }
-
-
 
 static MacroExp* InitMacroExp (MacroExp* E)
 // Initialize a MacroExp structure
@@ -715,8 +651,6 @@ static MacroExp* InitMacroExp (MacroExp* E)
     return E;
 }
 
-
-
 static void DoneMacroExp (MacroExp* E)
 // Cleanup after use of a MacroExp structure
 {
@@ -728,13 +662,9 @@ static void DoneMacroExp (MacroExp* E)
     }
 }
 
-
-
 //***************************************************************************
 //                            Rescan input stack
 //***************************************************************************
-
-
 
 static void PushRescanLine (RescanInputStack* RIS, StrBuf* L, unsigned LastTokLen)
 // Push an input line to the rescan input stack
@@ -743,8 +673,6 @@ static void PushRescanLine (RescanInputStack* RIS, StrBuf* L, unsigned LastTokLe
     // Abuse the pointer to store an unsigned
     CollAppend (&RIS->LastTokLens, (void*)(uintptr_t)LastTokLen);
 }
-
-
 
 static void PopRescanLine (void)
 // Pop and free a rescan input line if it reaches the end
@@ -756,8 +684,6 @@ static void PopRescanLine (void)
     }
 }
 
-
-
 static void InitRescanInputStack (RescanInputStack* RIS)
 // Init a RescanInputStack struct
 {
@@ -765,8 +691,6 @@ static void InitRescanInputStack (RescanInputStack* RIS)
     InitCollection (&RIS->LastTokLens);
     RIS->PrevTok = 0;
 }
-
-
 
 static void DoneRescanInputStack (RescanInputStack* RIS)
 // Free a RescanInputStack struct. RIS must be non-NULL.
@@ -786,13 +710,9 @@ static void DoneRescanInputStack (RescanInputStack* RIS)
     DoneCollection (&RIS->LastTokLens);
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static int MacName (char* Ident)
 /* Get a macro symbol name into Ident.  If we have an error, print a
@@ -812,8 +732,6 @@ static int MacName (char* Ident)
     }
 }
 
-
-
 static void CheckForBadIdent (const char* Ident, int Std, const Macro* M)
 // Check for and warning on problematic identifiers
 {
@@ -826,8 +744,6 @@ static void CheckForBadIdent (const char* Ident, int Std, const Macro* M)
         PPWarning ("__VA_ARGS__ can only appear in the expansion of a C99 variadic macro");
     }
 }
-
-
 
 static void AddPreLine (StrBuf* Str)
 // Add newlines to the string buffer
@@ -863,8 +779,6 @@ static void AddPreLine (StrBuf* Str)
     ContinuedLines = 0;
 }
 
-
-
 static void AppendIndent (StrBuf* Str, int Count)
 // Add Count of spaces ' ' to the string buffer
 {
@@ -873,8 +787,6 @@ static void AppendIndent (StrBuf* Str, int Count)
         --Count;
     }
 }
-
-
 
 static void Stringize (StrBuf* Source, StrBuf* Target)
 /* Stringize the given string: Add double quotes at start and end and preceed
@@ -904,8 +816,6 @@ static void Stringize (StrBuf* Source, StrBuf* Target)
     // Add the closing quote
     SB_AppendChar (Target, '\"');
 }
-
-
 
 static void OldStyleComment (void)
 // Remove an old style C comment from line
@@ -941,8 +851,6 @@ static void OldStyleComment (void)
     NextChar ();
 }
 
-
-
 static void NewStyleComment (void)
 // Remove a new style C comment from line
 {
@@ -965,8 +873,6 @@ static void NewStyleComment (void)
         NextChar ();
     }
 }
-
-
 
 static int SkipWhitespace (int SkipLines)
 /* Skip white space and comments in the input stream. If skipLines is true,
@@ -1046,8 +952,6 @@ static int SkipWhitespace (int SkipLines)
     return Skipped != 0 ? Skipped : -(NewLine != 0);
 }
 
-
-
 static void CopyHeaderNameToken (StrBuf* Target)
 // Copy a header name from the input to Target.
 {
@@ -1075,8 +979,6 @@ static void CopyHeaderNameToken (StrBuf* Target)
     }
 }
 
-
-
 static int IsQuotedString (void)
 /* Retrun 1 if the incoming characters indicate a string literal or character
 ** constant, otherwise return 0.
@@ -1084,8 +986,6 @@ static int IsQuotedString (void)
 {
     return IsQuote (CurC) || IsWideQuoted (CurC, NextC);
 }
-
-
 
 static void CopyQuotedString (StrBuf* Target)
 // Copy a single or double quoted string from the input to Target.
@@ -1122,8 +1022,6 @@ static void CopyQuotedString (StrBuf* Target)
         PPWarning ("Missing terminating %c character", Quote);
     }
 }
-
-
 
 static int GetPunc (char* S)
 /* Parse a punctuator token. Return 1 and store the parsed token string into S
@@ -1241,8 +1139,6 @@ static int GetPunc (char* S)
     return 1;
 }
 
-
-
 static int CheckPastePPTok (StrBuf* Source, unsigned TokLen, char Next)
 /* Return 1 if the last pp-tokens from Source could be concatenated with any
 ** characters from Appended to form a new valid one.
@@ -1302,8 +1198,6 @@ static int CheckPastePPTok (StrBuf* Source, unsigned TokLen, char Next)
     // Return if concatenation succeeded
     return NewTokLen != TokLen;
 }
-
-
 
 static int TryPastePPTok (StrBuf* Target,
                           StrBuf* Appended,
@@ -1422,8 +1316,6 @@ static int TryPastePPTok (StrBuf* Target,
     return TokLen != FirstTokLen;
 }
 
-
-
 static void SeparatePPTok (StrBuf* Target, char Next)
 /* Add a space to target if the previous pp-token could be concatenated with
 ** the following character.
@@ -1440,8 +1332,6 @@ static void SeparatePPTok (StrBuf* Target, char Next)
         CurRescanStack->PrevTok = 0;
     }
 }
-
-
 
 static void LazyCheckNextPPTok (const StrBuf* Prev, unsigned LastTokLen)
 /* Memorize the previous pp-token(s) to later check for potential pp-token
@@ -1501,8 +1391,6 @@ static void LazyCheckNextPPTok (const StrBuf* Prev, unsigned LastTokLen)
     }
 }
 
-
-
 static int CheckExtraTokens (const char* Name)
 /* Check for extra tokens at the end of the directive. Return 1 if there are
 ** extra tokens, otherwise 0.
@@ -1516,13 +1404,9 @@ static int CheckExtraTokens (const char* Name)
     return 0;
 }
 
-
-
 //***************************************************************************
 //                                Macro stuff
 //***************************************************************************
-
-
 
 static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, int MultiLine)
 /* Identify the arguments to a macro call as-is. Return the total count of
@@ -1744,8 +1628,6 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
     */
     return Idx;
 }
-
-
 
 static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, Macro* M, unsigned* IdentCount)
 /* Argument substitution according to ISO/IEC 9899:1999 (E), 6.10.3.1ff.
@@ -2045,8 +1927,6 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
     return TokLen;
 }
 
-
-
 static unsigned ExpandMacro (unsigned Idx, StrBuf* Target, MacroExp* E, Macro* M, int MultiLine)
 /* Expand a macro into Target. Return the length of the last pp-token in the
 ** result of the expansion.
@@ -2094,8 +1974,6 @@ static unsigned ExpandMacro (unsigned Idx, StrBuf* Target, MacroExp* E, Macro* M
     // Return the length of the last pp-token in the expansion result
     return Len;
 }
-
-
 
 static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsigned ModeFlags)
 /* Scan for and perform macro replacement. Return the count of identifiers and
@@ -2450,13 +2328,9 @@ Loop:
     return Count;
 }
 
-
-
 //***************************************************************************
 //                                Directives
 //***************************************************************************
-
-
 
 static int ParseMacroReplacement (StrBuf* Source, Macro* M)
 /* Check correctness of macro definition while squeezing old and new style
@@ -2549,8 +2423,6 @@ Error_Handler:
     // Failure
     return 0;
 }
-
-
 
 static void DoDefine (void)
 // Process #define directive
@@ -2703,8 +2575,6 @@ Error_Handler:
     }
 }
 
-
-
 static int PushIf (int Skip, int Invert, int Cond, unsigned Flags)
 // Push a new if level onto the if stack
 {
@@ -2725,8 +2595,6 @@ static int PushIf (int Skip, int Invert, int Cond, unsigned Flags)
     }
 }
 
-
-
 static void DoError (void)
 // Print an error
 {
@@ -2743,8 +2611,6 @@ static void DoError (void)
     // Clear the rest of line
     ClearLine ();
 }
-
-
 
 static int DoIf (int Skip)
 // Process #if directive
@@ -2801,8 +2667,6 @@ static int DoIf (int Skip)
     return PushIf (Skip, 1, Expr.IVal != 0, IFCOND_NONE);
 }
 
-
-
 static int DoIfDef (int Skip, int Flag)
 // Process #ifdef if Flag == 1, or #ifndef if Flag == 0.
 {
@@ -2833,8 +2697,6 @@ static int DoIfDef (int Skip, int Flag)
 
     return PushIf (Skip, Flag, IsDef, GuardFlag);
 }
-
-
 
 static void DoInclude (void)
 // Open an include file.
@@ -2924,8 +2786,6 @@ Done:
     ClearLine ();
 }
 
-
-
 static unsigned GetLineDirectiveNum (void)
 // Get a decimal digit-sequence from the input. Return 0 on errors.
 {
@@ -2971,8 +2831,6 @@ static unsigned GetLineDirectiveNum (void)
     return (unsigned)Num;
 }
 
-
-
 static void DoLine (void)
 // Process #line directive
 {
@@ -3014,8 +2872,6 @@ static void DoLine (void)
     MLine = InitLine (MLine);
 }
 
-
-
 static void DoPragma (void)
 /* Handle a #pragma line by converting the #pragma preprocessor directive into
 ** the _Pragma() compiler operator.
@@ -3042,8 +2898,6 @@ static void DoPragma (void)
     SB_SetIndex (PragmaLine, SB_GetLen (PragmaLine));
 }
 
-
-
 static void DoUndef (void)
 // Process the #undef directive
 {
@@ -3057,8 +2911,6 @@ static void DoUndef (void)
     // Check for extra tokens
     CheckExtraTokens ("undef");
 }
-
-
 
 static void DoWarning (void)
 // Print a warning
@@ -3076,8 +2928,6 @@ static void DoWarning (void)
     // Clear the rest of line
     ClearLine ();
 }
-
-
 
 static int ParseDirectives (unsigned ModeFlags)
 // Handle directives. Return 1 if any whitespace or newlines are parsed.
@@ -3306,8 +3156,6 @@ static int ParseDirectives (unsigned ModeFlags)
     return Whitespace;
 }
 
-
-
 void HandleSpecialMacro (Macro* M, const char* Name)
 // Handle special "magic" macros that may change
 {
@@ -3330,13 +3178,9 @@ void HandleSpecialMacro (Macro* M, const char* Name)
     }
 }
 
-
-
 //***************************************************************************
 //                               Preprocessing
 //***************************************************************************
-
-
 
 static void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
 /* Mimic Translation Phase 3. Handle old and new style comments. Collapse
@@ -3382,8 +3226,6 @@ static void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
     InitLine (OldSource);
 }
 
-
-
 static void PreprocessDirective (StrBuf* Source, StrBuf* Target, unsigned ModeFlags)
 /* Preprocess a single line. Handle specified tokens and operators, remove
 ** whitespace and comments, then do macro replacement.
@@ -3396,8 +3238,6 @@ static void PreprocessDirective (StrBuf* Source, StrBuf* Target, unsigned ModeFl
     ReplaceMacros (Source, Target, &E, ModeFlags | MSM_IN_DIRECTIVE);
     DoneMacroExp (&E);
 }
-
-
 
 void Preprocess (void)
 // Preprocess lines count of which is affected by directives
@@ -3444,8 +3284,6 @@ void Preprocess (void)
     FreeUndefinedMacros ();
 }
 
-
-
 void InitPreprocess (void)
 // Init preprocessor
 {
@@ -3453,8 +3291,6 @@ void InitPreprocess (void)
     MLine = NewStrBuf ();
     PLine = NewStrBuf ();
 }
-
-
 
 void DonePreprocess (void)
 // Done with preprocessor
@@ -3464,23 +3300,17 @@ void DonePreprocess (void)
     SB_Done (PLine);
 }
 
-
-
 void SetPPIfStack (PPIfStack* Stack)
 // Specify which PP #if stack to use
 {
     PPStack = Stack;
 }
 
-
-
 void ContinueLine (void)
 // Continue the current line ended with a '\\'
 {
     ++ContinuedLines;
 }
-
-
 
 void PreprocessBegin (IFile* Input)
 // Initialize the preprocessor for a new input file
@@ -3498,8 +3328,6 @@ void PreprocessBegin (IFile* Input)
     // Enable diagnostics on new style comments in C89 mode
     AllowNewComments = 0;
 }
-
-
 
 void PreprocessEnd (IFile* Input)
 /* Preprocessor done with current file. The parameter is the file we're

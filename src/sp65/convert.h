@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CONVERT_H
 #define CONVERT_H
-
-
 
 #include <stdio.h>
 
@@ -47,13 +43,9 @@
 // sp65
 #include "bitmap.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 StrBuf* ConvertTo (const Bitmap* B, const Collection* A);
 /* Convert the bitmap B into some sort of other binary format. The output is
@@ -64,8 +56,6 @@ StrBuf* ConvertTo (const Bitmap* B, const Collection* A);
 
 void ListConversionTargets (FILE* F);
 // Output a list of conversion targets
-
-
 
 // End of convert.h
 

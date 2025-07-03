@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -50,13 +48,9 @@
 #include "objfile.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
-
-
 
 static unsigned HT_GenHash (const void* Key);
 // Generate the hash over a key.
@@ -70,13 +64,9 @@ static int HT_Compare (const void* Key1, const void* Key2);
 ** than zero if Key1 is greater then Key2.
 */
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Number of entries in the table and the mask to generate the hash
 #define HASHTAB_MASK    0x1F
@@ -106,13 +96,9 @@ static const HashFunctions HashFunc = {
 // Hash table, hashed by name
 static HashTable HashTab = STATIC_HASHTABLE_INITIALIZER (HASHTAB_COUNT, &HashFunc);
 
-
-
 //***************************************************************************
 //                           Hash table functions
 //***************************************************************************
-
-
 
 static unsigned HT_GenHash (const void* Key)
 // Generate the hash over a key.
@@ -120,15 +106,11 @@ static unsigned HT_GenHash (const void* Key)
     return (*(const unsigned*)Key & HASHTAB_MASK);
 }
 
-
-
 static const void* HT_GetKey (const void* Entry)
 // Given a pointer to the user entry data, return a pointer to the index
 {
     return &((FileEntry*) Entry)->Name;
 }
-
-
 
 static int HT_Compare (const void* Key1, const void* Key2)
 /* Compare two keys. The function must return a value less than zero if
@@ -139,13 +121,9 @@ static int HT_Compare (const void* Key1, const void* Key2)
     return (int)*(const unsigned*)Key1 - (int)*(const unsigned*)Key2;
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static FileEntry* NewFileEntry (unsigned Name, FileType Type,
                                 unsigned long Size, unsigned long MTime)
@@ -172,8 +150,6 @@ static FileEntry* NewFileEntry (unsigned Name, FileType Type,
     return F;
 }
 
-
-
 const StrBuf* GetFileName (unsigned Name)
 // Get the name of a file where the name index is known
 {
@@ -198,8 +174,6 @@ const StrBuf* GetFileName (unsigned Name)
     return GetStrBuf (F->Name);
 }
 
-
-
 unsigned GetFileIndex (const StrBuf* Name)
 // Return the file index for the given file name.
 {
@@ -218,8 +192,6 @@ unsigned GetFileIndex (const StrBuf* Name)
     }
 }
 
-
-
 unsigned AddFile (const StrBuf* Name, FileType Type,
                   unsigned long Size, unsigned long MTime)
 /* Add a new file to the list of input files. Return the index of the file in
@@ -232,8 +204,6 @@ unsigned AddFile (const StrBuf* Name, FileType Type,
     // Return the index
     return F->Index;
 }
-
-
 
 void WriteFiles (void)
 // Write the list of input files to the object file
@@ -260,8 +230,6 @@ void WriteFiles (void)
     ObjEndFiles ();
 }
 
-
-
 static void WriteEscaped (FILE* F, const char* Name)
 // Write a file name to a dependency file escaping spaces
 {
@@ -274,8 +242,6 @@ static void WriteEscaped (FILE* F, const char* Name)
         ++Name;
     }
 }
-
-
 
 static void WriteDep (FILE* F, FileType Types)
 // Helper function. Writes all file names that match Types to the output
@@ -306,8 +272,6 @@ static void WriteDep (FILE* F, FileType Types)
     }
 }
 
-
-
 static void CreateDepFile (const char* Name, FileType Types)
 /* Create a dependency file with the given name and place dependencies for
 ** all files with the given types there.
@@ -337,8 +301,6 @@ static void CreateDepFile (const char* Name, FileType Types)
         Fatal ("Cannot write to dependeny file (disk full?)");
     }
 }
-
-
 
 void CreateDependencies (void)
 // Create dependency files requested by the user

@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SCANNER_H
 #define SCANNER_H
-
-
 
 // common
 #include "fp.h"
@@ -46,13 +42,9 @@
 #include "ident.h"
 #include "lineinfo.h"
 
-
-
 //***************************************************************************
 //                             Token definitions
 //***************************************************************************
-
-
 
 typedef enum token_t {
     TOK_INVALID,
@@ -197,13 +189,9 @@ typedef enum token_t {
     TOK_EAX
 } token_t;
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Forward for struct Literal
 struct Literal;
@@ -227,13 +215,9 @@ extern int      PPParserRunning;    // Is tokenizer used by the preprocessor
 extern int      NoCharMap;          // Disable literal translation
 extern unsigned InPragmaParser;     // Depth of pragma parser calling
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 #if defined(HAVE_INLINE)
 INLINE int TokIsPunc (const Token* T)
@@ -377,8 +361,6 @@ int ConsumeLCurly (void);
 
 int ConsumeRCurly (void);
 // Check for a right curly brace and skip it
-
-
 
 // End of scanner.h
 

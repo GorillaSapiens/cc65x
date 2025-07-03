@@ -28,22 +28,14 @@
 //
 //***************************************************************************
 
-
-
 #ifndef INTPTRSTACK_H
 #define INTPTRSTACK_H
 
-
-
 #include "inline.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 typedef struct IntPtrStack IntPtrStack;
 struct IntPtrInner {
@@ -61,13 +53,9 @@ struct IntPtrStack {
 // Declare an int stack with the given value as first element
 #define INTPTRSTACK(Val, Ptr)   { 1, { {Val, Ptr}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} } }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 #if defined(HAVE_INLINE)
 INLINE int IPS_IsFull (const IntPtrStack* S)
@@ -113,8 +101,6 @@ void IPS_Push (IntPtrStack* S, long Val, void *Ptr);
 
 void IPS_Pop (IntPtrStack* S, long *Val, void **Ptr);
 // Pop a value from an int stack
-
-
 
 // End of IntPtrStack.h
 

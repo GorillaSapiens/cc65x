@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -45,13 +43,9 @@
 #include "objdata.h"
 #include "exports.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // A hash table entry
 typedef struct HashEntry HashEntry;
@@ -65,13 +59,9 @@ struct HashEntry {
 #define HASHTAB_SIZE    4783
 static HashEntry*       HashTab [HASHTAB_SIZE];
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static HashEntry* NewHashEntry (const char* Name, const ObjData* Module)
 // Create and return a new hash entry
@@ -89,8 +79,6 @@ static HashEntry* NewHashEntry (const char* Name, const ObjData* Module)
     H->Name [Len] = '\0';
     return H;
 }
-
-
 
 void ExpInsert (const char* Name, const ObjData* Module)
 // Insert an exported identifier and check if it's already in the list
@@ -125,8 +113,6 @@ void ExpInsert (const char* Name, const ObjData* Module)
     }
     L->Next = H;
 }
-
-
 
 const ObjData* ExpFind (const char* Name)
 /* Check for an identifier in the list. Return NULL if not found, otherwise

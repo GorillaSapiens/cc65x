@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CODESEG_H
 #define CODESEG_H
-
-
 
 #include <stdarg.h>
 
@@ -50,23 +46,15 @@
 #include "lineinfo.h"
 #include "symentry.h"
 
-
-
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 struct CodeEntry;
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Size of the label hash table
 #define CS_LABEL_HASH_SIZE      29
@@ -86,13 +74,9 @@ struct CodeSeg {
     unsigned        CodeSizeFactor;
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func);
 // Create a new code segment, initialize and return it
@@ -298,8 +282,6 @@ void CS_FreeRegInfo (CodeSeg* S);
 
 void CS_GenRegInfo (CodeSeg* S);
 // Generate register infos for all instructions
-
-
 
 // End of codeseg.h
 

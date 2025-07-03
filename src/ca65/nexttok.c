@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 
@@ -50,23 +48,15 @@
 #include "toklist.h"
 #include "nexttok.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 static unsigned RawMode = 0;            // Raw token mode flag/counter
-
-
 
 //***************************************************************************
 //                              Error handling
 //***************************************************************************
-
-
 
 static int LookAtStrCon (void)
 /* Make sure the next token is a string constant. If not, print an error
@@ -83,13 +73,9 @@ static int LookAtStrCon (void)
     }
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static TokList* CollectTokens (unsigned Start, unsigned Count)
 /* Read a list of tokens that is optionally enclosed in curly braces and
@@ -137,8 +123,6 @@ static TokList* CollectTokens (unsigned Start, unsigned Count)
     // Return the list of collected tokens
     return List;
 }
-
-
 
 static void FuncConcat (void)
 // Handle the .CONCAT function
@@ -190,16 +174,12 @@ static void FuncConcat (void)
     SB_Done (&Buf);
 }
 
-
-
 static void NoIdent (void)
 // Print an error message and skip the remainder of the line
 {
     Error ("Argument of .IDENT is not a valid identifier");
     SkipUntilSep ();
 }
-
-
 
 static void FuncIdent (void)
 // Handle the .IDENT function
@@ -264,8 +244,6 @@ static void FuncIdent (void)
     SB_Done (&Buf);
 }
 
-
-
 static void FuncLeft (void)
 // Handle the .LEFT function
 {
@@ -303,8 +281,6 @@ static void FuncLeft (void)
     // Skip the current token
     NextTok ();
 }
-
-
 
 static void FuncMid (void)
 // Handle the .MID function
@@ -355,8 +331,6 @@ static void FuncMid (void)
     // Skip the current token
     NextTok ();
 }
-
-
 
 static void FuncRight (void)
 // Handle the .RIGHT function
@@ -411,16 +385,12 @@ static void FuncRight (void)
     NextTok ();
 }
 
-
-
 static void InvalidFormatString (void)
 // Print an error message and skip the remainder of the line
 {
     Error ("Invalid format string");
     SkipUntilSep ();
 }
-
-
 
 static void FuncSPrintF (void)
 // Handle the .SPRINTF function
@@ -432,8 +402,6 @@ static void FuncSPrintF (void)
     char        C;
     int         Done;
     long        IVal;                               // Integer value
-
-
 
     // Skip the .SPRINTF token
     NextTok ();
@@ -607,15 +575,12 @@ static void FuncSPrintF (void)
         SB_Terminate (&CurTok.SVal);
     }
 
-
     // Delete the string buffers
     SB_Done (&Format);
     SB_Done (&R);
     SB_Done (&F1);
     SB_Done (&R1);
 }
-
-
 
 static void FuncString (void)
 // Handle the .STRING function
@@ -671,8 +636,6 @@ static void FuncString (void)
     SB_Done (&Buf);
 }
 
-
-
 void NextTok (void)
 // Get next token and handle token level functions
 {
@@ -723,8 +686,6 @@ void NextTok (void)
     }
 }
 
-
-
 void Consume (token_t Expected, const char* ErrMsg)
 // Consume Expected, print an error if we don't find it
 {
@@ -734,8 +695,6 @@ void Consume (token_t Expected, const char* ErrMsg)
         Error ("%s", ErrMsg);
     }
 }
-
-
 
 void ConsumeSep (void)
 // Consume a separator token
@@ -749,15 +708,11 @@ void ConsumeSep (void)
     }
 }
 
-
-
 void ConsumeLParen (void)
 // Consume a left paren
 {
     Consume (TOK_LPAREN, "'(' expected");
 }
-
-
 
 void ConsumeRParen (void)
 // Consume a right paren
@@ -765,15 +720,11 @@ void ConsumeRParen (void)
     Consume (TOK_RPAREN, "')' expected");
 }
 
-
-
 void ConsumeComma (void)
 // Consume a comma
 {
     Consume (TOK_COMMA, "',' expected");
 }
-
-
 
 void SkipUntilSep (void)
 // Skip tokens until we reach a line separator or end of file
@@ -782,8 +733,6 @@ void SkipUntilSep (void)
         NextTok ();
     }
 }
-
-
 
 void ExpectSep (void)
 /* Check if we've reached a line separator, and output an error if not. Do
@@ -795,8 +744,6 @@ void ExpectSep (void)
     }
 }
 
-
-
 void EnterRawTokenMode (void)
 /* Enter raw token mode. In raw mode, token handling functions are not
 ** executed, but the function tokens are passed untouched to the upper
@@ -807,8 +754,6 @@ void EnterRawTokenMode (void)
 {
     ++RawMode;
 }
-
-
 
 void LeaveRawTokenMode (void)
 // Leave raw token mode.

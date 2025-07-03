@@ -31,30 +31,21 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 #include "memory.h"
 #include "peripherals.h"
 
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // The memory
 uint8_t Mem[0x10000];
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void MemWriteByte (uint16_t Addr, uint8_t Val)
 // Write a byte to a memory location
@@ -69,16 +60,12 @@ void MemWriteByte (uint16_t Addr, uint8_t Val)
     }
 }
 
-
-
 void MemWriteWord (uint16_t Addr, uint16_t Val)
 // Write a word to a memory location
 {
     MemWriteByte (Addr, Val & 0xFF);
     MemWriteByte (Addr + 1, Val >> 8);
 }
-
-
 
 uint8_t MemReadByte (uint16_t Addr)
 // Read a byte from a memory location
@@ -93,16 +80,12 @@ uint8_t MemReadByte (uint16_t Addr)
     }
 }
 
-
-
 uint16_t MemReadWord (uint16_t Addr)
 // Read a word from a memory location
 {
     uint8_t W = MemReadByte (Addr++);
     return (W | (MemReadByte (Addr) << 8));
 }
-
-
 
 uint16_t MemReadZPWord (uint8_t Addr)
 /* Read a word from the zero page. This function differs from MemReadWord in that
@@ -113,8 +96,6 @@ uint16_t MemReadZPWord (uint8_t Addr)
     uint8_t W = MemReadByte (Addr++);
     return (W | (MemReadByte (Addr) << 8));
 }
-
-
 
 void MemInit (void)
 // Initialize the memory subsystem

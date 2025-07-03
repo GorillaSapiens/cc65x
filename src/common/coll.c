@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -43,24 +41,16 @@
 // cc65
 #include "coll.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // An empty collection
 const Collection EmptyCollection = STATIC_COLLECTION_INITIALIZER;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Collection* InitCollection (Collection* C)
 // Initialize a collection and return it.
@@ -74,8 +64,6 @@ Collection* InitCollection (Collection* C)
     return C;
 }
 
-
-
 void DoneCollection (Collection* C)
 /* Free the data for a collection. This will not free the data contained in
 ** the collection.
@@ -85,16 +73,12 @@ void DoneCollection (Collection* C)
     xfree (C->Items);
 }
 
-
-
 Collection* NewCollection (void)
 // Create and return a new collection with the given initial size
 {
     // Allocate memory, intialize the collection and return it
     return InitCollection (xmalloc (sizeof (Collection)));
 }
-
-
 
 void FreeCollection (Collection* C)
 // Free a collection
@@ -105,8 +89,6 @@ void FreeCollection (Collection* C)
     // Free the structure itself
     xfree (C);
 }
-
-
 
 void CollGrow (Collection* C, unsigned Size)
 /* Grow the collection C so it is able to hold Size items without a resize
@@ -128,8 +110,6 @@ void CollGrow (Collection* C, unsigned Size)
     xfree (C->Items);
     C->Items = NewItems;
 }
-
-
 
 void CollInsert (Collection* C, void* Item, unsigned Index)
 // Insert the data at the given position in the collection
@@ -153,8 +133,6 @@ void CollInsert (Collection* C, void* Item, unsigned Index)
     C->Items[Index] = Item;
 }
 
-
-
 #if !defined(HAVE_INLINE)
 void CollAppend (Collection* C, void* Item)
 // Append an item to the end of the collection
@@ -163,8 +141,6 @@ void CollAppend (Collection* C, void* Item)
     CollInsert (C, Item, C->Count);
 }
 #endif
-
-
 
 #if !defined(HAVE_INLINE)
 void* CollAt (const Collection* C, unsigned Index)
@@ -178,8 +154,6 @@ void* CollAt (const Collection* C, unsigned Index)
 }
 #endif
 
-
-
 #if !defined(HAVE_INLINE)
 const void* CollConstAt (const Collection* C, unsigned Index)
 // Return the item at the given index
@@ -191,8 +165,6 @@ const void* CollConstAt (const Collection* C, unsigned Index)
     return C->Items[Index];
 }
 #endif
-
-
 
 #if !defined(HAVE_INLINE)
 void* CollLast (Collection* C)
@@ -206,8 +178,6 @@ void* CollLast (Collection* C)
 }
 #endif
 
-
-
 #if !defined(HAVE_INLINE)
 const void* CollConstLast (const Collection* C)
 // Return the last item in a collection
@@ -219,8 +189,6 @@ const void* CollConstLast (const Collection* C)
     return C->Items[C->Count-1];
 }
 #endif
-
-
 
 #if !defined(HAVE_INLINE)
 void* CollPop (Collection* C)
@@ -235,8 +203,6 @@ void* CollPop (Collection* C)
     return C->Items[--C->Count];
 }
 #endif
-
-
 
 int CollIndex (Collection* C, const void* Item)
 /* Return the index of the given item in the collection. Return -1 if the
@@ -256,8 +222,6 @@ int CollIndex (Collection* C, const void* Item)
     return -1;
 }
 
-
-
 void CollDelete (Collection* C, unsigned Index)
 /* Remove the item with the given index from the collection. This will not
 ** free the item itself, just the pointer. All items with higher indices
@@ -271,8 +235,6 @@ void CollDelete (Collection* C, unsigned Index)
     --C->Count;
     memmove (C->Items+Index, C->Items+Index+1, (C->Count-Index) * sizeof (void*));
 }
-
-
 
 void CollDeleteItem (Collection* C, const void* Item)
 /* Delete the item pointer from the collection. The item must be in the
@@ -288,8 +250,6 @@ void CollDeleteItem (Collection* C, const void* Item)
     memmove (C->Items+Index, C->Items+Index+1, (C->Count-Index) * sizeof (void*));
 }
 
-
-
 #if !defined(HAVE_INLINE)
 void CollReplace (Collection* C, void* Item, unsigned Index)
 /* Replace the item at the given position. The old item will not be freed,
@@ -303,8 +263,6 @@ void CollReplace (Collection* C, void* Item, unsigned Index)
     C->Items[Index] = Item;
 }
 #endif
-
-
 
 void CollReplaceExpand (Collection* C, void* Item, unsigned Index)
 /* If Index is a valid index for the collection, replace the item at this
@@ -337,8 +295,6 @@ void CollReplaceExpand (Collection* C, void* Item, unsigned Index)
     }
 }
 
-
-
 void CollMove (Collection* C, unsigned OldIndex, unsigned NewIndex)
 /* Move an item from one position in the collection to another. OldIndex
 ** is the current position of the item, NewIndex is the new index before
@@ -360,8 +316,6 @@ void CollMove (Collection* C, unsigned OldIndex, unsigned NewIndex)
     // Now, insert it at the new position
     CollInsert (C, Item, NewIndex);
 }
-
-
 
 void CollMoveMultiple (Collection* C, unsigned Start, unsigned Count, unsigned Target)
 /* Move a range of items from one position to another. Start is the index
@@ -424,8 +378,6 @@ void CollMoveMultiple (Collection* C, unsigned Start, unsigned Count, unsigned T
     xfree (TmpItems);
 }
 
-
-
 static void QuickSort (Collection* C, int Lo, int Hi,
                        int (*Compare) (void*, const void*, const void*),
                        void* Data)
@@ -470,8 +422,6 @@ static void QuickSort (Collection* C, int Lo, int Hi,
     }
 }
 
-
-
 void CollTransfer (Collection* Dest, const Collection* Source)
 /* Transfer all items from Source to Dest. Anything already in Dest is left
 ** untouched. The items in Source are not changed and are therefore in both
@@ -489,8 +439,6 @@ void CollTransfer (Collection* Dest, const Collection* Source)
     // Bump the counter
     Dest->Count += Source->Count;
 }
-
-
 
 void CollSort (Collection* C,
                int (*Compare) (void*, const void*, const void*),

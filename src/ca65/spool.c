@@ -31,29 +31,19 @@
 //
 //***************************************************************************
 
-
-
 // ca65
 #include "objfile.h"
 #include "spool.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 StringPool* StrPool = 0;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void WriteStrPool (void)
 // Write the string pool to the object file
@@ -77,8 +67,6 @@ void WriteStrPool (void)
     // Done writing the string pool
     ObjEndStrPool ();
 }
-
-
 
 void InitStrPool (void)
 // Initialize the string pool

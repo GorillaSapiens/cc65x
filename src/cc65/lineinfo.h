@@ -31,34 +31,22 @@
 //
 //***************************************************************************
 
-
-
 #ifndef LINEINFO_H
 #define LINEINFO_H
 
-
-
 // common
 #include "strbuf.h"
-
-
 
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 // Input file structure
 struct IFile;
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Struct that describes an input file for line info
 typedef struct LineInfoFile LineInfoFile;
@@ -80,13 +68,9 @@ struct LineInfo {
     char                Line[1];        // Text of source code line
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 LineInfo* UseLineInfo (LineInfo* LI);
 // Increase the reference count of the given line info and return it.
@@ -121,8 +105,6 @@ const char* GetActualFileName (const struct LineInfo* LI);
 
 unsigned GetActualLineNum (const struct LineInfo* LI);
 // Return the actual line number of the source file from a line info struct
-
-
 
 // End of lineinfo.h
 

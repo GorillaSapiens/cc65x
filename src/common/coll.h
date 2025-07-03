@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COLL_H
 #define COLL_H
-
-
 
 // common
 #include "attrib.h"
 #include "check.h"
 #include "inline.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // An array of pointers that grows if needed
 typedef struct Collection Collection;
@@ -68,13 +60,9 @@ extern const Collection EmptyCollection;
 // Initializer for auto collections
 #define AUTO_COLLECTION_INITIALIZER     EmptyCollection
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Collection* InitCollection (Collection* C);
 // Initialize a collection and return it.
@@ -295,8 +283,6 @@ void CollSort (Collection* C,
 ** sort function itself. The other two pointer passed to the Compare function
 ** are pointers to objects.
 */
-
-
 
 // End of coll.h
 

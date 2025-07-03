@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 /* We need a way to output a StrBuf, but on the other side, we don't want to
 ** switch off gcc's printf format string checking. So we cheat as follows:
 ** %m (which is a gcc extension and doesn't take an argument) switches %p
@@ -43,25 +41,17 @@
 ** format specifiers and we can change this ...
 */
 
-
-
 #ifndef XSPRINTF_H
 #define XSPRINTF_H
-
-
 
 #include <stdlib.h>
 #include <stdarg.h>
 
 #include "attrib.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
         attribute ((format (printf, 3, 0)));
@@ -82,8 +72,6 @@ int xsprintf (char* Buf, size_t BufSize, const char* Format, ...)
 int xvsprintf (char* Buf, size_t BufSize, const char* Format, va_list ap)
         attribute ((format (printf, 3, 0)));
 // Replacement function for sprintf. Will FAIL on errors.
-
-
 
 // End of xsprintf.h
 

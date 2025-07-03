@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -47,24 +45,16 @@
 #include "scanner.h"
 #include "toklist.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Number of currently pushed token lists
 static unsigned PushCounter = 0;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 TokNode* NewTokNode (void)
 // Create and return a token node with the current token value
@@ -82,16 +72,12 @@ TokNode* NewTokNode (void)
     return N;
 }
 
-
-
 void FreeTokNode (TokNode* N)
 // Free the given token node
 {
     SB_Done (&N->T.SVal);
     xfree (N);
 }
-
-
 
 void TokSet (TokNode* N)
 // Set the scanner token from the given token node.
@@ -100,8 +86,6 @@ void TokSet (TokNode* N)
     CopyToken (&CurTok, &N->T);
     SB_Terminate (&CurTok.SVal);
 }
-
-
 
 enum TC TokCmp (const TokNode* N)
 // Compare the token given as parameter against the current token
@@ -126,8 +110,6 @@ enum TC TokCmp (const TokNode* N)
     return tcIdentical;
 }
 
-
-
 TokList* NewTokList (void)
 // Create a new, empty token list
 {
@@ -148,8 +130,6 @@ TokList* NewTokList (void)
     // Return the new list
     return T;
 }
-
-
 
 void FreeTokList (TokList* List)
 // Delete the token list including all token nodes
@@ -176,8 +156,6 @@ void FreeTokList (TokList* List)
     xfree (List);
 }
 
-
-
 enum token_t GetTokListTerm (enum token_t Term)
 /* Determine if the following token list is enclosed in curly braces. This is
 ** the case if the next token is the opening brace. If so, skip it and return
@@ -191,8 +169,6 @@ enum token_t GetTokListTerm (enum token_t Term)
         return Term;
     }
 }
-
-
 
 void AddCurTok (TokList* List)
 // Add the current token to the token list
@@ -211,8 +187,6 @@ void AddCurTok (TokList* List)
     // Count nodes
     List->Count++;
 }
-
-
 
 static int ReplayTokList (void* List)
 /* Function that gets the next token from a token list and sets it. This
@@ -261,8 +235,6 @@ static int ReplayTokList (void* List)
     // We have a token
     return 1;
 }
-
-
 
 void PushTokList (TokList* List, const char* Desc)
 /* Push a token list to be used as input for InputFromStack. This includes

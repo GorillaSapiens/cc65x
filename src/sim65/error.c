@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -41,23 +39,16 @@
 #include "error.h"
 #include "peripherals.h"
 
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // flag to print cycles at program termination
 int PrintCycles = 0;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void Warning (const char* Format, ...)
 // Print a warning message
@@ -69,8 +60,6 @@ void Warning (const char* Format, ...)
     putc ('\n', stderr);
     va_end (ap);
 }
-
-
 
 void Error (const char* Format, ...)
 // Print an error message and die
@@ -84,8 +73,6 @@ void Error (const char* Format, ...)
     exit (SIM65_ERROR);
 }
 
-
-
 void ErrorCode (int Code, const char* Format, ...)
 // Print an error message and die with the given exit code
 {
@@ -98,8 +85,6 @@ void ErrorCode (int Code, const char* Format, ...)
     exit (Code);
 }
 
-
-
 void Internal (const char* Format, ...)
 // Print an internal error message and die
 {
@@ -111,8 +96,6 @@ void Internal (const char* Format, ...)
     va_end (ap);
     exit (SIM65_ERROR);
 }
-
-
 
 void SimExit (int Code)
 // Exit the simulation with an exit code

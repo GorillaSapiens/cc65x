@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -45,13 +43,9 @@
 #include "bin.h"
 #include "error.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void WriteBinFile (const StrBuf* Data, const Collection* A,
                    const Bitmap* B attribute ((unused)))

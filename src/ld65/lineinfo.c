@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "check.h"
 #include "lidefs.h"
@@ -46,13 +44,9 @@
 #include "objdata.h"
 #include "segments.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static LineInfo* NewLineInfo (void)
 // Create and return a new LineInfo struct with mostly empty fields
@@ -73,8 +67,6 @@ static LineInfo* NewLineInfo (void)
     return LI;
 }
 
-
-
 void FreeLineInfo (LineInfo* LI)
 // Free a LineInfo structure.
 {
@@ -84,8 +76,6 @@ void FreeLineInfo (LineInfo* LI)
     // Free the structure itself
     xfree (LI);
 }
-
-
 
 LineInfo* DupLineInfo (const LineInfo* LI)
 // Creates a duplicate of a line info structure
@@ -104,8 +94,6 @@ LineInfo* DupLineInfo (const LineInfo* LI)
     return New;
 }
 
-
-
 LineInfo* GenLineInfo (const FilePos* Pos)
 // Generate a new (internally used) line info with the given information
 {
@@ -118,8 +106,6 @@ LineInfo* GenLineInfo (const FilePos* Pos)
     // Return the struct read
     return LI;
 }
-
-
 
 LineInfo* ReadLineInfo (FILE* F, ObjData* O)
 // Read a line info from a file and return it
@@ -138,8 +124,6 @@ LineInfo* ReadLineInfo (FILE* F, ObjData* O)
     // Return the struct read
     return LI;
 }
-
-
 
 void ReadLineInfoList (FILE* F, ObjData* O, Collection* LineInfos)
 /* Read a list of line infos stored as a list of indices in the object file,
@@ -173,8 +157,6 @@ void ReadLineInfoList (FILE* F, ObjData* O, Collection* LineInfos)
     }
 }
 
-
-
 const LineInfo* GetAsmLineInfo (const Collection* LineInfos)
 /* Find a line info of type LI_TYPE_ASM and count zero in the given collection
 ** and return it. Return NULL if no such line info was found.
@@ -194,8 +176,6 @@ const LineInfo* GetAsmLineInfo (const Collection* LineInfos)
     return 0;
 }
 
-
-
 unsigned LineInfoCount (void)
 // Return the total number of line infos
 {
@@ -213,8 +193,6 @@ unsigned LineInfoCount (void)
 
     return Count;
 }
-
-
 
 void AssignLineInfoIds (void)
 // Assign the ids to the line infos
@@ -239,8 +217,6 @@ void AssignLineInfoIds (void)
         }
     }
 }
-
-
 
 void PrintDbgLineInfo (FILE* F)
 // Output the line infos to a debug info file

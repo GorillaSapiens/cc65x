@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <limits.h>
 
 // common
@@ -44,13 +42,9 @@
 #include "error.h"
 #include "casenode.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 CaseNode* NewCaseNode (unsigned char Value)
 // Create and initialize a new CaseNode
@@ -67,8 +61,6 @@ CaseNode* NewCaseNode (unsigned char Value)
     return N;
 }
 
-
-
 void FreeCaseNode (CaseNode* N)
 // Delete a case node plus all sub nodes
 {
@@ -77,8 +69,6 @@ void FreeCaseNode (CaseNode* N)
     }
     xfree (N);
 }
-
-
 
 void FreeCaseNodeColl (Collection* Nodes)
 // Free a collection of case nodes
@@ -89,8 +79,6 @@ void FreeCaseNodeColl (Collection* Nodes)
     }
     FreeCollection (Nodes);
 }
-
-
 
 int SearchCaseNode (const Collection* Nodes, unsigned char Key, int* Index)
 /* Search for a node in the given collection. If the node has been found,
@@ -129,8 +117,6 @@ int SearchCaseNode (const Collection* Nodes, unsigned char Key, int* Index)
     *Index = First;
     return S;
 }
-
-
 
 unsigned InsertCaseValue (Collection* Nodes, unsigned long Val, unsigned Depth)
 /* Insert a new case value into a CaseNode tree with the given depth. Return

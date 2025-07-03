@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 
 // common
@@ -44,13 +42,9 @@
 #include "input.h"
 #include "pcx.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Possible input formats
 enum InputFormat {
@@ -79,13 +73,9 @@ static const FileId FormatTable[] = {
 // END SORTED.SH
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Bitmap* ReadInputFile (const Collection* A)
 /* Read a bitmap from a file and return it. Format, file name etc. must be

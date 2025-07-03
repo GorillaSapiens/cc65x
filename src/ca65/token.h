@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef TOKEN_H
 #define TOKEN_H
-
-
 
 // common
 #include "filepos.h"
 #include "inline.h"
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Tokens
 typedef enum token_t {
@@ -288,8 +280,6 @@ typedef enum token_t {
     TOK_COUNT           // Count of tokens
 } token_t;
 
-
-
 // Complete token including attributes and flags
 typedef struct Token Token;
 struct Token {
@@ -309,13 +299,9 @@ struct Token {
     STATIC_FILEPOS_INITIALIZER          \
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int TokHasSVal (token_t Tok);
 // Return true if the given token has an attached SVal
@@ -337,8 +323,6 @@ void CopyToken (Token* Dst, const Token* Src);
 /* Copy a token. The current value of Dst.SVal is free'd, so Dst must be
 ** initialized.
 */
-
-
 
 // End of token.h
 

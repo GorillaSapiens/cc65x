@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -68,13 +66,9 @@
 #include "segments.h"
 #include "standard.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void Usage (void)
 // Print usage information to stderr
@@ -144,16 +138,12 @@ static void Usage (void)
             ProgName);
 }
 
-
-
 static void cbmsys (const char* sys)
 // Define a CBM system
 {
     DefineNumericMacro ("__CBM__", 1);
     DefineNumericMacro (sys, 1);
 }
-
-
 
 static void SetSys (const char* Sys)
 // Define a target system
@@ -329,8 +319,6 @@ static void SetSys (const char* Sys)
     TgtTranslateInit ();
 }
 
-
-
 static void DefineCpuMacros (void)
 // Define macros for the target CPU
 {
@@ -423,8 +411,6 @@ static void DefineCpuMacros (void)
     DefineNumericMacro ("__CPU__", CPUIsets[CPU]);
 }
 
-
-
 static void FileNameOption (const char* Opt, const char* Arg, StrBuf* Name)
 // Handle an option that remembers a file name for later
 {
@@ -440,8 +426,6 @@ static void FileNameOption (const char* Opt, const char* Arg, StrBuf* Name)
     SB_CopyStr (Name, Arg);
     SB_Terminate (Name);
 }
-
-
 
 static void DefineSym (const char* Def)
 // Define a symbol on the command line
@@ -485,8 +469,6 @@ static void DefineSym (const char* Def)
     }
 }
 
-
-
 static void CheckSegName (const char* Seg)
 // Abort if the given name is not a valid segment name
 {
@@ -496,8 +478,6 @@ static void CheckSegName (const char* Seg)
     }
 }
 
-
-
 static void OptAddSource (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
 // Add source lines as comments in generated assembler file
@@ -505,16 +485,12 @@ static void OptAddSource (const char* Opt attribute ((unused)),
     AddSource = 1;
 }
 
-
-
 static void OptAllCDecl (const char* Opt attribute ((unused)),
                          const char* Arg attribute ((unused)))
 // Make functions default to cdecl instead of fastcall.
 {
     AutoCDecl = 1;
 }
-
-
 
 static void OptBssName (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --bss-name option
@@ -526,16 +502,12 @@ static void OptBssName (const char* Opt attribute ((unused)), const char* Arg)
     SetSegName (SEG_BSS, Arg);
 }
 
-
-
 static void OptCheckStack (const char* Opt attribute ((unused)),
                            const char* Arg attribute ((unused)))
 // Handle the --check-stack option
 {
     IS_Set (&CheckStack, 1);
 }
-
-
 
 static void OptCodeName (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --code-name option
@@ -546,8 +518,6 @@ static void OptCodeName (const char* Opt attribute ((unused)), const char* Arg)
     // Set the name
     SetSegName (SEG_CODE, Arg);
 }
-
-
 
 static void OptCodeSize (const char* Opt, const char* Arg)
 // Handle the --codesize option
@@ -563,15 +533,11 @@ static void OptCodeSize (const char* Opt, const char* Arg)
     IS_Set (&CodeSizeFactor, Factor);
 }
 
-
-
 static void OptCreateDep (const char* Opt, const char* Arg)
 // Handle the --create-dep option
 {
     FileNameOption (Opt, Arg, &DepName);
 }
-
-
 
 static void OptCreateFullDep (const char* Opt attribute ((unused)),
                               const char* Arg)
@@ -579,8 +545,6 @@ static void OptCreateFullDep (const char* Opt attribute ((unused)),
 {
     FileNameOption (Opt, Arg, &FullDepName);
 }
-
-
 
 static void OptCPU (const char* Opt, const char* Arg)
 // Handle the --cpu option
@@ -596,8 +560,6 @@ static void OptCPU (const char* Opt, const char* Arg)
     }
 }
 
-
-
 static void OptDataName (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --data-name option
 {
@@ -607,8 +569,6 @@ static void OptDataName (const char* Opt attribute ((unused)), const char* Arg)
     // Set the name
     SetSegName (SEG_DATA, Arg);
 }
-
-
 
 static void OptDebug (const char* Opt attribute ((unused)),
                       const char* Arg attribute ((unused)))
@@ -629,8 +589,6 @@ static void OptDebugInfo (const char* Opt attribute ((unused)),
 {
     DebugInfo = 1;
 }
-
-
 
 static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
 // Debug optimization steps
@@ -697,8 +655,6 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
     (void) fclose (F);
 }
 
-
-
 static void OptDebugOptOutput (const char* Opt attribute ((unused)),
                                const char* Arg attribute ((unused)))
 // Output optimization steps
@@ -706,23 +662,17 @@ static void OptDebugOptOutput (const char* Opt attribute ((unused)),
     DebugOptOutput = 1;
 }
 
-
-
 static void OptDepTarget (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --dep-target option
 {
     FileNameOption (Opt, Arg, &DepTarget);
 }
 
-
-
 static void OptDisableOpt (const char* Opt attribute ((unused)), const char* Arg)
 // Disable an optimization step
 {
     DisableOpt (Arg);
 }
-
-
 
 static void OptEagerlyInlineFuncs (const char* Opt attribute((unused)),
                                    const char* Arg attribute((unused)))
@@ -732,15 +682,11 @@ static void OptEagerlyInlineFuncs (const char* Opt attribute((unused)),
     IS_Set (&EagerlyInlineFuncs, 1);
 }
 
-
-
 static void OptEnableOpt (const char* Opt attribute ((unused)), const char* Arg)
 // Enable an optimization step
 {
     EnableOpt (Arg);
 }
-
-
 
 static void OptHelp (const char* Opt attribute ((unused)),
                      const char* Arg attribute ((unused)))
@@ -750,8 +696,6 @@ static void OptHelp (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
-
-
 static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 // Add an include search path
 {
@@ -759,16 +703,12 @@ static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg
     AddSearchPath (UsrIncSearchPath, Arg);
 }
 
-
-
 static void OptInlineStdFuncs (const char* Opt attribute((unused)),
                                const char* Arg attribute((unused)))
 // Inline some standard functions
 {
     IS_Set (&InlineStdFuncs, 1);
 }
-
-
 
 static void OptListOptSteps (const char* Opt attribute ((unused)),
                              const char* Arg attribute ((unused)))
@@ -781,8 +721,6 @@ static void OptListOptSteps (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
-
-
 static void OptListWarnings (const char* Opt attribute ((unused)),
                              const char* Arg attribute ((unused)))
 // List all warning types
@@ -794,16 +732,12 @@ static void OptListWarnings (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
-
-
 static void OptLocalStrings (const char* Opt attribute ((unused)),
                              const char* Arg attribute ((unused)))
 // Emit string literals immediately
 {
     IS_Set (&LocalStrings, 1);
 }
-
-
 
 static void OptMemoryModel (const char* Opt, const char* Arg)
 // Set the memory model
@@ -827,8 +761,6 @@ static void OptMemoryModel (const char* Opt, const char* Arg)
     SetMemoryModel (M);
 }
 
-
-
 static void OptRegisterSpace (const char* Opt, const char* Arg)
 // Handle the --register-space option
 {
@@ -838,16 +770,12 @@ static void OptRegisterSpace (const char* Opt, const char* Arg)
     }
 }
 
-
-
 static void OptRegisterVars (const char* Opt attribute ((unused)),
                              const char* Arg attribute ((unused)))
 // Handle the --register-vars option
 {
     IS_Set (&EnableRegVars, 1);
 }
-
-
 
 static void OptRodataName (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --rodata-name option
@@ -859,16 +787,12 @@ static void OptRodataName (const char* Opt attribute ((unused)), const char* Arg
     SetSegName (SEG_RODATA, Arg);
 }
 
-
-
 static void OptSignedChars (const char* Opt attribute ((unused)),
                             const char* Arg attribute ((unused)))
 // Use 'signed char' as the underlying type of 'char'
 {
     IS_Set (&SignedChars, 1);
 }
-
-
 
 static void OptStandard (const char* Opt, const char* Arg)
 // Handle the --standard option
@@ -884,8 +808,6 @@ static void OptStandard (const char* Opt, const char* Arg)
     }
 }
 
-
-
 static void OptStaticLocals (const char* Opt attribute ((unused)),
                              const char* Arg attribute ((unused)))
 // Place local variables in static storage
@@ -893,15 +815,11 @@ static void OptStaticLocals (const char* Opt attribute ((unused)),
     IS_Set (&StaticLocals, 1);
 }
 
-
-
 static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 // Set the target system
 {
     SetSys (Arg);
 }
-
-
 
 static void OptVerbose (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
@@ -910,8 +828,6 @@ static void OptVerbose (const char* Opt attribute ((unused)),
     ++Verbosity;
 }
 
-
-
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 // Print the compiler version
@@ -919,8 +835,6 @@ static void OptVersion (const char* Opt attribute ((unused)),
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
     exit (EXIT_SUCCESS);
 }
-
-
 
 static void OptWarning (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the -W option
@@ -966,16 +880,12 @@ static void OptWarning (const char* Opt attribute ((unused)), const char* Arg)
     SB_Done (&W);
 }
 
-
-
 static void OptWritableStrings (const char* Opt attribute ((unused)),
                                 const char* Arg attribute ((unused)))
 // Make string literals writable
 {
     IS_Set (&WritableStrings, 1);
 }
-
-
 
 int main (int argc, char* argv[])
 {

@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef OPTIONS_H
 #define OPTIONS_H
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void OptStr (unsigned char Type, const StrBuf* Text);
 // Add a string option
@@ -67,8 +61,6 @@ void OptDateTime (unsigned long DateTime);
 
 void WriteOptions (void);
 // Write the options to the object file
-
-
 
 // End of options.h
 

@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef INPUT_H
 #define INPUT_H
-
-
 
 #include <stdio.h>
 
@@ -44,13 +40,9 @@
 #include "coll.h"
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Forwards
 struct IFile;
@@ -94,13 +86,9 @@ extern StrBuf* Line;
 extern char CurC;
 extern char NextC;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void OpenMainFile (const char* Name);
 // Open the main file. Will call Fatal() in case of failures.
@@ -177,8 +165,6 @@ unsigned GetCurrentCounter (void);
 
 void CreateDependencies (void);
 // Create dependency files requested by the user
-
-
 
 // End of input.h
 

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "attrib.h"
 #include "print.h"
@@ -43,18 +41,12 @@
 #include "error.h"
 #include "geosbitmap.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 #define UNIQUE_MAX       91U            // Maximum number of unique bytes
 #define REPEAT_MAX      127U            // Maximum number of repeated bytes
-
-
 
 // Structure used for RLE compression
 struct RLE {
@@ -66,20 +58,15 @@ struct RLE {
     StrBuf              UniqueData;     // Temp buffer for unique data
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void StoreByte (struct RLE* RLE)
 /* Store a unique byte or a run of repeated bytes. If count is zero, the
 ** function will flush the internal buffers, so that all data is in RLE->D.
 */
 {
-
 
     if (RLE->Count == 1 || RLE->Count == 2) {
         /* A run of two identical bytes is treated as two unique bytes, since
@@ -138,8 +125,6 @@ static void StoreByte (struct RLE* RLE)
     }
 }
 
-
-
 StrBuf* GenGeosBitmap (const Bitmap* B, const Collection* A attribute ((unused)))
 /* Generate binary output in GEOS compacted bitmap format for the bitmap B.
 ** The output is stored in a string buffer (which is actually a dynamic char
@@ -152,7 +137,6 @@ StrBuf* GenGeosBitmap (const Bitmap* B, const Collection* A attribute ((unused))
     StrBuf*         D;
     unsigned        X, Y;
     struct RLE      RLE;
-
 
     // Output the image properties
     Print (stdout, 1, "Image is %ux%u with %u colors%s\n",

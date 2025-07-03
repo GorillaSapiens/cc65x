@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "attrib.h"
 
@@ -40,25 +38,17 @@
 #include "error.h"
 #include "koala.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Screen size of a koala picture
 #define WIDTH   160U
 #define HEIGHT  200U
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 StrBuf* GenKoala (const Bitmap* B, const Collection* A attribute ((unused)))
 /* Generate binary output in koala format for the bitmap B. The output is

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <errno.h>
 
@@ -46,13 +44,9 @@
 #include "error.h"
 #include "labels.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static char* SkipWhitespace (char* L)
 // Ignore white space in L
@@ -63,8 +57,6 @@ static char* SkipWhitespace (char* L)
     return L;
 }
 
-
-
 unsigned DigitVal (unsigned char C)
 // Return the value of the given digit
 {
@@ -74,8 +66,6 @@ unsigned DigitVal (unsigned char C)
         return tolower (C) - 'a' + 10;
     }
 }
-
-
 
 void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
 // Read an assembler include file

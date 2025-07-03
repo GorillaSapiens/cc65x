@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COPTPTRLOAD_H
 #define COPTPTRLOAD_H
-
-
 
 // cc65
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned OptPtrLoad1 (CodeSeg* S);
 /* Search for the sequence:
@@ -378,7 +370,6 @@ unsigned OptPtrLoad18 (CodeSeg* S);
 ** instead of a label. Also, the initial X and A loads are reversed.
 */
 
-
 unsigned OptPtrLoad19 (CodeSeg* S);
 /* Search for the sequence:
 **
@@ -403,7 +394,6 @@ unsigned OptPtrLoad19 (CodeSeg* S);
 **      lda     label,y
 **      ldx     label+1,y
 */
-
 
 // End of coptptrload.h
 

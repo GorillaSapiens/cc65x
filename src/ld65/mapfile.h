@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef MAPFILE_H
 #define MAPFILE_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Constants that may be used as arguments for CreateMapFile
 enum {
@@ -50,13 +44,9 @@ enum {
     SHORT_MAPFILE
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void CreateMapFile (int ShortMap);
 /* Create a map file. If ShortMap is true, only the segment lists are
@@ -65,8 +55,6 @@ void CreateMapFile (int ShortMap);
 
 void CreateLabelFile (void);
 // Create a label file
-
-
 
 // End of mapfile.h
 

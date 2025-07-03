@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "chartype.h"
 
@@ -41,13 +39,9 @@
 #include "codeinfo.h"
 #include "coptsub.h"
 
-
-
 //***************************************************************************
 //                           Optimize subtractions
 //***************************************************************************
-
-
 
 unsigned OptSub1 (CodeSeg* S)
 /* Search for the sequence
@@ -98,8 +92,6 @@ unsigned OptSub1 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptSub2 (CodeSeg* S)
 /* Search for the sequence
@@ -175,8 +167,6 @@ unsigned OptSub2 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptSub3 (CodeSeg* S)
 /* Search for a call to decaxn and replace it by an 8 bit sub if the X register

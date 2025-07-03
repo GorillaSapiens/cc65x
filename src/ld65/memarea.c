@@ -31,21 +31,15 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "xmalloc.h"
 
 // ld65
 #include "memarea.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 MemoryArea* NewMemoryArea (const FilePos* Pos, unsigned Name)
 // Create a new memory area and insert it into the list

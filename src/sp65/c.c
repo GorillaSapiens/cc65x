@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -48,13 +46,9 @@
 #include "c.h"
 #include "error.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static int ValidIdentifier (const char* L)
 // Check a C identifier for validity
@@ -77,8 +71,6 @@ static int ValidIdentifier (const char* L)
     return 1;
 }
 
-
-
 static unsigned GetBytesPerLine (const Collection* A)
 // Return the number of bytes per line from the attribute collection A
 {
@@ -94,8 +86,6 @@ static unsigned GetBytesPerLine (const Collection* A)
     return BytesPerLine;
 }
 
-
-
 static unsigned GetBase (const Collection* A)
 // Return the number base from the attribute collection A
 {
@@ -110,8 +100,6 @@ static unsigned GetBase (const Collection* A)
     return Base;
 }
 
-
-
 static const char* GetIdentifier (const Collection* A)
 // Return the variable identifier from the attribute collection A
 {
@@ -123,15 +111,12 @@ static const char* GetIdentifier (const Collection* A)
     return Ident;
 }
 
-
-
 void WriteCFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
 // Write the contents of Data to a file in C format
 {
     FILE*       F;
     const char* D;
     unsigned    Size;
-
 
     // Get the name of the image
     const StrBuf* S = GetBitmapName (B);

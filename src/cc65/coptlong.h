@@ -32,31 +32,21 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COPTLONG_H
 #define COPTLONG_H
-
-
 
 // cc65
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned OptLongAssign (CodeSeg* S);
 // Simplify long assigns.
 
 unsigned OptLongCopy (CodeSeg* S);
 // Simplify long copy.
-
-
 
 // End of coptind.h
 

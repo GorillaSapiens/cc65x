@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef OUTPUT_H
 #define OUTPUT_H
-
-
 
 // common
 #include "attrib.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void OpenOutput (const char* Name);
 // Open the given file for output
@@ -113,8 +105,6 @@ void OutputMFlag (unsigned char enabled);
 
 void OutputXFlag (unsigned char enabled);
 // Output the 65816 X-flag state
-
-
 
 // End of output.h
 #endif

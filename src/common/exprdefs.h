@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef EXPRDEFS_H
 #define EXPRDEFS_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Expression type masks
 #define EXPR_TYPEMASK           0xC0
@@ -101,8 +95,6 @@
 #define EXPR_DWORD              (EXPR_UNARYNODE | 0x0F)
 #define EXPR_NEARADDR           (EXPR_UNARYNODE | 0x10)
 
-
-
 // The expression node itself
 typedef struct ExprNode ExprNode;
 struct ExprNode {
@@ -122,26 +114,18 @@ struct ExprNode {
     } V;
 };
 
-
-
 // Macros to determine the expression type
 #define EXPR_NODETYPE(Op)       ((Op) & EXPR_TYPEMASK)
 #define EXPR_IS_LEAF(Op)        (EXPR_NODETYPE (Op) == EXPR_LEAFNODE)
 #define EXPR_IS_UNARY(Op)       (EXPR_NODETYPE (Op) == EXPR_UNARYNODE)
 #define EXPR_IS_BINARY(OP)      (EXPR_NODETYPE (Op) == EXPR_BINARYNODE)
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 void DumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym) (const struct SymEntry*));
 // Dump an expression tree to stdout
-
-
 
 // End of exprdefs.h
 

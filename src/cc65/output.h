@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef OUTPUT_H
 #define OUTPUT_H
-
-
 
 #include <stdio.h>
 
 // common
 #include "attrib.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Name of the output file. Dynamically allocated and read only.
 extern const char* OutputFilename;
@@ -57,13 +49,9 @@ extern const char* OutputFilename;
 // Output file handle. Use WriteOutput if possible. Read only.
 extern FILE* OutputFile;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void SetOutputName (const char* Name);
 // Sets the name of the output file.
@@ -88,7 +76,6 @@ int WriteOutput (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Write to the output file using printf like formatting. Returns the number
 ** of chars written.
 */
-
 
 // End of output.h
 

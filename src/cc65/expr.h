@@ -4,24 +4,16 @@
 ** Ullrich von Bassewitz, 21.06.1998
 */
 
-
-
 #ifndef EXPR_H
 #define EXPR_H
-
-
 
 // cc65
 #include "datatype.h"
 #include "exprdesc.h"
 
-
-
 //***************************************************************************
 //                                   data
 //***************************************************************************
-
-
 
 // Generator attributes
 #define GEN_NOPUSH      0x01        // Don't push lhs
@@ -35,13 +27,9 @@ typedef struct GenDesc {
     void        (*Func) (unsigned, unsigned long);  // Generator func
 } GenDesc;
 
-
-
 //***************************************************************************
 //                                   code
 //***************************************************************************
-
-
 
 unsigned CG_AddrModeFlags (const ExprDesc* Expr);
 // Return the addressing mode flags for the given expression
@@ -130,8 +118,6 @@ void hie1 (ExprDesc* lval);
 
 void hie0 (ExprDesc* Expr);
 // Parse comma operator.
-
-
 
 // End of expr.h
 

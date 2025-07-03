@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // cc65
@@ -41,13 +39,9 @@
 #include "error.h"
 #include "coptcmp.h"
 
-
-
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 static int IsImmCmp16 (CodeEntry** L)
 /* Check if the instructions at L are an immediate compare of a/x:
@@ -70,8 +64,6 @@ static int IsImmCmp16 (CodeEntry** L)
             (L[1]->JumpTo->Owner == L[3] || L[1]->JumpTo == L[3]->JumpTo));
 }
 
-
-
 static int GetCmpRegVal (const CodeEntry* E)
 // Return the register value for an immediate compare
 {
@@ -84,13 +76,9 @@ static int GetCmpRegVal (const CodeEntry* E)
     }
 }
 
-
-
 //***************************************************************************
 //                        Optimizations for compares
 //***************************************************************************
-
-
 
 unsigned OptCmp1 (CodeSeg* S)
 /* Search for the sequence
@@ -147,8 +135,6 @@ unsigned OptCmp1 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptCmp2 (CodeSeg* S)
 /* Search for the sequence
 **
@@ -201,8 +187,6 @@ unsigned OptCmp2 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptCmp3 (CodeSeg* S)
 /* Search for
@@ -314,8 +298,6 @@ unsigned OptCmp3 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptCmp4 (CodeSeg* S)
 /* Search for
 **
@@ -391,8 +373,6 @@ unsigned OptCmp4 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptCmp5 (CodeSeg* S)
 /* Optimize compares of local variables:
@@ -501,8 +481,6 @@ unsigned OptCmp5 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptCmp6 (CodeSeg* S)
 /* Remove compare instructions before an RTS or an subroutine call that doesn't
 ** use the flags.
@@ -546,8 +524,6 @@ unsigned OptCmp6 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptCmp7 (CodeSeg* S)
 /* Search for a sequence ldx/txa/branch and remove the txa if A is not
 ** used later.
@@ -589,8 +565,6 @@ unsigned OptCmp7 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptCmp8 (CodeSeg* S)
 /* Check for register compares where the contents of the register and therefore
@@ -714,8 +688,6 @@ NextEntry:
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptCmp9 (CodeSeg* S)
 /* Search for the sequence

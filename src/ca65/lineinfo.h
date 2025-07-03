@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef LINEINFO_H
 #define LINEINFO_H
-
-
 
 // common
 #include "coll.h"
@@ -44,24 +40,16 @@
 #include "hashtab.h"
 #include "lidefs.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Opaque structure used to handle line information
 typedef struct LineInfo LineInfo;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void InitLineInfo (void);
 // Initialize the line infos
@@ -111,8 +99,6 @@ void WriteLineInfo (const Collection* LineInfos);
 
 void WriteLineInfos (void);
 // Write a list of all line infos to the object file.
-
-
 
 // End of lineinfo.h
 

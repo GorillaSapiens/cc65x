@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -45,13 +43,9 @@
 #include "error.h"
 #include "symentry.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 SymEntry* NewSymEntry (const char* Name, unsigned Flags)
 // Create a new symbol table with the given name
@@ -78,8 +72,6 @@ SymEntry* NewSymEntry (const char* Name, unsigned Flags)
     return E;
 }
 
-
-
 void FreeSymEntry (SymEntry* E)
 // Free a symbol entry
 {
@@ -98,8 +90,6 @@ void FreeSymEntry (SymEntry* E)
 
     xfree (E);
 }
-
-
 
 void DumpSymEntry (FILE* F, const SymEntry* E)
 // Dump the given symbol table entry to the file in readable form
@@ -217,8 +207,6 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
     fprintf (F, "\n");
 }
 
-
-
 int SymIsOutputFunc (const SymEntry* Sym)
 // Return true if this is a function that must be output
 {
@@ -230,8 +218,6 @@ int SymIsOutputFunc (const SymEntry* Sym)
            ((Sym->Flags & SC_REF) ||
             (Sym->Flags & SC_STORAGEMASK) != SC_STATIC);
 }
-
-
 
 const DeclAttr* SymGetAttr (const SymEntry* Sym, DeclAttrType AttrType)
 // Return an attribute for this symbol or NULL if the attribute does not exist
@@ -255,8 +241,6 @@ const DeclAttr* SymGetAttr (const SymEntry* Sym, DeclAttrType AttrType)
     return 0;
 }
 
-
-
 void SymUseAttr (SymEntry* Sym, struct Declarator* D)
 // Use the attributes from the declarator for this symbol
 {
@@ -273,8 +257,6 @@ void SymUseAttr (SymEntry* Sym, struct Declarator* D)
     D->Attributes = 0;
     Sym->Flags |= SC_HAVEATTR;
 }
-
-
 
 void SymSetAsmName (SymEntry* Sym)
 /* Set the assembler name for an external symbol from the name of the symbol.
@@ -293,8 +275,6 @@ void SymSetAsmName (SymEntry* Sym)
     memcpy (Sym->AsmName+1, Sym->Name, Len+1);
 }
 
-
-
 void SymCvtRegVarToAuto (SymEntry* Sym)
 // Convert a register variable to an auto variable
 {
@@ -305,8 +285,6 @@ void SymCvtRegVarToAuto (SymEntry* Sym)
     Sym->V.Offs = Sym->V.R.SaveOffs;
 }
 
-
-
 void SymChangeType (SymEntry* Sym, const Type* T)
 // Change the type of the given symbol
 {
@@ -314,16 +292,12 @@ void SymChangeType (SymEntry* Sym, const Type* T)
     Sym->Type = TypeDup (T);
 }
 
-
-
 void SymChangeAsmName (SymEntry* Sym, const char* NewAsmName)
 // Change the assembler name of the symbol
 {
     xfree (Sym->AsmName);
     Sym->AsmName = xstrdup (NewAsmName);
 }
-
-
 
 int SymHasAnonName (const SymEntry* Sym)
 // Return true if the symbol entry has an anonymous name

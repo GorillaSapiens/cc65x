@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -49,13 +47,9 @@
 #include "segments.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void CreateMapFile (int ShortMap)
 /* Create a map file. If ShortMap is true, only the segment lists are
@@ -135,8 +129,6 @@ void CreateMapFile (int ShortMap)
         Error ("Error closing map file '%s': %s", MapFileName, strerror (errno));
     }
 }
-
-
 
 void CreateLabelFile (void)
 // Create a label file

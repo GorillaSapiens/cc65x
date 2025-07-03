@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -67,33 +65,23 @@
 #include "memory.h"
 #include "paravirt.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 typedef void (*PVFunc) (CPURegs* Regs);
 
 static unsigned ArgStart;
 static unsigned char SPAddr;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static unsigned GetAX (CPURegs* Regs)
 {
     return Regs->AC + (Regs->XR << 8);
 }
-
-
 
 static void SetAX (CPURegs* Regs, unsigned Val)
 {
@@ -102,14 +90,10 @@ static void SetAX (CPURegs* Regs, unsigned Val)
     Regs->XR = Val;
 }
 
-
-
 static unsigned char Pop (CPURegs* Regs)
 {
     return MemReadByte (0x0100 + (++Regs->SP & 0xFF));
 }
-
-
 
 static unsigned PopParam (unsigned char Incr)
 {
@@ -119,15 +103,11 @@ static unsigned PopParam (unsigned char Incr)
     return Val;
 }
 
-
-
 static void PVExit (CPURegs* Regs)
 {
     Print (stderr, 1, "PVExit ($%02X)\n", Regs->AC);
     SimExit (Regs->AC); // Error code in range 0-255.
 }
-
-
 
 static void PVArgs (CPURegs* Regs)
 {
@@ -182,8 +162,6 @@ static void PVLseek (CPURegs* Regs)
 
     SetAX (Regs, RetVal);
 }
-
-
 
 static void PVOpen (CPURegs* Regs)
 {
@@ -252,8 +230,6 @@ static void PVOpen (CPURegs* Regs)
     SetAX (Regs, RetVal);
 }
 
-
-
 static void PVClose (CPURegs* Regs)
 {
     unsigned RetVal;
@@ -274,8 +250,6 @@ static void PVClose (CPURegs* Regs)
 
     SetAX (Regs, RetVal);
 }
-
-
 
 static void PVSysRemove (CPURegs* Regs)
 {
@@ -304,8 +278,6 @@ static void PVSysRemove (CPURegs* Regs)
     SetAX (Regs, RetVal);
 }
 
-
-
 static void PVRead (CPURegs* Regs)
 {
     unsigned char* Data;
@@ -331,8 +303,6 @@ static void PVRead (CPURegs* Regs)
     SetAX (Regs, RetVal);
 }
 
-
-
 static void PVWrite (CPURegs* Regs)
 {
     unsigned char* Data;
@@ -356,15 +326,11 @@ static void PVWrite (CPURegs* Regs)
     SetAX (Regs, RetVal);
 }
 
-
-
 static void PVOSMapErrno (CPURegs* Regs)
 {
     unsigned err = GetAX(Regs);
     SetAX (Regs, err != 0 ? -1 : 0);
 }
-
-
 
 static const PVFunc Hooks[] = {
     PVLseek,
@@ -378,16 +344,12 @@ static const PVFunc Hooks[] = {
     PVExit,
 };
 
-
-
 void ParaVirtInit (unsigned aArgStart, unsigned char aSPAddr)
 // Initialize the paravirtualization subsystem
 {
     ArgStart = aArgStart;
     SPAddr = aSPAddr;
 };
-
-
 
 void ParaVirtHooks (CPURegs* Regs)
 // Potentially execute paravirtualization hooks

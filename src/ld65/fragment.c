@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "fragdefs.h"
 #include "xmalloc.h"
@@ -43,13 +41,9 @@
 #include "objdata.h"
 #include "segments.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Fragment* NewFragment (unsigned char Type, unsigned Size, Section* S)
 // Create a new fragment and insert it into the section S

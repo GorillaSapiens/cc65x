@@ -31,34 +31,22 @@
 //
 //***************************************************************************
 
-
-
 #ifndef EXPR_H
 #define EXPR_H
-
-
 
 // common
 #include "coll.h"
 #include "exprdefs.h"
 
-
-
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 struct ExprDesc;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 ExprNode* Expression (void);
 /* Evaluate an expression, build the expression tree on the heap and return
@@ -176,8 +164,6 @@ ExprNode* MakeBoundedExpr (ExprNode* Expr, unsigned Size);
 
 ExprNode* BoundedExpr (ExprNode* (*ExprFunc) (void), unsigned Size);
 // Parse an expression and force it within a given size if ForceRange is true
-
-
 
 // End of expr.h
 

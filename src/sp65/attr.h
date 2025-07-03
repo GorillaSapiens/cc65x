@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ATTRCOLL_H
 #define ATTRCOLL_H
-
-
 
 // common
 #include "coll.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Attribute structure
 typedef struct Attr Attr;
@@ -56,13 +48,9 @@ struct Attr {
     char        Value[1];       // Attribute value followed by Name
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Attr* NewAttr (const char* Name, const char* Value);
 // Create a new attribute
@@ -120,8 +108,6 @@ Collection* ParseAttrList (const char* List, const char* const* NameList, unsign
 
 void FreeAttrList (Collection* C);
 // Free a list of attributes
-
-
 
 // End of attr.h
 

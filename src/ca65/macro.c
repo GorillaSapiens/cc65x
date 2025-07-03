@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 
@@ -54,13 +52,9 @@
 #include "toklist.h"
 #include "macro.h"
 
-
-
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
-
-
 
 static unsigned HT_GenHash (const void* Key);
 // Generate the hash over a key.
@@ -74,13 +68,9 @@ static int HT_Compare (const void* Key1, const void* Key2);
 ** than zero if Key1 is greater then Key2.
 */
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Struct that describes an identifer (macro param, local list)
 typedef struct IdDesc IdDesc;
@@ -88,8 +78,6 @@ struct IdDesc {
     IdDesc*         Next;       // Linked list
     StrBuf          Id;         // Identifier, dynamically allocated
 };
-
-
 
 // Struct that describes a macro definition
 struct Macro {
@@ -150,13 +138,9 @@ static unsigned LocalName = 0;
 // Define-style macros disabled if != 0
 static unsigned DisableDefines = 0;
 
-
-
 //***************************************************************************
 //                           Hash table functions
 //***************************************************************************
-
-
 
 static unsigned HT_GenHash (const void* Key)
 // Generate the hash over a key.
@@ -164,15 +148,11 @@ static unsigned HT_GenHash (const void* Key)
     return HashBuf (Key);
 }
 
-
-
 static const void* HT_GetKey (const void* Entry)
 // Given a pointer to the user entry data, return a pointer to the index
 {
     return &((Macro*) Entry)->Name;
 }
-
-
 
 static int HT_Compare (const void* Key1, const void* Key2)
 /* Compare two keys. The function must return a value less than zero if
@@ -183,13 +163,9 @@ static int HT_Compare (const void* Key1, const void* Key2)
     return SB_Compare (Key1, Key2);
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static IdDesc* NewIdDesc (const StrBuf* Id)
 // Create a new IdDesc, initialize and return it
@@ -206,8 +182,6 @@ static IdDesc* NewIdDesc (const StrBuf* Id)
     return ID;
 }
 
-
-
 static void FreeIdDesc (IdDesc* ID)
 // Free an IdDesc
 {
@@ -218,8 +192,6 @@ static void FreeIdDesc (IdDesc* ID)
     xfree (ID);
 }
 
-
-
 static void FreeIdDescList (IdDesc* ID)
 // Free a complete list of IdDesc structures
 {
@@ -229,8 +201,6 @@ static void FreeIdDescList (IdDesc* ID)
         FreeIdDesc (This);
     }
 }
-
-
 
 static Macro* NewMacro (const StrBuf* Name, unsigned char Style)
 // Generate a new macro entry, initialize and return it
@@ -260,8 +230,6 @@ static Macro* NewMacro (const StrBuf* Name, unsigned char Style)
     return M;
 }
 
-
-
 static void FreeMacro (Macro* M)
 // Free a macro entry which has already been removed from the macro table.
 {
@@ -285,8 +253,6 @@ static void FreeMacro (Macro* M)
     // Free the macro structure itself
     xfree (M);
 }
-
-
 
 static MacExp* NewMacExp (Macro* M)
 // Create a new expansion structure for the given macro
@@ -319,8 +285,6 @@ static MacExp* NewMacExp (Macro* M)
     // Return the new macro expansion
     return E;
 }
-
-
 
 static void FreeMacExp (MacExp* E)
 // Remove and free the current macro expansion
@@ -362,8 +326,6 @@ static void FreeMacExp (MacExp* E)
     xfree (E);
 }
 
-
-
 static void MacSkipDef (unsigned Style)
 // Skip a macro definition
 {
@@ -382,8 +344,6 @@ static void MacSkipDef (unsigned Style)
         SkipUntilSep ();
     }
 }
-
-
 
 void MacDef (unsigned Style)
 // Parse a macro definition
@@ -610,8 +570,6 @@ Done:
     LeaveRawTokenMode ();
 }
 
-
-
 void MacUndef (const StrBuf* Name, unsigned char Style)
 /* Undefine the macro with the given name and style. A style mismatch is
 ** treated as if the macro didn't exist.
@@ -636,8 +594,6 @@ void MacUndef (const StrBuf* Name, unsigned char Style)
     // Free the macro structure
     FreeMacro (M);
 }
-
-
 
 static int MacExpand (void* Data)
 /* If we're currently expanding a macro, set the scanner token and
@@ -797,8 +753,6 @@ MacEnd:
     return 0;
 }
 
-
-
 static void StartExpClassic (MacExp* E)
 // Start expanding a classic macro
 {
@@ -876,8 +830,6 @@ static void StartExpClassic (MacExp* E)
     // Insert a new token input function
     PushInput (MacExpand, E, ".MACRO");
 }
-
-
 
 static void StartExpDefine (MacExp* E)
 // Start expanding a DEFINE-style macro
@@ -957,8 +909,6 @@ static void StartExpDefine (MacExp* E)
     PushInput (MacExpand, E, ".DEFINE");
 }
 
-
-
 void MacExpandStart (Macro* M)
 // Start expanding a macro
 {
@@ -997,8 +947,6 @@ void MacExpandStart (Macro* M)
     }
 }
 
-
-
 void MacAbort (void)
 // Abort the current macro expansion
 {
@@ -1009,8 +957,6 @@ void MacAbort (void)
     DoMacAbort = 1;
 }
 
-
-
 Macro* FindMacro (const StrBuf* Name)
 /* Try to find the macro with the given name and return it. If no macro with
 ** this name was found, return NULL.
@@ -1019,8 +965,6 @@ Macro* FindMacro (const StrBuf* Name)
     Macro* M = HT_Find (&MacroTab, Name);
     return (M != 0 && M->Style == MAC_STYLE_CLASSIC)? M : 0;
 }
-
-
 
 Macro* FindDefine (const StrBuf* Name)
 /* Try to find the define-style macro with the given name; and, return it.
@@ -1039,23 +983,17 @@ Macro* FindDefine (const StrBuf* Name)
     return (M != 0 && M->Style == MAC_STYLE_DEFINE)? M : 0;
 }
 
-
-
 int InMacExpansion (void)
 // Return true if we're currently expanding a macro
 {
     return (MacExpansions > 0);
 }
 
-
-
 void DisableDefineStyleMacros (void)
 // Disable define-style macros until EnableDefineStyleMacros() is called
 {
     ++DisableDefines;
 }
-
-
 
 void EnableDefineStyleMacros (void)
 /* Re-enable define-style macros previously disabled with

@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef BIN_H
 #define BIN_H
-
-
 
 // common
 #include "coll.h"
@@ -45,18 +41,12 @@
 // sp65
 #include "bitmap.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 void WriteBinFile (const StrBuf* Data, const Collection* A, const Bitmap* B);
 // Write the contents of Data to a file in binary format
-
-
 
 // End of bin.h
 

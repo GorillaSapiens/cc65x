@@ -33,8 +33,6 @@
 // I hope that no one will be able to create a .grc bigger than this...
 #define BLOODY_BIG_BUFFER 65000
 
-
-
 struct menuitem {
     char *name;
     char *type;
@@ -108,7 +106,6 @@ int apple = 0;
 char outputCMode[2] = "w";
 char outputSMode[2] = "w";
 
-
 static void Usage (void)
 {
     printf (
@@ -127,7 +124,6 @@ static void Usage (void)
         ProgName);
 }
 
-
 static void OptHelp (const char* Opt attribute ((unused)),
                      const char* Arg attribute ((unused)))
 // Print usage information and exit
@@ -135,7 +131,6 @@ static void OptHelp (const char* Opt attribute ((unused)),
     Usage ();
     exit (EXIT_SUCCESS);
 }
-
 
 static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 // Set the target system
@@ -161,7 +156,6 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
     }
 }
 
-
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 // Print the program version
@@ -169,8 +163,6 @@ static void OptVersion (const char* Opt attribute ((unused)),
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
     exit(EXIT_SUCCESS);
 }
-
-
 
 static void printCHeader (void)
 {
@@ -184,7 +176,6 @@ static void printCHeader (void)
         "//\n\n");
 }
 
-
 static void printSHeader (void)
 {
     fprintf (outputSFile,
@@ -196,7 +187,6 @@ static void printSHeader (void)
         ";\tEdit proper resource file instead.\n"
         ";\n\n");
 }
-
 
 static void openCFile (void)
 {
@@ -211,7 +201,6 @@ static void openCFile (void)
     }
 }
 
-
 static void openSFile (void)
 {
     if ((outputSFile = fopen (outputSName, outputSMode)) == 0) {
@@ -224,7 +213,6 @@ static void openSFile (void)
         SFnum++;
     }
 }
-
 
 static int findToken (const char * const *tokenTbl, const char *token)
 {
@@ -242,18 +230,15 @@ static int findToken (const char * const *tokenTbl, const char *token)
     return -1;
 }
 
-
 static char *nextPhrase (void)
 {
     return strtok (NULL, "\"");
 }
 
-
 static char *nextWord (void)
 {
     return strtok (NULL, " ");
 }
-
 
 static void setLen (char *name, unsigned len)
 {
@@ -261,7 +246,6 @@ static void setLen (char *name, unsigned len)
         name[len] = '\0';
     }
 }
-
 
 static void fillOut (char *name, int len, char *filler)
 {
@@ -276,7 +260,6 @@ static void fillOut (char *name, int len, char *filler)
     }
 }
 
-
 static char *bintos (unsigned char a, char out[7])
 {
     int i=0;
@@ -290,7 +273,6 @@ static char *bintos (unsigned char a, char out[7])
     return out;
 }
 
-
 static int getNameSize (const char *word)
 {
     // count length of a word using BSW 9 font table
@@ -303,7 +285,6 @@ static int getNameSize (const char *word)
 
     return a;
 }
-
 
 static void DoMenu (void)
 {
@@ -415,7 +396,6 @@ static void DoMenu (void)
         AbEnd ("Error closing %s: %s", outputCName, strerror (errno));
     }
 }
-
 
 static void DoHeader (void)
 {
@@ -662,7 +642,6 @@ static void DoHeader (void)
     }
 }
 
-
 static void DoMemory (void)
 {
     char *token;
@@ -846,7 +825,6 @@ static void DoMemory (void)
     }
 }
 
-
 static char *filterInput (FILE *F, char *tbl)
 {
     // loads file into buffer filtering it out
@@ -905,7 +883,6 @@ static char *filterInput (FILE *F, char *tbl)
     return tbl;
 }
 
-
 static void processFile (const char *filename)
 {
     FILE *F;
@@ -954,7 +931,6 @@ static void processFile (const char *filename)
         token = nextWord ();
     } while (token != NULL);
 }
-
 
 int main (int argc, char *argv[])
 {

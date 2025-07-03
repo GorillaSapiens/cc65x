@@ -31,20 +31,14 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "check.h"
 #include "hashtab.h"
 #include "xmalloc.h"
 
-
-
 //***************************************************************************
 //                             struct HashTable
 //***************************************************************************
-
-
 
 HashTable* InitHashTable (HashTable* T, unsigned Slots, const HashFunctions* Func)
 // Initialize a hash table and return it
@@ -59,8 +53,6 @@ HashTable* InitHashTable (HashTable* T, unsigned Slots, const HashFunctions* Fun
     return T;
 }
 
-
-
 void DoneHashTable (HashTable* T)
 /* Destroy the contents of a hash table. Note: This will not free the entries
 ** in the table!
@@ -69,8 +61,6 @@ void DoneHashTable (HashTable* T)
     // Just free the array with the table pointers
     xfree (T->Table);
 }
-
-
 
 void FreeHashTable (HashTable* T)
 // Free a hash table. Note: This will not free the entries in the table!
@@ -82,8 +72,6 @@ void FreeHashTable (HashTable* T)
         xfree (T);
     }
 }
-
-
 
 static void HT_Alloc (HashTable* T)
 // Allocate table memory
@@ -98,8 +86,6 @@ static void HT_Alloc (HashTable* T)
         T->Table[I] = 0;
     }
 }
-
-
 
 HashNode* HT_FindHash (const HashTable* T, const void* Key, unsigned Hash)
 /* Find the node with the given key. Differs from HT_Find in that the hash
@@ -134,16 +120,12 @@ HashNode* HT_FindHash (const HashTable* T, const void* Key, unsigned Hash)
     return N;
 }
 
-
-
 void* HT_Find (const HashTable* T, const void* Key)
 // Find the entry with the given key and return it
 {
     // Search for the entry
     return HT_FindHash (T, Key, T->Func->GenHash (Key));
 }
-
-
 
 void HT_Insert (HashTable* T, void* Entry)
 // Insert an entry into the given hash table
@@ -173,8 +155,6 @@ void HT_Insert (HashTable* T, void* Entry)
     ++T->Count;
 }
 
-
-
 void HT_Remove (HashTable* T, void* Entry)
 // Remove an entry from the given hash table
 {
@@ -201,8 +181,6 @@ void HT_Remove (HashTable* T, void* Entry)
         Q = &(*Q)->Next;
     }
 }
-
-
 
 void HT_Walk (HashTable* T, int (*F) (void* Entry, void* Data), void* Data)
 /* Walk over all nodes of a hash table, optionally deleting entries from the

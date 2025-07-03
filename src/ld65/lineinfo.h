@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef LINEINFO_H
 #define LINEINFO_H
-
-
 
 #include <stdio.h>
 
@@ -48,24 +44,16 @@
 #include "span.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 struct ObjData;
 struct Segment;
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 /* Structure holding line information. The Pos.Name field is always the
 ** global string id of the file name. If the line info was read from the
@@ -80,13 +68,9 @@ struct LineInfo {
     unsigned*           Spans;          // Spans for this line
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 LineInfo* GenLineInfo (const FilePos* Pos);
 // Generate a new (internally used) line info with the given information
@@ -182,8 +166,6 @@ void AssignLineInfoIds (void);
 
 void PrintDbgLineInfo (FILE* F);
 // Output the line infos to a debug info file
-
-
 
 // End of lineinfo.h
 

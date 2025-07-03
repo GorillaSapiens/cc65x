@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 
 // common
@@ -44,13 +42,9 @@
 #include "codeoptutil.h"
 #include "error.h"
 
-
-
 //***************************************************************************
 //                            Load tracking code
 //***************************************************************************
-
-
 
 void ClearLoadRegInfo (LoadRegInfo* LRI)
 // Clear a LoadRegInfo struct
@@ -65,8 +59,6 @@ void ClearLoadRegInfo (LoadRegInfo* LRI)
     LRI->Offs       = 0;
 }
 
-
-
 void CopyLoadRegInfo (LoadRegInfo* To, LoadRegInfo* From)
 // Copy a LoadRegInfo struct
 {
@@ -79,8 +71,6 @@ void CopyLoadRegInfo (LoadRegInfo* To, LoadRegInfo* From)
     To->ChgEntry   = From->ChgEntry;
     To->Offs       = From->Offs;
 }
-
-
 
 void FinalizeLoadRegInfo (LoadRegInfo* LRI, CodeSeg* S)
 // Prepare a LoadRegInfo struct for use
@@ -117,8 +107,6 @@ void FinalizeLoadRegInfo (LoadRegInfo* LRI, CodeSeg* S)
         LRI->Flags &= ~LI_DIRECT;
     }
 }
-
-
 
 void AdjustLoadRegInfo (LoadRegInfo* LRI, int Index, int Change)
 /* Adjust a load register info struct after deleting or inserting an entry
@@ -163,8 +151,6 @@ void AdjustLoadRegInfo (LoadRegInfo* LRI, int Index, int Change)
     }
 }
 
-
-
 void ClearLoadInfo (LoadInfo* LI)
 // Clear a LoadInfo struct
 {
@@ -173,8 +159,6 @@ void ClearLoadInfo (LoadInfo* LI)
     ClearLoadRegInfo (&LI->Y);
 }
 
-
-
 void CopyLoadInfo (LoadInfo* To, LoadInfo* From)
 // Copy a LoadInfo struct
 {
@@ -182,8 +166,6 @@ void CopyLoadInfo (LoadInfo* To, LoadInfo* From)
     CopyLoadRegInfo (&To->X, &From->X);
     CopyLoadRegInfo (&To->Y, &From->Y);
 }
-
-
 
 void FinalizeLoadInfo (LoadInfo* LI, CodeSeg* S)
 // Prepare a LoadInfo struct for use
@@ -194,8 +176,6 @@ void FinalizeLoadInfo (LoadInfo* LI, CodeSeg* S)
     FinalizeLoadRegInfo (&LI->Y, S);
 }
 
-
-
 void AdjustLoadInfo (LoadInfo* LI, int Index, int Change)
 // Adjust a load info struct after deleting entry with a given index
 {
@@ -203,8 +183,6 @@ void AdjustLoadInfo (LoadInfo* LI, int Index, int Change)
     AdjustLoadRegInfo (&LI->X, Index, Change);
     AdjustLoadRegInfo (&LI->Y, Index, Change);
 }
-
-
 
 RegInfo* GetLastChangedRegInfo (StackOpData* D, LoadRegInfo* Reg)
 // Get RegInfo of the last insn entry that changed the reg
@@ -217,8 +195,6 @@ RegInfo* GetLastChangedRegInfo (StackOpData* D, LoadRegInfo* Reg)
 
     return 0;
 }
-
-
 
 static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
 /* Check if the result of the same loading code as in LRI may be changed by E.
@@ -413,8 +389,6 @@ L_Result:
     return Res;
 }
 
-
-
 static void HonourUseAndChg (LoadRegInfo* LRI, unsigned Reg, const CodeEntry* E, int I)
 // Honour use and change flags for an instruction
 {
@@ -427,8 +401,6 @@ static void HonourUseAndChg (LoadRegInfo* LRI, unsigned Reg, const CodeEntry* E,
         LRI->Flags |= Affected (LRI, E);
     }
 }
-
-
 
 void PrepairLoadRegInfoForArgCheck (CodeSeg* S, LoadRegInfo* LRI, CodeEntry* E)
 /* Set the load src flags and remember to check for load src change if necessary.
@@ -480,8 +452,6 @@ void PrepairLoadRegInfoForArgCheck (CodeSeg* S, LoadRegInfo* LRI, CodeEntry* E)
     }
 }
 
-
-
 void SetIfOperandSrcAffected (LoadInfo* LLI, CodeEntry* E)
 // Check and flag operand src that may be affected
 {
@@ -489,8 +459,6 @@ void SetIfOperandSrcAffected (LoadInfo* LLI, CodeEntry* E)
     LLI->X.Flags |= Affected (&LLI->X, E);
     LLI->Y.Flags |= Affected (&LLI->Y, E);
 }
-
-
 
 void SetIfOperandLoadUnremovable (LoadInfo* LI, unsigned Used)
 // Check and flag operand load that may be unremovable
@@ -506,8 +474,6 @@ void SetIfOperandLoadUnremovable (LoadInfo* LI, unsigned Used)
         LI->Y.Flags |= LI_DONT_REMOVE;
     }
 }
-
-
 
 unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
 /* Track loads for a code entry.
@@ -672,8 +638,6 @@ unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
     return Used;
 }
 
-
-
 void SetDontRemoveEntryFlag (LoadRegInfo* LRI)
 // Flag the entry as non-removable according to register flags
 {
@@ -688,8 +652,6 @@ void SetDontRemoveEntryFlag (LoadRegInfo* LRI)
         }
     }
 }
-
-
 
 void ResetDontRemoveEntryFlag (LoadRegInfo* LRI)
 // Unflag the entry as non-removable according to register flags
@@ -707,8 +669,6 @@ void ResetDontRemoveEntryFlag (LoadRegInfo* LRI)
     }
 }
 
-
-
 void SetDontRemoveEntryFlags (StackOpData* D)
 // Flag the entries as non-removable according to register flags
 {
@@ -723,8 +683,6 @@ void SetDontRemoveEntryFlags (StackOpData* D)
     SetDontRemoveEntryFlag (&D->Rv.Y);
 }
 
-
-
 void ResetDontRemoveEntryFlags (StackOpData* D)
 // Unflag the entries as non-removable according to register flags
 {
@@ -738,8 +696,6 @@ void ResetDontRemoveEntryFlags (StackOpData* D)
     ResetDontRemoveEntryFlag (&D->Rv.X);
     ResetDontRemoveEntryFlag (&D->Rv.Y);
 }
-
-
 
 void ResetStackOpData (StackOpData* Data)
 // Reset the given data structure
@@ -758,13 +714,9 @@ void ResetStackOpData (StackOpData* Data)
     Data->OpIndex       = -1;
 }
 
-
-
 //***************************************************************************
 //                                  Helpers
 //***************************************************************************
-
-
 
 void InsertEntry (StackOpData* D, CodeEntry* E, int Index)
 /* Insert a new entry. Depending on Index, D->PushIndex and D->OpIndex will
@@ -786,8 +738,6 @@ void InsertEntry (StackOpData* D, CodeEntry* E, int Index)
         ++D->OpIndex;
     }
 }
-
-
 
 void DelEntry (StackOpData* D, int Index)
 /* Delete an entry. Depending on Index, D->PushIndex and D->OpIndex will be
@@ -813,8 +763,6 @@ void DelEntry (StackOpData* D, int Index)
         D->OpEntry = 0;
     }
 }
-
-
 
 void AdjustStackOffset (StackOpData* D, unsigned Offs)
 /* Adjust the offset for all stack accesses in the range PushIndex to OpIndex.
@@ -944,8 +892,6 @@ void AdjustStackOffset (StackOpData* D, unsigned Offs)
     }
 }
 
-
-
 int IsRegVar (StackOpData* D)
 /* If the value pushed is that of a zeropage variable that is unchanged until Op,
 ** replace ZPLo and ZPHi in the given StackOpData struct by the variable and return true.
@@ -985,8 +931,6 @@ int IsRegVar (StackOpData* D)
     return 1;
 }
 
-
-
 void AddStoreLhsA (StackOpData* D)
 // Add a store to zero page after the push insn
 {
@@ -994,16 +938,12 @@ void AddStoreLhsA (StackOpData* D)
     InsertEntry (D, X, D->PushIndex+1);
 }
 
-
-
 void AddStoreLhsX (StackOpData* D)
 // Add a store to zero page after the push insn
 {
     CodeEntry* X = NewCodeEntry (OP65_STX, AM65_ZP, D->ZPHi, 0, D->PushEntry->LI);
     InsertEntry (D, X, D->PushIndex+1);
 }
-
-
 
 void ReplacePushByStore (StackOpData* D)
 /* Replace the call to the push subroutine by a store into the zero page
@@ -1022,8 +962,6 @@ void ReplacePushByStore (StackOpData* D)
         AddStoreLhsA (D);
     }
 }
-
-
 
 void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
 /* Add an op for the low byte of an operator. This function honours the
@@ -1077,8 +1015,6 @@ void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
 
     }
 }
-
-
 
 void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
 /* Add an op for the high byte of an operator. Special cases (constant values
@@ -1150,8 +1086,6 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
     }
 }
 
-
-
 void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
 // Remove register load insns
 {
@@ -1202,8 +1136,6 @@ void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
     }
 }
 
-
-
 void RemoveRemainders (StackOpData* D)
 // Remove the code that is unnecessary after translation of the sequence
 {
@@ -1216,14 +1148,11 @@ void RemoveRemainders (StackOpData* D)
     DelEntry (D, D->PushIndex);
 }
 
-
-
 static int CmpHarmless (const void* Key, const void* Entry)
 // Compare function for bsearch
 {
     return strcmp (Key, *(const char**)Entry);
 }
-
 
 // CAUTION: table must be sorted for bsearch
 static const char* const Tab[] = {
@@ -1267,19 +1196,13 @@ int HarmlessCall (const CodeEntry* E, int PushedBytes)
     }
 }
 
-
-
 //***************************************************************************
 //                            Load tracking code
 //***************************************************************************
 
-
-
 //***************************************************************************
 //                                  Helpers
 //***************************************************************************
-
-
 
 const char* GetZPName (unsigned ZPLoc)
 // Get the name strings of certain known ZP Regs
@@ -1428,8 +1351,6 @@ unsigned FindAvailableBackupLoc (BackupInfo* B, unsigned Type)
     return BU_UNKNOWN;
 }
 
-
-
 void AdjustEntryIndices (Collection* Indices, int Index, int Change)
 /* Adjust a load register info struct after deleting or inserting successive
 ** entries with a given index.
@@ -1462,8 +1383,6 @@ void AdjustEntryIndices (Collection* Indices, int Index, int Change)
     }
 }
 
-
-
 void DelEntryIdx (CodeSeg* S, int Idx, Collection* Indices)
 // Delete an entry and adjust Indices if necessary
 {
@@ -1471,16 +1390,12 @@ void DelEntryIdx (CodeSeg* S, int Idx, Collection* Indices)
     AdjustEntryIndices (Indices, Idx, -1);
 }
 
-
-
 void DelEntriesIdx (CodeSeg* S, int Idx, int Count, Collection* Indices)
 // Delete entries and adjust Indices if necessary
 {
     CS_DelEntries (S, Idx, Count);
     AdjustEntryIndices (Indices, Idx, -Count);
 }
-
-
 
 void RemoveFlaggedRegLoads (CodeSeg* S, LoadRegInfo* LRI, Collection* Indices)
 // Remove flagged register load insns
@@ -1509,7 +1424,6 @@ void RemoveFlaggedRegLoads (CodeSeg* S, LoadRegInfo* LRI, Collection* Indices)
     }
 }
 
-
 void RemoveFlaggedLoads (CodeSeg* S, LoadInfo* LI, Collection* Indices)
 // Remove flagged load insns
 {
@@ -1517,8 +1431,6 @@ void RemoveFlaggedLoads (CodeSeg* S, LoadInfo* LI, Collection* Indices)
     RemoveFlaggedRegLoads (S, &LI->X, Indices);
     RemoveFlaggedRegLoads (S, &LI->Y, Indices);
 }
-
-
 
 static int BackupAAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, int After)
 // Backup the content of A Before or After the specified index Idx depending on the After param
@@ -1597,8 +1509,6 @@ static int BackupAAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, i
     return 1;
 }
 
-
-
 static int BackupXAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, int After)
 // Backup the content of X before or after the specified index Idx depending on the param After
 {
@@ -1676,8 +1586,6 @@ static int BackupXAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, i
     return 1;
 }
 
-
-
 static int BackupYAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, int After)
 // Backup the content of Y before or after the specified index Idx depending on the param After
 {
@@ -1754,8 +1662,6 @@ static int BackupYAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, i
     // Done
     return 1;
 }
-
-
 
 static int BackupAXAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, int After)
 // Backup the content of AX Before or After the specified index Idx depending on the After param
@@ -1844,8 +1750,6 @@ static int BackupAXAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, 
     // Done
     return 1;
 }
-
-
 
 static int BackupAXYAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, int After)
 /* Backup the content of AXY before or after the specified index Idx depending on the param After.
@@ -1951,15 +1855,11 @@ static int BackupAXYAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices,
     return 1;
 }
 
-
-
 int BackupABefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 // Backup the content of A Before the specified index Idx
 {
     return BackupAAt (S, B, Idx, Indices, 0);
 }
-
-
 
 int BackupXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 // Backup the content of X before the specified index Idx
@@ -1967,23 +1867,17 @@ int BackupXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
     return BackupXAt (S, B, Idx, Indices, 0);
 }
 
-
-
 int BackupYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 // Backup the content of Y before the specified index Idx
 {
     return BackupYAt (S, B, Idx, Indices, 0);
 }
 
-
-
 int BackupAXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 // Backup the content of AX before the specified index Idx
 {
     return BackupAXAt (S, B, Idx, Indices, 0);
 }
-
-
 
 int BackupAXYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 /* Backup the content of AXY before the specified index Idx.
@@ -1993,15 +1887,11 @@ int BackupAXYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
     return BackupAXYAt (S, B, Idx, Indices, 0);
 }
 
-
-
 int BackupAAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 // Backup the content of A after the specified index Idx
 {
     return BackupAAt (S, B, Idx, Indices, 1);
 }
-
-
 
 int BackupXAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 // Backup the content of X after the specified index Idx
@@ -2009,23 +1899,17 @@ int BackupXAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
     return BackupXAt (S, B, Idx, Indices, 1);
 }
 
-
-
 int BackupYAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 // Backup the content of Y after the specified index Idx
 {
     return BackupYAt (S, B, Idx, Indices, 1);
 }
 
-
-
 int BackupAXAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 // Backup the content of AX after the specified index Idx
 {
     return BackupAXAt (S, B, Idx, Indices, 1);
 }
-
-
 
 int BackupAXYAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 /* Backup the content of AXY after the specified index Idx.
@@ -2034,8 +1918,6 @@ int BackupAXYAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 {
     return BackupAXYAt (S, B, Idx, Indices, 1);
 }
-
-
 
 int RestoreABefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 // Restore the content of Y before the specified index Idx
@@ -2095,8 +1977,6 @@ int RestoreABefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
     // Done
     return 1;
 }
-
-
 
 int RestoreXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 // Restore the content of X before the specified index Idx
@@ -2176,8 +2056,6 @@ int RestoreXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
     return 1;
 }
 
-
-
 int RestoreYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 // Restore the content of Y before the specified index Idx
 {
@@ -2256,8 +2134,6 @@ int RestoreYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
     return 1;
 }
 
-
-
 int RestoreAXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 // Restore the content of AX before the specified index Idx
 {
@@ -2327,8 +2203,6 @@ int RestoreAXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 
     return 1;
 }
-
-
 
 int RestoreAXYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 /* Restore the content of AXY before the specified index Idx.
@@ -2405,8 +2279,6 @@ int RestoreAXYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
     // Done
     return 1;
 }
-
-
 
 int BackupArgAfter (CodeSeg* S, BackupInfo* B, int Idx, const CodeEntry* E, Collection* Indices)
 /* Backup the content of the opc arg of the entry E after the specified index Idx.
@@ -2651,8 +2523,6 @@ static int LoadAAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
     return 0;
 }
 
-
-
 static int LoadXAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices, int After)
 /* Reload into X the same arg according to LoadRegInfo before or after Idx
 ** depending on the After param.
@@ -2750,8 +2620,6 @@ static int LoadXAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
     return 0;
 }
 
-
-
 static int LoadYAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices, int After)
 /* Reload into Y the same arg according to LoadRegInfo before or after Idx
 ** depending on the After param.
@@ -2843,15 +2711,11 @@ static int LoadYAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
     return 0;
 }
 
-
-
 int LoadABefore (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
 // Reload into A the same arg according to LoadRegInfo at Idx
 {
     return LoadAAt (S, Idx, LRI, Indices, 0);
 }
-
-
 
 int LoadXBefore (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
 // Reload into X the same arg according to LoadRegInfo at Idx
@@ -2859,15 +2723,11 @@ int LoadXBefore (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indice
     return LoadXAt (S, Idx, LRI, Indices, 0);
 }
 
-
-
 int LoadYBefore (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
 // Reload into Y the same arg according to LoadRegInfo at Idx
 {
     return LoadYAt (S, Idx, LRI, Indices, 0);
 }
-
-
 
 int LoadAAfter (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
 // Reload into A the same arg according to LoadRegInfo after Idx
@@ -2875,23 +2735,17 @@ int LoadAAfter (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices
     return LoadAAt (S, Idx, LRI, Indices, 1);
 }
 
-
-
 int LoadXAfter (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
 // Reload into X the same arg according to LoadRegInfo after Idx
 {
     return LoadXAt (S, Idx, LRI, Indices, 1);
 }
 
-
-
 int LoadYAfter (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
 // Reload into Y the same arg according to LoadRegInfo after Idx
 {
     return LoadYAt (S, Idx, LRI, Indices, 1);
 }
-
-
 
 unsigned GetRegAccessedInOpenRange (CodeSeg* S, int First, int Last)
 /* Get what ZPs, registers or processor states are used or changed in the range
@@ -2911,8 +2765,6 @@ unsigned GetRegAccessedInOpenRange (CodeSeg* S, int First, int Last)
 
     return ZPAccessed;
 }
-
-
 
 unsigned GetRegUsageInOpenRange (CodeSeg* S, int First, int Last, unsigned* Use, unsigned* Chg)
 /* Get what ZPs, registers or processor states are used or changed in the range
@@ -2950,8 +2802,6 @@ unsigned GetRegUsageInOpenRange (CodeSeg* S, int First, int Last, unsigned* Use,
 
     return U;
 }
-
-
 
 int IsArgSameInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E)
 /* Check if the loading the opc arg gives the same result everywhere between (First, Last).
@@ -2998,8 +2848,6 @@ int IsArgSameInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E)
     return 1;
 }
 
-
-
 int FindArgFirstChangeInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E)
 /* Find the first possible spot where the loaded arg of E might be changed in
 ** the range (First, Last). The code block in the range must be basic without
@@ -3039,8 +2887,6 @@ int FindArgFirstChangeInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E
     // Not found
     return Last;
 }
-
-
 
 int FindArgLastUsageInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E, int ReloadY)
 /* Find the last index where the arg of E might be used or changed in the range (First, Last).
@@ -3099,8 +2945,6 @@ int FindArgLastUsageInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E, 
     return Found;
 }
 
-
-
 int FindRegFirstChangeInOpenRange (CodeSeg* S, int First, int Last, unsigned what)
 /* Find the first possible spot where the queried ZPs, registers and/or processor
 ** states might be changed in the range (First, Last). The code block in the
@@ -3122,8 +2966,6 @@ int FindRegFirstChangeInOpenRange (CodeSeg* S, int First, int Last, unsigned wha
     // Not found
     return Last;
 }
-
-
 
 int FindRegFirstUseInOpenRange (CodeSeg* S, int First, int Last, unsigned what)
 /* Find the first possible spot where the queried ZPs, registers and/or processor
@@ -3147,8 +2989,6 @@ int FindRegFirstUseInOpenRange (CodeSeg* S, int First, int Last, unsigned what)
     return Last;
 }
 
-
-
 int FindRegLastChangeInOpenRange (CodeSeg* S, int First, int Last, unsigned what)
 /* Find the last possible spot where the queried ZPs, registers and/or processor
 ** states might be changed in the range (First, Last). The code block in the
@@ -3170,8 +3010,6 @@ int FindRegLastChangeInOpenRange (CodeSeg* S, int First, int Last, unsigned what
 
     return Found;
 }
-
-
 
 int FindRegLastUseInOpenRange (CodeSeg* S, int First, int Last, unsigned what)
 /* Find the last possible spot where the queried ZPs, registers and/or processor

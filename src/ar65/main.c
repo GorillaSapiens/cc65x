@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -49,13 +47,9 @@
 #include "list.h"
 #include "extract.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void Usage (void)
 // Print usage information and exit
@@ -71,8 +65,6 @@ static void Usage (void)
             ProgName);
     exit (EXIT_FAILURE);
 }
-
-
 
 int main (int argc, char* argv [])
 // Assembler main program

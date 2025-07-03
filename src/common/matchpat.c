@@ -31,24 +31,16 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
 #include "matchpat.h"
 
-
-
 //***************************************************************************
 //                       Character bit set implementation
 //***************************************************************************
 
-
-
 typedef unsigned char CharSet[32];      // 256 bits
-
-
 
 // Clear a character set
 #define CS_CLEAR(CS)            memset (CS, 0, sizeof (CharSet))
@@ -71,15 +63,9 @@ typedef unsigned char CharSet[32];      // 256 bits
         }                                               \
     } while (0)
 
-
-
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 // Escape character
 #define ESCAPE_CHAR     '\\'
@@ -89,8 +75,6 @@ typedef unsigned char CharSet[32];      // 256 bits
                         if (*Pattern == '\0') {         \
                             return 0;                   \
                         }
-
-
 
 static int RealChar (const unsigned char* Pattern)
 /* Return the next character from Pattern. If the next character is the
@@ -104,8 +88,6 @@ static int RealChar (const unsigned char* Pattern)
         return *Pattern;
     }
 }
-
-
 
 static int RecursiveMatch (const unsigned char* Source, const unsigned char* Pattern)
 // A recursive pattern matcher
@@ -218,9 +200,6 @@ static int RecursiveMatch (const unsigned char* Source, const unsigned char* Pat
         }
     }
 }
-
-
-
 
 int MatchPattern (const char* Source, const char* Pattern)
 /* Match the string in Source against Pattern. Pattern may contain the

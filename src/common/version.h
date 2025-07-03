@@ -31,26 +31,18 @@
 //
 //***************************************************************************
 
-
-
 #ifndef VERSION_H
 #define VERSION_H
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 const char* GetVersionAsString (void);
 // Returns the version number as a string in a static buffer
 
 unsigned GetVersionAsNumber (void);
 // Returns the version number as a combined unsigned for use in a #define
-
-
 
 // End of version.h
 

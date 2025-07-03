@@ -31,24 +31,16 @@
 //
 //***************************************************************************
 
-
-
 #ifndef GLOBAL_H
 #define GLOBAL_H
-
-
 
 // common
 #include "intstack.h"
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Options
 extern unsigned char    AddSource;              // Add source lines as comments
@@ -81,8 +73,6 @@ extern StrBuf           DepName;                // Name of dependencies file
 extern StrBuf           FullDepName;            // Name of full dependencies file
 extern StrBuf           DepTarget;              // Name of dependency target
 extern StrBuf           DebugTableName;         // Name of debug table dump file
-
-
 
 // End of global.h
 

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -42,13 +40,9 @@
 // sp65
 #include "palette.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Palette* NewPalette (unsigned Entries)
 // Create a new palette with the given number of entries
@@ -66,8 +60,6 @@ Palette* NewPalette (unsigned Entries)
     return P;
 }
 
-
-
 Palette* NewMonochromePalette (void)
 // Create and return a palette with two entries (black and white)
 {
@@ -82,13 +74,10 @@ Palette* NewMonochromePalette (void)
     return P;
 }
 
-
-
 Palette* DupPalette (const Palette* P)
 // Create a copy of a palette
 {
     Palette* N;
-
 
     // Allow to pass a NULL palette
     if (P == 0) {
@@ -105,15 +94,11 @@ Palette* DupPalette (const Palette* P)
     return N;
 }
 
-
-
 void FreePalette (Palette* P)
 // Free a dynamically allocated palette
 {
     xfree (P);
 }
-
-
 
 void DumpPalette (FILE* F, const Palette* P)
 // Dump the palette in readable form to the given file

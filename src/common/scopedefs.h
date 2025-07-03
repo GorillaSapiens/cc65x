@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SCOPEDEFS_H
 #define SCOPEDEFS_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Size of scope available?
 #define SCOPE_SIZELESS          0x00U   // No scope size available
@@ -58,8 +52,6 @@
 
 #define SCOPE_HAS_LABEL(x)      (((x) & SCOPE_MASK_LABEL) == SCOPE_LABELED)
 
-
-
 // Scope types
 enum {
     SCOPE_GLOBAL,                       // Global level
@@ -70,8 +62,6 @@ enum {
     SCOPE_ENUM,                         // .ENUM
     SCOPE_UNDEF    = 0xFF
 };
-
-
 
 // End of scopedefs.h
 

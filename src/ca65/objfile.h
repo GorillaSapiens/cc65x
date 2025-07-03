@@ -31,24 +31,16 @@
 //
 //***************************************************************************
 
-
-
 #ifndef OBJFILE_H
 #define OBJFILE_H
-
-
 
 // common
 #include "filepos.h"
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void ObjOpen (void);
 // Open the object file for writing, write a dummy header
@@ -154,8 +146,6 @@ void ObjStartSpans (void);
 
 void ObjEndSpans (void);
 // Mark the end of the span table
-
-
 
 // End of objfile.h
 

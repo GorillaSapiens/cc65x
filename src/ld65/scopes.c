@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "xmalloc.h"
 
@@ -43,13 +41,9 @@
 #include "span.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static Scope* NewScope (ObjData* Obj, unsigned Id)
 // Create a new Scope and return it
@@ -67,8 +61,6 @@ static Scope* NewScope (ObjData* Obj, unsigned Id)
     // Return the new entry
     return S;
 }
-
-
 
 Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id)
 // Read a scope from a file and return it
@@ -94,8 +86,6 @@ Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id)
     return S;
 }
 
-
-
 unsigned ScopeCount (void)
 // Return the total number of scopes
 {
@@ -112,8 +102,6 @@ unsigned ScopeCount (void)
     }
     return Count;
 }
-
-
 
 void PrintDbgScopes (FILE* F)
 // Output the scopes to a debug info file

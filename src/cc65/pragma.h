@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef PRAGMA_H
 #define PRAGMA_H
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 void ConsumePragma (void);
 /* Parse a pragma. The pragma comes always in the form of the new C99 _Pragma()
 ** operator.
 */
-
-
 
 // End of pragma.h
 

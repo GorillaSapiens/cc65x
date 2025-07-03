@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef EXPR_H
 #define EXPR_H
-
-
 
 // common
 #include "exprdefs.h"
@@ -46,13 +42,9 @@
 #include "exports.h"
 #include "config.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Structure for parsing segment based expression trees
 typedef struct SegExprDesc SegExprDesc;
@@ -62,13 +54,9 @@ struct SegExprDesc {
     Segment*        Seg;                // Segment reference if any
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 ExprNode* NewExprNode (ObjData* O, unsigned char Op);
 // Create a new expression node
@@ -116,8 +104,6 @@ ExprNode* ReadExpr (FILE* F, ObjData* O);
 
 int EqualExpr (ExprNode* E1, ExprNode* E2);
 // Check if two expressions are identical.
-
-
 
 // End of expr.h
 

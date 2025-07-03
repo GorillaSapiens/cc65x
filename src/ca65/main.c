@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -79,13 +77,9 @@
 #include "symtab.h"
 #include "ulabel.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void Usage (void)
 // Print usage information and exit
@@ -133,8 +127,6 @@ static void Usage (void)
             ProgName);
 }
 
-
-
 static void SetOptions (void)
 // Set the option for the translator
 {
@@ -150,8 +142,6 @@ static void SetOptions (void)
     // Release memory for the string
     SB_Done (&Buf);
 }
-
-
 
 static void NewSymbol (const char* SymName, long Val)
 // Define a symbol with a fixed numeric value in the current scope
@@ -181,16 +171,12 @@ static void NewSymbol (const char* SymName, long Val)
     SB_Done (&SymBuf);
 }
 
-
-
 static void CBMSystem (const char* Sys)
 // Define a CBM system
 {
     NewSymbol ("__CBM__", 1);
     NewSymbol (Sys, 1);
 }
-
-
 
 static void SetSys (const char* Sys)
 // Define a target system
@@ -367,8 +353,6 @@ static void SetSys (const char* Sys)
     TgtTranslateInit ();
 }
 
-
-
 static void FileNameOption (const char* Opt, const char* Arg, StrBuf* Name)
 // Handle an option that remembers a file name for later
 {
@@ -381,15 +365,12 @@ static void FileNameOption (const char* Opt, const char* Arg, StrBuf* Name)
     SB_Terminate (Name);
 }
 
-
-
 static void DefineSymbol (const char* Def)
 // Define a symbol from the command line
 {
     const char* P;
     long Val;
     StrBuf SymName = AUTO_STRBUF_INITIALIZER;
-
 
     // The symbol must start with a character or underline
     if (!IsIdStart (Def [0])) {
@@ -431,8 +412,6 @@ static void DefineSymbol (const char* Def)
     SB_Done (&SymName);
 }
 
-
-
 static void OptAutoImport (const char* Opt attribute ((unused)),
                            const char* Arg attribute ((unused)))
 // Mark unresolved symbols as imported
@@ -440,15 +419,11 @@ static void OptAutoImport (const char* Opt attribute ((unused)),
     AutoImport = 1;
 }
 
-
-
 static void OptBinIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 // Add an include search path for binaries
 {
     AddSearchPath (BinSearchPath, Arg);
 }
-
-
 
 static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --cpu option
@@ -461,15 +436,11 @@ static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
     }
 }
 
-
-
 static void OptCreateDep (const char* Opt, const char* Arg)
 // Handle the --create-dep option
 {
     FileNameOption (Opt, Arg, &DepName);
 }
-
-
 
 static void OptCreateFullDep (const char* Opt attribute ((unused)),
                               const char* Arg)
@@ -478,8 +449,6 @@ static void OptCreateFullDep (const char* Opt attribute ((unused)),
     FileNameOption (Opt, Arg, &FullDepName);
 }
 
-
-
 static void OptDebug (const char* Opt attribute ((unused)),
                       const char* Arg attribute ((unused)))
 // Compiler debug mode
@@ -487,16 +456,12 @@ static void OptDebug (const char* Opt attribute ((unused)),
     ++Debug;
 }
 
-
-
 static void OptDebugInfo (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
 // Add debug info to the object file
 {
     DbgSyms = 1;
 }
-
-
 
 static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
 // Set an emulation feature
@@ -513,8 +478,6 @@ static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
     }
 }
 
-
-
 static void OptHelp (const char* Opt attribute ((unused)),
                      const char* Arg attribute ((unused)))
 // Print usage information and exit
@@ -523,8 +486,6 @@ static void OptHelp (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
-
-
 static void OptIgnoreCase (const char* Opt attribute ((unused)),
                            const char* Arg attribute ((unused)))
 // Ignore case on symbols
@@ -532,15 +493,11 @@ static void OptIgnoreCase (const char* Opt attribute ((unused)),
     IgnoreCase = 1;
 }
 
-
-
 static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 // Add an include search path
 {
     AddSearchPath (IncSearchPath, Arg);
 }
-
-
 
 static void OptLargeAlignment (const char* Opt attribute ((unused)),
                                const char* Arg attribute ((unused)))
@@ -548,8 +505,6 @@ static void OptLargeAlignment (const char* Opt attribute ((unused)),
 {
     LargeAlignment = 1;
 }
-
-
 
 static void OptListBytes (const char* Opt, const char* Arg)
 // Set the maximum number of bytes per listing line
@@ -571,8 +526,6 @@ static void OptListBytes (const char* Opt, const char* Arg)
     SetListBytes (Num);
 }
 
-
-
 static void OptListing (const char* Opt, const char* Arg)
 // Create a listing file
 {
@@ -587,8 +540,6 @@ static void OptListing (const char* Opt, const char* Arg)
     // Get the file name
     FileNameOption (Opt, Arg, &ListingName);
 }
-
-
 
 static void OptMemoryModel (const char* Opt, const char* Arg)
 // Set the memory model
@@ -612,8 +563,6 @@ static void OptMemoryModel (const char* Opt, const char* Arg)
     SetMemoryModel (M);
 }
 
-
-
 static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --pagelength option
 {
@@ -624,16 +573,12 @@ static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg
     PageLength = Len;
 }
 
-
-
 static void OptRelaxChecks (const char* Opt attribute ((unused)),
                             const char* Arg attribute ((unused)))
 // Handle the --relax-checks options
 {
     RelaxChecks = 1;
 }
-
-
 
 static void OptSmart (const char* Opt attribute ((unused)),
                       const char* Arg attribute ((unused)))
@@ -642,15 +587,11 @@ static void OptSmart (const char* Opt attribute ((unused)),
     SmartMode = 1;
 }
 
-
-
 static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 // Set the target system
 {
     SetSys (Arg);
 }
-
-
 
 static void OptVerbose (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
@@ -658,8 +599,6 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 {
     ++Verbosity;
 }
-
-
 
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
@@ -669,16 +608,12 @@ static void OptVersion (const char* Opt attribute ((unused)),
     exit(EXIT_SUCCESS);
 }
 
-
-
 static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
                                  const char* Arg attribute ((unused)))
 // Generate an error if any warnings occur
 {
     WarningsAsErrors = 1;
 }
-
-
 
 static void DoPCAssign (void)
 // Start absolute code
@@ -690,8 +625,6 @@ static void DoPCAssign (void)
         EnterAbsoluteMode (PC);
     }
 }
-
-
 
 static void OneLine (void)
 // Assemble one line
@@ -900,8 +833,6 @@ static void OneLine (void)
     ConsumeSep ();
 }
 
-
-
 static void Assemble (void)
 // Start the ball rolling ...
 {
@@ -913,8 +844,6 @@ static void Assemble (void)
         OneLine ();
     }
 }
-
-
 
 static void CreateObjFile (void)
 // Create the object file
@@ -958,8 +887,6 @@ static void CreateObjFile (void)
     // Write an updated header and close the file
     ObjClose ();
 }
-
-
 
 int main (int argc, char* argv [])
 // Assembler main program

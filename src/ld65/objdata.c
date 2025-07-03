@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -47,24 +45,16 @@
 #include "objdata.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Collection containing used ObjData objects
 Collection       ObjDataList = STATIC_COLLECTION_INITIALIZER;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 ObjData* NewObjData (void)
 // Allocate a new structure on the heap, insert it into the list, return it
@@ -99,8 +89,6 @@ ObjData* NewObjData (void)
     // Return the new entry
     return O;
 }
-
-
 
 void FreeObjData (ObjData* O)
 /* Free an ObjData object. NOTE: This function works only for unused object
@@ -141,8 +129,6 @@ void FreeObjData (ObjData* O)
     xfree (O);
 }
 
-
-
 void FreeObjStrings (ObjData* O)
 /* Free the module string data. Used once the object file is loaded completely
 ** when all strings are converted to global strings.
@@ -152,15 +138,11 @@ void FreeObjStrings (ObjData* O)
     O->Strings = 0;
 }
 
-
-
 void InsertObjData (ObjData* O)
 // Insert the ObjData object into the collection of used ObjData objects.
 {
     CollAppend (&ObjDataList, O);
 }
-
-
 
 void InsertObjGlobals (ObjData* O)
 /* Insert imports and exports from the object file into the global import and
@@ -178,8 +160,6 @@ void InsertObjGlobals (ObjData* O)
     }
 }
 
-
-
 unsigned MakeGlobalStringId (const ObjData* O, unsigned Index)
 // Convert a local string id into a global one and return it.
 {
@@ -190,8 +170,6 @@ unsigned MakeGlobalStringId (const ObjData* O, unsigned Index)
     return O->Strings[Index];
 }
 
-
-
 const char* GetObjFileName (const ObjData* O)
 /* Get the name of the object file. Return "[linker generated]" if the object
 ** file is NULL.
@@ -200,15 +178,11 @@ const char* GetObjFileName (const ObjData* O)
     return O? GetString (O->Name) : "[linker generated]";
 }
 
-
-
 const struct StrBuf* GetObjString (const ObjData* Obj, unsigned Id)
 // Get a string from an object file checking for an invalid index
 {
     return GetStrBuf (MakeGlobalStringId (Obj, Id));
 }
-
-
 
 struct Section* GetObjSection (const ObjData* O, unsigned Id)
 // Get a section from an object file checking for a valid index
@@ -220,8 +194,6 @@ struct Section* GetObjSection (const ObjData* O, unsigned Id)
     return CollAtUnchecked (&O->Sections, Id);
 }
 
-
-
 struct Import* GetObjImport (const ObjData* O, unsigned Id)
 // Get an import from an object file checking for a valid index
 {
@@ -231,8 +203,6 @@ struct Import* GetObjImport (const ObjData* O, unsigned Id)
     }
     return CollAtUnchecked (&O->Imports, Id);
 }
-
-
 
 struct Export* GetObjExport (const ObjData* O, unsigned Id)
 // Get an export from an object file checking for a valid index
@@ -244,8 +214,6 @@ struct Export* GetObjExport (const ObjData* O, unsigned Id)
     return CollAtUnchecked (&O->Exports, Id);
 }
 
-
-
 struct DbgSym* GetObjDbgSym (const ObjData* O, unsigned Id)
 // Get a debug symbol from an object file checking for a valid index
 {
@@ -255,8 +223,6 @@ struct DbgSym* GetObjDbgSym (const ObjData* O, unsigned Id)
     }
     return CollAtUnchecked (&O->DbgSyms, Id);
 }
-
-
 
 struct Scope* GetObjScope (const ObjData* O, unsigned Id)
 // Get a scope from an object file checking for a valid index
@@ -268,15 +234,11 @@ struct Scope* GetObjScope (const ObjData* O, unsigned Id)
     return CollAtUnchecked (&O->Scopes, Id);
 }
 
-
-
 unsigned ObjDataCount (void)
 // Return the total number of modules
 {
     return CollCount (&ObjDataList);
 }
-
-
 
 void PrintDbgModules (FILE* F)
 // Output the modules to a debug info file

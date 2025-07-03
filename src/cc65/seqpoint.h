@@ -28,18 +28,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SEQPOINT_H
 #define SEQPOINT_H
-
-
 
 //***************************************************************************
 //                                   data
 //***************************************************************************
-
-
 
 #define SQP_KEEP_NONE   0x00U
 #define SQP_KEEP_A      0x01U
@@ -49,21 +43,15 @@
 #define SQP_KEEP_TEST   0x10U
 #define SQP_KEEP_EXPR   0x17U       // SQP_KEEP_TEST | SQP_KEEP_EAX
 
-
-
 //***************************************************************************
 //                                   code
 //***************************************************************************
-
-
 
 void SetSQPFlags (unsigned Flags);
 // Set the SQP_KEEP_* flags for the deferred operations in the statement
 
 unsigned GetSQPFlags (void);
 // Get the SQP_KEEP_* flags for the deferred operations in the statement
-
-
 
 // End of seqpoint.h
 

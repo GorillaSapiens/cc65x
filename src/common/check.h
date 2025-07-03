@@ -31,42 +31,28 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CHECK_H
 #define CHECK_H
 
-
-
 #include "attrib.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 extern const char* MsgInternalError;            // "Internal error: "
 extern const char* MsgPrecondition;             // "Precondition violated: "
 extern const char* MsgCheckFailed;              // "Check failed: "
 extern const char* MsgProgramAborted;           // "Program aborted: "
 
-
-
 extern void (*CheckFailed) (const char* Msg, const char* Cond,
                             const char* File, unsigned Line)
                             attribute ((noreturn));
 // Function pointer that is called from check if the condition code is true.
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 #define FAIL(s) CheckFailed (MsgInternalError, s, __FILE__, __LINE__)
 // Fail macro. Is used if something evil happens, calls checkfailed directly.
@@ -82,8 +68,6 @@ extern void (*CheckFailed) (const char* Msg, const char* Cond,
 
 #define CHECK(c)        \
     ((void) ((c)? 0 : (CheckFailed (MsgCheckFailed, #c, __FILE__, __LINE__), 0)))
-
-
 
 // End of check.h
 

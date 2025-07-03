@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef LOOP_H
 #define LOOP_H
-
-
 
 //***************************************************************************
 //                                   data
 //***************************************************************************
-
-
 
 typedef struct LoopDesc LoopDesc;
 struct LoopDesc {
@@ -52,13 +46,9 @@ struct LoopDesc {
     unsigned    ContinueLabel;
 };
 
-
-
 //***************************************************************************
 //                                   code
 //***************************************************************************
-
-
 
 LoopDesc* AddLoop (unsigned BreakLabel, unsigned ContinueLabel);
 // Create and add a new loop descriptor.
@@ -68,8 +58,6 @@ LoopDesc* CurrentLoop (void);
 
 void DelLoop (void);
 // Remove the current loop
-
-
 
 // End of loop.h
 

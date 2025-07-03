@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef FRAGMENT_H
 #define FRAGMENT_H
-
-
 
 // common
 #include "exprdefs.h"
@@ -45,13 +41,9 @@
 // ca65
 #include "lineinfo.h"
 
-
-
 //***************************************************************************
 //                              struct Fragment
 //***************************************************************************
-
-
 
 typedef struct Fragment Fragment;
 struct Fragment {
@@ -66,20 +58,14 @@ struct Fragment {
     } V;
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Fragment* NewFragment (unsigned char Type, unsigned short Len);
 /* Create, initialize and return a new fragment. The fragment will be inserted
 ** into the current segment.
 */
-
-
 
 // End of fragment.h
 

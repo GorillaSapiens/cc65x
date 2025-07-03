@@ -928,8 +928,6 @@ static unsigned GetInstructionLength (uint8_t opcode)
     return -1;
 }
 
-
-
 static char * PrintAssemblyInstruction (char * ptr)
 // Print assembly instruction: mnemonic and addres-mode specific operand(s).
 {
@@ -994,8 +992,6 @@ static char * PrintAssemblyInstruction (char * ptr)
 
     return ptr;
 }
-
-
 
 static void PrintTraceInstructionOrInterrupt (const char * InterruptType)
 {
@@ -1128,28 +1124,20 @@ static void PrintTraceInstructionOrInterrupt (const char * InterruptType)
     }
 }
 
-
-
 void TraceInit (uint8_t SPAddr)
 {
     StackPointerZPageAddress = SPAddr;
 }
-
-
 
 void PrintTraceNMI (void)
 {
     PrintTraceInstructionOrInterrupt("NMI");
 }
 
-
-
 void PrintTraceIRQ (void)
 {
     PrintTraceInstructionOrInterrupt("IRQ");
 }
-
-
 
 void PrintTraceInstruction (void)
 {

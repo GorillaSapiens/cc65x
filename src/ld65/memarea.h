@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef MEMAREA_H
 #define MEMAREA_H
-
-
 
 // common
 #include "coll.h"
@@ -44,13 +40,9 @@
 // ld65
 #include "lineinfo.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Forwards for structures
 struct ExprNode;
@@ -83,18 +75,12 @@ struct MemoryArea {
 #define MF_OVERFLOW     0x0008          // Memory area overflow
 #define MF_PLACED       0x0010          // Memory area was placed
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 MemoryArea* NewMemoryArea (const FilePos* Pos, unsigned Name);
 // Create a new memory area and insert it into the list
-
-
 
 // End of memarea.h
 

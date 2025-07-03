@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -55,13 +53,9 @@
 #include "segments.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 struct BinDesc {
     unsigned    Undef;          // Count of undefined externals
@@ -69,13 +63,9 @@ struct BinDesc {
     const char* Filename;       // Name of output file
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 BinDesc* NewBinDesc (void)
 // Create a new binary format descriptor
@@ -92,15 +82,11 @@ BinDesc* NewBinDesc (void)
     return D;
 }
 
-
-
 void FreeBinDesc (BinDesc* D)
 // Free a binary format descriptor
 {
     xfree (D);
 }
-
-
 
 static unsigned BinWriteExpr (ExprNode* E, int Signed, unsigned Size,
                               unsigned long Offs attribute ((unused)),
@@ -113,23 +99,17 @@ static unsigned BinWriteExpr (ExprNode* E, int Signed, unsigned Size,
     return SegWriteConstExpr (((BinDesc*)Data)->F, E, Signed, Size);
 }
 
-
-
 static void PrintBoolVal (const char* Name, int B)
 // Print a boolean value for debugging
 {
     Print (stdout, 2, "      %s = %s\n", Name, B? "true" : "false");
 }
 
-
-
 static void PrintNumVal (const char* Name, unsigned long V)
 // Print a numerical value for debugging
 {
     Print (stdout, 2, "      %s = 0x%lx\n", Name, V);
 }
-
-
 
 static void BinWriteMem (BinDesc* D, MemoryArea* M)
 // Write the segments of one memory area to a file
@@ -265,8 +245,6 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
     }
 }
 
-
-
 static int BinUnresolved (unsigned Name attribute ((unused)), void* D)
 // Called if an unresolved symbol is encountered
 {
@@ -277,8 +255,6 @@ static int BinUnresolved (unsigned Name attribute ((unused)), void* D)
     ((BinDesc*) D)->Undef++;
     return 0;
 }
-
-
 
 void BinWriteTarget (BinDesc* D, struct File* F)
 // Write a binary output file

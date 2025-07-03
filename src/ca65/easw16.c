@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // ca65
 #include "ea.h"
 #include "ea65.h"
@@ -41,13 +39,9 @@
 #include "instr.h"
 #include "nexttok.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static long RegNum ()
 /* Try to read a register number specified not as a register (Rx) but as a
@@ -66,8 +60,6 @@ static long RegNum ()
     FreeExpr (Expr);
     return Val;
 }
-
-
 
 void GetSweet16EA (EffAddr* A)
 // Parse an effective address, return the result in A
@@ -145,6 +137,4 @@ void GetSweet16EA (EffAddr* A)
 
     }
 }
-
-
 

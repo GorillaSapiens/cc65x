@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef FILEIO_H
 #define FILEIO_H
-
-
 
 #include <stdio.h>
 
@@ -45,13 +41,9 @@
 #include "filepos.h"
 #include "objdefs.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void FileSetPos (FILE* F, unsigned long Pos);
 // Seek to the given absolute position, fail on errors
@@ -91,8 +83,6 @@ void ReadObjHeader (FILE* F, ObjHeader* Header);
 
 void ReadStrPool (FILE* F, Collection* C);
 // Read a string pool from the current position into C.
-
-
 
 // End of fileio.h
 

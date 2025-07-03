@@ -31,7 +31,6 @@
 //
 //***************************************************************************
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -61,12 +60,9 @@
 #include "standard.h"
 #include "symtab.h"
 
-
 //***************************************************************************
 //                                   data
 //***************************************************************************
-
-
 
 static Token SavedTok;          // Saved token
 Token       CurTok;             // The current token
@@ -74,8 +70,6 @@ Token       NextTok;            // The next token
 int         PPParserRunning;    // Is tokenizer used by the preprocessor
 int         NoCharMap;          // Disable literal translation
 unsigned    InPragmaParser;     // Depth of pragma parser calling
-
-
 
 // Token types
 enum {
@@ -149,20 +143,16 @@ static const struct Keyword {
 };
 #define KEY_COUNT       (sizeof (Keywords) / sizeof (Keywords [0]))
 
-
-
 // Stuff for determining the type of an integer constant
 #define IT_INT          0x01
 #define IT_UINT         0x02
 #define IT_LONG         0x04
 #define IT_ULONG        0x08
 
-
 /* Internal type for numeric constant scanning.
 ** Size must be explicit for cross-platform uniformity.
 */
 typedef uint32_t scan_t;
-
 
 // ParseChar return values
 typedef struct {
@@ -174,15 +164,11 @@ typedef struct {
 //                                   code
 //***************************************************************************
 
-
-
 static int CmpKey (const void* Key, const void* Elem)
 // Compare function for bsearch
 {
     return strcmp ((const char*) Key, ((const struct Keyword*) Elem)->Key);
 }
-
-
 
 static token_t FindKey (const char* Key)
 /* Find a keyword and return the token. Return IDENT if the token is not a
@@ -197,8 +183,6 @@ static token_t FindKey (const char* Key)
         return TOK_IDENT;
     }
 }
-
-
 
 static int SkipWhite (void)
 /* Skip white space in the input stream, reading and preprocessing new lines
@@ -222,8 +206,6 @@ static int SkipWhite (void)
     }
 }
 
-
-
 int TokIsFuncSpec (const Token* T)
 // Return true if the token is a function specifier
 {
@@ -231,8 +213,6 @@ int TokIsFuncSpec (const Token* T)
            (T->Tok == TOK_FASTCALL) || (T->Tok == TOK_CDECL) ||
            (T->Tok == TOK_NEAR)     || (T->Tok == TOK_FAR);
 }
-
-
 
 void SymName (char* S)
 /* Read a symbol from the input stream. The first character must have been
@@ -251,8 +231,6 @@ void SymName (char* S)
     *S = '\0';
 }
 
-
-
 int IsWideQuoted (char First, char Second)
 /* Return 1 if the two successive characters indicate a wide string literal or
 ** a wide char constant, otherwise return 0.
@@ -260,8 +238,6 @@ int IsWideQuoted (char First, char Second)
 {
     return First == 'L' && IsQuote(Second);
 }
-
-
 
 int IsSym (char* S)
 // If a symbol follows, read it and return 1, otherwise return 0
@@ -274,8 +250,6 @@ int IsSym (char* S)
     }
 }
 
-
-
 int IsPPNumber (int Cur, int Next)
 /* Return 1 if the two successive characters indicate a pp-number, otherwise
 ** return 0.
@@ -283,8 +257,6 @@ int IsPPNumber (int Cur, int Next)
 {
     return Cur != '.' ? IsDigit (Cur) : IsDigit (Next);
 }
-
-
 
 void CopyPPNumber (StrBuf* Target)
 // Copy a pp-number from the input to Target
@@ -313,8 +285,6 @@ void CopyPPNumber (StrBuf* Target)
     }
 }
 
-
-
 static void UnknownChar (char C)
 // Error message for unknown character
 {
@@ -322,16 +292,12 @@ static void UnknownChar (char C)
     NextChar ();                        // Skip
 }
 
-
-
 static void SetTok (int tok)
 // Set NextTok.Tok and bump line ptr
 {
     NextTok.Tok = tok;
     NextChar ();
 }
-
-
 
 static parsedchar_t ParseChar (void)
 // Parse a character token. Converts escape chars into character codes.
@@ -452,8 +418,6 @@ IllegalEscape:
     return Result;
 }
 
-
-
 static void CharConst (void)
 // Parse a character constant token
 {
@@ -489,8 +453,6 @@ static void CharConst (void)
     // Character constants have type int
     NextTok.Type = type_int;
 }
-
-
 
 static void StringConst (void)
 // Parse a quoted string token
@@ -542,8 +504,6 @@ ExitPoint:
     // Free the buffer
     SB_Done (&S);
 }
-
-
 
 static void NumericConst (void)
 // Parse a numeric constant token
@@ -826,8 +786,6 @@ static void NumericConst (void)
     // We don't need the string buffer any longer
     SB_Done (&Src);
 }
-
-
 
 static void GetNextInputToken (void)
 // Get next token from input stream
@@ -1164,8 +1122,6 @@ static void GetNextInputToken (void)
     }
 }
 
-
-
 void NextToken (void)
 /* Get next non-pragma token from input stream consuming any pragmas
 ** encountered. Adjacent string literal tokens will be concatenated.
@@ -1248,8 +1204,6 @@ void NextToken (void)
     }
 }
 
-
-
 void SkipTokens (const token_t* TokenList, unsigned TokenCount)
 /* Skip tokens until we reach TOK_CEOF or a token in the given token list.
 ** This routine is used for error recovery.
@@ -1272,8 +1226,6 @@ void SkipTokens (const token_t* TokenList, unsigned TokenCount)
     }
 }
 
-
-
 static void OpenBrace (Collection* C, token_t Tok)
 // Consume an opening parenthesis/bracket/curly brace and remember that
 {
@@ -1287,8 +1239,6 @@ static void OpenBrace (Collection* C, token_t Tok)
     NextToken ();
 }
 
-
-
 static void PopBrace (Collection* C)
 // Close the latest open parenthesis/bracket/curly brace
 {
@@ -1296,8 +1246,6 @@ static void PopBrace (Collection* C)
         CollPop (C);
     }
 }
-
-
 
 static int CloseBrace (Collection* C, token_t Tok)
 /* Consume a closing parenthesis/bracket/curly brace if it is matched with an
@@ -1316,8 +1264,6 @@ static int CloseBrace (Collection* C, token_t Tok)
 
     return -1;
 }
-
-
 
 int SmartErrorSkip (int TillEnd)
 /* Try some smart error recovery.
@@ -1429,8 +1375,6 @@ ExitPoint:
     return Res;
 }
 
-
-
 int SimpleErrorSkip (void)
 /* Skip tokens until an EOF or unpaired right parenthesis/bracket/curly brace
 ** is reached. Return 0 If this exits at an EOF. Otherwise return -1.
@@ -1478,8 +1422,6 @@ ExitPoint:
     return Res;
 }
 
-
-
 int Consume (token_t Token, const char* ErrorMsg)
 /* Eat token if it is the next in the input stream, otherwise print an error
 ** message. Returns true if the token was found and false otherwise.
@@ -1494,15 +1436,11 @@ int Consume (token_t Token, const char* ErrorMsg)
     }
 }
 
-
-
 int ConsumeColon (void)
 // Check for a colon and skip it.
 {
     return Consume (TOK_COLON, "':' expected");
 }
-
-
 
 int ConsumeSemi (void)
 // Check for a semicolon and skip it.
@@ -1520,8 +1458,6 @@ int ConsumeSemi (void)
     }
 }
 
-
-
 int ConsumeComma (void)
 // Check for a comma and skip it.
 {
@@ -1538,15 +1474,11 @@ int ConsumeComma (void)
     }
 }
 
-
-
 int ConsumeLParen (void)
 // Check for a left parenthesis and skip it
 {
     return Consume (TOK_LPAREN, "'(' expected");
 }
-
-
 
 int ConsumeRParen (void)
 // Check for a right parenthesis and skip it
@@ -1554,15 +1486,11 @@ int ConsumeRParen (void)
     return Consume (TOK_RPAREN, "')' expected");
 }
 
-
-
 int ConsumeLBrack (void)
 // Check for a left bracket and skip it
 {
     return Consume (TOK_LBRACK, "'[' expected");
 }
-
-
 
 int ConsumeRBrack (void)
 // Check for a right bracket and skip it
@@ -1570,15 +1498,11 @@ int ConsumeRBrack (void)
     return Consume (TOK_RBRACK, "']' expected");
 }
 
-
-
 int ConsumeLCurly (void)
 // Check for a left curly brace and skip it
 {
     return Consume (TOK_LCURLY, "'{' expected");
 }
-
-
 
 int ConsumeRCurly (void)
 // Check for a right curly brace and skip it

@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SYMENTRY_H
 #define SYMENTRY_H
-
-
 
 #include <stdio.h>
 
@@ -48,25 +44,17 @@
 #include "datatype.h"
 #include "declattr.h"
 
-
-
 //***************************************************************************
 //                                  Forwards
 //***************************************************************************
-
-
 
 struct SegContext;
 struct LiteralPool;
 struct CodeEntry;
 
-
-
 //***************************************************************************
 //                              struct SymEntry
 //***************************************************************************
-
-
 
 // Symbol types and flags
 #define SC_NONE         0x0000U         // Nothing
@@ -155,8 +143,6 @@ struct CodeEntry;
 #define SC_INLINE       0x10000000U     // Inline function
 #define SC_NORETURN     0x20000000U     // Noreturn function
 
-
-
 // Label definition or reference
 typedef struct DefOrRef DefOrRef;
 struct DefOrRef {
@@ -242,13 +228,9 @@ struct SymEntry {
     char                        Name[1]; // Name, dynamically allocated
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 SymEntry* NewSymEntry (const char* Name, unsigned Flags);
 // Create a new symbol table with the given name
@@ -394,8 +376,6 @@ void SymChangeAsmName (SymEntry* Sym, const char* NewAsmName);
 
 int SymHasAnonName (const SymEntry* Sym);
 // Return true if the symbol entry has an anonymous name
-
-
 
 // End of symentry.h
 

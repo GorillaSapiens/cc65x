@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -46,13 +44,9 @@
 #include "codeinfo.h"
 #include "coptptrstore.h"
 
-
-
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 static unsigned OptPtrStore1Sub (CodeSeg* S, unsigned I, CodeEntry** const L)
 // Check if this is one of the allowed suboperation for OptPtrStore1
@@ -87,13 +81,9 @@ static unsigned OptPtrStore1Sub (CodeSeg* S, unsigned I, CodeEntry** const L)
         return 2;
     }
 
-
-
     // Not found
     return 0;
 }
-
-
 
 static const char* LoadAXZP (CodeSeg* S, unsigned I)
 /* If the two instructions preceeding S/I are a load of A/X from a two byte
@@ -126,8 +116,6 @@ static const char* LoadAXZP (CodeSeg* S, unsigned I)
 
     }
 }
-
-
 
 static const char* LoadAXImm (CodeSeg* S, unsigned I)
 /* If the instructions preceeding S/I are a load of A/X of a constant value
@@ -213,13 +201,9 @@ static const char* LoadAXImm (CodeSeg* S, unsigned I)
     return 0;
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned OptPtrStore1 (CodeSeg* S)
 /* Search for the sequence:
@@ -383,8 +367,6 @@ unsigned OptPtrStore1 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptPtrStore2 (CodeSeg* S)
 /* Search for the sequence:
@@ -626,8 +608,6 @@ unsigned OptPtrStore2 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptPtrStore3 (CodeSeg* S)
 /* Search for the sequence:
 **
@@ -681,11 +661,9 @@ unsigned OptPtrStore3 (CodeSeg* S)
             CE_IsCallTo (L[4+K], "staspidx")        &&
             !CE_HasLabel (L[4+K])) {
 
-
             const char* RegBank = 0;
             const char* ZPLoc   = "ptr1";
             CodeEntry* X;
-
 
             /* Get the preceeding two instructions and check them. We check
             ** for:

@@ -31,24 +31,16 @@
 //
 //***************************************************************************
 
-
-
 #ifndef HASHTAB_H
 #define HASHTAB_H
-
-
 
 // common
 #include "inline.h"
 #include "xmalloc.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 /* Hash table node. NOTE: This structure must be the first member of a struct
 ** that is hashed by the module. Having it first allows to omit a pointer to
@@ -91,13 +83,9 @@ struct HashTable {
 
 #define STATIC_HASHTABLE_INITIALIZER(Slots, Func)   { Slots, 0, 0, Func }
 
-
-
 //***************************************************************************
 //                              struct HashNode
 //***************************************************************************
-
-
 
 #if defined(HAVE_INLINE)
 INLINE void InitHashNode (HashNode* N)
@@ -109,13 +97,9 @@ INLINE void InitHashNode (HashNode* N)
 #define InitHashNode(N)         do { (N)->Next   = 0; } while (0)
 #endif
 
-
-
 //***************************************************************************
 //                             struct HashTable
 //***************************************************************************
-
-
 
 HashTable* InitHashTable (HashTable* T, unsigned Slots, const HashFunctions* Func);
 // Initialize a hash table and return it
@@ -171,8 +155,6 @@ void HT_Walk (HashTable* T, int (*F) (void* Entry, void* Data), void* Data);
 ** left in place. While deleting the node, the node is not accessed, so it is
 ** safe for F to free the memory associcated with the entry.
 */
-
-
 
 // End of hashtab.h
 

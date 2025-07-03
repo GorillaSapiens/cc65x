@@ -31,20 +31,14 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "check.h"
 #include "strstack.h"
 #include "xmalloc.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 const char* SS_Get (const StrStack* S)
 // Get the value on top of a string stack
@@ -52,8 +46,6 @@ const char* SS_Get (const StrStack* S)
     CHECK (S->Count > 0);
     return S->Stack[S->Count-1];
 }
-
-
 
 void SS_Set (StrStack* S, const char* Val)
 // Set the value on top of a string stack
@@ -63,16 +55,12 @@ void SS_Set (StrStack* S, const char* Val)
     S->Stack[S->Count-1] = xstrdup (Val);
 }
 
-
-
 void SS_Drop (StrStack* S)
 // Drop a value from a string stack
 {
     CHECK (S->Count > 1);
     xfree (S->Stack[--S->Count]);
 }
-
-
 
 void SS_Push (StrStack* S, const char* Val)
 // Push a value onto a string stack

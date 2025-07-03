@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
@@ -63,13 +61,9 @@
 #include "symtab.h"
 #include "typeconv.h"
 
-
-
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
-
-
 
 static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags);
 // Parse an enum specifier
@@ -80,13 +74,9 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags);
 static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags);
 // Parse a struct specifier
 
-
-
 //***************************************************************************
 //                         Type specification parser
 //***************************************************************************
-
-
 
 static void InitDeclSpec (DeclSpec* Spec)
 // Initialize the DeclSpec struct for use
@@ -95,8 +85,6 @@ static void InitDeclSpec (DeclSpec* Spec)
     Spec->Type[0].C     = T_END;
     Spec->Flags         = 0;
 }
-
-
 
 static unsigned ParseOneStorageClass (void)
 // Parse and return a storage class specifier
@@ -138,8 +126,6 @@ static unsigned ParseOneStorageClass (void)
     return StorageClass;
 }
 
-
-
 static unsigned ParseOneFuncSpec (void)
 // Parse and return a function specifier
 {
@@ -164,8 +150,6 @@ static unsigned ParseOneFuncSpec (void)
 
     return FuncSpec;
 }
-
-
 
 static int ParseStorageClass (DeclSpec* Spec)
 /* Parse storage class specifiers. Return true if a specifier is read even if
@@ -193,8 +177,6 @@ static int ParseStorageClass (DeclSpec* Spec)
     return 1;
 }
 
-
-
 static int ParseFuncSpecClass (DeclSpec* Spec)
 /* Parse function specifiers. Return true if a specifier is read even if it
 ** was duplicated or disallowed.
@@ -218,15 +200,11 @@ static int ParseFuncSpecClass (DeclSpec* Spec)
     return 1;
 }
 
-
-
 static void DuplicateQualifier (const char* Name)
 // Print an error message
 {
     Warning ("Duplicate qualifier: '%s'", Name);
 }
-
-
 
 static TypeCode OptionalQualifiers (TypeCode Qualifiers, TypeCode Allowed)
 /* Read type qualifiers if we have any. Allowed specifies the allowed
@@ -361,8 +339,6 @@ Done:
     return Q;
 }
 
-
-
 static void OptionalSpecifiers (DeclSpec* Spec, TypeCode* Qualifiers, typespec_t TSFlags)
 /* Read storage specifiers and/or type qualifiers if we have any. Storage class
 ** specifiers require the corresponding typespec_t flag set to be allowed, and
@@ -394,8 +370,6 @@ static void OptionalSpecifiers (DeclSpec* Spec, TypeCode* Qualifiers, typespec_t
     } while (Q != T_QUAL_NONE || HasStorageClass || HasFuncSpec);
 }
 
-
-
 static void OptionalInt (void)
 // Eat an optional "int" token
 {
@@ -404,8 +378,6 @@ static void OptionalInt (void)
         NextToken ();
     }
 }
-
-
 
 static void OptionalSigned (DeclSpec* Spec)
 // Eat an optional "signed" token
@@ -418,8 +390,6 @@ static void OptionalSigned (DeclSpec* Spec)
         }
     }
 }
-
-
 
 static void UseDefaultType (DeclSpec* Spec, typespec_t TSFlags)
 // Use the default type for the type specifier
@@ -434,8 +404,6 @@ static void UseDefaultType (DeclSpec* Spec, typespec_t TSFlags)
         Spec->Type[1].C = T_END;
     }
 }
-
-
 
 static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
 /* Parse a type specifier.  Store whether one of "signed" or "unsigned" was
@@ -709,13 +677,9 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
     Spec->Type[0].C |= Qualifiers;
 }
 
-
-
 //***************************************************************************
 //                         Enum/struct/union parser
 //***************************************************************************
-
-
 
 static SymEntry* ForwardESU (const char* Name, unsigned Flags, unsigned* DSFlags)
 // Handle an enum, struct or union forward declaration
@@ -736,8 +700,6 @@ static SymEntry* ForwardESU (const char* Name, unsigned Flags, unsigned* DSFlags
     }
     return TagEntry;
 }
-
-
 
 static const Type* GetEnumeratorType (long Min, unsigned long Max, int Signed)
 /* GitHub #1093 - We use unsigned types to save spaces whenever possible.
@@ -775,8 +737,6 @@ static const Type* GetEnumeratorType (long Min, unsigned long Max, int Signed)
     return Underlying;
 }
 
-
-
 static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
 // Parse an enum specifier
 {
@@ -791,7 +751,6 @@ static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
     const Type*     MemberType  = type_int; // default member type
     unsigned        Flags       = 0;
     unsigned        PrevErrorCount = ErrorCount;
-
 
     if (CurTok.Tok != TOK_LCURLY) {
         // Just a forward definition
@@ -945,8 +904,6 @@ static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
     return AddEnumSym (Name, SC_DEF | Flags, MemberType, FieldTab, DSFlags);
 }
 
-
-
 static int ParseFieldWidth (Declarator* D)
 /* Parse an optional field width. Returns -1 if no field width is specified,
 ** otherwise the width of the field.
@@ -1009,8 +966,6 @@ static int ParseFieldWidth (Declarator* D)
     return (int) Expr.IVal;
 }
 
-
-
 static unsigned PadWithBitField (unsigned StructSize, unsigned BitOffs)
 /* Pad the current struct with an anonymous bit-field aligned to the next byte.
 ** Return how many bits are used to pad.
@@ -1033,8 +988,6 @@ static unsigned PadWithBitField (unsigned StructSize, unsigned BitOffs)
 
     return PaddingBits;
 }
-
-
 
 static unsigned AliasAnonStructFields (const Declarator* D, SymEntry* Anon)
 /* Create alias fields from an anon union/struct in the current lexical level.
@@ -1081,8 +1034,6 @@ static unsigned AliasAnonStructFields (const Declarator* D, SymEntry* Anon)
     return Count;
 }
 
-
-
 static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
 // Parse a union specifier
 {
@@ -1095,7 +1046,6 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
     SymEntry* Field;
     unsigned  Flags = 0;
     unsigned  PrevErrorCount = ErrorCount;
-
 
     if (CurTok.Tok != TOK_LCURLY) {
         // Just a forward declaration
@@ -1289,8 +1239,6 @@ EndOfDecl:
     return AddStructSym (Name, SC_UNION | SC_DEF | Flags, UnionSize, FieldTab, DSFlags);
 }
 
-
-
 static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
 // Parse a struct specifier
 {
@@ -1304,7 +1252,6 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
     SymEntry* Field;
     unsigned  Flags = 0;
     unsigned  PrevErrorCount = ErrorCount;
-
 
     if (CurTok.Tok != TOK_LCURLY) {
         // Just a forward declaration
@@ -1561,13 +1508,9 @@ EndOfDecl:
     return AddStructSym (Name, SC_STRUCT | SC_DEF | Flags, StructSize, FieldTab, DSFlags);
 }
 
-
-
 //***************************************************************************
 //                             Declarator parser
 //***************************************************************************
-
-
 
 static void InitDeclarator (Declarator* D)
 // Initialize the Declarator struct for use
@@ -1577,8 +1520,6 @@ static void InitDeclarator (Declarator* D)
     D->Index      = 0;
     D->Attributes = 0;
 }
-
-
 
 static void NeedTypeSpace (Declarator* D, unsigned Count)
 // Check if there is enough space for Count type specifiers within D
@@ -1592,16 +1533,12 @@ static void NeedTypeSpace (Declarator* D, unsigned Count)
     }
 }
 
-
-
 static void AddTypeCodeToDeclarator (Declarator* D, TypeCode T)
 // Add a type specifier to the type of a declarator
 {
     NeedTypeSpace (D, 1);
     D->Type[D->Index++].C = T;
 }
-
-
 
 static void FixQualifiers (Type* DataType)
 // Apply several fixes to qualifiers
@@ -1729,8 +1666,6 @@ static void FixQualifiers (Type* DataType)
     }
 }
 
-
-
 static void FixFunctionReturnType (Type* T)
 /* Check if the data type consists of any functions returning forbidden return
 ** types and remove qualifiers from the return types if they are not void.
@@ -1764,8 +1699,6 @@ static void FixFunctionReturnType (Type* T)
         }
     }
 }
-
-
 
 static void CheckArrayElementType (const Type* T)
 // Check recursively if type consists of arrays of forbidden element types
@@ -1805,8 +1738,6 @@ static void CheckArrayElementType (const Type* T)
         }
     }
 }
-
-
 
 static void ParseOldStyleParamList (FuncDesc* F)
 // Parse an old-style (K&R) parameter list
@@ -1848,8 +1779,6 @@ static void ParseOldStyleParamList (FuncDesc* F)
 
     }
 }
-
-
 
 static void ParseOldStyleParamDeclList (FuncDesc* F attribute ((unused)))
 // Parse an old-style (K&R) function declarator declaration list
@@ -1960,8 +1889,6 @@ EndOfDecl:
     }
 }
 
-
-
 static void ParseAnsiParamList (FuncDesc* F)
 // Parse a new-style (ANSI) parameter list
 {
@@ -2058,8 +1985,6 @@ static void ParseAnsiParamList (FuncDesc* F)
     }
 }
 
-
-
 static void ParseFuncDecl (Declarator* D, declmode_t Mode, TypeCode Qualifiers)
 // Parse the argument list of a function with the closing parenthesis
 {
@@ -2140,8 +2065,6 @@ static void ParseFuncDecl (Declarator* D, declmode_t Mode, TypeCode Qualifiers)
     D->Type[D->Index].A.F = F;
     ++D->Index;
 }
-
-
 
 static void DirectDecl (DeclSpec* Spec, Declarator* D, TypeCode* RemQ, declmode_t Mode)
 // Recursively process direct declarators. Build a type array in reverse order.
@@ -2315,13 +2238,9 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, TypeCode* RemQ, declmode_
     *RemQ = Qualifiers;
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Type* ParseType (Type* T)
 // Parse a complete type specification in parentheses
@@ -2363,8 +2282,6 @@ Type* ParseType (Type* T)
     // Return a pointer to the target buffer
     return T;
 }
-
-
 
 int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
 /* Parse a variable, type or function declarator. Return -1 if this stops at
@@ -2536,8 +2453,6 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
     return 1;
 }
 
-
-
 void ParseDeclSpec (DeclSpec* Spec, typespec_t TSFlags, unsigned DefStorage)
 // Parse a declaration specification
 {
@@ -2556,8 +2471,6 @@ void ParseDeclSpec (DeclSpec* Spec, typespec_t TSFlags, unsigned DefStorage)
         Spec->StorageClass |= DefStorage;
     }
 }
-
-
 
 void CheckEmptyDecl (const DeclSpec* Spec)
 /* Called after an empty type declaration (that is, a type declaration without

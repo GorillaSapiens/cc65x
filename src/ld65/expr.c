@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "check.h"
 #include "exprdefs.h"
@@ -46,13 +44,9 @@
 #include "segments.h"
 #include "expr.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 ExprNode* NewExprNode (ObjData* O, unsigned char Op)
 // Create a new expression node
@@ -68,16 +62,12 @@ ExprNode* NewExprNode (ObjData* O, unsigned char Op)
     return N;
 }
 
-
-
 static void FreeExprNode (ExprNode* E)
 // Free a node
 {
     // Free the memory
     xfree (E);
 }
-
-
 
 void FreeExpr (ExprNode* Root)
 // Free the expression, Root is pointing to.
@@ -88,8 +78,6 @@ void FreeExpr (ExprNode* Root)
         FreeExprNode (Root);
     }
 }
-
-
 
 int IsConstExpr (ExprNode* Root)
 /* Return true if the given expression is a constant expression, that is, one
@@ -215,8 +203,6 @@ int IsConstExpr (ExprNode* Root)
     }
 }
 
-
-
 Import* GetExprImport (ExprNode* Expr)
 // Get the import data structure for a symbol expression node
 {
@@ -235,8 +221,6 @@ Import* GetExprImport (ExprNode* Expr)
     }
 }
 
-
-
 Export* GetExprExport (ExprNode* Expr)
 // Get the exported symbol for a symbol expression node
 {
@@ -246,8 +230,6 @@ Export* GetExprExport (ExprNode* Expr)
     // Return the export for an import
     return GetExprImport (Expr)->Exp;
 }
-
-
 
 Section* GetExprSection (ExprNode* Expr)
 // Get the segment for a section expression node
@@ -266,8 +248,6 @@ Section* GetExprSection (ExprNode* Expr)
         return Expr->V.Sec;
     }
 }
-
-
 
 long GetExprVal (ExprNode* Expr)
 // Get the value of a constant expression
@@ -454,8 +434,6 @@ long GetExprVal (ExprNode* Expr)
     }
 }
 
-
-
 static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
 /* Check if the given expression consists of a segment reference and only
 ** constant values, additions, and subtractions. If anything else is found,
@@ -533,8 +511,6 @@ static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
     }
 }
 
-
-
 void GetSegExprVal (ExprNode* Expr, SegExprDesc* D)
 /* Check if the given expression consists of a segment reference and only
 ** constant values, additions and subtractions. If anything else is found,
@@ -550,8 +526,6 @@ void GetSegExprVal (ExprNode* Expr, SegExprDesc* D)
     GetSegExprValInternal (Expr, D, 1);
 }
 
-
-
 ExprNode* LiteralExpr (long Val, ObjData* O)
 // Return an expression tree that encodes the given literal value
 {
@@ -559,8 +533,6 @@ ExprNode* LiteralExpr (long Val, ObjData* O)
     Expr->V.IVal = Val;
     return Expr;
 }
-
-
 
 ExprNode* MemoryExpr (MemoryArea* Mem, long Offs, ObjData* O)
 // Return an expression tree that encodes an offset into a memory area
@@ -581,8 +553,6 @@ ExprNode* MemoryExpr (MemoryArea* Mem, long Offs, ObjData* O)
     return Root;
 }
 
-
-
 ExprNode* SegmentExpr (Segment* Seg, long Offs, ObjData* O)
 // Return an expression tree that encodes an offset into a segment
 {
@@ -602,8 +572,6 @@ ExprNode* SegmentExpr (Segment* Seg, long Offs, ObjData* O)
     return Root;
 }
 
-
-
 ExprNode* SectionExpr (Section* Sec, long Offs, ObjData* O)
 // Return an expression tree that encodes an offset into a section
 {
@@ -622,8 +590,6 @@ ExprNode* SectionExpr (Section* Sec, long Offs, ObjData* O)
 
     return Root;
 }
-
-
 
 ExprNode* ReadExpr (FILE* F, ObjData* O)
 // Read an expression from the given file
@@ -673,8 +639,6 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
     // Return the tree
     return Expr;
 }
-
-
 
 int EqualExpr (ExprNode* E1, ExprNode* E2)
 // Check if two expressions are identical.

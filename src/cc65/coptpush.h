@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COPTPUSH_H
 #define COPTPUSH_H
-
-
 
 // cc65
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned OptPush1 (CodeSeg* S);
 /* Given a sequence
@@ -74,8 +66,6 @@ unsigned OptPush2 (CodeSeg* S);
 **
 **     jsr     pushwidx
 */
-
-
 
 // End of coptpush.h
 

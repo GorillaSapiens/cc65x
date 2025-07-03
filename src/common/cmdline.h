@@ -31,22 +31,14 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CMDLINE_H
 #define CMDLINE_H
 
-
-
 #include "attrib.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Program name - is set after call to InitCmdLine
 extern const char* ProgName;
@@ -63,13 +55,9 @@ struct LongOpt {
     void        (*Func) (const char* Opt, const char* Arg);
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void InitCmdLine (int* aArgCount, char*** aArgVec, const char* aProgName);
 /* Initialize command line parsing. aArgVec is the argument array terminated by
@@ -96,8 +84,6 @@ const char* GetArg (unsigned* ArgNum, unsigned Len);
 
 void LongOption (unsigned* ArgNum, const LongOpt* OptTab, unsigned OptCount);
 // Handle a long command line option
-
-
 
 // End of cmdline.h
 

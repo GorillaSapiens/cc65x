@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef OUTPUT_H
 #define OUTPUT_H
-
-
 
 // common
 #include "strbuf.h"
@@ -44,13 +40,9 @@
 // sp65
 #include "bitmap.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void WriteOutputFile (const StrBuf* Data, const Collection* A, const Bitmap* B);
 /* Write the contents of Data to a file. Format, file name etc. must be given
@@ -59,8 +51,6 @@ void WriteOutputFile (const StrBuf* Data, const Collection* A, const Bitmap* B);
 ** function is the bitmap used as source of the conversion. It may be used to
 ** determine the bitmap properties for documentation purposes.
 */
-
-
 
 // End of output.h
 

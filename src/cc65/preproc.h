@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #ifndef PREPROC_H
 #define PREPROC_H
 
@@ -41,8 +39,6 @@
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Maximum #if depth per file
 #define MAX_PP_IFS      256
@@ -57,13 +53,9 @@ struct PPIfStack {
 // Forward
 struct IFile;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void HandleSpecialMacro (Macro* M, const char* Name);
 // Handle special "magic" macros that may change
@@ -90,8 +82,6 @@ void PreprocessEnd (struct IFile* Input);
 /* Preprocessor done with current file. The parameter is the file we're
 ** switching back to.
 */
-
-
 
 // End of preproc.h
 

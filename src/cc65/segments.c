@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdarg.h>
 #include <string.h>
 
@@ -54,20 +52,15 @@
 #include "textseg.h"
 #include "segments.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Table struct for address sizes of segments
 typedef struct {
     StrBuf Name;
     unsigned char AddrSize;
 } SegAddrSize_t;
-
 
 // Pointer to the current segment context. Output goes here.
 SegContext* CS = 0;
@@ -88,21 +81,15 @@ static Collection SegmentAddrSizes;
 */
 static Collection SegContextStack = STATIC_COLLECTION_INITIALIZER;
 
-
-
 //***************************************************************************
 //                       Segment name and address size
 //***************************************************************************
-
-
 
 void InitSegAddrSizes (void)
 // Initialize the segment address sizes
 {
     InitCollection (&SegmentAddrSizes);
 }
-
-
 
 void DoneSegAddrSizes (void)
 // Free the segment address sizes
@@ -116,8 +103,6 @@ void DoneSegAddrSizes (void)
     }
     DoneCollection (&SegmentAddrSizes);
 }
-
-
 
 static SegAddrSize_t* FindSegAddrSize (const char* Name)
 /* Find already specified address size for a segment by name.
@@ -134,8 +119,6 @@ static SegAddrSize_t* FindSegAddrSize (const char* Name)
     }
     return 0;
 }
-
-
 
 void SetSegAddrSize (const char* Name, unsigned char AddrSize)
 // Set the address size for a segment
@@ -159,8 +142,6 @@ void SetSegAddrSize (const char* Name, unsigned char AddrSize)
     A->AddrSize = AddrSize;
 }
 
-
-
 unsigned char GetSegAddrSize (const char* Name)
 /* Get the address size of the given segment.
 ** Return ADDR_SIZE_INVALID if not found.
@@ -173,8 +154,6 @@ unsigned char GetSegAddrSize (const char* Name)
     return ADDR_SIZE_INVALID;
 }
 
-
-
 void InitSegNames (void)
 // Initialize the segment names
 {
@@ -184,15 +163,11 @@ void InitSegNames (void)
     SS_Push (&SegmentNames[SEG_RODATA], SEGNAME_RODATA);
 }
 
-
-
 void SetSegName (segment_t Seg, const char* Name)
 // Set a new name for a segment
 {
     SS_Set (&SegmentNames[Seg], Name);
 }
-
-
 
 void PushSegName (segment_t Seg, const char* Name)
 // Push the current segment name and set a new name for a segment
@@ -204,8 +179,6 @@ void PushSegName (segment_t Seg, const char* Name)
     }
 }
 
-
-
 void PopSegName (segment_t Seg)
 // Restore a segment name from the segment name stack
 {
@@ -216,21 +189,15 @@ void PopSegName (segment_t Seg)
     }
 }
 
-
-
 const char* GetSegName (segment_t Seg)
 // Get the name of the given segment
 {
     return SS_Get (&SegmentNames[Seg]);
 }
 
-
-
 //***************************************************************************
 //                              Segment context
 //***************************************************************************
-
-
 
 static SegContext* NewSegContext (SymEntry* Func)
 // Initialize a SegContext structure (set all fields to NULL)
@@ -252,8 +219,6 @@ static SegContext* NewSegContext (SymEntry* Func)
     return S;
 }
 
-
-
 SegContext* PushSegContext (SymEntry* Func)
 // Make the new segment context current but remember the old one
 {
@@ -267,8 +232,6 @@ SegContext* PushSegContext (SymEntry* Func)
     return CS;
 }
 
-
-
 void PopSegContext (void)
 // Pop the old segment context (make it current)
 {
@@ -279,15 +242,11 @@ void PopSegContext (void)
     CS = CollPop (&SegContextStack);
 }
 
-
-
 void CreateGlobalSegments (void)
 // Create the global segments and remember them in GS
 {
     GS = PushSegContext (0);
 }
-
-
 
 void UseDataSeg (segment_t DSeg)
 // For the current segment context, use the data segment DSeg
@@ -298,8 +257,6 @@ void UseDataSeg (segment_t DSeg)
     // Set the new segment to use
     CS->CurDSeg = DSeg;
 }
-
-
 
 struct DataSeg* GetDataSeg (void)
 // Return the current data segment
@@ -315,8 +272,6 @@ struct DataSeg* GetDataSeg (void)
     }
 }
 
-
-
 void AddTextLine (const char* Format, ...)
 // Add a line of code to the current text segment
 {
@@ -326,8 +281,6 @@ void AddTextLine (const char* Format, ...)
     TS_AddVLine (CS->Text, Format, ap);
     va_end (ap);
 }
-
-
 
 void AddCodeLine (const char* Format, ...)
 // Add a line of code to the current code segment
@@ -339,16 +292,12 @@ void AddCodeLine (const char* Format, ...)
     va_end (ap);
 }
 
-
-
 void AddCode (opc_t OPC, am_t AM, const char* Arg, struct CodeLabel* JumpTo)
 // Add a code entry to the current code segment
 {
     CHECK (CS != 0);
     CS_AddEntry (CS->Code, NewCodeEntry (OPC, AM, Arg, JumpTo, CurTok.LI));
 }
-
-
 
 void AddDataLine (const char* Format, ...)
 // Add a line of data to the current data segment
@@ -360,23 +309,17 @@ void AddDataLine (const char* Format, ...)
     va_end (ap);
 }
 
-
-
 int HaveGlobalCode (void)
 // Return true if the global code segment contains entries (which is an error)
 {
     return (CS_GetEntryCount (GS->Code) > 0);
 }
 
-
-
 void RemoveGlobalCode (void)
 // Remove all code from the global code segment. Used for error recovery.
 {
     CS_DelEntries (GS->Code, 0, CS_GetEntryCount (GS->Code));
 }
-
-
 
 void OutputSegments (const SegContext* S)
 // Output the given segments to the output file

@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COPTCMP_H
 #define COPTCMP_H
-
-
 
 // cc65
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //                        Optimizations for compares
 //***************************************************************************
-
-
 
 unsigned OptCmp1 (CodeSeg* S);
 /* Search for the sequence
@@ -150,8 +142,6 @@ unsigned OptCmp9 (CodeSeg* S);
 ** If A is not used later (which should be the case), we can branch on the N
 ** flag instead of the carry flag and remove the asl.
 */
-
-
 
 // End of coptcmp.h
 

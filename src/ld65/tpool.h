@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef TPOOL_H
 #define TPOOL_H
-
-
 
 #include <stdio.h>
 
 // common
 #include "strpool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // An invalid type
 #define INVALID_TYPE_ID   (~0U)
@@ -57,13 +49,9 @@
 // The string pool we're using
 extern StringPool* TypePool;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 #if defined(HAVE_INLINE)
 INLINE unsigned GetTypeId (const StrBuf* Type)
@@ -100,8 +88,6 @@ void PrintDbgTypes (FILE* F);
 
 void InitTypePool (void);
 // Initialize the type pool
-
-
 
 // End of tpool.h
 

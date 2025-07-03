@@ -31,22 +31,14 @@
 //
 //***************************************************************************
 
-
-
 #ifndef BITOPS_H
 #define BITOPS_H
 
-
-
 #include "attrib.h"
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned BitFind (unsigned long Val) attribute ((const));
 // Find the first bit that is set in Val. Val must *not* be zero
@@ -65,8 +57,6 @@ int BitIsReset (void* Data, unsigned Bit) attribute ((const));
 
 void BitMerge (void* Target, const void* Source, unsigned Size);
 // Merge the bits of two char arrays (that is, do an or for the full array)
-
-
 
 // End of bitops.h
 

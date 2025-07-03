@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COPTMISC_H
 #define COPTMISC_H
-
-
 
 // cc65
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned OptDecouple (CodeSeg* S);
 /* Decouple operations, that is, do the following replacements:
@@ -119,8 +111,6 @@ unsigned OptBinOps2 (CodeSeg* S);
 /* Search for an AND/EOR/ORA for identical memory locations and replace it
 ** by something simpler.
 */
-
-
 
 // End of coptmisc.h
 

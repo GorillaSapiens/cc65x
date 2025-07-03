@@ -31,22 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef EA_H
 #define EA_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
 // EffAddr Flags
 #define EFFADDR_OVERRIDE_ZP     0x00000001UL
-
-
 
 // GetEA result struct
 typedef struct EffAddr EffAddr;
@@ -62,8 +55,6 @@ struct EffAddr {
     unsigned long       AddrModeBit;    // Addressing mode as bit mask
     unsigned char       Opcode;         // Opcode
 };
-
-
 
 // End of ea.h
 

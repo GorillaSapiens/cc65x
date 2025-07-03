@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -55,13 +53,9 @@
 #include "symentry.h"
 #include "symtab.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Structure used for a high level language function or symbol
 typedef struct HLLDbgSym HLLDbgSym;
@@ -83,13 +77,9 @@ static LineInfo* CurLineInfo = 0;
 // List of high level language debug symbols
 static Collection HLLDbgSyms = STATIC_COLLECTION_INITIALIZER;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static HLLDbgSym* NewHLLDbgSym (unsigned Flags, unsigned Name, unsigned Type)
 // Allocate and return a new HLLDbgSym structure
@@ -112,8 +102,6 @@ static HLLDbgSym* NewHLLDbgSym (unsigned Flags, unsigned Name, unsigned Type)
     return S;
 }
 
-
-
 static unsigned HexValue (char C)
 // Convert the ascii representation of a hex nibble into the hex nibble
 {
@@ -126,8 +114,6 @@ static unsigned HexValue (char C)
     }
 }
 
-
-
 static int ValidateType (StrBuf* Type)
 /* Check if the given type is valid and if so, return a string id for it. If
 ** the type isn't valid, return -1. Type is overwritten when checking.
@@ -136,7 +122,6 @@ static int ValidateType (StrBuf* Type)
     unsigned        I;
     const char*     A;
     char*           B;
-
 
     // The length must not be zero and divideable by two
     unsigned Length = SB_GetLen (Type);
@@ -166,8 +151,6 @@ static int ValidateType (StrBuf* Type)
     // Allocate the type and return it
     return GetStrBufId (Type);
 }
-
-
 
 void DbgInfoFile (void)
 // Parse and handle FILE subcommand of the .dbg pseudo instruction
@@ -206,8 +189,6 @@ void DbgInfoFile (void)
     SB_Done (&Name);
 }
 
-
-
 void DbgInfoFunc (void)
 // Parse and handle func subcommand of the .dbg pseudo instruction
 {
@@ -221,7 +202,6 @@ void DbgInfoFunc (void)
     unsigned    AsmName;
     unsigned    Flags;
     HLLDbgSym*  S;
-
 
     // Parameters are separated by a comma
     ConsumeComma ();
@@ -296,8 +276,6 @@ void DbgInfoFunc (void)
     CollAppend (&HLLDbgSyms, S);
 }
 
-
-
 void DbgInfoLine (void)
 // Parse and handle LINE subcommand of the .dbg pseudo instruction
 {
@@ -347,8 +325,6 @@ void DbgInfoLine (void)
     CurLineInfo = StartLine (&Pos, LI_TYPE_EXT, 0);
 }
 
-
-
 void DbgInfoSym (void)
 // Parse and handle SYM subcommand of the .dbg pseudo instruction
 {
@@ -365,7 +341,6 @@ void DbgInfoSym (void)
     unsigned    Flags;
     int         Offs = 0;
     HLLDbgSym*  S;
-
 
     // Parameters are separated by a comma
     ConsumeComma ();
@@ -439,8 +414,6 @@ void DbgInfoSym (void)
     CollAppend (&HLLDbgSyms, S);
 }
 
-
-
 void DbgInfoCheck (void)
 // Do checks on all hll debug info symbols when assembly is complete
 {
@@ -477,8 +450,6 @@ void DbgInfoCheck (void)
 
     }
 }
-
-
 
 void WriteHLLDbgSyms (void)
 // Write a list of all high level language symbols to the object file.

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -45,26 +43,18 @@
 #include "options.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Option list
 static Option*          OptRoot = 0;
 static Option*          OptLast = 0;
 static unsigned         OptCount = 0;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static Option* NewOption (unsigned char Type, unsigned long Val)
 // Create a new option, insert it into the list and return it
@@ -94,15 +84,11 @@ static Option* NewOption (unsigned char Type, unsigned long Val)
     return Opt;
 }
 
-
-
 void OptStr (unsigned char Type, const StrBuf* Text)
 // Add a string option
 {
     NewOption (Type, GetStrBufId (Text));
 }
-
-
 
 void OptComment (const StrBuf* Comment)
 // Add a comment
@@ -110,15 +96,11 @@ void OptComment (const StrBuf* Comment)
     NewOption (OPT_COMMENT, GetStrBufId (Comment));
 }
 
-
-
 void OptAuthor (const StrBuf* Author)
 // Add an author statement
 {
     NewOption (OPT_AUTHOR, GetStrBufId (Author));
 }
-
-
 
 void OptTranslator (const StrBuf* Translator)
 // Add a translator option
@@ -126,15 +108,11 @@ void OptTranslator (const StrBuf* Translator)
     NewOption (OPT_TRANSLATOR, GetStrBufId (Translator));
 }
 
-
-
 void OptCompiler (const StrBuf* Compiler)
 // Add a compiler option
 {
     NewOption (OPT_COMPILER, GetStrBufId (Compiler));
 }
-
-
 
 void OptOS (const StrBuf* OS)
 // Add an operating system option
@@ -142,15 +120,11 @@ void OptOS (const StrBuf* OS)
     NewOption (OPT_OS, GetStrBufId (OS));
 }
 
-
-
 void OptDateTime (unsigned long DateTime)
 // Add a date/time option
 {
     NewOption (OPT_DATETIME, DateTime);
 }
-
-
 
 void WriteOptions (void)
 // Write the options to the object file
@@ -179,7 +153,4 @@ void WriteOptions (void)
     // Done writing options
     ObjEndOptions ();
 }
-
-
-
 

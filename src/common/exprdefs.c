@@ -31,20 +31,14 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 
 #include "abend.h"
 #include "exprdefs.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void InternalDumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym) (const struct SymEntry*))
 // Dump an expression in RPN to stdout
@@ -227,8 +221,6 @@ static void InternalDumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym
 
     }
 }
-
-
 
 void DumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym) (const struct SymEntry*))
 // Dump an expression tree to stdout

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -41,13 +39,9 @@
 #include "debugflag.h"
 #include "xmalloc.h"
 
-
-
 //***************************************************************************
 //                                   code
 //***************************************************************************
-
-
 
 void* xmalloc (size_t Size)
 // Allocate memory, check for out of memory condition. Do some debugging
@@ -71,8 +65,6 @@ void* xmalloc (size_t Size)
     return P;
 }
 
-
-
 void* xrealloc (void* P, size_t Size)
 // Reallocate a memory block, check for out of memory
 {
@@ -88,15 +80,11 @@ void* xrealloc (void* P, size_t Size)
     return N;
 }
 
-
-
 void xfree (void* Block)
 // Free the block, do some debugging
 {
     free (Block);
 }
-
-
 
 char* xstrdup (const char* S)
 // Duplicate a string on the heap. The function checks for out of memory
@@ -117,8 +105,6 @@ char* xstrdup (const char* S)
 
     }
 }
-
-
 
 void* xdup (const void* Buf, size_t Size)
 // Create a copy of Buf on the heap and return a pointer to it.

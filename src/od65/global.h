@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef GLOBAL_H
 #define GLOBAL_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 #define D_HEADER        0x0001U         // Dump the header
 #define D_OPTIONS       0x0002U         // Dump the options
@@ -56,11 +50,7 @@
 #define D_SEGSIZE       0x0200U         // Dump segment sizes
 #define D_ALL           0xFFFFU         // Dump anything
 
-
-
 extern unsigned         What;           // What should get dumped?
-
-
 
 // End of global.h
 

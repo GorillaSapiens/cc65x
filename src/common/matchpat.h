@@ -31,22 +31,14 @@
 //
 //***************************************************************************
 
-
-
 #ifndef MATCHPAT_H
 #define MATCHPAT_H
 
-
-
 #include "attrib.h"
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int MatchPattern (const char* Source, const char* Pattern);
 /* Match the string in Source against Pattern. Pattern may contain the
@@ -55,8 +47,6 @@ int MatchPattern (const char* Source, const char* Pattern);
 ** otherwise a non zero value is returned. If Pattern contains an invalid
 ** wildcard pattern (e.g. 'A[x'), the function returns zero.
 */
-
-
 
 // End of matchpat.h
 

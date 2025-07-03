@@ -28,12 +28,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef WRAPPEDCALL_H
 #define WRAPPEDCALL_H
-
-
 
 #include <stdio.h>
 
@@ -43,12 +39,9 @@
 // cc65
 #include "opcodes.h"
 
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void PushWrappedCall (void *Ptr, unsigned int Val);
 // Push the current WrappedCall
@@ -58,7 +51,6 @@ void PopWrappedCall (void);
 
 void GetWrappedCall (void **Ptr, unsigned int *Val);
 // Get the current WrappedCall, if any
-
 
 // End of wrappedcall.h
 

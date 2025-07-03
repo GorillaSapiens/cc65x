@@ -31,24 +31,16 @@
 //
 //***************************************************************************
 
-
-
 #ifndef STDFUNC_H
 #define STDFUNC_H
-
-
 
 // cc65
 #include "expr.h"
 #include "symtab.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void AddCmpCodeIfSizeNot256 (const char* Code, long Size);
 /* Add a line of Assembly code that compares an index register
@@ -63,8 +55,6 @@ int FindStdFunc (const char* Name);
 
 void HandleStdFunc (int Index, struct FuncDesc* F, ExprDesc* lval);
 // Generate code for a known standard function.
-
-
 
 // End of stdfunc.h
 #endif

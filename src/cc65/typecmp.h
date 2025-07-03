@@ -31,22 +31,14 @@
 //
 //***************************************************************************
 
-
-
 #ifndef TYPECMP_H
 #define TYPECMP_H
 
-
-
 #include "datatype.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Degree of type compatibility affected. Must be in ascending order
 typedef enum {
@@ -93,8 +85,6 @@ typedef struct {
 //                                   Code
 //***************************************************************************
 
-
-
 typecmp_t TypeCmp (const Type* lhs, const Type* rhs);
 // Compare two types and return the result
 
@@ -103,8 +93,6 @@ void TypeCompatibilityDiagnostic (const Type* NewType, const Type* OldType, int 
 ** names. The format string shall contain two '%s' specifiers for the names of
 ** the two types.
 */
-
-
 
 // End of typecmp.h
 

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -62,13 +60,9 @@
 #include "toklist.h"
 #include "scanner.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Current input token incl. attributes
 Token CurTok = STATIC_TOKEN_INITIALIZER;
@@ -325,13 +319,9 @@ struct DotKeyword {
 // END SORTED.SH
 };
 
-
-
 //***************************************************************************
 //                            CharSource functions
 //***************************************************************************
-
-
 
 static void UseCharSource (CharSource* S)
 // Initialize a new input source and start to use it.
@@ -356,8 +346,6 @@ static void UseCharSource (CharSource* S)
     */
     CurTok.Tok = TOK_SEP;
 }
-
-
 
 static void DoneCharSource (void)
 // Close the top level character source
@@ -384,21 +372,15 @@ static void DoneCharSource (void)
     Source = S;
 }
 
-
-
 //***************************************************************************
 //                            InputFile functions
 //***************************************************************************
-
-
 
 static void IFMarkStart (CharSource* S)
 // Mark the start of the next token
 {
     CurTok.Pos = S->V.File.Pos;
 }
-
-
 
 static void IFNextChar (CharSource* S)
 // Read the next character from the input file
@@ -449,7 +431,6 @@ static void IFNextChar (CharSource* S)
             }
         }
 
-
         /* If we come here, we have a new input line. To avoid problems
         ** with strange line terminators, remove all whitespace from the
         ** end of the line, then add a single newline.
@@ -478,8 +459,6 @@ static void IFNextChar (CharSource* S)
     // Return the next character from the buffer
     C = SB_Get (&S->V.File.Line);
 }
-
-
 
 void IFDone (CharSource* S)
 // Close the current input file
@@ -510,16 +489,12 @@ void IFDone (CharSource* S)
     --FCount;
 }
 
-
-
 // Set of input file handling functions
 static const CharSourceFunctions IFFunc = {
     IFMarkStart,
     IFNextChar,
     IFDone
 };
-
-
 
 int NewInputFile (const char* Name)
 /* Open a new input file. Returns true if the file could be successfully opened
@@ -534,7 +509,6 @@ int NewInputFile (const char* Name)
     StrBuf      Path = AUTO_STRBUF_INITIALIZER;
     unsigned    FileIdx;
     CharSource* S;
-
 
     /* If this is the main file, just try to open it. If it's an include file,
     ** search for it using the include path list.
@@ -610,21 +584,15 @@ ExitPoint:
     return RetCode;
 }
 
-
-
 //***************************************************************************
 //                            InputData functions
 //***************************************************************************
-
-
 
 static void IDMarkStart (CharSource* S attribute ((unused)))
 // Mark the start of the next token
 {
     // Nothing to do here
 }
-
-
 
 static void IDNextChar (CharSource* S)
 // Read the next character from the input text
@@ -637,8 +605,6 @@ static void IDNextChar (CharSource* S)
     }
 }
 
-
-
 void IDDone (CharSource* S)
 // Close the current input data
 {
@@ -648,16 +614,12 @@ void IDDone (CharSource* S)
     }
 }
 
-
-
 // Set of input data handling functions
 static const CharSourceFunctions IDFunc = {
     IDMarkStart,
     IDNextChar,
     IDDone
 };
-
-
 
 void NewInputData (char* Text, int Malloced)
 // Add a chunk of input data to the input stream
@@ -675,13 +637,9 @@ void NewInputData (char* Text, int Malloced)
     UseCharSource (S);
 }
 
-
-
 //***************************************************************************
 //                    Character classification functions
 //***************************************************************************
-
-
 
 int IsIdChar (int C)
 // Return true if the character is a valid character for an identifier
@@ -692,21 +650,15 @@ int IsIdChar (int C)
            (C == '$' && DollarInIdents);
 }
 
-
-
 int IsIdStart (int C)
 // Return true if the character may start an identifier
 {
     return IsAlpha (C) || C == '_';
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static unsigned DigitVal (unsigned char C)
 // Convert a digit into it's numerical representation
@@ -718,15 +670,11 @@ static unsigned DigitVal (unsigned char C)
     }
 }
 
-
-
 static void NextChar (void)
 // Read the next character from the input file
 {
     Source->Func->NextChar (Source);
 }
-
-
 
 void LocaseSVal (void)
 // Make SVal lower case
@@ -734,23 +682,17 @@ void LocaseSVal (void)
     SB_ToLower (&CurTok.SVal);
 }
 
-
-
 void UpcaseSVal (void)
 // Make SVal upper case
 {
     SB_ToUpper (&CurTok.SVal);
 }
 
-
-
 static int CmpDotKeyword (const void* K1, const void* K2)
 // Compare function for the dot keyword search
 {
     return strcmp (((struct DotKeyword*)K1)->Key, ((struct DotKeyword*)K2)->Key);
 }
-
-
 
 static token_t FindDotKeyword (void)
 /* Find the dot keyword in SVal. Return the corresponding token if found,
@@ -779,8 +721,6 @@ static token_t FindDotKeyword (void)
     }
 }
 
-
-
 static void ReadIdent (void)
 /* Read an identifier from the current input position into Ident. Filling SVal
 ** starts at the current position with the next character in C. It is assumed
@@ -800,8 +740,6 @@ static void ReadIdent (void)
         UpcaseSVal ();
     }
 }
-
-
 
 static void ReadStringConst (int StringTerm)
 // Read a string constant into SVal.
@@ -948,8 +886,6 @@ static void ReadStringConst (int StringTerm)
     SB_Terminate (&CurTok.SVal);
 }
 
-
-
 static int Sweet16Reg (const StrBuf* Id)
 /* Check if the given identifier is a sweet16 register. Return -1 if this is
 ** not the case, return the register number otherwise.
@@ -976,8 +912,6 @@ static int Sweet16Reg (const StrBuf* Id)
     // The register number is valid
     return (int) RegNum;
 }
-
-
 
 void NextRawTok (void)
 // Read the next raw token from the input stream
@@ -1256,7 +1190,6 @@ Again:
 
         return;
     }
-
 
     // Identifier or keyword?
     if (IsIdStart (C)) {
@@ -1641,8 +1574,6 @@ CharAgain:
     goto Again;
 }
 
-
-
 int GetSubKey (const char* const* Keys, unsigned Count)
 /* Search for a subkey in a table of keywords. The current token must be an
 ** identifier and all keys must be in upper case. The identifier will be
@@ -1672,8 +1603,6 @@ int GetSubKey (const char* const* Keys, unsigned Count)
     return -1;
 }
 
-
-
 unsigned char ParseAddrSize (void)
 /* Check if the next token is a keyword that denotes an address size specifier.
 ** If so, return the corresponding address size constant, otherwise output an
@@ -1699,16 +1628,12 @@ unsigned char ParseAddrSize (void)
     return AddrSize;
 }
 
-
-
 void InitScanner (const char* InFile)
 // Initialize the scanner, open the given input file
 {
     // Open the input file
     NewInputFile (InFile);
 }
-
-
 
 void DoneScanner (void)
 // Release scanner resources

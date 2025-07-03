@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 /* Note: This is NOT some sort of code segment, it is used to store lines of
 ** output that are textual (not real code) instead.
 */
 
-
-
 #ifndef TEXTSEG_H
 #define TEXTSEG_H
-
-
 
 #include <stdarg.h>
 
@@ -53,13 +47,9 @@
 // cc65
 #include "symentry.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 typedef struct TextSeg TextSeg;
 struct TextSeg {
@@ -67,13 +57,9 @@ struct TextSeg {
     Collection          Lines;          // List of text lines
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 TextSeg* NewTextSeg (SymEntry* Func);
 // Create a new text segment, initialize and return it
@@ -86,8 +72,6 @@ void TS_AddLine (TextSeg* S, const char* Format, ...) attribute ((format(printf,
 
 void TS_Output (const TextSeg* S);
 // Output the text segment data to the output file
-
-
 
 // End of textseg.h
 

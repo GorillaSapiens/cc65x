@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef EXTSYMS_H
 #define EXTSYMS_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Forward decl for structure holding an external symbol
 typedef struct ExtSym ExtSym;
@@ -50,13 +44,9 @@ typedef struct ExtSym ExtSym;
 // External symbol table structure
 typedef struct ExtSymTab ExtSymTab;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 ExtSym* NewExtSym (ExtSymTab* Tab, unsigned Name);
 // Create a new external symbol and insert it into the list
@@ -88,8 +78,6 @@ unsigned ExtSymName (const ExtSym* E);
 
 const ExtSym* ExtSymNext (const ExtSym* E);
 // Return the next symbol in the list
-
-
 
 // End of extsyms.h
 

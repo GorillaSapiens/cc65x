@@ -31,20 +31,14 @@
 //
 //***************************************************************************
 
-
-
 #ifndef _6502_H
 #define _6502_H
 
-
 #include <stdint.h>
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Supported CPUs
 typedef enum CPUType {
@@ -79,13 +73,9 @@ extern CPURegs Regs;
 #define OF      0x40            // Overflow flag
 #define SF      0x80            // Sign flag
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void Reset (void);
 // Generate a CPU RESET
@@ -100,7 +90,6 @@ unsigned ExecuteInsn (void);
 /* Execute one CPU instruction. Return the number of clock cycles for the
 ** executed instruction.
 */
-
 
 // End of 6502.h
 

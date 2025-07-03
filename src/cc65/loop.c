@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "check.h"
 #include "xmalloc.h"
@@ -42,24 +40,16 @@
 #include "loop.h"
 #include "stackptr.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // The root
 static LoopDesc* LoopStack = 0;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 LoopDesc* AddLoop (unsigned BreakLabel, unsigned ContinueLabel)
 // Create and add a new loop descriptor.
@@ -80,15 +70,11 @@ LoopDesc* AddLoop (unsigned BreakLabel, unsigned ContinueLabel)
     return L;
 }
 
-
-
 LoopDesc* CurrentLoop (void)
 // Return a pointer to the descriptor of the current loop
 {
     return LoopStack;
 }
-
-
 
 void DelLoop (void)
 // Remove the current loop

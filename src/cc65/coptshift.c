@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "chartype.h"
 
@@ -41,13 +39,9 @@
 #include "codeinfo.h"
 #include "coptshift.h"
 
-
-
 //***************************************************************************
 //                                     Data
 //***************************************************************************
-
-
 
 // Shift types. Shift type is in the first byte, shift count in the second
 enum {
@@ -125,21 +119,15 @@ enum {
     SHIFT_LSR_7         = SHIFT_TYPE_LSR | SHIFT_COUNT_7,
 };
 
-
-
 // Macros to extract values from a shift type
 #define SHIFT_COUNT(S)          ((S) & SHIFT_MASK_COUNT)
 #define SHIFT_DIR(S)            ((S) & SHIFT_MASK_DIR)
 #define SHIFT_MODE(S)           ((S) & SHIFT_MASK_MODE)
 #define SHIFT_TYPE(S)           ((S) & SHIFT_MASK_TYPE)
 
-
-
 //***************************************************************************
 //                              Helper routines
 //***************************************************************************
-
-
 
 static unsigned GetShift (const char* Name)
 // Determine the shift from the name of the subroutine
@@ -180,13 +168,9 @@ static unsigned GetShift (const char* Name)
     }
 }
 
-
-
 //***************************************************************************
 //                              Optimize shifts
 //***************************************************************************
-
-
 
 unsigned OptShift1 (CodeSeg* S)
 /* A call to the shlaxN routine may get replaced by one or more asl insns
@@ -218,7 +202,6 @@ unsigned OptShift1 (CodeSeg* S)
         if (E->OPC == OP65_JSR                          &&
             (Shift = GetShift (E->Arg)) != SHIFT_NONE   &&
             SHIFT_DIR (Shift) == SHIFT_DIR_LEFT) {
-
 
             unsigned Count = SHIFT_COUNT (Shift);
             if (!RegXUsed (S, I+1)) {
@@ -304,8 +287,6 @@ NextEntry:
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptShift2 (CodeSeg* S)
 /* The sequence
@@ -397,8 +378,6 @@ unsigned OptShift2 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptShift3 (CodeSeg* S)
 /* The sequence
 **
@@ -468,8 +447,6 @@ unsigned OptShift3 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptShift4 (CodeSeg* S)
 /* Calls to the asraxN or shraxN routines may get replaced by one or more lsr
@@ -564,8 +541,6 @@ NextEntry:
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptShift5 (CodeSeg* S)
 /* Search for the sequence
@@ -686,8 +661,6 @@ unsigned OptShift5 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptShift6 (CodeSeg* S)
 // Inline the shift subroutines.

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -51,13 +49,9 @@
 #include "o65.h"
 #include "convert.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void PrintO65Stats (const O65Data* D)
 // Print information about the O65 file if --verbose is given
@@ -71,8 +65,6 @@ static void PrintO65Stats (const O65Data* D)
     Print (stdout, 1, "Number of text segment relocations: %5u\n", CollCount (&D->TextReloc));
     Print (stdout, 1, "Number of data segment relocations: %5u\n", CollCount (&D->DataReloc));
 }
-
-
 
 static void SetupSegLabels (FILE* F)
 // Setup the segment label names
@@ -99,8 +91,6 @@ static void SetupSegLabels (FILE* F)
     }
 }
 
-
-
 static const char* LabelPlusOffs (const char* Label, long Offs)
 // Generate "Label+xxx" in a static buffer and return a pointer to the buffer
 {
@@ -108,8 +98,6 @@ static const char* LabelPlusOffs (const char* Label, long Offs)
     xsprintf (Buf, sizeof (Buf), "%s%+ld", Label, Offs);
     return Buf;
 }
-
-
 
 static const char* RelocExpr (const O65Data* D, unsigned char SegID,
                               unsigned long Val, const O65Reloc* R)
@@ -158,8 +146,6 @@ static const char* RelocExpr (const O65Data* D, unsigned char SegID,
     return 0;
 }
 
-
-
 static void ConvertImports (FILE* F, const O65Data* D)
 // Convert the imports
 {
@@ -177,8 +163,6 @@ static void ConvertImports (FILE* F, const O65Data* D)
         fprintf (F, "\n");
     }
 }
-
-
 
 static void ConvertExports (FILE* F, const O65Data* D)
 // Convert the exports
@@ -202,8 +186,6 @@ static void ConvertExports (FILE* F, const O65Data* D)
         fprintf (F, "\n");
     }
 }
-
-
 
 static void ConvertSeg (FILE* F, const O65Data* D, const Collection* Relocs,
                         const unsigned char* Data, unsigned long Size)
@@ -284,8 +266,6 @@ static void ConvertSeg (FILE* F, const O65Data* D, const Collection* Relocs,
     fprintf (F, "\n");
 }
 
-
-
 static void ConvertCodeSeg (FILE* F, const O65Data* D)
 // Do code segment conversion
 {
@@ -300,8 +280,6 @@ static void ConvertCodeSeg (FILE* F, const O65Data* D)
     // Segment data
     ConvertSeg (F, D, &D->TextReloc, D->Text, D->Header.tlen);
 }
-
-
 
 static void ConvertDataSeg (FILE* F, const O65Data* D)
 // Do data segment conversion
@@ -318,8 +296,6 @@ static void ConvertDataSeg (FILE* F, const O65Data* D)
     ConvertSeg (F, D, &D->DataReloc, D->Data, D->Header.dlen);
 }
 
-
-
 static void ConvertBssSeg (FILE* F, const O65Data* D)
 // Do bss segment conversion
 {
@@ -335,8 +311,6 @@ static void ConvertBssSeg (FILE* F, const O65Data* D)
     fprintf (F, "\t.res\t%lu\n", D->Header.blen);
     fprintf (F, "\n");
 }
-
-
 
 static void ConvertZeropageSeg (FILE* F, const O65Data* D)
 // Do zeropage segment conversion
@@ -361,8 +335,6 @@ static void ConvertZeropageSeg (FILE* F, const O65Data* D)
     }
     fprintf (F, "\n");
 }
-
-
 
 void Convert (const O65Data* D)
 // Convert the o65 file in D using the given output file.

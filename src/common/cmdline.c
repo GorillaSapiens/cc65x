@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -44,13 +42,9 @@
 #include "xmalloc.h"
 #include "cmdline.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Program name - is set after call to InitCmdLine
 const char* ProgName;
@@ -66,13 +60,9 @@ typedef struct {
     unsigned    Size;           // Number of argument allocated
 } CmdLine;
 
-
-
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 static void NewCmdLine (CmdLine* L)
 // Initialize a CmdLine struct
@@ -82,8 +72,6 @@ static void NewCmdLine (CmdLine* L)
     L->Count   = 0;
     L->Vec     = xmalloc (L->Size * sizeof (L->Vec[0]));
 }
-
-
 
 static void AddArg (CmdLine* L, char* Arg)
 // Add one argument to the list
@@ -101,8 +89,6 @@ static void AddArg (CmdLine* L, char* Arg)
     // We have space left, add a copy of the argument
     L->Vec[L->Count++] = Arg;
 }
-
-
 
 static void ExpandFile (CmdLine* L, const char* Name)
 /* Add the contents of a file to the command line. Each line is a separate
@@ -153,13 +139,9 @@ static void ExpandFile (CmdLine* L, const char* Name)
     (void) fclose (F);
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void InitCmdLine (int* aArgCount, char*** aArgVec, const char* aProgName)
 /* Initialize command line parsing. aArgVec is the argument array terminated by
@@ -229,15 +211,11 @@ void InitCmdLine (int* aArgCount, char*** aArgVec, const char* aProgName)
     *aArgVec   = L.Vec;
 }
 
-
-
 void UnknownOption (const char* Opt)
 // Print an error about an unknown option and die.
 {
     AbEnd ("Unknown option: %s", Opt);
 }
-
-
 
 void NeedArg (const char* Opt)
 // Print an error about a missing option argument and exit.
@@ -245,23 +223,17 @@ void NeedArg (const char* Opt)
     AbEnd ("Option requires an argument: %s", Opt);
 }
 
-
-
 void InvArg (const char* Opt, const char* Arg)
 // Print an error about an invalid option argument and exit.
 {
     AbEnd ("Invalid argument for %s: '%s'", Opt, Arg);
 }
 
-
-
 void InvDef (const char* Def)
 // Print an error about an invalid definition and die
 {
     AbEnd ("Invalid definition: '%s'", Def);
 }
-
-
 
 const char* GetArg (unsigned* ArgNum, unsigned Len)
 /* Get an argument for a short option. The argument may be appended to the
@@ -283,8 +255,6 @@ const char* GetArg (unsigned* ArgNum, unsigned Len)
         return Arg;
     }
 }
-
-
 
 void LongOption (unsigned* ArgNum, const LongOpt* OptTab, unsigned OptCount)
 // Handle a long command line option

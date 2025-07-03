@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <inttypes.h>
 #include <stdio.h>
 #include <stddef.h>
@@ -46,13 +44,9 @@
 #include "va_copy.h"
 #include "xsprintf.h"
 
-
-
 //***************************************************************************
 //                                  vsnprintf
 //***************************************************************************
-
-
 
 /* The following is a very basic vsnprintf like function called xvsnprintf. It
 ** features only the basic format specifiers (especially the floating point
@@ -123,8 +117,6 @@ typedef struct {
 
 } PrintfCtrl;
 
-
-
 static void AddChar (PrintfCtrl* P, char C)
 // Store one character in the output buffer if there's enough room.
 {
@@ -133,8 +125,6 @@ static void AddChar (PrintfCtrl* P, char C)
     }
 }
 
-
-
 static void AddPadding (PrintfCtrl* P, char C, unsigned Count)
 // Add some amount of padding
 {
@@ -142,8 +132,6 @@ static void AddPadding (PrintfCtrl* P, char C, unsigned Count)
         AddChar (P, C);
     }
 }
-
-
 
 static intmax_t NextIVal (PrintfCtrl*P)
 // Read the next integer value from the variable argument list
@@ -162,8 +150,6 @@ static intmax_t NextIVal (PrintfCtrl*P)
     }
 }
 
-
-
 static uintmax_t NextUVal (PrintfCtrl*P)
 // Read the next unsigned integer value from the variable argument list
 {
@@ -181,8 +167,6 @@ static uintmax_t NextUVal (PrintfCtrl*P)
     }
 }
 
-
-
 static void ToStr (PrintfCtrl* P, uintmax_t Val)
 // Convert the given value to a (reversed) string
 {
@@ -194,8 +178,6 @@ static void ToStr (PrintfCtrl* P, uintmax_t Val)
     P->ArgLen = S - P->ArgBuf;
 }
 
-
-
 static void FormatInt (PrintfCtrl* P, uintmax_t Val)
 // Convert the integer value
 {
@@ -204,7 +186,6 @@ static void FormatInt (PrintfCtrl* P, uintmax_t Val)
     unsigned PrecPadding;
     unsigned WidthPadding;
     unsigned I;
-
 
     // Determine the translation table
     P->CharTable = (P->Flags & fUpcase)? "0123456789ABCDEF" : "0123456789abcdef";
@@ -297,8 +278,6 @@ static void FormatInt (PrintfCtrl* P, uintmax_t Val)
     }
 }
 
-
-
 static void FormatStr (PrintfCtrl* P, const char* Val)
 // Convert the string
 {
@@ -346,8 +325,6 @@ static void FormatStr (PrintfCtrl* P, const char* Val)
     }
 }
 
-
-
 static void StoreOffset (PrintfCtrl* P)
 // Store the current output offset (%n format spec)
 {
@@ -363,8 +340,6 @@ static void StoreOffset (PrintfCtrl* P)
     }
 }
 
-
-
 int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
 /* A basic vsnprintf implementation. Does currently only support integer
 ** formats.
@@ -376,7 +351,6 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
     char SBuf[2];
     const char* SPtr;
     int UseStrBuf = 0;
-
 
     // Initialize the control structure
     va_copy (P.ap, ap);
@@ -641,8 +615,6 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
     return P.BufFill - 1;
 }
 
-
-
 int xsnprintf (char* Buf, size_t Size, const char* Format, ...)
 /* A basic snprintf implementation. Does currently only support integer
 ** formats.
@@ -658,13 +630,9 @@ int xsnprintf (char* Buf, size_t Size, const char* Format, ...)
     return Res;
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int xsprintf (char* Buf, size_t BufSize, const char* Format, ...)
 // Replacement function for sprintf
@@ -678,8 +646,6 @@ int xsprintf (char* Buf, size_t BufSize, const char* Format, ...)
 
     return Res;
 }
-
-
 
 int xvsprintf (char* Buf, size_t BufSize, const char* Format, va_list ap)
 // Replacement function for sprintf

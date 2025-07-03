@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef EXPORTS_H
 #define EXPORTS_H
-
-
 
 #include <stdio.h>
 
@@ -51,13 +47,9 @@
 #include "memarea.h"
 #include "objdata.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Import symbol structure
 typedef struct Import Import;
@@ -71,8 +63,6 @@ struct Import {
     unsigned short      Flags;          // Generic flags
     unsigned short      AddrSize;       // Address size of import
 };
-
-
 
 // Export symbol structure
 typedef struct Export Export;
@@ -93,8 +83,6 @@ struct Export {
     unsigned char       ConDes[CD_TYPE_COUNT];  // Constructor/destructor decls
 };
 
-
-
 /* Prototype of a function that is called if an undefined symbol is found. It
 ** may check if the symbol is an external symbol (for binary formats that
 ** support externals) and will return zero if the symbol could not be
@@ -103,13 +91,9 @@ struct Export {
 */
 typedef int (*ExpCheckFunc) (unsigned Name, void* Data);
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void FreeImport (Import* I);
 /* Free an import. NOTE: This won't remove the import from the exports table,
@@ -209,8 +193,6 @@ int ExportHasMark (Export* E);
 
 void CircularRefError (const Export* E);
 // Print an error about a circular reference using to define the given export
-
-
 
 // End of exports.h
 

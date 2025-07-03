@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -49,13 +47,9 @@
 #include "symtab.h"
 #include "ulabel.h"
 
-
-
 //***************************************************************************
 //                              struct ExprDesc
 //***************************************************************************
-
-
 
 ExprDesc* ED_Init (ExprDesc* ED)
 // Initialize an ExprDesc structure for use with StudyExpr
@@ -72,16 +66,12 @@ ExprDesc* ED_Init (ExprDesc* ED)
     return ED;
 }
 
-
-
 void ED_Done (ExprDesc* ED)
 // Delete allocated memory for an ExprDesc.
 {
     xfree (ED->SymRef);
     xfree (ED->SecRef);
 }
-
-
 
 int ED_IsConst (const ExprDesc* D)
 // Return true if the expression is constant
@@ -104,8 +94,6 @@ int ED_IsConst (const ExprDesc* D)
     return 1;
 }
 
-
-
 static int ED_IsValid (const ExprDesc* D)
 /* Return true if the expression is valid, that is, neither the ERROR nor the
 ** TOO_COMPLEX flags are set.
@@ -114,15 +102,11 @@ static int ED_IsValid (const ExprDesc* D)
     return ((D->Flags & (ED_ERROR | ED_TOO_COMPLEX)) == 0);
 }
 
-
-
 static int ED_HasError (const ExprDesc* D)
 // Return true if the expression has an error.
 {
     return ((D->Flags & ED_ERROR) != 0);
 }
-
-
 
 static void ED_Invalidate (ExprDesc* D)
 // Set the TOO_COMPLEX flag for D
@@ -130,15 +114,11 @@ static void ED_Invalidate (ExprDesc* D)
     D->Flags |= ED_TOO_COMPLEX;
 }
 
-
-
 static void ED_SetError (ExprDesc* D)
 // Set the TOO_COMPLEX and ERROR flags for D
 {
     D->Flags |= (ED_ERROR | ED_TOO_COMPLEX);
 }
-
-
 
 static void ED_UpdateAddrSize (ExprDesc* ED, unsigned char AddrSize)
 // Update the address size of the expression
@@ -157,8 +137,6 @@ static void ED_UpdateAddrSize (ExprDesc* ED, unsigned char AddrSize)
         }
     }
 }
-
-
 
 static void ED_MergeAddrSize (ExprDesc* ED, const ExprDesc* Right)
 // Merge the address sizes of two expressions into ED
@@ -186,7 +164,6 @@ static void ED_MergeAddrSize (ExprDesc* ED, const ExprDesc* Right)
         }
     }
 }
-
 
 static void ED_MergeAddrSizeAND (ExprNode* Expr, ExprDesc* ED, const ExprDesc* Right)
 // Merge the address sizes of two expressions into ED, special case for AND operator
@@ -252,7 +229,6 @@ static void ED_MergeAddrSizeAND (ExprNode* Expr, ExprDesc* ED, const ExprDesc* R
     }
 }
 
-
 static ED_SymRef* ED_FindSymRef (ExprDesc* ED, SymEntry* Sym)
 /* Find a symbol reference and return it. Return NULL if the reference does
 ** not exist.
@@ -268,8 +244,6 @@ static ED_SymRef* ED_FindSymRef (ExprDesc* ED, SymEntry* Sym)
     return 0;
 }
 
-
-
 static ED_SecRef* ED_FindSecRef (ExprDesc* ED, unsigned Sec)
 /* Find a section reference and return it. Return NULL if the reference does
 ** not exist.
@@ -284,8 +258,6 @@ static ED_SecRef* ED_FindSecRef (ExprDesc* ED, unsigned Sec)
     }
     return 0;
 }
-
-
 
 static ED_SymRef* ED_AllocSymRef (ExprDesc* ED, SymEntry* Sym)
 /* Allocate a new symbol reference and return it. The count of the new
@@ -312,8 +284,6 @@ static ED_SymRef* ED_AllocSymRef (ExprDesc* ED, SymEntry* Sym)
     return SymRef;
 }
 
-
-
 static ED_SecRef* ED_AllocSecRef (ExprDesc* ED, unsigned Sec)
 /* Allocate a new section reference and return it. The count of the new
 ** reference will be set to zero, and the reference itself to Sec.
@@ -339,8 +309,6 @@ static ED_SecRef* ED_AllocSecRef (ExprDesc* ED, unsigned Sec)
     return SecRef;
 }
 
-
-
 static ED_SymRef* ED_GetSymRef (ExprDesc* ED, SymEntry* Sym)
 /* Get a symbol reference and return it. If the symbol reference does not
 ** exist, a new one is created and returned.
@@ -353,8 +321,6 @@ static ED_SymRef* ED_GetSymRef (ExprDesc* ED, SymEntry* Sym)
     return SymRef;
 }
 
-
-
 static ED_SecRef* ED_GetSecRef (ExprDesc* ED, unsigned Sec)
 /* Get a section reference and return it. If the section reference does not
 ** exist, a new one is created and returned.
@@ -366,8 +332,6 @@ static ED_SecRef* ED_GetSecRef (ExprDesc* ED, unsigned Sec)
     }
     return SecRef;
 }
-
-
 
 static void ED_MergeSymRefs (ExprDesc* ED, const ExprDesc* New)
 // Merge the symbol references from New into ED
@@ -386,8 +350,6 @@ static void ED_MergeSymRefs (ExprDesc* ED, const ExprDesc* New)
     }
 }
 
-
-
 static void ED_MergeSecRefs (ExprDesc* ED, const ExprDesc* New)
 // Merge the section references from New into ED
 {
@@ -405,16 +367,12 @@ static void ED_MergeSecRefs (ExprDesc* ED, const ExprDesc* New)
     }
 }
 
-
-
 static void ED_MergeRefs (ExprDesc* ED, const ExprDesc* New)
 // Merge all references from New into ED
 {
     ED_MergeSymRefs (ED, New);
     ED_MergeSecRefs (ED, New);
 }
-
-
 
 static void ED_NegRefs (ExprDesc* D)
 // Negate the references in ED
@@ -428,8 +386,6 @@ static void ED_NegRefs (ExprDesc* D)
     }
 }
 
-
-
 static void ED_Add (ExprDesc* ED, const ExprDesc* Right)
 // Calculate ED = ED + Right, update address size in ED
 {
@@ -437,8 +393,6 @@ static void ED_Add (ExprDesc* ED, const ExprDesc* Right)
     ED_MergeRefs (ED, Right);
     ED_MergeAddrSize (ED, Right);
 }
-
-
 
 static void ED_Sub (ExprDesc* ED, const ExprDesc* Right)
 // Calculate ED = ED - Right, update address size in ED
@@ -450,8 +404,6 @@ static void ED_Sub (ExprDesc* ED, const ExprDesc* Right)
     ED_MergeRefs (ED, &D);      // Merge negatives
     ED_MergeAddrSize (ED, Right);
 }
-
-
 
 static void ED_Mul (ExprDesc* ED, const ExprDesc* Right)
 // Calculate ED = ED * Right, update address size in ED
@@ -468,16 +420,12 @@ static void ED_Mul (ExprDesc* ED, const ExprDesc* Right)
     ED_MergeAddrSize (ED, Right);
 }
 
-
-
 static void ED_Neg (ExprDesc* D)
 // Negate an expression
 {
     D->Val = -D->Val;
     ED_NegRefs (D);
 }
-
-
 
 static void ED_Move (ExprDesc* From, ExprDesc* To)
 /* Move the data from one ExprDesc to another. Old data is freed, and From
@@ -494,18 +442,12 @@ static void ED_Move (ExprDesc* From, ExprDesc* To)
     ED_Init (From);
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 static void StudyExprInternal (ExprNode* Expr, ExprDesc* D);
 // Study an expression tree and place the contents into D
-
-
 
 static unsigned char GetConstAddrSize (long Val)
 // Get the address size of a constant
@@ -520,8 +462,6 @@ static unsigned char GetConstAddrSize (long Val)
         return ADDR_SIZE_LONG;
     }
 }
-
-
 
 static void StudyBinaryExpr (ExprNode* Expr, ExprDesc* D)
 /* Study a binary expression subtree. This is a helper function for StudyExpr
@@ -566,8 +506,6 @@ static void StudyBinaryExpr (ExprNode* Expr, ExprDesc* D)
     ED_Done (&Right);
 }
 
-
-
 static void StudyLiteral (ExprNode* Expr, ExprDesc* D)
 // Study a literal expression node
 {
@@ -575,8 +513,6 @@ static void StudyLiteral (ExprNode* Expr, ExprDesc* D)
     D->Val      = Expr->V.IVal;
     D->AddrSize = GetConstAddrSize (D->Val);
 }
-
-
 
 static void StudySymbol (ExprNode* Expr, ExprDesc* D)
 // Study a symbol expression node
@@ -663,8 +599,6 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
     }
 }
 
-
-
 static void StudySection (ExprNode* Expr, ExprDesc* D)
 // Study a section expression node
 {
@@ -675,8 +609,6 @@ static void StudySection (ExprNode* Expr, ExprDesc* D)
     ++SecRef->Count;
     ED_UpdateAddrSize (D, GetSegAddrSize (SecRef->Ref));
 }
-
-
 
 static void StudyULabel (ExprNode* Expr, ExprDesc* D)
 // Study an unnamed label expression node
@@ -691,8 +623,6 @@ static void StudyULabel (ExprNode* Expr, ExprDesc* D)
         ED_Invalidate (D);
     }
 }
-
-
 
 static void StudyPlus (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_PLUS binary expression node
@@ -727,8 +657,6 @@ static void StudyPlus (ExprNode* Expr, ExprDesc* D)
     ED_Done (&Right);
 }
 
-
-
 static void StudyMinus (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_MINUS binary expression node
 {
@@ -761,8 +689,6 @@ static void StudyMinus (ExprNode* Expr, ExprDesc* D)
     // Done
     ED_Done (&Right);
 }
-
-
 
 static void StudyMul (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_MUL binary expression node
@@ -809,8 +735,6 @@ static void StudyMul (ExprNode* Expr, ExprDesc* D)
     ED_Done (&Right);
 }
 
-
-
 static void StudyDiv (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_DIV binary expression node
 {
@@ -827,8 +751,6 @@ static void StudyDiv (ExprNode* Expr, ExprDesc* D)
         }
     }
 }
-
-
 
 static void StudyMod (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_MOD binary expression node
@@ -847,8 +769,6 @@ static void StudyMod (ExprNode* Expr, ExprDesc* D)
     }
 }
 
-
-
 static void StudyOr (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_OR binary expression node
 {
@@ -860,8 +780,6 @@ static void StudyOr (ExprNode* Expr, ExprDesc* D)
         D->Val |= D->Right;
     }
 }
-
-
 
 static void StudyXor (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_XOR binary expression node
@@ -875,8 +793,6 @@ static void StudyXor (ExprNode* Expr, ExprDesc* D)
     }
 }
 
-
-
 static void StudyAnd (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_AND binary expression node
 {
@@ -888,8 +804,6 @@ static void StudyAnd (ExprNode* Expr, ExprDesc* D)
         D->Val &= D->Right;
     }
 }
-
-
 
 static void StudyShl (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_SHL binary expression node
@@ -903,8 +817,6 @@ static void StudyShl (ExprNode* Expr, ExprDesc* D)
     }
 }
 
-
-
 static void StudyShr (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_SHR binary expression node
 {
@@ -916,8 +828,6 @@ static void StudyShr (ExprNode* Expr, ExprDesc* D)
         D->Val = shr_l (D->Val, D->Right);
     }
 }
-
-
 
 static void StudyEQ (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_EQ binary expression node
@@ -934,8 +844,6 @@ static void StudyEQ (ExprNode* Expr, ExprDesc* D)
     D->AddrSize = ADDR_SIZE_ZP;
 }
 
-
-
 static void StudyNE (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_NE binary expression node
 {
@@ -950,8 +858,6 @@ static void StudyNE (ExprNode* Expr, ExprDesc* D)
     // In any case, the result is 0 or 1
     D->AddrSize = ADDR_SIZE_ZP;
 }
-
-
 
 static void StudyLT (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_LT binary expression node
@@ -968,8 +874,6 @@ static void StudyLT (ExprNode* Expr, ExprDesc* D)
     D->AddrSize = ADDR_SIZE_ZP;
 }
 
-
-
 static void StudyGT (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_GT binary expression node
 {
@@ -984,8 +888,6 @@ static void StudyGT (ExprNode* Expr, ExprDesc* D)
     // In any case, the result is 0 or 1
     D->AddrSize = ADDR_SIZE_ZP;
 }
-
-
 
 static void StudyLE (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_LE binary expression node
@@ -1002,8 +904,6 @@ static void StudyLE (ExprNode* Expr, ExprDesc* D)
     D->AddrSize = ADDR_SIZE_ZP;
 }
 
-
-
 static void StudyGE (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_GE binary expression node
 {
@@ -1018,8 +918,6 @@ static void StudyGE (ExprNode* Expr, ExprDesc* D)
     // In any case, the result is 0 or 1
     D->AddrSize = ADDR_SIZE_ZP;
 }
-
-
 
 static void StudyBoolAnd (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_BOOLAND binary expression node
@@ -1043,8 +941,6 @@ static void StudyBoolAnd (ExprNode* Expr, ExprDesc* D)
     // In any case, the result is 0 or 1
     D->AddrSize = ADDR_SIZE_ZP;
 }
-
-
 
 static void StudyBoolOr (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_BOOLOR binary expression node
@@ -1071,8 +967,6 @@ static void StudyBoolOr (ExprNode* Expr, ExprDesc* D)
     D->AddrSize = ADDR_SIZE_ZP;
 }
 
-
-
 static void StudyBoolXor (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_BOOLXOR binary expression node
 {
@@ -1088,8 +982,6 @@ static void StudyBoolXor (ExprNode* Expr, ExprDesc* D)
     D->AddrSize = ADDR_SIZE_ZP;
 }
 
-
-
 static void StudyMax (ExprNode* Expr, ExprDesc* D)
 // Study an MAX binary expression node
 {
@@ -1101,8 +993,6 @@ static void StudyMax (ExprNode* Expr, ExprDesc* D)
         D->Val = (D->Val > D->Right)? D->Val : D->Right;
     }
 }
-
-
 
 static void StudyMin (ExprNode* Expr, ExprDesc* D)
 // Study an MIN binary expression node
@@ -1116,8 +1006,6 @@ static void StudyMin (ExprNode* Expr, ExprDesc* D)
     }
 }
 
-
-
 static void StudyUnaryMinus (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_UNARY_MINUS expression node
 {
@@ -1129,8 +1017,6 @@ static void StudyUnaryMinus (ExprNode* Expr, ExprDesc* D)
         ED_Neg (D);
     }
 }
-
-
 
 static void StudyNot (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_NOT expression node
@@ -1146,8 +1032,6 @@ static void StudyNot (ExprNode* Expr, ExprDesc* D)
     }
 }
 
-
-
 static void StudySwap (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_SWAP expression node
 {
@@ -1161,8 +1045,6 @@ static void StudySwap (ExprNode* Expr, ExprDesc* D)
         ED_Invalidate (D);
     }
 }
-
-
 
 static void StudyBoolNot (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_BOOLNOT expression node
@@ -1181,8 +1063,6 @@ static void StudyBoolNot (ExprNode* Expr, ExprDesc* D)
     D->AddrSize = ADDR_SIZE_ZP;
 }
 
-
-
 static void StudyBank (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_BANK expression node
 {
@@ -1192,8 +1072,6 @@ static void StudyBank (ExprNode* Expr, ExprDesc* D)
     // The expression is always linker evaluated, so invalidate it
     ED_Invalidate (D);
 }
-
-
 
 static void StudyByte0 (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_BYTE0 expression node
@@ -1212,8 +1090,6 @@ static void StudyByte0 (ExprNode* Expr, ExprDesc* D)
     D->AddrSize = ADDR_SIZE_ZP;
 }
 
-
-
 static void StudyByte1 (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_BYTE1 expression node
 {
@@ -1230,8 +1106,6 @@ static void StudyByte1 (ExprNode* Expr, ExprDesc* D)
     // In any case, the result is a zero page expression
     D->AddrSize = ADDR_SIZE_ZP;
 }
-
-
 
 static void StudyByte2 (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_BYTE2 expression node
@@ -1250,8 +1124,6 @@ static void StudyByte2 (ExprNode* Expr, ExprDesc* D)
     D->AddrSize = ADDR_SIZE_ZP;
 }
 
-
-
 static void StudyByte3 (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_BYTE3 expression node
 {
@@ -1268,8 +1140,6 @@ static void StudyByte3 (ExprNode* Expr, ExprDesc* D)
     // In any case, the result is a zero page expression
     D->AddrSize = ADDR_SIZE_ZP;
 }
-
-
 
 static void StudyWord0 (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_WORD0 expression node
@@ -1288,8 +1158,6 @@ static void StudyWord0 (ExprNode* Expr, ExprDesc* D)
     D->AddrSize = ADDR_SIZE_ABS;
 }
 
-
-
 static void StudyWord1 (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_WORD1 expression node
 {
@@ -1306,8 +1174,6 @@ static void StudyWord1 (ExprNode* Expr, ExprDesc* D)
     // In any case, the result is an absolute expression
     D->AddrSize = ADDR_SIZE_ABS;
 }
-
-
 
 static void StudyFarAddr (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_FARADDR expression node
@@ -1326,8 +1192,6 @@ static void StudyFarAddr (ExprNode* Expr, ExprDesc* D)
     D->AddrSize = ADDR_SIZE_FAR;
 }
 
-
-
 static void StudyDWord (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_DWORD expression node
 {
@@ -1344,8 +1208,6 @@ static void StudyDWord (ExprNode* Expr, ExprDesc* D)
     // In any case, the result is a long expression
     D->AddrSize = ADDR_SIZE_LONG;
 }
-
-
 
 static void StudyNearAddr (ExprNode* Expr, ExprDesc* D)
 // Study an EXPR_NEARADDR expression node
@@ -1364,8 +1226,6 @@ static void StudyNearAddr (ExprNode* Expr, ExprDesc* D)
         D->AddrSize = ADDR_SIZE_ABS;
     }
 }
-
-
 
 static void StudyExprInternal (ExprNode* Expr, ExprDesc* D)
 // Study an expression tree and place the contents into D
@@ -1534,8 +1394,6 @@ static void StudyExprInternal (ExprNode* Expr, ExprDesc* D)
             break;
     }
 }
-
-
 
 void StudyExpr (ExprNode* Expr, ExprDesc* D)
 // Study an expression tree and place the contents into D

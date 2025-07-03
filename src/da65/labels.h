@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef LABELS_H
 #define LABELS_H
-
-
 
 #include <stdint.h>
 
 // da65
 #include "attrtab.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void AddIntLabel (uint32_t Addr);
 // Add an internal label using the address to generate the name.
@@ -102,8 +94,6 @@ void DefOutOfRangeLabels (void);
 
 unsigned long GetLabelCount (void);
 // Return the total number of labels defined so far
-
-
 
 // End of labels.h
 

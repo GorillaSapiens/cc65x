@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -60,13 +58,9 @@
 #include "objdata.h"
 #include "objfile.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Name of the library file
 const char*             LibName = 0;
@@ -84,13 +78,9 @@ static LibHeader        Header = {
     0
 };
 
-
-
 //***************************************************************************
 //                       Writing file data structures
 //***************************************************************************
-
-
 
 static void ReadHeader (void)
 // Read the header of a library file
@@ -111,8 +101,6 @@ static void ReadHeader (void)
     Header.IndexOffs = Read32 (Lib);
 }
 
-
-
 static void ReadIndexEntry (void)
 // Read one entry in the index
 {
@@ -126,8 +114,6 @@ static void ReadIndexEntry (void)
     O->Start    = Read32 (Lib);
     O->Size     = Read32 (Lib);
 }
-
-
 
 static void ReadIndex (void)
 // Read the index of a library file
@@ -156,13 +142,9 @@ static void ReadIndex (void)
     }
 }
 
-
-
 //***************************************************************************
 //                       Writing file data structures
 //***************************************************************************
-
-
 
 static void WriteHeader (void)
 // Write the header to the library file
@@ -177,8 +159,6 @@ static void WriteHeader (void)
     Write32 (NewLib, Header.IndexOffs);
 }
 
-
-
 static void WriteIndexEntry (const ObjData* O)
 // Write one index entry
 {
@@ -189,8 +169,6 @@ static void WriteIndexEntry (const ObjData* O)
     Write32  (NewLib, O->Start);
     Write32  (NewLib, O->Size);
 }
-
-
 
 static void WriteIndex (void)
 // Write the index of a library file
@@ -212,13 +190,9 @@ static void WriteIndex (void)
     }
 }
 
-
-
 //***************************************************************************
 //                             High level stuff
 //***************************************************************************
-
-
 
 void LibOpen (const char* Name, int MustExist, int NeedTemp)
 /* Open an existing library and a temporary copy. If MustExist is true, the
@@ -269,8 +243,6 @@ void LibOpen (const char* Name, int MustExist, int NeedTemp)
     }
 }
 
-
-
 unsigned long LibCopyTo (FILE* F, unsigned long Bytes)
 /* Copy data from F to the temp library file, return the start position in
 ** the temporary library file.
@@ -293,8 +265,6 @@ unsigned long LibCopyTo (FILE* F, unsigned long Bytes)
     return Pos;
 }
 
-
-
 void LibCopyFrom (unsigned long Pos, unsigned long Bytes, FILE* F)
 // Copy data from the library file into another file
 {
@@ -311,8 +281,6 @@ void LibCopyFrom (unsigned long Pos, unsigned long Bytes, FILE* F)
         Bytes -= Count;
     }
 }
-
-
 
 static void LibCheckExports (ObjData* O)
 /* Insert all exports from the given object file into the global list
@@ -335,8 +303,6 @@ static void LibCheckExports (ObjData* O)
         ExpInsert (Name, O);
     }
 }
-
-
 
 void LibClose (void)
 /* Write remaining data, close both files and copy the temp file to the old

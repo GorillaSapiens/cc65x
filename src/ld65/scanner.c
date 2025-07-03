@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -50,13 +48,9 @@
 #include "scanner.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Current token and attributes
 cfgtok_t        CfgTok;
@@ -74,13 +68,9 @@ static int              C               = ' ';
 static FilePos          InputPos;
 static FILE*            InputFile       = 0;
 
-
-
 //***************************************************************************
 //                              Error handling
 //***************************************************************************
-
-
 
 void CfgWarning (const FilePos* Pos, const char* Format, ...)
 // Print a warning message adding file name and line number of a given file
@@ -100,8 +90,6 @@ void CfgWarning (const FilePos* Pos, const char* Format, ...)
     ++WarningCount;
 }
 
-
-
 void CfgError (const FilePos* Pos, const char* Format, ...)
 // Print an error message adding file name and line number of a given file
 {
@@ -117,13 +105,9 @@ void CfgError (const FilePos* Pos, const char* Format, ...)
     SB_Done (&Buf);
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void NextChar (void)
 // Read the next character from the input file
@@ -143,8 +127,6 @@ static void NextChar (void)
     }
 }
 
-
-
 static unsigned DigitVal (int C)
 // Return the value for a numeric digit
 {
@@ -154,8 +136,6 @@ static unsigned DigitVal (int C)
         return toupper (C) - 'A' + 10;
     }
 }
-
-
 
 static void StrVal (void)
 // Parse a string value and expand escape sequences
@@ -222,8 +202,6 @@ static void StrVal (void)
     // We've read a string value
     CfgTok = CFGTOK_STRCON;
 }
-
-
 
 void CfgNextTok (void)
 // Read the next token from the input stream
@@ -397,8 +375,6 @@ Again:
     }
 }
 
-
-
 void CfgConsume (cfgtok_t T, const char* Msg)
 // Skip a token, print an error message if not found
 {
@@ -408,23 +384,17 @@ void CfgConsume (cfgtok_t T, const char* Msg)
     CfgNextTok ();
 }
 
-
-
 void CfgConsumeSemi (void)
 // Consume a semicolon
 {
     CfgConsume (CFGTOK_SEMI, "';' expected");
 }
 
-
-
 void CfgConsumeColon (void)
 // Consume a colon
 {
     CfgConsume (CFGTOK_COLON, "':' expected");
 }
-
-
 
 void CfgOptionalComma (void)
 // Consume a comma if there is one
@@ -434,8 +404,6 @@ void CfgOptionalComma (void)
     }
 }
 
-
-
 void CfgOptionalAssign (void)
 // Consume an equal sign if there is one
 {
@@ -443,8 +411,6 @@ void CfgOptionalAssign (void)
         CfgNextTok ();
     }
 }
-
-
 
 void CfgAssureInt (void)
 // Make sure the next token is an integer
@@ -454,8 +420,6 @@ void CfgAssureInt (void)
     }
 }
 
-
-
 void CfgAssureStr (void)
 // Make sure the next token is a string constant
 {
@@ -463,8 +427,6 @@ void CfgAssureStr (void)
         CfgError (&CfgErrorPos, "String constant expected");
     }
 }
-
-
 
 void CfgAssureIdent (void)
 // Make sure the next token is an identifier
@@ -474,8 +436,6 @@ void CfgAssureIdent (void)
     }
 }
 
-
-
 void CfgRangeCheck (unsigned long Lo, unsigned long Hi)
 // Check the range of CfgIVal
 {
@@ -483,8 +443,6 @@ void CfgRangeCheck (unsigned long Lo, unsigned long Hi)
         CfgError (&CfgErrorPos, "Range error");
     }
 }
-
-
 
 void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
 // Map an identifier to one of the special tokens in the table
@@ -513,8 +471,6 @@ void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
     CfgError (&CfgErrorPos, "%s expected", Name);
 }
 
-
-
 void CfgBoolToken (void)
 // Map an identifier or integer to a boolean token
 {
@@ -537,23 +493,17 @@ void CfgBoolToken (void)
     }
 }
 
-
-
 void CfgSetName (const char* Name)
 // Set a name for a config file
 {
     CfgName = Name;
 }
 
-
-
 int CfgAvail (void)
 // Return true if we have a configuration available
 {
     return CfgName != 0;
 }
-
-
 
 void CfgOpenInput (void)
 // Open the input file if we have one
@@ -573,8 +523,6 @@ void CfgOpenInput (void)
     // Start the ball rolling ...
     CfgNextTok ();
 }
-
-
 
 void CfgCloseInput (void)
 // Close the input file if we have one

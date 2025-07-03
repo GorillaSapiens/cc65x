@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef OBJDATA_H
 #define OBJDATA_H
-
-
 
 // common
 #include "coll.h"
 #include "inline.h"
 #include "objdefs.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Forwards
 struct Export;
@@ -93,18 +85,12 @@ struct ObjData {
     Collection          Spans;          // List of spans
 };
 
-
-
 // Collection containing used ObjData objects
 extern Collection       ObjDataList;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 ObjData* NewObjData (void);
 // Allocate a new structure on the heap, insert it into the list, return it
@@ -169,8 +155,6 @@ unsigned ObjDataCount (void);
 
 void PrintDbgModules (FILE* F);
 // Output the modules to a debug info file
-
-
 
 // End of objdata.h
 

@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef PALETTE_H
 #define PALETTE_H
-
-
 
 #include <stdio.h>
 
 // sp65
 #include "color.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 typedef struct Palette Palette;
 struct Palette {
@@ -57,13 +49,9 @@ struct Palette {
     Color               Entries[1];     // Palette entries - dynamic
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Palette* NewPalette (unsigned Entries);
 // Create a new palette with the given number of entries
@@ -79,8 +67,6 @@ void FreePalette (Palette* P);
 
 void DumpPalette (FILE* F, const Palette* P);
 // Dump the palette in readable form to the given file
-
-
 
 // End of palette.h
 

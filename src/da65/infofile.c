@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -62,13 +60,9 @@
 #include "segment.h"
 #include "handler.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void AddAttr (const char* Name, unsigned* Set, unsigned Attr)
 // Add an attribute to the set and check that it is not given twice
@@ -79,8 +73,6 @@ static void AddAttr (const char* Name, unsigned* Set, unsigned Attr)
     }
     *Set |= Attr;
 }
-
-
 
 static void AsmIncSection (void)
 // Parse a asminc section
@@ -172,8 +164,6 @@ static void AsmIncSection (void)
     // Consume the closing brace
     InfoConsumeRCurly ();
 }
-
-
 
 static void GlobalSection (void)
 // Parse a global section
@@ -373,8 +363,6 @@ static void GlobalSection (void)
     InfoConsumeRCurly ();
 }
 
-
-
 static void LabelSection (void)
 // Parse a label section
 {
@@ -517,8 +505,6 @@ static void LabelSection (void)
     InfoConsumeRCurly ();
 }
 
-
-
 static void RangeSection (void)
 // Parse a range section
 {
@@ -544,7 +530,6 @@ static void RangeSection (void)
         {   "WORDTABLE",        INFOTOK_WORDTAB  },
     };
 
-
     // Which values did we get?
     enum {
         tNone     = 0x00,
@@ -568,7 +553,6 @@ static void RangeSection (void)
     char* Comment       = 0;
     unsigned MemberSize = 0;
     unsigned Unit       = 0;
-
 
     // Skip the token
     InfoNextTok ();
@@ -772,8 +756,6 @@ static void RangeSection (void)
     InfoConsumeRCurly ();
 }
 
-
-
 static void SegmentSection (void)
 // Parse a segment section
 {
@@ -872,8 +854,6 @@ static void SegmentSection (void)
     InfoConsumeRCurly ();
 }
 
-
-
 static void InfoParse (void)
 // Parse the config file
 {
@@ -921,8 +901,6 @@ static void InfoParse (void)
         InfoConsumeSemi ();
     }
 }
-
-
 
 void ReadInfoFile (void)
 // Read the info file

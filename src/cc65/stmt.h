@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef STMT_H
 #define STMT_H
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int AnyStatement (int* PendingToken);
 /* Statement parser. Returns 1 if the statement does a return/break, returns
@@ -53,8 +47,6 @@ int AnyStatement (int* PendingToken);
 ** check this token, it must be skipped, however. If the argument pointer is
 ** NULL, the function will skip the token.
 */
-
-
 
 // End of stmt.h
 

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 
 // common
@@ -46,13 +44,9 @@
 #include "error.h"
 #include "symtab.h"
 
-
-
 //***************************************************************************
 //                            Decouple operations
 //***************************************************************************
-
-
 
 unsigned OptDecouple (CodeSeg* S)
 /* Decouple operations, that is, do the following replacements:
@@ -276,8 +270,6 @@ unsigned OptDecouple (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptIndLoads1 (CodeSeg* S)
 /* Change
 **
@@ -323,8 +315,6 @@ unsigned OptIndLoads1 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptIndLoads2 (CodeSeg* S)
 /* Change
@@ -372,13 +362,9 @@ unsigned OptIndLoads2 (CodeSeg* S)
     return Changes;
 }
 
-
-
 //***************************************************************************
 //                        Optimize stack pointer ops
 //***************************************************************************
-
-
 
 static unsigned IsDecSP (const CodeEntry* E)
 /* Check if this is an insn that decrements the stack pointer. If so, return
@@ -397,8 +383,6 @@ static unsigned IsDecSP (const CodeEntry* E)
     // If we come here, it's not a decsp op
     return 0;
 }
-
-
 
 unsigned OptStackPtrOps (CodeSeg* S)
 /* Merge adjacent calls to decsp into one. NOTE: This function won't merge all
@@ -465,8 +449,6 @@ unsigned OptStackPtrOps (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptGotoSPAdj (CodeSeg* S)
 // Optimize SP adjustment for forward 'goto'
@@ -579,13 +561,9 @@ unsigned OptGotoSPAdj (CodeSeg* S)
     return Changes;
 }
 
-
-
 //***************************************************************************
 //                       Optimize stack load/store ops
 //***************************************************************************
-
-
 
 unsigned OptLoadStore2 (CodeSeg* S)
 // Remove 16 bit stack loads followed by a store into the same location.
@@ -630,8 +608,6 @@ unsigned OptLoadStore2 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptLoad1 (CodeSeg* S)
 /* Search for a call to ldaxysp where X is not used later and replace it by
@@ -682,8 +658,6 @@ unsigned OptLoad1 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptLoad2 (CodeSeg* S)
 // Replace calls to ldaxysp by inline code
@@ -779,8 +753,6 @@ unsigned OptLoad2 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptBinOps1 (CodeSeg* S)
 /* Search for an AND/EOR/ORA where the value of A or the operand is known and
@@ -948,8 +920,6 @@ unsigned OptBinOps1 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptBinOps2 (CodeSeg* S)
 /* Search for an AND/EOR/ORA for identical memory locations and replace it

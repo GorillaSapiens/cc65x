@@ -28,8 +28,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -52,8 +50,6 @@
 #include "segments.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
@@ -64,7 +60,6 @@ typedef struct XexInitAd {
     Import *InitAd;
     struct XexInitAd *next;
 } XexInitAd;
-
 
 struct XexDesc {
     unsigned    Undef;          // Count of undefined externals
@@ -77,12 +72,9 @@ struct XexDesc {
     unsigned long HeadSize;     // Last header size, can be removed if zero
 };
 
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 XexDesc* NewXexDesc (void)
 // Create a new XEX format descriptor
@@ -104,15 +96,11 @@ XexDesc* NewXexDesc (void)
     return D;
 }
 
-
-
 void FreeXexDesc (XexDesc* D)
 // Free a XEX format descriptor
 {
     xfree (D);
 }
-
-
 
 void XexSetRunAd (XexDesc* D, Import *RunAd)
 // Set the RUNAD export
@@ -130,7 +118,6 @@ XexInitAd* XexSearchInitMem(XexDesc* D, MemoryArea *InitMem)
     }
     return NULL;
 }
-
 
 int XexAddInitAd (XexDesc* D, MemoryArea *InitMem, Import *InitAd)
 // Sets and INITAD for the given memory area
@@ -160,15 +147,11 @@ static unsigned XexWriteExpr (ExprNode* E, int Signed, unsigned Size,
     return SegWriteConstExpr (((XexDesc*)Data)->F, E, Signed, Size);
 }
 
-
-
 static void PrintNumVal (const char* Name, unsigned long V)
 // Print a numerical value for debugging
 {
     Print (stdout, 2, "      %s = 0x%lx\n", Name, V);
 }
-
-
 
 static void XexStartSegment (XexDesc *D, unsigned long Addr, unsigned long Size)
 {
@@ -211,8 +194,6 @@ static void XexStartSegment (XexDesc *D, unsigned long Addr, unsigned long Size)
     }
 }
 
-
-
 static void XexFakeSegment (XexDesc *D, unsigned long Addr)
 {
     // See if last header can be expanded into this one, we are done
@@ -230,8 +211,6 @@ static void XexFakeSegment (XexDesc *D, unsigned long Addr)
     Write16 (D->F, Addr);
     Write16 (D->F, D->HeadEnd);
 }
-
-
 
 static unsigned long XexWriteMem (XexDesc* D, MemoryArea* M)
 // Write the segments of one memory area to a file
@@ -359,8 +338,6 @@ static unsigned long XexWriteMem (XexDesc* D, MemoryArea* M)
     return ftell (D->F) - StartPos;
 }
 
-
-
 static int XexUnresolved (unsigned Name attribute ((unused)), void* D)
 // Called if an unresolved symbol is encountered
 {
@@ -371,8 +348,6 @@ static int XexUnresolved (unsigned Name attribute ((unused)), void* D)
     ((XexDesc*) D)->Undef++;
     return 0;
 }
-
-
 
 void XexWriteTarget (XexDesc* D, struct File* F)
 // Write a XEX output file

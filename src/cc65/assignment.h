@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ASSIGNMENT_H
 #define ASSIGNMENT_H
-
-
 
 // cc65
 #include "exprdesc.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Whether to save/restore the original lhs or result value
 enum {
@@ -59,13 +51,9 @@ enum {
 // Forward
 struct GenDesc;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void DoIncDecBitField (ExprDesc* Expr, long Val, unsigned KeepResult);
 // Process inc/dec for bit-field
@@ -75,8 +63,6 @@ void OpAssign (const struct GenDesc* Gen, ExprDesc* lval, const char* Op);
 
 void OpAddSubAssign (const struct GenDesc* Gen, ExprDesc *Expr, const char* Op);
 // Parse a "+=" or "-=" operation
-
-
 
 // End of assignment.h
 

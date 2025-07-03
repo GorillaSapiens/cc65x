@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -40,21 +38,15 @@
 #include "fileid.h"
 #include "fname.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int CompareFileId (const void* Key, const void* Id)
 // Compare function used when calling bsearch with a table of FileIds
 {
     return strcmp (Key, ((const FileId*) Id)->Ext);
 }
-
-
 
 const FileId* GetFileId (const char* Name, const FileId* Table, unsigned Count)
 /* Determine the id of the given file by looking at file extension of the name.

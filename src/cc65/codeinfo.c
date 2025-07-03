@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -52,13 +50,9 @@
 #include "symtab.h"
 #include "codeinfo.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Table with the compare suffixes
 static const char CmpSuffixTab [][4] = {
@@ -407,13 +401,9 @@ static const ZPInfo ZPInfoTable[] = {
 };
 #define ZPInfoCount     (sizeof(ZPInfoTable) / sizeof(ZPInfoTable[0]))
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static int IsAddrOnZP (long Address)
 /* Return true if the Address is within the ZP range.
@@ -423,8 +413,6 @@ static int IsAddrOnZP (long Address)
     // ZP in range [0x00, 0xFF]
     return Address >= 0 && Address < 0x100;
 }
-
-
 
 int IsZPArg (const char* Name)
 // Exam if the main part of the arg string indicates a ZP loc
@@ -490,15 +478,11 @@ int IsZPArg (const char* Name)
     return 0;
 }
 
-
-
 static int CompareFuncInfo (const void* Key, const void* Info)
 // Compare function for bsearch
 {
     return strcmp (Key, ((const FuncInfo*) Info)->Name);
 }
-
-
 
 fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg)
 /* For the given function, lookup register information and store it into
@@ -621,8 +605,6 @@ fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg)
     return FNCLS_UNKNOWN;
 }
 
-
-
 static int CompareZPInfo (const void* Name, const void* Info)
 // Compare function for bsearch
 {
@@ -647,8 +629,6 @@ static int CompareZPInfo (const void* Name, const void* Info)
     }
 }
 
-
-
 const ZPInfo* GetZPInfo (const char* Name)
 /* If the given name is a zero page symbol, return a pointer to the info
 ** struct for this symbol, otherwise return NULL.
@@ -658,8 +638,6 @@ const ZPInfo* GetZPInfo (const char* Name)
     return bsearch (Name, ZPInfoTable, ZPInfoCount,
                     sizeof(ZPInfo), CompareZPInfo);
 }
-
-
 
 static unsigned GetRegInfo2 (CodeSeg* S,
                              CodeEntry* E,
@@ -797,8 +775,6 @@ static unsigned GetRegInfo2 (CodeSeg* S,
     return Used;
 }
 
-
-
 static unsigned GetRegInfo1 (CodeSeg* S,
                              CodeEntry* E,
                              int Index,
@@ -825,8 +801,6 @@ static unsigned GetRegInfo1 (CodeSeg* S,
     // Return the registers used
     return R;
 }
-
-
 
 unsigned GetRegInfo (struct CodeSeg* S, unsigned Index, unsigned Wanted)
 /* Determine register usage information for the instructions starting at the
@@ -857,15 +831,11 @@ unsigned GetRegInfo (struct CodeSeg* S, unsigned Index, unsigned Wanted)
     return R;
 }
 
-
-
 int RegAUsed (struct CodeSeg* S, unsigned Index)
 // Check if the value in A is used.
 {
     return (GetRegInfo (S, Index, REG_A) & REG_A) != 0;
 }
-
-
 
 int RegXUsed (struct CodeSeg* S, unsigned Index)
 // Check if the value in X is used.
@@ -873,15 +843,11 @@ int RegXUsed (struct CodeSeg* S, unsigned Index)
     return (GetRegInfo (S, Index, REG_X) & REG_X) != 0;
 }
 
-
-
 int RegYUsed (struct CodeSeg* S, unsigned Index)
 // Check if the value in Y is used.
 {
     return (GetRegInfo (S, Index, REG_Y) & REG_Y) != 0;
 }
-
-
 
 int RegAXUsed (struct CodeSeg* S, unsigned Index)
 // Check if the value in A or(!) the value in X are used.
@@ -889,23 +855,17 @@ int RegAXUsed (struct CodeSeg* S, unsigned Index)
     return (GetRegInfo (S, Index, REG_AX) & REG_AX) != 0;
 }
 
-
-
 int RegEAXUsed (struct CodeSeg* S, unsigned Index)
 // Check if any of the four bytes in EAX are used.
 {
     return (GetRegInfo (S, Index, REG_EAX) & REG_EAX) != 0;
 }
 
-
-
 int LoadFlagsUsed (struct CodeSeg* S, unsigned Index)
 // Check if one of the flags set by a register load (Z and N) are used.
 {
     return (GetRegInfo (S, Index, PSTATE_ZN) & PSTATE_ZN) != 0;
 }
-
-
 
 unsigned GetKnownReg (unsigned Use, const RegContents* RC)
 /* Return the register or zero page location from the set in Use, thats
@@ -934,8 +894,6 @@ unsigned GetKnownReg (unsigned Use, const RegContents* RC)
     }
 }
 
-
-
 static cmp_t FindCmpCond (const char* Code, unsigned CodeLen)
 // Search for a compare condition by the given code using the given length
 {
@@ -953,8 +911,6 @@ static cmp_t FindCmpCond (const char* Code, unsigned CodeLen)
     return CMP_INV;
 }
 
-
-
 cmp_t FindBoolCmpCond (const char* Name)
 /* Check if the given string is the name of one of the boolean transformer
 ** subroutine, and if so, return the condition that is evaluated by this
@@ -970,8 +926,6 @@ cmp_t FindBoolCmpCond (const char* Name)
         return CMP_INV;
     }
 }
-
-
 
 cmp_t FindTosCmpCond (const char* Name)
 /* Check if this is a call to one of the TOS compare functions (tosgtax).
@@ -990,8 +944,6 @@ cmp_t FindTosCmpCond (const char* Name)
     }
 }
 
-
-
 const char* GetCmpSuffix (cmp_t Cond)
 // Return the compare suffix by the given a compare condition or 0 on failure
 {
@@ -1005,8 +957,6 @@ const char* GetCmpSuffix (cmp_t Cond)
         return 0;
     }
 }
-
-
 
 char* GetBoolCmpSuffix (char* Buf, cmp_t Cond)
 /* Search for a boolean transformer subroutine (eg. booleq) by the given compare
@@ -1027,8 +977,6 @@ char* GetBoolCmpSuffix (char* Buf, cmp_t Cond)
     }
 }
 
-
-
 char* GetTosCmpSuffix (char* Buf, cmp_t Cond)
 /* Search for a TOS compare function (eg. tosgtax) by the given compare condition.
 ** Return the output buffer filled with the name of the correct function or 0 on
@@ -1047,8 +995,6 @@ char* GetTosCmpSuffix (char* Buf, cmp_t Cond)
     }
 }
 
-
-
 const char* GetBoolTransformer (cmp_t Cond)
 // Get the bool transformer corresponding to the given compare condition
 {
@@ -1059,7 +1005,6 @@ const char* GetBoolTransformer (cmp_t Cond)
     // Not found
     return 0;
 }
-
 
 cmp_t GetNegatedCond (cmp_t Cond)
 // Get the logically opposite compare condition
@@ -1078,8 +1023,6 @@ cmp_t GetNegatedCond (cmp_t Cond)
     default: return CMP_INV;
     }
 }
-
-
 
 cmp_t GetRevertedCond (cmp_t Cond)
 // Get the compare condition in reverted order of operands

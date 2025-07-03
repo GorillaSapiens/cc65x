@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef DBGSYMS_H
 #define DBGSYMS_H
-
-
 
 #include <stdio.h>
 
@@ -47,13 +43,9 @@
 // ld65
 #include "objdata.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Forwards
 struct Scope;
@@ -62,13 +54,9 @@ struct HLLDbgSym;
 // Opaque debug symbol structure
 typedef struct DbgSym DbgSym;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 DbgSym* ReadDbgSym (FILE* F, ObjData* Obj, unsigned Id);
 // Read a debug symbol from a file, insert and return it
@@ -90,8 +78,6 @@ void PrintHLLDbgSyms (FILE* F);
 
 void PrintDbgSymLabels (FILE* F);
 // Print the debug symbols in a VICE label file
-
-
 
 // End of dbgsyms.h
 

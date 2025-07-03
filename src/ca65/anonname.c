@@ -31,31 +31,21 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 
 // ca65
 #include "anonname.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 static const char AnonTag[] = "$anon";
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 StrBuf* AnonName (StrBuf* Buf, const char* Spec)
 /* Get a name for an anonymous scope, variable or type. Size is the size of
@@ -67,8 +57,6 @@ StrBuf* AnonName (StrBuf* Buf, const char* Spec)
     SB_Printf (Buf, "%s-%s-%04X", AnonTag, Spec, ++ACount);
     return Buf;
 }
-
-
 
 int IsAnonName (const StrBuf* Name)
 // Check if the given symbol name is that of an anonymous symbol

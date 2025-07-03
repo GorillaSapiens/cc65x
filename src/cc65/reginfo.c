@@ -31,21 +31,15 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "xmalloc.h"
 
 // cc65
 #include "reginfo.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void RC_Invalidate (RegContents* C)
 // Invalidate all registers
@@ -60,8 +54,6 @@ void RC_Invalidate (RegContents* C)
     C->Tmp1   = UNKNOWN_REGVAL;
 }
 
-
-
 void RC_InvalidateZP (RegContents* C)
 // Invalidate all ZP registers
 {
@@ -72,16 +64,12 @@ void RC_InvalidateZP (RegContents* C)
     C->Tmp1   = UNKNOWN_REGVAL;
 }
 
-
-
 void RC_InvalidatePS (RegContents* C)
 // Invalidate processor status
 {
     C->PFlags = UNKNOWN_PFVAL_ALL;
     C->ZNRegs = ZNREG_NONE;
 }
-
-
 
 static void RC_Dump1 (FILE* F, const char* Desc, short Val)
 // Dump one register value
@@ -92,8 +80,6 @@ static void RC_Dump1 (FILE* F, const char* Desc, short Val)
         fprintf (F, "%s=$XX ", Desc);
     }
 }
-
-
 
 void RC_Dump (FILE* F, const RegContents* RC)
 // Dump the contents of the given RegContents struct
@@ -109,8 +95,6 @@ void RC_Dump (FILE* F, const RegContents* RC)
     fprintf (F, "\n");
 }
 
-
-
 #if !defined(HAVE_INLINE)
 int PStatesAreKnown (unsigned short PFlags, unsigned WhatStates)
 /* Return true if all queried processor states are known.
@@ -120,8 +104,6 @@ int PStatesAreKnown (unsigned short PFlags, unsigned WhatStates)
     return ((PFlags << (PSTATE_BITS_SHIFT - 8)) & WhatStates & PSTATE_BITS_MASK) == 0;
 }
 #endif
-
-
 
 #if !defined(HAVE_INLINE)
 int PStatesAreSet (unsigned short PFlags, unsigned WhatStates)
@@ -134,8 +116,6 @@ int PStatesAreSet (unsigned short PFlags, unsigned WhatStates)
 }
 #endif
 
-
-
 #if !defined(HAVE_INLINE)
 int PStatesAreClear (unsigned short PFlags, unsigned WhatStates)
 /* Return true if all queried processor states are known to be cleared.
@@ -146,8 +126,6 @@ int PStatesAreClear (unsigned short PFlags, unsigned WhatStates)
            (PFlags & (WhatStates >> PSTATE_BITS_SHIFT)) == 0;
 }
 #endif
-
-
 
 RegInfo* NewRegInfo (const RegContents* RC)
 /* Allocate a new register info, initialize and return it. If RC is not
@@ -176,15 +154,11 @@ RegInfo* NewRegInfo (const RegContents* RC)
     return RI;
 }
 
-
-
 void FreeRegInfo (RegInfo* RI)
 // Free a RegInfo struct
 {
     xfree (RI);
 }
-
-
 
 void DumpRegInfo (const char* Desc, const RegInfo* RI)
 // Dump the register info for debugging

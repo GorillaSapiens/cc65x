@@ -31,7 +31,6 @@
 //
 //***************************************************************************
 
-
 // common
 #include "xmalloc.h"
 #include "xsprintf.h"
@@ -56,12 +55,9 @@
 #include "typeconv.h"
 #include "input.h"
 
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static unsigned AllocLabel (void (*UseSeg) ())
 // Switch to a segment, define a local data label and return it
@@ -79,8 +75,6 @@ static unsigned AllocLabel (void (*UseSeg) ())
     return DataLabel;
 }
 
-
-
 static void AllocStorage (unsigned DataLabel, void (*UseSeg) (), unsigned Size)
 // Reserve Size bytes of BSS storage prefixed by a local data label.
 {
@@ -93,8 +87,6 @@ static void AllocStorage (unsigned DataLabel, void (*UseSeg) (), unsigned Size)
     // Reserve space for the data
     g_res (Size);
 }
-
-
 
 static void ParseRegisterDecl (Declarator* Decl, int Reg)
 /* Parse the declarator of a register variable. Reg is the offset of the
@@ -213,8 +205,6 @@ static void ParseRegisterDecl (Declarator* Decl, int Reg)
         }
     }
 }
-
-
 
 static void ParseAutoDecl (Declarator* Decl)
 // Parse the declarator of an auto variable.
@@ -343,7 +333,6 @@ static void ParseAutoDecl (Declarator* Decl)
 
         unsigned DataLabel;
 
-
         // Static local variables.
         Decl->StorageClass = (Decl->StorageClass & ~SC_STORAGEMASK) | SC_STATIC;
 
@@ -422,8 +411,6 @@ static void ParseAutoDecl (Declarator* Decl)
     }
 }
 
-
-
 static void ParseStaticDecl (Declarator* Decl)
 // Parse the declarator of a static variable.
 {
@@ -480,14 +467,11 @@ static void ParseStaticDecl (Declarator* Decl)
     }
 }
 
-
-
 static int ParseOneDecl (DeclSpec* Spec)
 // Parse one variable declarator.
 {
     Declarator  Decl;           // Declarator data structure
     int         NeedClean;
-
 
     // Read the declarator
     NeedClean = ParseDecl (Spec, &Decl, DM_IDENT_OR_EMPTY);
@@ -580,8 +564,6 @@ static int ParseOneDecl (DeclSpec* Spec)
 
     return NeedClean;
 }
-
-
 
 void DeclareLocals (void)
 // Declare local variables and types.

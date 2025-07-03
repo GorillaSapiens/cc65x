@@ -31,28 +31,18 @@
 //
 //***************************************************************************
 
-
-
 #ifndef MACRO_H
 #define MACRO_H
-
-
 
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 struct StrBuf;
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Macro styles
 #define MAC_STYLE_CLASSIC       0
@@ -62,13 +52,9 @@ struct StrBuf;
 struct Macro;
 typedef struct Macro Macro;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void MacDef (unsigned Style);
 // Parse a macro definition
@@ -104,8 +90,6 @@ void EnableDefineStyleMacros (void);
 /* Re-enable define style macros previously disabled with
 ** DisableDefineStyleMacros.
 */
-
-
 
 // End of macro.h
 

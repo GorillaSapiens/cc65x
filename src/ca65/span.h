@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SPAN_H
 #define SPAN_H
-
-
 
 // common
 #include "coll.h"
@@ -45,13 +41,9 @@
 #include "inline.h"
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Forwards
 struct Segment;
@@ -67,13 +59,9 @@ struct Span{
     unsigned        Type;               // Type of data in span
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 #if defined(HAVE_INLINE)
 INLINE unsigned long GetSpanSize (const Span* R)
@@ -111,8 +99,6 @@ void WriteSpanList (const Collection* Spans);
 
 void WriteSpans (void);
 // Write all spans to the object file
-
-
 
 // End of span.h
 

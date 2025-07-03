@@ -115,7 +115,6 @@ Fx  BEQ  SBC  ---  ISC  NOP  SBC  INC  ISC  SED  SBC  NOP  ISC  NOP  SBC  INC  I
 
 65xx ILLEGAL INSTRUCTIONS
 
-
 * SLO: shift left the contents of a memory location and then OR the result with
        the accumulator.
 
@@ -129,7 +128,6 @@ SLO zp,X     |   17h  |  6     |
 SLO (zp,X)   |   03h  |  8     |
 SLO (zp),Y   |   13h  |  8     |
 -------------+--------+--------+
-
 
 * RLA: rotate left the contents of a memory location and then AND the result with
        the accumulator.
@@ -145,7 +143,6 @@ RLA (zp,X)   |   23h  |  8     |
 RLA (zp),Y   |   33h  |  8     |
 -------------+--------+--------+
 
-
 * SRE: shift right the contents of a memory location and then X-OR the result
        with the accumulator.
 
@@ -159,7 +156,6 @@ SRE zp,X     |   57h  |  6     |
 SRE (zp,X)   |   43h  |  8     |
 SRE (zp),Y   |   53h  |  8     |
 -------------+--------+--------+
-
 
 * RRA: rotate right the contents of a memory location and then adds with carry
        the result with the accumulator.
@@ -175,7 +171,6 @@ RRA (zp,X)   |   63h  |  8     |
 RRA (zp),Y   |   73h  |  8     |
 -------------+--------+--------+
 
-
 * SAX: calculate AND between the A and X registers (without changing the
        contents of the registers) and stores the result in memory.
        Flags into P register are not modified.
@@ -187,7 +182,6 @@ SAX zp       |   87h  |  3     |
 SAX zp,Y     |   97h  |  4     |
 SAX (zp,X)   |   83h  |  6     |
 -------------+--------+--------+
-
 
 * LAX: loads both the accumulator and the X register with the content of a memory
        location.
@@ -201,7 +195,6 @@ LAX zp,Y     |   B7h  |  4     |
 LAX (zp,X)   |   A3h  |  6     |
 LAX (zp),Y   |   B3h  |  5*    |
 -------------+--------+--------+
-
 
 * DCP: decrements the contents of a memory location and then compares the result
        with the accumulator.
@@ -217,7 +210,6 @@ DCP (zp,X)   |   C3h  |  8     |
 DCP (zp),Y   |   D3h  |  8     |
 -------------+--------+--------+
 
-
 * ISC: increments the contents of a memory location and then subtract with carry
        the result from the accumulator.
 
@@ -232,7 +224,6 @@ ISC (zp,X)   |   E3h  |  8     |
 ISC (zp),Y   |   F3h  |  8     |
 -------------+--------+--------+
 
-
 * ASR: calculates the AND between the accumulator and an immediate value and then
        shift right the result.
 
@@ -241,7 +232,6 @@ Address mode | opcode | cycles |            N V B D I Z C
 ASR #imm     |   4Bh  |  2     |
 -------------+--------+--------+
 
-
 * ARR: calculates the AND between the accumulator and an immediate value and then
        rotate right the result.
 
@@ -249,7 +239,6 @@ Address mode | opcode | cycles |            N V B D I Z C
 -------------+--------+--------+    FLAGS:  X . . . . X X
 ARR #imm     |   6Bh  |  2     |
 -------------+--------+--------+
-
 
 * ANE: calculates the OR of the accumulator with an unstable constant, then it does
        an AND with the X register and an immediate value.
@@ -260,7 +249,6 @@ Address mode | opcode | cycles |            N V B D I Z C
 -------------+--------+--------+    FLAGS:  X . . . . X .
 ANE #imm     |   8Bh  |  2     |
 -------------+--------+--------+
-
 
 * LXA: calculates the OR of the accumulator with an unstable constant, then it does
        an AND with an immediate value. The result is copied into the X register and
@@ -273,7 +261,6 @@ Address mode | opcode | cycles |            N V B D I Z C
 LXA #imm     |   ABh  |  2     |
 -------------+--------+--------+
 
-
 * SBX: calculates the AND of the accumulator with the X register and the subtracts
        an immediate value.
 
@@ -281,7 +268,6 @@ Address mode | opcode | cycles |            N V B D I Z C
 -------------+--------+--------+    FLAGS:  X . . . . X X
 SBX #imm     |   CBh  |  2     |
 -------------+--------+--------+
-
 
 * NOP: No-Operation.
 
@@ -316,7 +302,6 @@ NOP abs,x    |   DCh  |  4*    |
 NOP abs,x    |   FCh  |  4*    |
 -------------+--------+--------+
 
-
 * TAS: calculates the AND of the accumulator with the X register and stores the result
        into the stack pointer. Then, it calculates the AND of the result with the
        high byte of the memory pointer plus 1 and it stores the final result in memory.
@@ -326,7 +311,6 @@ Address mode | opcode | cycles |            N V B D I Z C
 TAS abs,y    |   9Bh  |  5     |
 -------------+--------+--------+
 
-
 * SHY: calculates the AND of the Y register with the high byte of the memory pointer
        plus 1 and it stores the final result in memory.
 
@@ -334,7 +318,6 @@ Address mode | opcode | cycles |            N V B D I Z C
 -------------+--------+--------+    FLAGS:  . . . . . . .
 SHY abs,x    |   9Ch  |  5     |
 -------------+--------+--------+
-
 
 * SHX: calculates the AND of the X register with the high byte of the memory pointer
        plus 1 and it stores the final result in memory.
@@ -344,7 +327,6 @@ Address mode | opcode | cycles |            N V B D I Z C
 SHX abs,y    |   9Eh  |  5     |
 -------------+--------+--------+
 
-
 * SHA: calculates the AND of the accumulator with the X register with the high byte
        of the memory pointer plus 1 and it stores the final result in memory.
 
@@ -353,7 +335,6 @@ Address mode | opcode | cycles |            N V B D I Z C
 SHX abs,y    |   9Fh  |  5     |
 SHX (zp),y   |   93h  |  6     |
 -------------+--------+--------+
-
 
 * ANC: calculates the AND of the accumulator with an immediate value and then
        updates the status of N and Z bits of the status register.
@@ -365,7 +346,6 @@ ANC #imm     |   0Bh  |  2     |
 ANC #imm     |   2Bh  |  2     |
 -------------+--------+--------+
 
-
 * LAS: calculates the AND of a memory location with the contents of the
 stack pointer register and it stores the result in the accumulator, the X
 register, and the stack pointer.
@@ -374,7 +354,6 @@ Address mode | opcode | cycles |            N V B D I Z C
 -------------+--------+--------+    FLAGS:  X . . . . X .
 LAS abs,y    |   BBh  |  4*    |
 -------------+--------+--------+    * = adds +1 if page cross is detected.
-
 
 * SBC: alias of the official SBC opcode.
 
@@ -388,8 +367,6 @@ SBC #imm     |   EBh  |  2     |
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Current CPU
 CPUType CPU;
@@ -409,13 +386,9 @@ static bool HaveNMIRequest;
 // IRQ request active
 static bool HaveIRQRequest;
 
-
-
 //***************************************************************************
 //                        Helper functions and macros
 //***************************************************************************
-
-
 
 // Return the flags as boolean values (0/1)
 #define GET_CF()        ((Regs.SR & CF) != 0)
@@ -531,8 +504,6 @@ static bool HaveIRQRequest;
     ad = MemReadZPWord (MemReadByte (Regs.PC+1));               \
     ad += Regs.YR;                                              \
     Regs.PC += 2
-
-
 
 // Memory operators
 
@@ -664,7 +635,6 @@ static bool HaveIRQRequest;
     Regs.AC = Regs.AC op operand;                               \
     TEST_ZF (Regs.AC);                                          \
     TEST_SF (Regs.AC)
-
 
 // ADC, binary mode (6502 and 65C02)
 #define ADC_BINARY_MODE(v)                                      \
@@ -1024,7 +994,6 @@ static bool HaveIRQRequest;
     TEST_SF (Val);                                              \
     TEST_ZF (Val)
 
-
 // LAS
 #define LAS(Val)                                                \
     Val = Regs.SP & Val;                                        \
@@ -1115,8 +1084,6 @@ static bool HaveIRQRequest;
         }                                                       \
     } while (0)
 
-
-
 /* Set/reset a specific bit in a zero-page byte. This macro
  * macro is used to implement the 65C02 RMBx and SMBx instructions.
  */
@@ -1161,15 +1128,11 @@ static bool HaveIRQRequest;
 //                         Opcode handling functions
 //***************************************************************************
 
-
-
 static void OPC_Illegal (void)
 {
     Error ("Illegal opcode $%02X at address $%04X",
            MemReadByte (Regs.PC), Regs.PC);
 }
-
-
 
 static void OPC_6502_00 (void)
 // Opcode $00: BRK
@@ -1187,23 +1150,17 @@ static void OPC_6502_00 (void)
     Regs.PC = MemReadWord (0xFFFE);
 }
 
-
-
 static void OPC_6502_01 (void)
 // Opcode $01: ORA (ind,x)
 {
     AC_OP (ZPXIND, |);
 }
 
-
-
 static void OPC_6502X_03 (void)
 // Opcode $03: SLO (zp,x)
 {
     ILLx2_OP (ZPXIND, SLO);
 }
-
-
 
 // Aliases of opcode $04
 #define OPC_6502X_44 OPC_6502X_04
@@ -1215,15 +1172,11 @@ static void OPC_6502X_04 (void)
     ALU_OP (ZP, NOP);
 }
 
-
-
 static void OPC_65C02_04 (void)
 // Opcode $04: TSB zp
 {
     MEM_OP (ZP, TSB);
 }
-
-
 
 static void OPC_6502_05 (void)
 // Opcode $05: ORA zp
@@ -1231,15 +1184,11 @@ static void OPC_6502_05 (void)
     AC_OP (ZP, |);
 }
 
-
-
 static void OPC_6502_06 (void)
 // Opcode $06: ASL zp
 {
     MEM_OP (ZP, ASL);
 }
-
-
 
 static void OPC_6502X_07 (void)
 // Opcode $07: SLO zp
@@ -1247,15 +1196,11 @@ static void OPC_6502X_07 (void)
     ILLx2_OP (ZP, SLO);
 }
 
-
-
 static void OPC_65C02_07 (void)
 // Opcode $07: RMB0 zp
 {
     ZP_BITOP(0, 0);
 }
-
-
 
 static void OPC_6502_08 (void)
 // Opcode $08: PHP
@@ -1265,15 +1210,11 @@ static void OPC_6502_08 (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502_09 (void)
 // Opcode $09: ORA #imm
 {
     AC_OP_IMM (|);
 }
-
-
 
 static void OPC_6502_0A (void)
 // Opcode $0A: ASL a
@@ -1282,8 +1223,6 @@ static void OPC_6502_0A (void)
     ASL(Regs.AC);
     Regs.PC += 1;
 }
-
-
 
 // Aliases of opcode $0B
 #define OPC_6502X_2B OPC_6502X_0B
@@ -1294,15 +1233,11 @@ static void OPC_6502X_0B (void)
     ALU_OP_IMM (ANC);
 }
 
-
-
 static void OPC_6502X_0C (void)
 // Opcode $0C: NOP abs
 {
     ALU_OP (ABS, NOP);
 }
-
-
 
 static void OPC_65C02_0C (void)
 // Opcode $0C: TSB abs
@@ -1310,15 +1245,11 @@ static void OPC_65C02_0C (void)
     MEM_OP (ABS, TSB);
 }
 
-
-
 static void OPC_6502_0D (void)
 // Opcode $0D: ORA abs
 {
     AC_OP (ABS, |);
 }
-
-
 
 static void OPC_6502_0E (void)
 // Opcode $0E: ASL abs
@@ -1326,15 +1257,11 @@ static void OPC_6502_0E (void)
     MEM_OP (ABS, ASL);
 }
 
-
-
 static void OPC_6502X_0F (void)
 // Opcode $0F: SLO abs
 {
     ILLx2_OP (ABS, SLO);
 }
-
-
 
 static void OPC_65C02_0F (void)
 // Opcode $0F: BBR0 zp, rel
@@ -1342,15 +1269,11 @@ static void OPC_65C02_0F (void)
     ZP_BIT_BRANCH (0, 0);
 }
 
-
-
 static void OPC_6502_10 (void)
 // Opcode $10: BPL
 {
     BRANCH (!GET_SF ());
 }
-
-
 
 static void OPC_6502_11 (void)
 // Opcode $11: ORA (zp),y
@@ -1358,23 +1281,17 @@ static void OPC_6502_11 (void)
     AC_OP (ZPINDY, |);
 }
 
-
-
 static void OPC_65C02_12 (void)
 // Opcode $12: ORA (zp)
 {
     AC_OP (ZPIND, |);
 }
 
-
-
 static void OPC_6502X_13 (void)
 // Opcode $03: SLO (zp),y
 {
     ILLx2_OP (ZPINDY_NP, SLO);
 }
-
-
 
 // Aliases of opcode $14
 #define OPC_6502X_34 OPC_6502X_14
@@ -1389,15 +1306,11 @@ static void OPC_6502X_14 (void)
     ALU_OP (ZPX, NOP);
 }
 
-
-
 static void OPC_65C02_14 (void)
 // Opcode $14: TRB zp
 {
     MEM_OP (ZP, TRB);
 }
-
-
 
 static void OPC_6502_15 (void)
 // Opcode $15: ORA zp,x
@@ -1405,15 +1318,11 @@ static void OPC_6502_15 (void)
    AC_OP (ZPX, |);
 }
 
-
-
 static void OPC_6502_16 (void)
 // Opcode $16: ASL zp,x
 {
     MEM_OP (ZPX, ASL);
 }
-
-
 
 static void OPC_6502X_17 (void)
 // Opcode $17: SLO zp,x
@@ -1421,15 +1330,11 @@ static void OPC_6502X_17 (void)
     ILLx2_OP (ZPX, SLO);
 }
 
-
-
 static void OPC_65C02_17 (void)
 // Opcode $17: RMB1 zp
 {
     ZP_BITOP(1, 0);
 }
-
-
 
 static void OPC_6502_18 (void)
 // Opcode $18: CLC
@@ -1439,15 +1344,11 @@ static void OPC_6502_18 (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502_19 (void)
 // Opcode $19: ORA abs,y
 {
     AC_OP (ABSY, |);
 }
-
-
 
 static void OPC_65C02_1A (void)
 // Opcode $1A: INC a
@@ -1457,15 +1358,11 @@ static void OPC_65C02_1A (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502X_1B (void)
 // Opcode $1B: SLO abs,y
 {
     ILLx2_OP (ABSY_NP, SLO);
 }
-
-
 
 // Aliases of opcode $1C
 #define OPC_6502X_3C OPC_6502X_1C
@@ -1480,15 +1377,11 @@ static void OPC_6502X_1C (void)
     ALU_OP (ABSX, NOP);
 }
 
-
-
 static void OPC_65C02_1C (void)
 // Opcode $1C: TRB abs
 {
     MEM_OP (ABS, TRB);
 }
-
-
 
 static void OPC_6502_1D (void)
 // Opcode $1D: ORA abs,x
@@ -1496,15 +1389,11 @@ static void OPC_6502_1D (void)
     AC_OP (ABSX, |);
 }
 
-
-
 static void OPC_6502_1E (void)
 // Opcode $1E: ASL abs,x
 {
     MEM_OP (ABSX_NP, ASL);
 }
-
-
 
 static void OPC_65C02_1E (void)
 // Opcode $1E: ASL abs,x
@@ -1513,23 +1402,17 @@ static void OPC_65C02_1E (void)
     --Cycles;
 }
 
-
-
 static void OPC_6502X_1F (void)
 // Opcode $1F: SLO abs,x
 {
     ILLx2_OP (ABSX_NP, SLO);
 }
 
-
-
 static void OPC_65C02_1F (void)
 // Opcode $1F: BBR1 zp, rel
 {
     ZP_BIT_BRANCH (1, 0);
 }
-
-
 
 static void OPC_6502_20 (void)
 // Opcode $20: JSR
@@ -1571,15 +1454,11 @@ static void OPC_6502_20 (void)
     }
 }
 
-
-
 static void OPC_6502_21 (void)
 // Opcode $21: AND (zp,x)
 {
     AC_OP (ZPXIND, &);
 }
-
-
 
 static void OPC_6502X_23 (void)
 // Opcode $23: RLA (zp,x)
@@ -1587,15 +1466,11 @@ static void OPC_6502X_23 (void)
     ILLx2_OP (ZPXIND, RLA);
 }
 
-
-
 static void OPC_6502_24 (void)
 {
 // Opcode $24: BIT zp
     ALU_OP (ZP, BIT);
 }
-
-
 
 static void OPC_6502_25 (void)
 // Opcode $25: AND zp
@@ -1603,15 +1478,11 @@ static void OPC_6502_25 (void)
     AC_OP (ZP, &);
 }
 
-
-
 static void OPC_6502_26 (void)
 // Opcode $26: ROL zp
 {
     MEM_OP (ZP, ROL);
 }
-
-
 
 static void OPC_6502X_27 (void)
 // Opcode $27: RLA zp
@@ -1619,15 +1490,11 @@ static void OPC_6502X_27 (void)
     ILLx2_OP (ZP, RLA);
 }
 
-
-
 static void OPC_65C02_27 (void)
 // Opcode $27: RMB2 zp
 {
     ZP_BITOP(2, 0);
 }
-
-
 
 static void OPC_6502_28 (void)
 // Opcode $28: PLP
@@ -1639,15 +1506,11 @@ static void OPC_6502_28 (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502_29 (void)
 // Opcode $29: AND #imm
 {
     AC_OP_IMM (&);
 }
-
-
 
 static void OPC_6502_2A (void)
 // Opcode $2A: ROL a
@@ -1658,15 +1521,11 @@ static void OPC_6502_2A (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502_2C (void)
 // Opcode $2C: BIT abs
 {
     ALU_OP (ABS, BIT);
 }
-
-
 
 static void OPC_6502_2D (void)
 // Opcode $2D: AND abs
@@ -1674,15 +1533,11 @@ static void OPC_6502_2D (void)
     AC_OP (ABS, &);
 }
 
-
-
 static void OPC_6502_2E (void)
 // Opcode $2E: ROL abs
 {
     MEM_OP (ABS, ROL);
 }
-
-
 
 static void OPC_6502X_2F (void)
 // Opcode $2F: RLA abs
@@ -1690,15 +1545,11 @@ static void OPC_6502X_2F (void)
     ILLx2_OP (ABS, RLA);
 }
 
-
-
 static void OPC_65C02_2F (void)
 // Opcode $2F: BBR2 zp, rel
 {
     ZP_BIT_BRANCH (2, 0);
 }
-
-
 
 static void OPC_6502_30 (void)
 // Opcode $30: BMI
@@ -1706,15 +1557,11 @@ static void OPC_6502_30 (void)
     BRANCH (GET_SF ());
 }
 
-
-
 static void OPC_6502_31 (void)
 // Opcode $31: AND (zp),y
 {
     AC_OP (ZPINDY, &);
 }
-
-
 
 static void OPC_65C02_32 (void)
 // Opcode $32: AND (zp)
@@ -1722,15 +1569,11 @@ static void OPC_65C02_32 (void)
     AC_OP (ZPIND, &);
 }
 
-
-
 static void OPC_6502X_33 (void)
 // Opcode $33: RLA (zp),y
 {
     ILLx2_OP (ZPINDY_NP, RLA);
 }
-
-
 
 static void OPC_65C02_34 (void)
 // Opcode $34: BIT zp,x
@@ -1738,15 +1581,11 @@ static void OPC_65C02_34 (void)
     ALU_OP (ZPX, BIT);
 }
 
-
-
 static void OPC_6502_35 (void)
 // Opcode $35: AND zp,x
 {
     AC_OP (ZPX, &);
 }
-
-
 
 static void OPC_6502_36 (void)
 // Opcode $36: ROL zp,x
@@ -1754,23 +1593,17 @@ static void OPC_6502_36 (void)
     MEM_OP (ZPX, ROL);
 }
 
-
-
 static void OPC_6502X_37 (void)
 // Opcode $37: RLA zp,x
 {
     ILLx2_OP (ZPX, RLA);
 }
 
-
-
 static void OPC_65C02_37 (void)
 // Opcode $37: RMB3 zp
 {
     ZP_BITOP(3, 0);
 }
-
-
 
 static void OPC_6502_38 (void)
 // Opcode $38: SEC
@@ -1780,15 +1613,11 @@ static void OPC_6502_38 (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502_39 (void)
 // Opcode $39: AND abs,y
 {
     AC_OP (ABSY, &);
 }
-
-
 
 static void OPC_65C02_3A (void)
 // Opcode $3A: DEC a
@@ -1798,15 +1627,11 @@ static void OPC_65C02_3A (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502X_3B (void)
 // Opcode $3B: RLA abs,y
 {
     ILLx2_OP (ABSY_NP, RLA);
 }
-
-
 
 static void OPC_65C02_3C (void)
 // Opcode $3C: BIT abs,x
@@ -1814,23 +1639,17 @@ static void OPC_65C02_3C (void)
     ALU_OP (ABSX, BIT);
 }
 
-
-
 static void OPC_6502_3D (void)
 // Opcode $3D: AND abs,x
 {
     AC_OP (ABSX, &);
 }
 
-
-
 static void OPC_6502_3E (void)
 // Opcode $3E: ROL abs,x
 {
     MEM_OP (ABSX_NP, ROL);
 }
-
-
 
 static void OPC_65C02_3E (void)
 // Opcode $3E: ROL abs,x
@@ -1839,23 +1658,17 @@ static void OPC_65C02_3E (void)
     --Cycles;
 }
 
-
-
 static void OPC_6502X_3F (void)
 // Opcode $3F: RLA abs,x
 {
     ILLx2_OP (ABSX_NP, RLA);
 }
 
-
-
 static void OPC_65C02_3F (void)
 // Opcode $3F: BBR3 zp, rel
 {
     ZP_BIT_BRANCH (3, 0);
 }
-
-
 
 static void OPC_6502_40 (void)
 // Opcode $40: RTI
@@ -1868,15 +1681,11 @@ static void OPC_6502_40 (void)
     Regs.PC |= (POP () << 8);        // PCH
 }
 
-
-
 static void OPC_6502_41 (void)
 // Opcode $41: EOR (zp,x)
 {
     AC_OP (ZPXIND, ^);
 }
-
-
 
 static void OPC_6502X_43 (void)
 // Opcode $43: SRE (zp,x)
@@ -1884,15 +1693,11 @@ static void OPC_6502X_43 (void)
     ILLx2_OP (ZPXIND, SRE);
 }
 
-
-
 static void OPC_6502_45 (void)
 // Opcode $45: EOR zp
 {
     AC_OP (ZP, ^);
 }
-
-
 
 static void OPC_6502_46 (void)
 // Opcode $46: LSR zp
@@ -1900,23 +1705,17 @@ static void OPC_6502_46 (void)
     MEM_OP (ZP, LSR);
 }
 
-
-
 static void OPC_6502X_47 (void)
 // Opcode $47: SRE zp
 {
     ILLx2_OP (ZP, SRE);
 }
 
-
-
 static void OPC_65C02_47 (void)
 // Opcode $47: RMB4 zp
 {
     ZP_BITOP(4, 0);
 }
-
-
 
 static void OPC_6502_48 (void)
 // Opcode $48: PHA
@@ -1926,15 +1725,11 @@ static void OPC_6502_48 (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502_49 (void)
 // Opcode $49: EOR #imm
 {
     AC_OP_IMM (^);
 }
-
-
 
 static void OPC_6502_4A (void)
 // Opcode $4A: LSR a
@@ -1944,15 +1739,11 @@ static void OPC_6502_4A (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502X_4B (void)
 // Opcode $4B: ASR imm
 {
     ALU_OP_IMM (ASR);
 }
-
-
 
 static void OPC_6502_4C (void)
 // Opcode $4C: JMP abs
@@ -1963,15 +1754,11 @@ static void OPC_6502_4C (void)
     ParaVirtHooks (&Regs);
 }
 
-
-
 static void OPC_6502_4D (void)
 // Opcode $4D: EOR abs
 {
     AC_OP (ABS, ^);
 }
-
-
 
 static void OPC_6502_4E (void)
 // Opcode $4E: LSR abs
@@ -1979,15 +1766,11 @@ static void OPC_6502_4E (void)
     MEM_OP (ABS, LSR);
 }
 
-
-
 static void OPC_6502X_4F (void)
 // Opcode $4F: SRE abs
 {
     ILLx2_OP (ABS, SRE);
 }
-
-
 
 static void OPC_65C02_4F (void)
 // Opcode $4F: BBR4 zp, rel
@@ -1995,15 +1778,11 @@ static void OPC_65C02_4F (void)
     ZP_BIT_BRANCH (4, 0);
 }
 
-
-
 static void OPC_6502_50 (void)
 // Opcode $50: BVC
 {
     BRANCH (!GET_OF ());
 }
-
-
 
 static void OPC_6502_51 (void)
 // Opcode $51: EOR (zp),y
@@ -2011,15 +1790,11 @@ static void OPC_6502_51 (void)
     AC_OP (ZPINDY, ^);
 }
 
-
-
 static void OPC_65C02_52 (void)
 // Opcode $52: EOR (zp)
 {
     AC_OP (ZPIND, ^);
 }
-
-
 
 static void OPC_6502X_53 (void)
 // Opcode $43: SRE (zp),y
@@ -2027,15 +1802,11 @@ static void OPC_6502X_53 (void)
     ILLx2_OP (ZPINDY_NP, SRE);
 }
 
-
-
 static void OPC_6502_55 (void)
 // Opcode $55: EOR zp,x
 {
     AC_OP (ZPX, ^);
 }
-
-
 
 static void OPC_6502_56 (void)
 // Opcode $56: LSR zp,x
@@ -2043,23 +1814,17 @@ static void OPC_6502_56 (void)
     MEM_OP (ZPX, LSR);
 }
 
-
-
 static void OPC_6502X_57 (void)
 // Opcode $57: SRE zp,x
 {
     ILLx2_OP (ZPX, SRE);
 }
 
-
-
 static void OPC_65C02_57 (void)
 // Opcode $57: RMB5 zp
 {
     ZP_BITOP(5, 0);
 }
-
-
 
 static void OPC_6502_58 (void)
 // Opcode $58: CLI
@@ -2069,15 +1834,11 @@ static void OPC_6502_58 (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502_59 (void)
 // Opcode $59: EOR abs,y
 {
     AC_OP (ABSY, ^);
 }
-
-
 
 static void OPC_65C02_5A (void)
 // Opcode $5A: PHY
@@ -2087,15 +1848,11 @@ static void OPC_65C02_5A (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502X_5B (void)
 // Opcode $5B: SRE abs,y
 {
     ILLx2_OP (ABSY_NP, SRE);
 }
-
-
 
 static void OPC_65C02_5C (void)
 // Opcode $5C: 'Absolute' 8 cycle NOP
@@ -2112,23 +1869,17 @@ static void OPC_65C02_5C (void)
     Regs.PC += 3;
 }
 
-
-
 static void OPC_6502_5D (void)
 // Opcode $5D: EOR abs,x
 {
     AC_OP (ABSX, ^);
 }
 
-
-
 static void OPC_6502_5E (void)
 // Opcode $5E: LSR abs,x
 {
     MEM_OP (ABSX_NP, LSR);
 }
-
-
 
 static void OPC_65C02_5E (void)
 // Opcode $5E: LSR abs,x
@@ -2137,23 +1888,17 @@ static void OPC_65C02_5E (void)
     --Cycles;
 }
 
-
-
 static void OPC_6502X_5F (void)
 // Opcode $5F: SRE abs,x
 {
     ILLx2_OP (ABSX_NP, SRE);
 }
 
-
-
 static void OPC_65C02_5F (void)
 // Opcode $5F: BBR5 zp, rel
 {
     ZP_BIT_BRANCH (5, 0);
 }
-
-
 
 static void OPC_6502_60 (void)
 // Opcode $60: RTS
@@ -2168,15 +1913,11 @@ static void OPC_6502_60 (void)
     }
 }
 
-
-
 static void OPC_6502_61 (void)
 // Opcode $61: ADC (zp,x)
 {
     ALU_OP (ZPXIND, ADC_6502);
 }
-
-
 
 static void OPC_65C02_61 (void)
 // Opcode $61: ADC (zp,x)
@@ -2184,15 +1925,11 @@ static void OPC_65C02_61 (void)
     ALU_OP (ZPXIND, ADC_65C02);
 }
 
-
-
 static void OPC_6502X_63 (void)
 // Opcode $63: RRA (zp,x)
 {
     ILLx2_OP (ZPXIND, RRA);
 }
-
-
 
 static void OPC_65C02_64 (void)
 // Opcode $64: STZ zp
@@ -2200,15 +1937,11 @@ static void OPC_65C02_64 (void)
     STO_OP (ZP, 0);
 }
 
-
-
 static void OPC_6502_65 (void)
 // Opcode $65: ADC zp
 {
     ALU_OP (ZP, ADC_6502);
 }
-
-
 
 static void OPC_65C02_65 (void)
 // Opcode $65: ADC zp
@@ -2216,15 +1949,11 @@ static void OPC_65C02_65 (void)
     ALU_OP (ZP, ADC_65C02);
 }
 
-
-
 static void OPC_6502_66 (void)
 // Opcode $66: ROR zp
 {
     MEM_OP (ZP, ROR);
 }
-
-
 
 static void OPC_6502X_67 (void)
 // Opcode $67: RRA zp
@@ -2232,15 +1961,11 @@ static void OPC_6502X_67 (void)
     ILLx2_OP (ZP, RRA);
 }
 
-
-
 static void OPC_65C02_67 (void)
 // Opcode $67: RMB6 zp
 {
     ZP_BITOP(6, 0);
 }
-
-
 
 static void OPC_6502_68 (void)
 // Opcode $68: PLA
@@ -2252,23 +1977,17 @@ static void OPC_6502_68 (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502_69 (void)
 // Opcode $69: ADC #imm
 {
     ALU_OP_IMM (ADC_6502);
 }
 
-
-
 static void OPC_65C02_69 (void)
 // Opcode $69: ADC #imm
 {
     ALU_OP_IMM (ADC_65C02);
 }
-
-
 
 static void OPC_6502_6A (void)
 // Opcode $6A: ROR a
@@ -2278,15 +1997,11 @@ static void OPC_6502_6A (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502X_6B (void)
 // Opcode $6B: ARR imm
 {
     ALU_OP_IMM (ARR);
 }
-
-
 
 static void OPC_6502_6C (void)
 // Opcode $6C: JMP (ind)
@@ -2311,8 +2026,6 @@ static void OPC_6502_6C (void)
     ParaVirtHooks (&Regs);
 }
 
-
-
 static void OPC_65C02_6C (void)
 // Opcode $6C: JMP (ind)
 {
@@ -2323,15 +2036,11 @@ static void OPC_65C02_6C (void)
     ParaVirtHooks (&Regs);
 }
 
-
-
 static void OPC_6502_6D (void)
 // Opcode $6D: ADC abs
 {
     ALU_OP (ABS, ADC_6502);
 }
-
-
 
 static void OPC_65C02_6D (void)
 // Opcode $6D: ADC abs
@@ -2339,15 +2048,11 @@ static void OPC_65C02_6D (void)
     ALU_OP (ABS, ADC_65C02);
 }
 
-
-
 static void OPC_6502_6E (void)
 // Opcode $6E: ROR abs
 {
     MEM_OP (ABS, ROR);
 }
-
-
 
 static void OPC_6502X_6F (void)
 // Opcode $6F: RRA abs
@@ -2355,15 +2060,11 @@ static void OPC_6502X_6F (void)
     ILLx2_OP (ABS, RRA);
 }
 
-
-
 static void OPC_65C02_6F (void)
 // Opcode $6F: BBR6 zp, rel
 {
     ZP_BIT_BRANCH (6, 0);
 }
-
-
 
 static void OPC_6502_70 (void)
 // Opcode $70: BVS
@@ -2371,15 +2072,11 @@ static void OPC_6502_70 (void)
     BRANCH (GET_OF ());
 }
 
-
-
 static void OPC_6502_71 (void)
 // Opcode $71: ADC (zp),y
 {
     ALU_OP (ZPINDY, ADC_6502);
 }
-
-
 
 static void OPC_65C02_71 (void)
 // Opcode $71: ADC (zp),y
@@ -2387,15 +2084,11 @@ static void OPC_65C02_71 (void)
     ALU_OP (ZPINDY, ADC_65C02);
 }
 
-
-
 static void OPC_65C02_72 (void)
 // Opcode $72: ADC (zp)
 {
     ALU_OP (ZPIND, ADC_65C02);
 }
-
-
 
 static void OPC_6502X_73 (void)
 // Opcode $73: RRA (zp),y
@@ -2403,15 +2096,11 @@ static void OPC_6502X_73 (void)
     ILLx2_OP (ZPINDY_NP, RRA);
 }
 
-
-
 static void OPC_65C02_74 (void)
 // Opcode $74: STZ zp,x
 {
     STO_OP (ZPX, 0);
 }
-
-
 
 static void OPC_6502_75 (void)
 // Opcode $75: ADC zp,x
@@ -2419,15 +2108,11 @@ static void OPC_6502_75 (void)
     ALU_OP (ZPX, ADC_6502);
 }
 
-
-
 static void OPC_65C02_75 (void)
 // Opcode $75: ADC zp,x
 {
     ALU_OP (ZPX, ADC_65C02);
 }
-
-
 
 static void OPC_6502_76 (void)
 // Opcode $76: ROR zp,x
@@ -2435,23 +2120,17 @@ static void OPC_6502_76 (void)
     MEM_OP (ZPX, ROR);
 }
 
-
-
 static void OPC_6502X_77 (void)
 // Opcode $77: RRA zp,x
 {
     ILLx2_OP (ZPX, RRA);
 }
 
-
-
 static void OPC_65C02_77 (void)
 // Opcode $77: RMB7 zp
 {
     ZP_BITOP(7, 0);
 }
-
-
 
 static void OPC_6502_78 (void)
 // Opcode $78: SEI
@@ -2461,23 +2140,17 @@ static void OPC_6502_78 (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502_79 (void)
 // Opcode $79: ADC abs,y
 {
     ALU_OP (ABSY, ADC_6502);
 }
 
-
-
 static void OPC_65C02_79 (void)
 // Opcode $79: ADC abs,y
 {
     ALU_OP (ABSY, ADC_65C02);
 }
-
-
 
 static void OPC_65C02_7A (void)
 // Opcode $7A: PLY
@@ -2489,15 +2162,11 @@ static void OPC_65C02_7A (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502X_7B (void)
 // Opcode $7B: RRA abs,y
 {
     ILLx2_OP (ABSY_NP, RRA);
 }
-
-
 
 static void OPC_65C02_7C (void)
 // Opcode $7C: JMP (ind,X)
@@ -2511,15 +2180,11 @@ static void OPC_65C02_7C (void)
     ParaVirtHooks (&Regs);
 }
 
-
-
 static void OPC_6502_7D (void)
 // Opcode $7D: ADC abs,x
 {
     ALU_OP (ABSX, ADC_6502);
 }
-
-
 
 static void OPC_65C02_7D (void)
 // Opcode $7D: ADC abs,x
@@ -2527,15 +2192,11 @@ static void OPC_65C02_7D (void)
     ALU_OP (ABSX, ADC_65C02);
 }
 
-
-
 static void OPC_6502_7E (void)
 // Opcode $7E: ROR abs,x
 {
     MEM_OP (ABSX_NP, ROR);
 }
-
-
 
 static void OPC_65C02_7E (void)
 // Opcode $7E: ROR abs,x
@@ -2544,23 +2205,17 @@ static void OPC_65C02_7E (void)
     --Cycles;
 }
 
-
-
 static void OPC_6502X_7F (void)
 // Opcode $7F: RRA abs,x
 {
     ILLx2_OP (ABSX_NP, RRA);
 }
 
-
-
 static void OPC_65C02_7F (void)
 // Opcode $7F: BBR7 zp, rel
 {
     ZP_BIT_BRANCH (7, 0);
 }
-
-
 
 // Aliases of opcode $80
 #define OPC_6502X_82 OPC_6502X_80
@@ -2574,15 +2229,11 @@ static void OPC_6502X_80 (void)
     ALU_OP_IMM (NOP);
 }
 
-
-
 static void OPC_65C02_80 (void)
 // Opcode $80: BRA
 {
     BRANCH (1);
 }
-
-
 
 static void OPC_6502_81 (void)
 // Opcode $81: STA (zp,x)
@@ -2590,15 +2241,11 @@ static void OPC_6502_81 (void)
     STO_OP (ZPXIND, Regs.AC);
 }
 
-
-
 static void OPC_6502X_83 (void)
 // Opcode $83: SAX (zp,x)
 {
     STO_OP (ZPXIND, Regs.AC & Regs.XR);
 }
-
-
 
 static void OPC_6502_84 (void)
 // Opcode $84: STY zp
@@ -2606,15 +2253,11 @@ static void OPC_6502_84 (void)
     STO_OP (ZP, Regs.YR);
 }
 
-
-
 static void OPC_6502_85 (void)
 // Opcode $85: STA zp
 {
     STO_OP (ZP, Regs.AC);
 }
-
-
 
 static void OPC_6502_86 (void)
 // Opcode $86: STX zp
@@ -2622,23 +2265,17 @@ static void OPC_6502_86 (void)
     STO_OP (ZP, Regs.XR);
 }
 
-
-
 static void OPC_6502X_87 (void)
 // Opcode $87: SAX zp
 {
     STO_OP (ZP, Regs.AC & Regs.XR);
 }
 
-
-
 static void OPC_65C02_87 (void)
 // Opcode $87: SMB0 zp
 {
     ZP_BITOP(0, 1);
 }
-
-
 
 static void OPC_6502_88 (void)
 // Opcode $88: DEY
@@ -2648,8 +2285,6 @@ static void OPC_6502_88 (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_65C02_89 (void)
 // Opcode $89: BIT #imm
 {
@@ -2657,8 +2292,6 @@ static void OPC_65C02_89 (void)
      * hence the different 'op' argument to the macro. */
     ALU_OP_IMM (BITIMM);
 }
-
-
 
 static void OPC_6502_8A (void)
 // Opcode $8A: TXA
@@ -2670,15 +2303,11 @@ static void OPC_6502_8A (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502X_8B (void)
 // Opcode $8B: ANE imm
 {
     ALU_OP_IMM (ANE);
 }
-
-
 
 static void OPC_6502_8C (void)
 // Opcode $8C: STY abs
@@ -2686,15 +2315,11 @@ static void OPC_6502_8C (void)
     STO_OP (ABS, Regs.YR);
 }
 
-
-
 static void OPC_6502_8D (void)
 // Opcode $8D: STA abs
 {
     STO_OP (ABS, Regs.AC);
 }
-
-
 
 static void OPC_6502_8E (void)
 // Opcode $8E: STX abs
@@ -2702,15 +2327,11 @@ static void OPC_6502_8E (void)
     STO_OP (ABS, Regs.XR);
 }
 
-
-
 static void OPC_6502X_8F (void)
 // Opcode $8F: SAX abs
 {
     STO_OP (ABS, Regs.AC & Regs.XR);
 }
-
-
 
 static void OPC_65C02_8F (void)
 // Opcode $8F: BBS0 zp, rel
@@ -2718,15 +2339,11 @@ static void OPC_65C02_8F (void)
     ZP_BIT_BRANCH (0, 1);
 }
 
-
-
 static void OPC_6502_90 (void)
 // Opcode $90: BCC
 {
     BRANCH (!GET_CF ());
 }
-
-
 
 static void OPC_6502_91 (void)
 // Opcode $91: sta (zp),y
@@ -2734,15 +2351,11 @@ static void OPC_6502_91 (void)
     STO_OP (ZPINDY_NP, Regs.AC);
 }
 
-
-
 static void OPC_65C02_92 (void)
 // Opcode $92: sta (zp)
 {
     STO_OP (ZPIND, Regs.AC);
 }
-
-
 
 static void OPC_6502X_93 (void)
 // Opcode $93: SHA (zp),y
@@ -2763,15 +2376,11 @@ static void OPC_6502X_93 (void)
     Cycles=6;
 }
 
-
-
 static void OPC_6502_94 (void)
 // Opcode $94: STY zp,x
 {
     STO_OP (ZPX, Regs.YR);
 }
-
-
 
 static void OPC_6502_95 (void)
 // Opcode $95: STA zp,x
@@ -2779,15 +2388,11 @@ static void OPC_6502_95 (void)
     STO_OP (ZPX, Regs.AC);
 }
 
-
-
 static void OPC_6502_96 (void)
 // Opcode $96: stx zp,y
 {
     STO_OP (ZPY, Regs.XR);
 }
-
-
 
 static void OPC_6502X_97 (void)
 // Opcode $97: SAX zp,y
@@ -2795,15 +2400,11 @@ static void OPC_6502X_97 (void)
     STO_OP (ZPY, Regs.AC & Regs.XR);
 }
 
-
-
 static void OPC_65C02_97 (void)
 // Opcode $97: SMB1 zp
 {
     ZP_BITOP(1, 1);
 }
-
-
 
 static void OPC_6502_98 (void)
 // Opcode $98: TYA
@@ -2815,15 +2416,11 @@ static void OPC_6502_98 (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502_99 (void)
 // Opcode $99: STA abs,y
 {
     STO_OP (ABSY_NP, Regs.AC);
 }
-
-
 
 static void OPC_6502_9A (void)
 // Opcode $9A: TXS
@@ -2832,8 +2429,6 @@ static void OPC_6502_9A (void)
     Regs.SP = Regs.XR;
     Regs.PC += 1;
 }
-
-
 
 static void OPC_6502X_9B (void)
 // Opcode $9B: TAS abs,y
@@ -2854,8 +2449,6 @@ static void OPC_6502X_9B (void)
     Cycles=5;
 }
 
-
-
 static void OPC_6502X_9C (void)
 // Opcode $9D: SHY abs,x
 {
@@ -2874,23 +2467,17 @@ static void OPC_6502X_9C (void)
     Cycles=5;
 }
 
-
-
 static void OPC_65C02_9C (void)
 // Opcode $9C: STZ abs
 {
     STO_OP (ABS, 0);
 }
 
-
-
 static void OPC_6502_9D (void)
 // Opcode $9D: STA abs,x
 {
     STO_OP (ABSX_NP, Regs.AC);
 }
-
-
 
 static void OPC_6502X_9E (void)
 // Opcode $9E: SHX abs,x
@@ -2910,15 +2497,11 @@ static void OPC_6502X_9E (void)
     Cycles=5;
 }
 
-
-
 static void OPC_65C02_9E (void)
 // Opcode $9E: STZ abs,x
 {
     STO_OP (ABSX_NP, 0);
 }
-
-
 
 static void OPC_6502X_9F (void)
 // Opcode $9F: SHA abs,y
@@ -2938,15 +2521,11 @@ static void OPC_6502X_9F (void)
     Cycles=5;
 }
 
-
-
 static void OPC_65C02_9F (void)
 // Opcode $9F: BBS1 zp, rel
 {
     ZP_BIT_BRANCH (1, 1);
 }
-
-
 
 static void OPC_6502_A0 (void)
 // Opcode $A0: LDY #imm
@@ -2954,15 +2533,11 @@ static void OPC_6502_A0 (void)
     ALU_OP_IMM (LDY);
 }
 
-
-
 static void OPC_6502_A1 (void)
 // Opcode $A1: LDA (zp,x)
 {
     ALU_OP (ZPXIND, LDA);
 }
-
-
 
 static void OPC_6502_A2 (void)
 // Opcode $A2: LDX #imm
@@ -2970,15 +2545,11 @@ static void OPC_6502_A2 (void)
     ALU_OP_IMM (LDX);
 }
 
-
-
 static void OPC_6502X_A3 (void)
 // Opcode $A3: LAX (zp,x)
 {
     ALU_OP (ZPXIND, LAX);
 }
-
-
 
 static void OPC_6502_A4 (void)
 // Opcode $A4: LDY zp
@@ -2986,15 +2557,11 @@ static void OPC_6502_A4 (void)
     ALU_OP (ZP, LDY);
 }
 
-
-
 static void OPC_6502_A5 (void)
 // Opcode $A5: LDA zp
 {
     ALU_OP (ZP, LDA);
 }
-
-
 
 static void OPC_6502_A6 (void)
 // Opcode $A6: LDX zp
@@ -3002,23 +2569,17 @@ static void OPC_6502_A6 (void)
     ALU_OP (ZP, LDX);
 }
 
-
-
 static void OPC_6502X_A7 (void)
 // Opcode $A7: LAX zp
 {
     ALU_OP (ZP, LAX);
 }
 
-
-
 static void OPC_65C02_A7 (void)
 // Opcode $A7: SMB2 zp
 {
     ZP_BITOP(2, 1);
 }
-
-
 
 static void OPC_6502_A8 (void)
 // Opcode $A8: TAY
@@ -3030,15 +2591,11 @@ static void OPC_6502_A8 (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502_A9 (void)
 // Opcode $A9: LDA #imm
 {
     ALU_OP_IMM (LDA);
 }
-
-
 
 static void OPC_6502_AA (void)
 // Opcode $AA: TAX
@@ -3050,15 +2607,11 @@ static void OPC_6502_AA (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502X_AB (void)
 // Opcode $AB: LXA imm
 {
     ALU_OP_IMM (LXA);
 }
-
-
 
 static void OPC_6502_AC (void)
 // Opcode $Regs.AC: LDY abs
@@ -3066,15 +2619,11 @@ static void OPC_6502_AC (void)
     ALU_OP (ABS, LDY);
 }
 
-
-
 static void OPC_6502_AD (void)
 // Opcode $AD: LDA abs
 {
     ALU_OP (ABS, LDA);
 }
-
-
 
 static void OPC_6502_AE (void)
 // Opcode $AE: LDX abs
@@ -3082,15 +2631,11 @@ static void OPC_6502_AE (void)
     ALU_OP (ABS, LDX);
 }
 
-
-
 static void OPC_6502X_AF (void)
 // Opcode $AF: LAX abs
 {
     ALU_OP (ABS, LAX);
 }
-
-
 
 static void OPC_65C02_AF (void)
 // Opcode $AF: BBS2 zp, rel
@@ -3098,15 +2643,11 @@ static void OPC_65C02_AF (void)
     ZP_BIT_BRANCH (2, 1);
 }
 
-
-
 static void OPC_6502_B0 (void)
 // Opcode $B0: BCS
 {
     BRANCH (GET_CF ());
 }
-
-
 
 static void OPC_6502_B1 (void)
 // Opcode $B1: LDA (zp),y
@@ -3114,15 +2655,11 @@ static void OPC_6502_B1 (void)
     ALU_OP (ZPINDY, LDA);
 }
 
-
-
 static void OPC_65C02_B2 (void)
 // Opcode $B2: LDA (zp)
 {
     ALU_OP (ZPIND, LDA);
 }
-
-
 
 static void OPC_6502X_B3 (void)
 // Opcode $B3: LAX (zp),y
@@ -3130,15 +2667,11 @@ static void OPC_6502X_B3 (void)
     ALU_OP (ZPINDY, LAX);
 }
 
-
-
 static void OPC_6502_B4 (void)
 // Opcode $B4: LDY zp,x
 {
     ALU_OP (ZPX, LDY);
 }
-
-
 
 static void OPC_6502_B5 (void)
 // Opcode $B5: LDA zp,x
@@ -3146,15 +2679,11 @@ static void OPC_6502_B5 (void)
     ALU_OP (ZPX, LDA);
 }
 
-
-
 static void OPC_6502_B6 (void)
 // Opcode $B6: LDX zp,y
 {
     ALU_OP (ZPY, LDX);
 }
-
-
 
 static void OPC_6502X_B7 (void)
 // Opcode $B7: LAX zp,y
@@ -3162,15 +2691,11 @@ static void OPC_6502X_B7 (void)
     ALU_OP (ZPY, LAX);
 }
 
-
-
 static void OPC_65C02_B7 (void)
 // Opcode $B7: SMB3 zp
 {
     ZP_BITOP(3, 1);
 }
-
-
 
 static void OPC_6502_B8 (void)
 // Opcode $B8: CLV
@@ -3180,15 +2705,11 @@ static void OPC_6502_B8 (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502_B9 (void)
 // Opcode $B9: LDA abs,y
 {
     ALU_OP (ABSY, LDA);
 }
-
-
 
 static void OPC_6502_BA (void)
 // Opcode $BA: TSX
@@ -3200,15 +2721,11 @@ static void OPC_6502_BA (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502X_BB (void)
 // Opcode $BB: LAS abs,y
 {
     ALU_OP (ABSY, LAS);
 }
-
-
 
 static void OPC_6502_BC (void)
 // Opcode $BC: LDY abs,x
@@ -3216,15 +2733,11 @@ static void OPC_6502_BC (void)
     ALU_OP (ABSX, LDY);
 }
 
-
-
 static void OPC_6502_BD (void)
 // Opcode $BD: LDA abs,x
 {
     ALU_OP (ABSX, LDA);
 }
-
-
 
 static void OPC_6502_BE (void)
 // Opcode $BE: LDX abs,y
@@ -3232,15 +2745,11 @@ static void OPC_6502_BE (void)
     ALU_OP (ABSY, LDX);
 }
 
-
-
 static void OPC_6502X_BF (void)
 // Opcode $BF: LAX abs,y
 {
     ALU_OP (ABSY, LAX);
 }
-
-
 
 static void OPC_65C02_BF (void)
 // Opcode $BF: BBS3 zp, rel
@@ -3248,15 +2757,11 @@ static void OPC_65C02_BF (void)
     ZP_BIT_BRANCH (3, 1);
 }
 
-
-
 static void OPC_6502_C0 (void)
 // Opcode $C0: CPY #imm
 {
     ALU_OP_IMM (CPY);
 }
-
-
 
 static void OPC_6502_C1 (void)
 // Opcode $C1: CMP (zp,x)
@@ -3264,15 +2769,11 @@ static void OPC_6502_C1 (void)
     ALU_OP (ZPXIND, CMP);
 }
 
-
-
 static void OPC_6502X_C3 (void)
 // Opcode $C3: DCP (zp,x)
 {
     MEM_OP (ZPXIND, DCP);
 }
-
-
 
 static void OPC_6502_C4 (void)
 // Opcode $C4: CPY zp
@@ -3280,15 +2781,11 @@ static void OPC_6502_C4 (void)
     ALU_OP (ZP, CPY);
 }
 
-
-
 static void OPC_6502_C5 (void)
 // Opcode $C5: CMP zp
 {
     ALU_OP (ZP, CMP);
 }
-
-
 
 static void OPC_6502_C6 (void)
 // Opcode $C6: DEC zp
@@ -3296,23 +2793,17 @@ static void OPC_6502_C6 (void)
     MEM_OP (ZP, DEC);
 }
 
-
-
 static void OPC_6502X_C7 (void)
 // Opcode $C7: DCP zp
 {
     MEM_OP (ZP, DCP);
 }
 
-
-
 static void OPC_65C02_C7 (void)
 // Opcode $C7: SMB4 zp
 {
     ZP_BITOP(4, 1);
 }
-
-
 
 static void OPC_6502_C8 (void)
 // Opcode $C8: INY
@@ -3322,15 +2813,11 @@ static void OPC_6502_C8 (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502_C9 (void)
 // Opcode $C9: CMP #imm
 {
     ALU_OP_IMM (CMP);
 }
-
-
 
 static void OPC_6502_CA (void)
 // Opcode $CA: DEX
@@ -3340,15 +2827,11 @@ static void OPC_6502_CA (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502X_CB (void)
 // Opcode $CB: SBX imm
 {
     ALU_OP_IMM (SBX);
 }
-
-
 
 static void OPC_6502_CC (void)
 // Opcode $CC: CPY abs
@@ -3356,15 +2839,11 @@ static void OPC_6502_CC (void)
     ALU_OP (ABS, CPY);
 }
 
-
-
 static void OPC_6502_CD (void)
 // Opcode $CD: CMP abs
 {
     ALU_OP (ABS, CMP);
 }
-
-
 
 static void OPC_6502_CE (void)
 // Opcode $CE: DEC abs
@@ -3372,15 +2851,11 @@ static void OPC_6502_CE (void)
     MEM_OP (ABS, DEC);
 }
 
-
-
 static void OPC_6502X_CF (void)
 // Opcode $CF: DCP abs
 {
     MEM_OP (ABS, DCP);
 }
-
-
 
 static void OPC_65C02_CF (void)
 // Opcode $CF: BBS4 zp, rel
@@ -3388,15 +2863,11 @@ static void OPC_65C02_CF (void)
     ZP_BIT_BRANCH (4, 1);
 }
 
-
-
 static void OPC_6502_D0 (void)
 // Opcode $D0: BNE
 {
     BRANCH (!GET_ZF ());
 }
-
-
 
 static void OPC_6502_D1 (void)
 // Opcode $D1: CMP (zp),y
@@ -3404,15 +2875,11 @@ static void OPC_6502_D1 (void)
     ALU_OP (ZPINDY, CMP);
 }
 
-
-
 static void OPC_65C02_D2 (void)
 // Opcode $D2: CMP (zp)
 {
     ALU_OP (ZPIND, CMP);
 }
-
-
 
 static void OPC_6502X_D3 (void)
 // Opcode $D3: DCP (zp),y
@@ -3420,15 +2887,11 @@ static void OPC_6502X_D3 (void)
     MEM_OP (ZPINDY_NP, DCP);
 }
 
-
-
 static void OPC_6502_D5 (void)
 // Opcode $D5: CMP zp,x
 {
     ALU_OP (ZPX, CMP);
 }
-
-
 
 static void OPC_6502_D6 (void)
 // Opcode $D6: DEC zp,x
@@ -3436,23 +2899,17 @@ static void OPC_6502_D6 (void)
     MEM_OP (ZPX, DEC);
 }
 
-
-
 static void OPC_6502X_D7 (void)
 // Opcode $D7: DCP zp,x
 {
     MEM_OP (ZPX, DCP);
 }
 
-
-
 static void OPC_65C02_D7 (void)
 // Opcode $D7: SMB5 zp
 {
     ZP_BITOP(5, 1);
 }
-
-
 
 static void OPC_6502_D8 (void)
 // Opcode $D8: CLD
@@ -3462,15 +2919,11 @@ static void OPC_6502_D8 (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502_D9 (void)
 // Opcode $D9: CMP abs,y
 {
     ALU_OP (ABSY, CMP);
 }
-
-
 
 static void OPC_65C02_DA (void)
 // Opcode $DA: PHX
@@ -3480,15 +2933,11 @@ static void OPC_65C02_DA (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502X_DB (void)
 // Opcode $DB: DCP abs,y
 {
     MEM_OP (ABSY_NP, DCP);
 }
-
-
 
 static void OPC_6502_DD (void)
 // Opcode $DD: CMP abs,x
@@ -3496,15 +2945,11 @@ static void OPC_6502_DD (void)
     ALU_OP (ABSX, CMP);
 }
 
-
-
 static void OPC_6502_DE (void)
 // Opcode $DE: DEC abs,x
 {
     MEM_OP (ABSX_NP, DEC);
 }
-
-
 
 static void OPC_6502X_DF (void)
 // Opcode $DF: DCP abs,x
@@ -3512,15 +2957,11 @@ static void OPC_6502X_DF (void)
     MEM_OP (ABSX_NP, DCP);
 }
 
-
-
 static void OPC_65C02_DF (void)
 // Opcode $DF: BBS5 zp, rel
 {
     ZP_BIT_BRANCH (5, 1);
 }
-
-
 
 static void OPC_6502_E0 (void)
 // Opcode $E0: CPX #imm
@@ -3528,15 +2969,11 @@ static void OPC_6502_E0 (void)
     ALU_OP_IMM (CPX);
 }
 
-
-
 static void OPC_6502_E1 (void)
 // Opcode $E1: SBC (zp,x)
 {
     ALU_OP (ZPXIND, SBC_6502);
 }
-
-
 
 static void OPC_65C02_E1 (void)
 // Opcode $E1: SBC (zp,x)
@@ -3544,15 +2981,11 @@ static void OPC_65C02_E1 (void)
     ALU_OP (ZPXIND, SBC_65C02);
 }
 
-
-
 static void OPC_6502X_E3 (void)
 // Opcode $E3: ISC (zp,x)
 {
     MEM_OP (ZPXIND, ISC);
 }
-
-
 
 static void OPC_6502_E4 (void)
 // Opcode $E4: CPX zp
@@ -3560,15 +2993,11 @@ static void OPC_6502_E4 (void)
     ALU_OP (ZP, CPX);
 }
 
-
-
 static void OPC_6502_E5 (void)
 // Opcode $E5: SBC zp
 {
     ALU_OP (ZP, SBC_6502);
 }
-
-
 
 static void OPC_65C02_E5 (void)
 // Opcode $E5: SBC zp
@@ -3576,15 +3005,11 @@ static void OPC_65C02_E5 (void)
     ALU_OP (ZP, SBC_65C02);
 }
 
-
-
 static void OPC_6502_E6 (void)
 // Opcode $E6: INC zp
 {
     MEM_OP (ZP, INC);
 }
-
-
 
 static void OPC_6502X_E7 (void)
 // Opcode $E7: ISC zp
@@ -3592,15 +3017,11 @@ static void OPC_6502X_E7 (void)
     MEM_OP (ZP, ISC);
 }
 
-
-
 static void OPC_65C02_E7 (void)
 // Opcode $E7: SMB6 zp
 {
     ZP_BITOP(6, 1);
 }
-
-
 
 static void OPC_6502_E8 (void)
 // Opcode $E8: INX
@@ -3610,8 +3031,6 @@ static void OPC_6502_E8 (void)
     Regs.PC += 1;
 }
 
-
-
 // Aliases of opcode $E9
 #define OPC_6502X_EB OPC_6502_E9
 
@@ -3620,8 +3039,6 @@ static void OPC_6502_E9 (void)
 {
     ALU_OP_IMM (SBC_6502);
 }
-
-
 
 static void OPC_65C02_E9 (void)
 // Opcode $E9: SBC #imm
@@ -3645,16 +3062,12 @@ static void OPC_6502_EA (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_65C02_NOP11(void)
 // Opcode 'Illegal' 1 cycle NOP
 {
     Cycles = 1;
     Regs.PC += 1;
 }
-
-
 
 static void OPC_65C02_NOP22 (void)
 // Opcode 'Illegal' 2 byte 2 cycle NOP
@@ -3663,16 +3076,12 @@ static void OPC_65C02_NOP22 (void)
     Regs.PC += 2;
 }
 
-
-
 static void OPC_65C02_NOP24 (void)
 // Opcode 'Illegal' 2 byte 4 cycle NOP
 {
     Cycles = 4;
     Regs.PC += 2;
 }
-
-
 
 static void OPC_65C02_NOP34 (void)
 // Opcode 'Illegal' 3 byte 4 cycle NOP
@@ -3681,15 +3090,11 @@ static void OPC_65C02_NOP34 (void)
     Regs.PC += 3;
 }
 
-
-
 static void OPC_6502_EC (void)
 // Opcode $EC: CPX abs
 {
     ALU_OP (ABS, CPX);
 }
-
-
 
 static void OPC_6502_ED (void)
 // Opcode $ED: SBC abs
@@ -3697,14 +3102,11 @@ static void OPC_6502_ED (void)
     ALU_OP (ABS, SBC_6502);
 }
 
-
-
 static void OPC_65C02_ED (void)
 // Opcode $ED: SBC abs
 {
     ALU_OP (ABS, SBC_65C02);
 }
-
 
 static void OPC_6502_EE (void)
 // Opcode $EE: INC abs
@@ -3712,15 +3114,11 @@ static void OPC_6502_EE (void)
     MEM_OP (ABS, INC);
 }
 
-
-
 static void OPC_6502X_EF (void)
 // Opcode $EF: ISC abs
 {
     MEM_OP (ABS, ISC);
 }
-
-
 
 static void OPC_65C02_EF (void)
 // Opcode $EF: BBS6 zp, rel
@@ -3728,15 +3126,11 @@ static void OPC_65C02_EF (void)
     ZP_BIT_BRANCH (6, 1);
 }
 
-
-
 static void OPC_6502_F0 (void)
 // Opcode $F0: BEQ
 {
     BRANCH (GET_ZF ());
 }
-
-
 
 static void OPC_6502_F1 (void)
 // Opcode $F1: SBC (zp),y
@@ -3744,15 +3138,11 @@ static void OPC_6502_F1 (void)
     ALU_OP (ZPINDY, SBC_6502);
 }
 
-
-
 static void OPC_65C02_F1 (void)
 // Opcode $F1: SBC (zp),y
 {
     ALU_OP (ZPINDY, SBC_65C02);
 }
-
-
 
 static void OPC_65C02_F2 (void)
 // Opcode $F2: SBC (zp)
@@ -3760,15 +3150,11 @@ static void OPC_65C02_F2 (void)
     ALU_OP (ZPIND, SBC_65C02);
 }
 
-
-
 static void OPC_6502X_F3 (void)
 // Opcode $F3: ISC (zp),y
 {
     MEM_OP (ZPINDY_NP, ISC);
 }
-
-
 
 static void OPC_6502_F5 (void)
 // Opcode $F5: SBC zp,x
@@ -3776,15 +3162,11 @@ static void OPC_6502_F5 (void)
     ALU_OP (ZPX, SBC_6502);
 }
 
-
-
 static void OPC_65C02_F5 (void)
 // Opcode $F5: SBC zp,x
 {
     ALU_OP (ZPX, SBC_65C02);
 }
-
-
 
 static void OPC_6502_F6 (void)
 // Opcode $F6: INC zp,x
@@ -3792,23 +3174,17 @@ static void OPC_6502_F6 (void)
     MEM_OP (ZPX, INC);
 }
 
-
-
 static void OPC_6502X_F7 (void)
 // Opcode $F7: ISC zp,x
 {
     MEM_OP (ZPX, ISC);
 }
 
-
-
 static void OPC_65C02_F7 (void)
 // Opcode $F7: SMB7 zp
 {
     ZP_BITOP(7, 1);
 }
-
-
 
 static void OPC_6502_F8 (void)
 // Opcode $F8: SED
@@ -3818,23 +3194,17 @@ static void OPC_6502_F8 (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502_F9 (void)
 // Opcode $F9: SBC abs,y
 {
     ALU_OP (ABSY, SBC_6502);
 }
 
-
-
 static void OPC_65C02_F9 (void)
 // Opcode $F9: SBC abs,y
 {
     ALU_OP (ABSY, SBC_65C02);
 }
-
-
 
 static void OPC_65C02_FA (void)
 // Opcode $7A: PLX
@@ -3846,15 +3216,11 @@ static void OPC_65C02_FA (void)
     Regs.PC += 1;
 }
 
-
-
 static void OPC_6502X_FB (void)
 // Opcode $FB: ISC abs,y
 {
     MEM_OP (ABSY_NP, ISC);
 }
-
-
 
 static void OPC_6502_FD (void)
 // Opcode $FD: SBC abs,x
@@ -3862,15 +3228,11 @@ static void OPC_6502_FD (void)
     ALU_OP (ABSX, SBC_6502);
 }
 
-
-
 static void OPC_65C02_FD (void)
 // Opcode $FD: SBC abs,x
 {
     ALU_OP (ABSX, SBC_65C02);
 }
-
-
 
 static void OPC_6502_FE (void)
 // Opcode $FE: INC abs,x
@@ -3878,15 +3240,11 @@ static void OPC_6502_FE (void)
     MEM_OP (ABSX_NP, INC);
 }
 
-
-
 static void OPC_6502X_FF (void)
 // Opcode $FF: ISC abs,x
 {
     MEM_OP (ABSX_NP, ISC);
 }
-
-
 
 static void OPC_65C02_FF (void)
 // Opcode $FF: BBS7 zp, rel
@@ -3894,13 +3252,9 @@ static void OPC_65C02_FF (void)
     ZP_BIT_BRANCH (7, 1);
 }
 
-
-
 //***************************************************************************
 //                           Opcode handler tables
 //***************************************************************************
-
-
 
 // Opcode handler table for the 6502
 static const OPFunc OP6502Table[256] = {
@@ -4162,8 +3516,6 @@ static const OPFunc OP6502Table[256] = {
     OPC_Illegal,
 };
 
-
-
 // Opcode handler table for the 6502X
 static const OPFunc OP6502XTable[256] = {
     OPC_6502_00,
@@ -4423,8 +3775,6 @@ static const OPFunc OP6502XTable[256] = {
     OPC_6502_FE,
     OPC_6502X_FF
 };
-
-
 
 // Opcode handler table for the 65C02
 static const OPFunc OP65C02Table[256] = {
@@ -4686,8 +4036,6 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65C02_FF
 };
 
-
-
 // Tables with opcode handlers
 static const OPFunc* Handlers[3] = {
     OP6502Table,
@@ -4695,13 +4043,9 @@ static const OPFunc* Handlers[3] = {
     OP6502XTable
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void IRQRequest (void)
 // Generate an IRQ
@@ -4710,16 +4054,12 @@ void IRQRequest (void)
     HaveIRQRequest = true;
 }
 
-
-
 void NMIRequest (void)
 // Generate an NMI
 {
     // Remember the request
     HaveNMIRequest = true;
 }
-
-
 
 void Reset (void)
 // Generate a CPU RESET
@@ -4736,8 +4076,6 @@ void Reset (void)
         ProfileReset(Regs.PC);
     }
 }
-
-
 
 unsigned ExecuteInsn (void)
 // Execute one CPU instruction

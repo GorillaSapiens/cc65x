@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef OPCODES_H
 #define OPCODES_H
-
-
 
 // common
 #include "inline.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // 65XX opcodes
 typedef enum {
@@ -200,13 +192,9 @@ typedef struct {
 // Opcode description table
 extern const OPCDesc OPCTable[OP65_COUNT];
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 const OPCDesc* FindOP65 (const char* OPC);
 /* Find the given opcode and return the opcode description. If the opcode was
@@ -261,8 +249,6 @@ bc_t GetBranchCond (opc_t OPC);
 
 bc_t GetInverseCond (bc_t BC);
 // Return the inverse condition of the given one
-
-
 
 // End of opcodes.h
 

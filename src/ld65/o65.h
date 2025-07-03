@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef O65_H
 #define O65_H
-
-
 
 #include <stdio.h>
 
 #include "extsyms.h"
 #include "config.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Structure describing the format
 typedef struct O65Desc O65Desc;
@@ -69,13 +61,9 @@ typedef struct O65Desc O65Desc;
 #define O65OS_OPENCBM           4
 #define O65OS_MAX               255
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 O65Desc* NewO65Desc (void);
 // Create, initialize and return a new O65 descriptor struct
@@ -118,8 +106,6 @@ void O65SetExport (O65Desc* D, unsigned Ident);
 
 void O65WriteTarget (O65Desc* D, File* F);
 // Write an o65 output file
-
-
 
 // End of o65.h
 

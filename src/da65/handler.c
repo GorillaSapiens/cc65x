@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <inttypes.h>
 #include <stdarg.h>
 
@@ -51,15 +49,11 @@
 #include "opc45GS02.h"
 #include "output.h"
 
-
-
 static unsigned short SubroutineParamSize[0x10000];
 
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 static void Mnemonic (const char* M)
 // Indent and output a mnemonic
@@ -67,8 +61,6 @@ static void Mnemonic (const char* M)
     Indent (MCol);
     Output ("%s", M);
 }
-
-
 
 static void OneLine (const OpcDesc* D, const char* Arg, ...) attribute ((format(printf, 2, 3)));
 static void OneLine (const OpcDesc* D, const char* Arg, ...)
@@ -94,8 +86,6 @@ static void OneLine (const OpcDesc* D, const char* Arg, ...)
     LineFeed ();
 }
 
-
-
 static const char* GetAbsOverride (unsigned Flags, uint32_t Addr)
 /* If the instruction requires an abs override modifier, return the necessary
 ** string, otherwise return the empty string.
@@ -109,8 +99,6 @@ static const char* GetAbsOverride (unsigned Flags, uint32_t Addr)
         return "";
     }
 }
-
-
 
 static const char* GetAddrArg (unsigned Flags, uint32_t Addr)
 // Return an address argument - a label if we have one, or the address itself
@@ -131,8 +119,6 @@ static const char* GetAddrArg (unsigned Flags, uint32_t Addr)
         return Buf;
     }
 }
-
-
 
 static void GenerateLabel (unsigned Flags, uint32_t Addr)
 // Generate a label in pass one if requested
@@ -157,7 +143,6 @@ static void GenerateLabel (unsigned Flags, uint32_t Addr)
         } else {
 
             // THIS CODE IS A MESS AND WILL FAIL ON SEVERAL CONDITIONS! ###
-
 
             /* Search for the start of the range or the last non dependent
             ** label in the range.
@@ -195,27 +180,19 @@ static void GenerateLabel (unsigned Flags, uint32_t Addr)
     }
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void OH_Illegal (const OpcDesc* D attribute ((unused)))
 {
     DataByteLine (1);
 }
 
-
-
 void OH_Accumulator (const OpcDesc* D)
 {
     OneLine (D, "a");
 }
-
-
 
 void OH_Implicit (const OpcDesc* D)
 {
@@ -223,8 +200,6 @@ void OH_Implicit (const OpcDesc* D)
     LineComment (PC, D->Size);
     LineFeed ();
 }
-
-
 
 void OH_Implicit_ea_45GS02 (const OpcDesc* D)
 // handle disassembling EOM prefixed opcodes, $ea $xx
@@ -253,8 +228,6 @@ void OH_Implicit_ea_45GS02 (const OpcDesc* D)
         OH_Implicit (D);
     }
 }
-
-
 
 void OH_Implicit_42_45GS02 (const OpcDesc* D)
 // handle disassembling NEG NEG prefixed opcodes, $42 42 ($ea) $xx
@@ -300,14 +273,10 @@ void OH_Implicit_42_45GS02 (const OpcDesc* D)
     OH_Implicit (D);
 }
 
-
-
 void OH_Immediate (const OpcDesc* D)
 {
     OneLine (D, "#$%02" PRIX8, GetCodeByte (PC+1));
 }
-
-
 
 void OH_Immediate65816M (const OpcDesc* D)
 {
@@ -318,8 +287,6 @@ void OH_Immediate65816M (const OpcDesc* D)
     }
 }
 
-
-
 void OH_Immediate65816X (const OpcDesc* D)
 {
     if (GetAttr (PC) & atIdx16) {
@@ -329,14 +296,10 @@ void OH_Immediate65816X (const OpcDesc* D)
     }
 }
 
-
-
 void OH_ImmediateWord (const OpcDesc* D)
 {
     OneLine (D, "#$%04" PRIX16, GetCodeWord (PC+1));
 }
-
-
 
 void OH_Direct (const OpcDesc* D)
 {
@@ -350,8 +313,6 @@ void OH_Direct (const OpcDesc* D)
     OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
 }
 
-
-
 void OH_Direct_Q (const OpcDesc* D)
 {
     // Get the operand
@@ -363,8 +324,6 @@ void OH_Direct_Q (const OpcDesc* D)
     // Output the line
     OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
 }
-
-
 
 void OH_DirectX (const OpcDesc* D)
 {
@@ -378,8 +337,6 @@ void OH_DirectX (const OpcDesc* D)
     OneLine (D, "%s,x", GetAddrArg (D->Flags, Addr));
 }
 
-
-
 void OH_DirectX_Q (const OpcDesc* D)
 {
     // Get the operand
@@ -391,8 +348,6 @@ void OH_DirectX_Q (const OpcDesc* D)
     // Output the line
     OneLine (D, "%s,x", GetAddrArg (D->Flags, Addr));
 }
-
-
 
 void OH_DirectY (const OpcDesc* D)
 {
@@ -406,8 +361,6 @@ void OH_DirectY (const OpcDesc* D)
     OneLine (D, "%s,y", GetAddrArg (D->Flags, Addr));
 }
 
-
-
 void OH_Absolute (const OpcDesc* D)
 {
     // Get the operand
@@ -419,8 +372,6 @@ void OH_Absolute (const OpcDesc* D)
     // Output the line
     OneLine (D, "%s%s", GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
 }
-
-
 
 void OH_Absolute_Q (const OpcDesc* D)
 {
@@ -434,8 +385,6 @@ void OH_Absolute_Q (const OpcDesc* D)
     OneLine (D, "%s%s", GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
 }
 
-
-
 void OH_AbsoluteX (const OpcDesc* D)
 {
     // Get the operand
@@ -447,8 +396,6 @@ void OH_AbsoluteX (const OpcDesc* D)
     // Output the line
     OneLine (D, "%s%s,x", GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
 }
-
-
 
 void OH_AbsoluteX_Q (const OpcDesc* D)
 {
@@ -462,8 +409,6 @@ void OH_AbsoluteX_Q (const OpcDesc* D)
     OneLine (D, "%s%s,x", GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
 }
 
-
-
 void OH_AbsoluteY (const OpcDesc* D)
 {
     // Get the operand
@@ -475,8 +420,6 @@ void OH_AbsoluteY (const OpcDesc* D)
     // Output the line
     OneLine (D, "%s%s,y", GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
 }
-
-
 
 void OH_AbsoluteLong (const OpcDesc* D attribute ((unused)))
 {
@@ -490,8 +433,6 @@ void OH_AbsoluteLong (const OpcDesc* D attribute ((unused)))
     OneLine (D, "%s%s", GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
 }
 
-
-
 void OH_AbsoluteLongX (const OpcDesc* D attribute ((unused)))
 {
     // Get the operand
@@ -503,8 +444,6 @@ void OH_AbsoluteLongX (const OpcDesc* D attribute ((unused)))
     // Output the line
     OneLine (D, "%s%s,x", GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
 }
-
-
 
 void OH_Relative (const OpcDesc* D)
 {
@@ -526,8 +465,6 @@ void OH_Relative (const OpcDesc* D)
     }
 }
 
-
-
 void OH_RelativeLong (const OpcDesc* D attribute ((unused)))
 {
     // Get the operand
@@ -542,8 +479,6 @@ void OH_RelativeLong (const OpcDesc* D attribute ((unused)))
     // Output the line
     OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
 }
-
-
 
 void OH_RelativeLong4510 (const OpcDesc* D attribute ((unused)))
 {
@@ -560,8 +495,6 @@ void OH_RelativeLong4510 (const OpcDesc* D attribute ((unused)))
     OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
 }
 
-
-
 void OH_DirectIndirect (const OpcDesc* D)
 {
     // Get the operand
@@ -573,8 +506,6 @@ void OH_DirectIndirect (const OpcDesc* D)
     // Output the line
     OneLine (D, "(%s)", GetAddrArg (D->Flags, Addr));
 }
-
-
 
 void OH_DirectIndirectY (const OpcDesc* D)
 {
@@ -588,8 +519,6 @@ void OH_DirectIndirectY (const OpcDesc* D)
     OneLine (D, "(%s),y", GetAddrArg (D->Flags, Addr));
 }
 
-
-
 void OH_DirectIndirectZ (const OpcDesc* D)
 {
     // Get the operand
@@ -601,8 +530,6 @@ void OH_DirectIndirectZ (const OpcDesc* D)
     // Output the line
     OneLine (D, "(%s),z", GetAddrArg (D->Flags, Addr));
 }
-
-
 
 void OH_DirectIndirectZ_Q (const OpcDesc* D)
 {
@@ -616,8 +543,6 @@ void OH_DirectIndirectZ_Q (const OpcDesc* D)
     OneLine (D, "(%s),z", GetAddrArg (D->Flags, Addr));
 }
 
-
-
 void OH_DirectXIndirect (const OpcDesc* D)
 {
     // Get the operand
@@ -630,8 +555,6 @@ void OH_DirectXIndirect (const OpcDesc* D)
     OneLine (D, "(%s,x)", GetAddrArg (D->Flags, Addr));
 }
 
-
-
 void OH_AbsoluteIndirect (const OpcDesc* D)
 {
     // Get the operand
@@ -643,8 +566,6 @@ void OH_AbsoluteIndirect (const OpcDesc* D)
     // Output the line
     OneLine (D, "(%s)", GetAddrArg (D->Flags, Addr));
 }
-
-
 
 void OH_BitBranch (const OpcDesc* D)
 {
@@ -677,8 +598,6 @@ void OH_BitBranch (const OpcDesc* D)
     xfree (BranchLabel);
 }
 
-
-
 void OH_BitBranch_m740 (const OpcDesc* D)
 /* <bit> zp, rel
 ** NOTE: currently <bit> is part of the instruction
@@ -699,8 +618,6 @@ void OH_BitBranch_m740 (const OpcDesc* D)
     OneLine (D, "%s, %s", GetAddrArg (D->Flags, Addr), GetAddrArg (flLabel, BranchAddr));
 }
 
-
-
 void OH_ImmediateDirect (const OpcDesc* D)
 {
     // Get the operand
@@ -712,8 +629,6 @@ void OH_ImmediateDirect (const OpcDesc* D)
     // Output the line
     OneLine (D, "#$%02X,%s", GetCodeByte (PC+1), GetAddrArg (D->Flags, Addr));
 }
-
-
 
 void OH_ImmediateDirectX (const OpcDesc* D)
 {
@@ -727,8 +642,6 @@ void OH_ImmediateDirectX (const OpcDesc* D)
     OneLine (D, "#$%02X,%s,x", GetCodeByte (PC+1), GetAddrArg (D->Flags, Addr));
 }
 
-
-
 void OH_ImmediateAbsolute (const OpcDesc* D)
 {
     // Get the operand
@@ -740,8 +653,6 @@ void OH_ImmediateAbsolute (const OpcDesc* D)
     // Output the line
     OneLine (D, "#$%02X,%s%s", GetCodeByte (PC+1), GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
 }
-
-
 
 void OH_ImmediateAbsoluteX (const OpcDesc* D)
 {
@@ -755,22 +666,16 @@ void OH_ImmediateAbsoluteX (const OpcDesc* D)
     OneLine (D, "#$%02X,%s%s,x", GetCodeByte (PC+1), GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
 }
 
-
-
 void OH_StackRelative (const OpcDesc* D attribute ((unused)))
 {
     // Output the line
     OneLine (D, "$%02X,s", GetCodeByte (PC+1));
 }
 
-
-
 void OH_DirectIndirectLongX (const OpcDesc* D attribute ((unused)))
 {
     Error ("Not implemented %s", __FUNCTION__);
 }
-
-
 
 void OH_StackRelativeIndirectY (const OpcDesc* D attribute ((unused)))
 {
@@ -778,15 +683,11 @@ void OH_StackRelativeIndirectY (const OpcDesc* D attribute ((unused)))
     OneLine (D, "($%02X,s),y", GetCodeByte (PC+1));
 }
 
-
-
 void OH_StackRelativeIndirectY4510 (const OpcDesc* D attribute ((unused)))
 {
     // Output the line
     OneLine (D, "($%02X,sp),y", GetCodeByte (PC+1));
 }
-
-
 
 void OH_DirectIndirectLong (const OpcDesc* D attribute ((unused)))
 {
@@ -800,8 +701,6 @@ void OH_DirectIndirectLong (const OpcDesc* D attribute ((unused)))
     OneLine (D, "[%s]", GetAddrArg (D->Flags, Addr));
 }
 
-
-
 void OH_DirectIndirectLongY (const OpcDesc* D attribute ((unused)))
 {
     // Get the operand
@@ -813,8 +712,6 @@ void OH_DirectIndirectLongY (const OpcDesc* D attribute ((unused)))
     // Output the line
     OneLine (D, "[%s],y", GetAddrArg (D->Flags, Addr));
 }
-
-
 
 void OH_BlockMove (const OpcDesc* D)
 {
@@ -844,8 +741,6 @@ void OH_BlockMove (const OpcDesc* D)
     xfree (DstLabel);
 }
 
-
-
 void OH_BlockMove65816 (const OpcDesc* D)
 {
     // Get source operand
@@ -856,8 +751,6 @@ void OH_BlockMove65816 (const OpcDesc* D)
     // Output the line
     OneLine (D, "#$%02" PRIX8 ", #$%02" PRIX8, Src, Dst);
 }
-
-
 
 void OH_AbsoluteXIndirect (const OpcDesc* D attribute ((unused)))
 {
@@ -871,8 +764,6 @@ void OH_AbsoluteXIndirect (const OpcDesc* D attribute ((unused)))
     OneLine (D, "(%s,x)", GetAddrArg (D->Flags, Addr));
 }
 
-
-
 void OH_DirectImmediate (const OpcDesc* D)
 {
     // Get the operand
@@ -884,8 +775,6 @@ void OH_DirectImmediate (const OpcDesc* D)
     // Output the line
     OneLine (D, "%s, #$%02X", GetAddrArg (D->Flags, Addr), GetCodeByte (PC+2));
 }
-
-
 
 void OH_ZeroPageBit (const OpcDesc* D)
 /* <bit> zp
@@ -901,8 +790,6 @@ void OH_ZeroPageBit (const OpcDesc* D)
     OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
 }
 
-
-
 void OH_AccumulatorBit (const OpcDesc* D)
 /* <bit> A
 ** NOTE: currently <bit> is part of the instruction
@@ -911,7 +798,6 @@ void OH_AccumulatorBit (const OpcDesc* D)
     // Output the line
     OneLine (D, "a");
 }
-
 
 void OH_AccumulatorBitBranch (const OpcDesc* D)
 /* <bit> A, rel
@@ -930,8 +816,6 @@ void OH_AccumulatorBitBranch (const OpcDesc* D)
     OneLine (D, "a, %s", GetAddrArg (flLabel, BranchAddr));
 }
 
-
-
 void OH_JmpDirectIndirect (const OpcDesc* D)
 {
     OH_DirectIndirect (D);
@@ -940,7 +824,6 @@ void OH_JmpDirectIndirect (const OpcDesc* D)
     }
     SeparatorLine ();
 }
-
 
 void OH_SpecialPage (const OpcDesc* D)
 // m740 "special page" address mode
@@ -954,8 +837,6 @@ void OH_SpecialPage (const OpcDesc* D)
     OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
 }
 
-
-
 void OH_Rts (const OpcDesc* D)
 {
     OH_Implicit (D);
@@ -964,8 +845,6 @@ void OH_Rts (const OpcDesc* D)
     }
     SeparatorLine ();
 }
-
-
 
 void OH_JmpAbsolute (const OpcDesc* D)
 {
@@ -976,8 +855,6 @@ void OH_JmpAbsolute (const OpcDesc* D)
     SeparatorLine ();
 }
 
-
-
 void OH_JmpAbsoluteIndirect (const OpcDesc* D)
 {
     OH_AbsoluteIndirect (D);
@@ -987,8 +864,6 @@ void OH_JmpAbsoluteIndirect (const OpcDesc* D)
     SeparatorLine ();
 }
 
-
-
 void OH_JmpAbsoluteXIndirect (const OpcDesc* D)
 {
     OH_AbsoluteXIndirect (D);
@@ -997,8 +872,6 @@ void OH_JmpAbsoluteXIndirect (const OpcDesc* D)
     }
     SeparatorLine ();
 }
-
-
 
 void OH_JsrAbsolute (const OpcDesc* D)
 {
@@ -1019,8 +892,6 @@ void OH_JsrAbsolute (const OpcDesc* D)
         PC -= D->Size;
     }
 }
-
-
 
 void SetSubroutineParamSize (uint32_t Addr, unsigned Size)
 {

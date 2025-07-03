@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,13 +38,9 @@
 #include "cmdline.h"
 #include "abend.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void AbEnd (const char* Format, ...)
 /* Print a message preceeded by the program name and terminate the program

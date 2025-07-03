@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "shift.h"
 
@@ -47,13 +45,9 @@
 #include "typecmp.h"
 #include "typeconv.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
 // Emit code to convert the given expression to a new type.
@@ -61,7 +55,6 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
     const Type* OldType;
     unsigned    OldBits;
     unsigned    NewBits;
-
 
     // Remember the old type
     OldType = Expr->Type;
@@ -205,8 +198,6 @@ ExitPoint:
     ReplaceType (Expr, NewType);
 }
 
-
-
 void TypeConversion (ExprDesc* Expr, const Type* NewType)
 /* Do an automatic conversion of the given expression to the new type. Output
 ** warnings or errors where this automatic conversion is suspicious or
@@ -227,7 +218,6 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
     int HasError        = 0;
     const char* Msg     = 0;
     const Type* OldType = Expr->Type;
-
 
     // If one of the sides is of type void, it is an error
     if (IsTypeVoid (NewType) || IsTypeVoid (OldType)) {
@@ -329,8 +319,6 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
     }
 }
 
-
-
 void TypeCast (ExprDesc* Expr)
 // Handle an explicit cast.
 {
@@ -377,8 +365,6 @@ void TypeCast (ExprDesc* Expr)
     // The result is always an rvalue
     ED_MarkExprAsRVal (Expr);
 }
-
-
 
 static void ComposeFuncParamList (const FuncDesc* F1, const FuncDesc* F2)
 // Compose two function symbol tables regarding function parameters into F1
@@ -434,8 +420,6 @@ static void ComposeFuncParamList (const FuncDesc* F1, const FuncDesc* F2)
         Sym2 = Sym2->NextSym;
     }
 }
-
-
 
 void TypeComposition (Type* lhs, const Type* rhs)
 /* Recursively compose two types into lhs. The two types must have compatible

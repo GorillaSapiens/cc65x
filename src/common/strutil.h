@@ -31,22 +31,14 @@
 //
 //***************************************************************************
 
-
-
 #ifndef STRUTIL_H
 #define STRUTIL_H
 
-
-
 #include <stdlib.h>
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 char* StrCopy (char* Dest, size_t DestSize, const char* Source);
 /* Copy Source to Dest honouring the maximum size of the target buffer. In
@@ -56,8 +48,6 @@ char* StrCopy (char* Dest, size_t DestSize, const char* Source);
 
 int StrCaseCmp (const char* S1, const char* S2);
 // Compare two strings ignoring case
-
-
 
 // End of strutil.h
 

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 #include <errno.h>
 
@@ -52,13 +50,9 @@
 #include "library.h"
 #include "objfile.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static const char* GetModule (const char* Name)
 // Get a module name from the file name
@@ -74,8 +68,6 @@ static const char* GetModule (const char* Name)
     // Done
     return Module;
 }
-
-
 
 static void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
 // Read the header of the object file checking the signature
@@ -113,8 +105,6 @@ static void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
     H->SpanSize     = Read32 (Obj);
 }
 
-
-
 static void SkipExpr (FILE* F)
 // Skip an expression in F
 {
@@ -150,8 +140,6 @@ static void SkipExpr (FILE* F)
     }
 }
 
-
-
 static void SkipLineInfoList (FILE* F)
 // Skip a list of line infos in F
 {
@@ -163,8 +151,6 @@ static void SkipLineInfoList (FILE* F)
         (void) ReadVar (F);
     }
 }
-
-
 
 void ObjReadData (FILE* F, ObjData* O)
 /* Read object file data from the given file. The function expects the Name
@@ -222,8 +208,6 @@ void ObjReadData (FILE* F, ObjData* O)
         SkipLineInfoList (F);
     }
 }
-
-
 
 void ObjAdd (const char* Name)
 // Add an object file to the library
@@ -297,8 +281,6 @@ void ObjAdd (const char* Name)
     // Done, close the file (we read it only, so no error check)
     fclose (Obj);
 }
-
-
 
 void ObjExtract (const char* Name)
 // Extract a module from the library

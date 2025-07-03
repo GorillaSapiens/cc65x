@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -42,13 +40,9 @@
 #include "coll.h"
 #include "xmalloc.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Translation table actually used. Default is no translation
 static unsigned char Tab[256] = {
@@ -73,13 +67,9 @@ static unsigned char Tab[256] = {
 #define MAX_CHARMAP_STACK   16
 static Collection CharmapStack = STATIC_COLLECTION_INITIALIZER;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void TgtTranslateInit (void)
 // Initialize the translation tables
@@ -87,8 +77,6 @@ void TgtTranslateInit (void)
     // Copy the translation for the selected target
     memcpy (Tab, GetTargetProperties (Target)->CharMap, sizeof (Tab));
 }
-
-
 
 int TgtTranslateChar (int C)
 /* Translate one character from the source character set into the target
@@ -98,8 +86,6 @@ int TgtTranslateChar (int C)
     // Translate
     return Tab[C & 0xFF];
 }
-
-
 
 void TgtTranslateBuf (void* Buf, unsigned Len)
 /* Translate a buffer of the given length from the source character set into
@@ -113,8 +99,6 @@ void TgtTranslateBuf (void* Buf, unsigned Len)
         ++B;
     }
 }
-
-
 
 void TgtTranslateStrBuf (StrBuf* Buf)
 /* Translate a string buffer from the source character set into the target
@@ -136,16 +120,12 @@ void TgtTranslateStrBuf (StrBuf* Buf)
     }
 }
 
-
-
 void TgtTranslateSet (unsigned Index, unsigned char C)
 // Set the translation code for the given character
 {
     CHECK (Index < (sizeof (Tab) / sizeof(Tab[0])));
     Tab[Index] = C;
 }
-
-
 
 int TgtTranslatePush (void)
 /* Pushes the current translation table to the internal stack
@@ -165,8 +145,6 @@ int TgtTranslatePush (void)
     return 1;
 }
 
-
-
 int TgtTranslatePop (void)
 /* Pops a translation table from the internal stack into the current table
 ** Returns 1 on success, 0 on stack empty
@@ -185,8 +163,6 @@ int TgtTranslatePop (void)
     xfree (TempTab);
     return 1;
 }
-
-
 
 int TgtTranslateStackIsEmpty (void)
 // Returns 1 if the internal stack is empty

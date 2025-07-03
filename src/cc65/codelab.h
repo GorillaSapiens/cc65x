@@ -31,33 +31,21 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CODELAB_H
 #define CODELAB_H
 
-
-
 // common
 #include "coll.h"
-
-
 
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 struct CodeEntry;
-
-
 
 //***************************************************************************
 //                             struct CodeLabel
 //***************************************************************************
-
-
 
 // Label structure
 typedef struct CodeLabel CodeLabel;
@@ -69,13 +57,9 @@ struct CodeLabel {
     Collection          JumpFrom;       // Entries that jump here
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 CodeLabel* NewCodeLabel (const char* Name, unsigned Hash);
 // Create a new code label, initialize and return it
@@ -113,8 +97,6 @@ void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel);
 
 void CL_Output (const CodeLabel* L);
 // Output the code label to the output file
-
-
 
 // End of codelab.h
 

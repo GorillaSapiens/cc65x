@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -40,13 +38,9 @@
 #include "fileid.h"
 #include "filetype.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // CAUTION: table must be sorted for bsearch
 static const FileId TypeTable[] = {
@@ -87,12 +81,9 @@ static const FileId TypeTable[] = {
 
 #define FILETYPE_COUNT (sizeof (TypeTable) / sizeof (TypeTable[0]))
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
 
 FILETYPE GetTypeOfFile (const char* Name)
 /* Determine the type of the given file by looking at the name. If the file

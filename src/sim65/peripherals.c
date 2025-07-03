@@ -35,22 +35,16 @@
 #include <sys/time.h>
 #endif
 
-
 #include "peripherals.h"
 #include "trace.h"
 #include "6502.h"
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // The system-wide state of the peripherals
 Sim65Peripherals Peripherals;
-
-
 
 //***************************************************************************
 //                                   Code
@@ -104,8 +98,6 @@ static bool GetWallclockTime (struct timespec * ts)
 
     return time_valid;
 }
-
-
 
 void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
 // Write a byte to a memory location in the peripherals address aperture.
@@ -170,8 +162,6 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
     }
 }
 
-
-
 uint8_t PeripheralsReadByte (uint8_t Addr)
 // Read a byte from a memory location in the peripherals address aperture.
 {
@@ -226,8 +216,6 @@ uint8_t PeripheralsReadByte (uint8_t Addr)
         }
     }
 }
-
-
 
 void PeripheralsInit (void)
 // Initialize the peripherals.

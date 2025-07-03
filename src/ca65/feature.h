@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef FEATURE_H
 #define FEATURE_H
-
-
 
 // common
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 typedef enum {
     FEAT_UNKNOWN                = -1,
@@ -75,13 +67,9 @@ typedef enum {
     FEAT_COUNT
 } feature_t;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 feature_t FindFeature (const StrBuf* Key);
 /* Find the feature in a table and return the corresponding enum value. If the
@@ -91,8 +79,6 @@ feature_t FindFeature (const StrBuf* Key);
 void SetFeature (feature_t Feature, unsigned char On);
 /* Set the corresponding feature flag if Feature is valid.
 */
-
-
 
 // End of feature.h
 

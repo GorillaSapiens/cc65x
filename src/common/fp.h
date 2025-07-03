@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 /* The compiler must use the same floating point arithmetic as the target
 ** platform, otherwise expressions will yield a different result when
 ** evaluated in the compiler or on the target platform. Since writing a target
@@ -44,42 +42,29 @@
 ** BEWARE: This code will currently only work on little endian systems!
 */
 
-
-
 #ifndef FP_H
 #define FP_H
-
-
 
 #include <stddef.h>
 #include <stdint.h>
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
 
 typedef union Float Float;
 union Float {
     float         V;
 };
 
-
-
 typedef union Double Double;
 union Double {
     double        V;
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 size_t FP_F_Size (void);
 // Return the size of the data type float

@@ -31,29 +31,19 @@
 //
 //***************************************************************************
 
-
-
 // ca65
 #include "incpath.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 SearchPaths*    IncSearchPath;          // Standard include path
 SearchPaths*    BinSearchPath;          // Binary include path
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void InitIncludePaths (void)
 // Initialize the include path search list
@@ -62,8 +52,6 @@ void InitIncludePaths (void)
     IncSearchPath = NewSearchPath ();
     BinSearchPath = NewSearchPath ();
 }
-
-
 
 void FinishIncludePaths (void)
 // Finish creating the include path search list.

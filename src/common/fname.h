@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef FNAME_H
 #define FNAME_H
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 const char* FindExt (const char* Name);
 // Return a pointer to the file extension in Name or NULL if there is none
@@ -68,8 +62,6 @@ char* MakeTmpFilename (const char *Directory, const char *Origin, const char* Ex
 ** the Origin filename, the compiler's PID and the Extension.
 ** The result is placed in a malloc'ed buffer and returned.
 */
-
-
 
 // End of fname.h
 

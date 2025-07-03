@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SPOOL_H
 #define SPOOL_H
-
-
 
 // common
 #include "strpool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // An invalid message index
 #define INVALID_STRING_ID       0U
@@ -55,13 +47,9 @@
 // The string pool we're using
 extern StringPool* StrPool;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 #if defined(HAVE_INLINE)
 INLINE unsigned GetStrBufId (const StrBuf* S)
@@ -105,8 +93,6 @@ INLINE const char* GetString (unsigned Index)
 
 void InitStrPool (void);
 // Initialize the string pool
-
-
 
 // End of spool.h
 

@@ -31,18 +31,13 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CHARTYPE_H
 #define CHARTYPE_H
-
-
 
 #include <ctype.h>
 
 // common
 #include "inline.h"
-
 
 /* This module contains replacements for functions in ctype.h besides other
 ** functions. There is a problem with using ctype.h directly:
@@ -53,13 +48,9 @@
 ** problem, since EOF is always handled separately.
 */
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int IsAlpha (char C);
 // Check for a letter
@@ -106,8 +97,6 @@ int IsXDigit (char C);
 
 int IsQuote (char C);
 // Check for a single or double quote
-
-
 
 // End of chartype.h
 

@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ANONNAME_H
 #define ANONNAME_H
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 char* AnonFieldName (char* Buf, const char* Spec, int ANumber);
 /* Get a name for an anonymous field of a struct or union. The given buffer is
@@ -56,8 +50,6 @@ char* AnonName (char* Buf, const char* Spec);
 
 int IsAnonName (const char* Name);
 // Check if the given symbol name is that of an anonymous symbol
-
-
 
 // End of anonname.h
 

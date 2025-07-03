@@ -31,26 +31,18 @@
 //
 //***************************************************************************
 
-
-
 /* This module contains definitions for high level language symbols passed
 ** down from the C compiler. They're collected in the assembler and written to
 ** the object file in binary form, then again read by the linker and finally
 ** placed in the debug info file.
 */
 
-
-
 #ifndef HLLDBGSYM_H
 #define HLLDBGSYM_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Flag bits that tell something about the symbol
 #define HLL_TYPE_FUNC   0x0000U                 // Function
@@ -71,8 +63,6 @@
 // Other information
 #define HLL_DATA_SYM    0x0080U                 // Attached asm symbol
 #define HLL_HAS_SYM(x)  (((x) & HLL_DATA_SYM) != 0)
-
-
 
 // End of hlldbgsyms.h
 

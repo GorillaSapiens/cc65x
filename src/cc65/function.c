@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "check.h"
 #include "xmalloc.h"
@@ -54,24 +52,16 @@
 #include "symtab.h"
 #include "function.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Pointer to current function
 Function* CurrentFunc = 0;
-
-
 
 //***************************************************************************
 //                 Subroutines working with struct Function
 //***************************************************************************
-
-
 
 static Function* NewFunction (struct SymEntry* Sym, FuncDesc* D)
 // Create a new function activation structure and return it
@@ -95,16 +85,12 @@ static Function* NewFunction (struct SymEntry* Sym, FuncDesc* D)
     return F;
 }
 
-
-
 static void FreeFunction (Function* F)
 // Free a function activation structure
 {
     DoneCollection (&F->LocalsBlockStack);
     xfree (F);
 }
-
-
 
 int F_CheckParamList (FuncDesc* D, int RequireAll)
 /* Check and set the parameter sizes.
@@ -166,15 +152,11 @@ int F_CheckParamList (FuncDesc* D, int RequireAll)
     return 0;
 }
 
-
-
 const char* F_GetFuncName (const Function* F)
 // Return the name of the current function
 {
     return F->FuncEntry->Name;
 }
-
-
 
 unsigned F_GetParamCount (const Function* F)
 // Return the parameter count for the current function
@@ -182,15 +164,11 @@ unsigned F_GetParamCount (const Function* F)
     return F->Desc->ParamCount;
 }
 
-
-
 unsigned F_GetParamSize (const Function* F)
 // Return the parameter size for the current function
 {
     return F->Desc->ParamSize;
 }
-
-
 
 const Type* F_GetReturnType (Function* F)
 // Get the return type for the function
@@ -198,15 +176,11 @@ const Type* F_GetReturnType (Function* F)
     return F->ReturnType;
 }
 
-
-
 int F_HasVoidReturn (const Function* F)
 // Return true if the function does not have a return value
 {
     return (F->Flags & FF_VOID_RETURN) != 0;
 }
-
-
 
 void F_ReturnFound (Function* F)
 // Mark the function as having a return statement
@@ -214,15 +188,11 @@ void F_ReturnFound (Function* F)
     F->Flags |= FF_HAS_RETURN;
 }
 
-
-
 int F_HasReturn (const Function* F)
 // Return true if the function contains a return statement
 {
     return (F->Flags & FF_HAS_RETURN) != 0;
 }
-
-
 
 int F_IsMainFunc (const Function* F)
 // Return true if this is the main function
@@ -230,15 +200,11 @@ int F_IsMainFunc (const Function* F)
     return (F->Flags & FF_IS_MAIN) != 0;
 }
 
-
-
 int F_IsVariadic (const Function* F)
 // Return true if this is a variadic function
 {
     return (F->Desc->Flags & FD_VARIADIC) != 0;
 }
-
-
 
 int F_IsOldStyle (const Function* F)
 // Return true if this is an old style (K&R) function
@@ -246,15 +212,11 @@ int F_IsOldStyle (const Function* F)
     return (F->Desc->Flags & FD_OLDSTYLE) != 0;
 }
 
-
-
 int F_HasOldStyleIntRet (const Function* F)
 // Return true if this is an old style (K&R) function with an implicit int return
 {
     return (F->Desc->Flags & FD_OLDSTYLE_INTRET) != 0;
 }
-
-
 
 void F_SetRetLab (Function* F, unsigned NewRetLab)
 // Change the return jump label
@@ -262,23 +224,17 @@ void F_SetRetLab (Function* F, unsigned NewRetLab)
     F->RetLab = NewRetLab;
 }
 
-
-
 unsigned F_GetRetLab (const Function* F)
 // Return the return jump label
 {
     return F->RetLab;
 }
 
-
-
 int F_GetTopLevelSP (const Function* F)
 // Get the value of the stack pointer on function top level
 {
     return F->TopLevelSP;
 }
-
-
 
 int F_ReserveLocalSpace (Function* F, unsigned Size)
 /* Reserve (but don't allocate) the given local space and return the stack
@@ -289,8 +245,6 @@ int F_ReserveLocalSpace (Function* F, unsigned Size)
     return StackPtr - F->Reserved;
 }
 
-
-
 int F_GetStackPtr (const Function* F)
 /* Return the current stack pointer including reserved (but not allocated)
 ** space on the stack.
@@ -298,8 +252,6 @@ int F_GetStackPtr (const Function* F)
 {
     return StackPtr - F->Reserved;
 }
-
-
 
 void F_AllocLocalSpace (Function* F)
 /* Allocate any local space previously reserved. The function will do
@@ -318,8 +270,6 @@ void F_AllocLocalSpace (Function* F)
         F->Reserved = 0;
     }
 }
-
-
 
 int F_AllocRegVar (Function* F, const Type* Type)
 /* Allocate a register variable for the given variable type. If the allocation
@@ -347,8 +297,6 @@ int F_AllocRegVar (Function* F, const Type* Type)
     // No space left or no allocation
     return -1;
 }
-
-
 
 static void F_RestoreRegVars (Function* F)
 // Restore the register variables for the local function if there are any.
@@ -421,8 +369,6 @@ static void F_RestoreRegVars (Function* F)
     }
 }
 
-
-
 static void F_EmitDebugInfo (void)
 // Emit debug infos for the current function
 {
@@ -438,13 +384,9 @@ static void F_EmitDebugInfo (void)
     }
 }
 
-
-
 //***************************************************************************
 //                                   code
 //***************************************************************************
-
-
 
 void NewFunc (SymEntry* Func, FuncDesc* D)
 // Parse argument declarations and function body.

@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SYMTAB_H
 #define SYMTAB_H
-
-
 
 #include <stdio.h>
 
 #include "datatype.h"
 #include "symentry.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Symbol table
 typedef struct SymTable SymTable;
@@ -83,13 +75,9 @@ struct LexicalLevel {
 // Forwards
 struct FuncDesc;
 
-
-
 //***************************************************************************
 //                        Handling of lexical levels
 //***************************************************************************
-
-
 
 unsigned GetLexicalLevelDepth (void);
 // Return the current lexical level depth
@@ -133,13 +121,9 @@ void EnterStructLevel (void);
 void LeaveStructLevel (void);
 // Leave a nested block for a struct definition
 
-
-
 //***************************************************************************
 //                              Find functions
 //***************************************************************************
-
-
 
 SymEntry* FindSym (const char* Name);
 // Find with the given name the symbol visible in the current scope
@@ -162,12 +146,9 @@ SymEntry FindStructField (const Type* TypeArray, const char* Name);
 unsigned short FindSPAdjustment (const char* Name);
 // Search for an entry in the table of SP adjustments
 
-
 //***************************************************************************
 //                       Add stuff to the symbol table
 //***************************************************************************
-
-
 
 SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTable* Tab, unsigned* DSFlags);
 // Add an enum tag entry and return it
@@ -191,13 +172,9 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
 SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags);
 // Add an external or global symbol to the symbol table and return the entry
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 SymTable* GetSymTab (void);
 // Return the current symbol table
@@ -228,8 +205,6 @@ void EmitExternals (void);
 
 void EmitDebugInfo (void);
 // Emit debug infos for the locals of the current scope
-
-
 
 // End of symtab.h
 

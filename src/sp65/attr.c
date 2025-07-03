@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 
@@ -45,13 +43,9 @@
 #include "attr.h"
 #include "error.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Attr* NewAttr (const char* Name, const char* Value)
 // Create a new attribute
@@ -72,15 +66,11 @@ Attr* NewAttr (const char* Name, const char* Value)
     return A;
 }
 
-
-
 void FreeAttr (Attr* A)
 // Free an attribute structure
 {
     xfree (A);
 }
-
-
 
 void DumpAttrColl (const Collection* C)
 // Dump a collection of attribute/value pairs for debugging
@@ -91,8 +81,6 @@ void DumpAttrColl (const Collection* C)
         printf ("%s=%s\n", A->Name, A->Value);
     }
 }
-
-
 
 int FindAttr (const Collection* C, const char* Name, unsigned* Index)
 /* Search for an attribute with the given name in the collection. If it is
@@ -132,8 +120,6 @@ int FindAttr (const Collection* C, const char* Name, unsigned* Index)
     return 0;
 }
 
-
-
 const Attr* GetAttr (const Collection* C, const char* Name)
 /* Search for an attribute with the given name and return it. The function
 ** returns NULL if the attribute wasn't found.
@@ -149,8 +135,6 @@ const Attr* GetAttr (const Collection* C, const char* Name)
     }
 }
 
-
-
 const Attr* NeedAttr (const Collection* C, const char* Name, const char* Op)
 /* Search for an attribute with the given name and return it. If the attribute
 ** is not found, the function terminates with an error using Op as additional
@@ -165,8 +149,6 @@ const Attr* NeedAttr (const Collection* C, const char* Name, const char* Op)
     return CollConstAt (C, Index);
 }
 
-
-
 const char* GetAttrVal (const Collection* C, const char* Name)
 /* Search for an attribute with the given name and return its value. The
 ** function returns NULL if the attribute wasn't found.
@@ -175,8 +157,6 @@ const char* GetAttrVal (const Collection* C, const char* Name)
     const Attr* A = GetAttr (C, Name);
     return (A == 0)? 0 : A->Value;
 }
-
-
 
 const char* NeedAttrVal (const Collection* C, const char* Name, const char* Op)
 /* Search for an attribute with the given name and return its value. If the
@@ -187,8 +167,6 @@ const char* NeedAttrVal (const Collection* C, const char* Name, const char* Op)
     const Attr* A = NeedAttr (C, Name, Op);
     return (A == 0)? 0 : A->Value;
 }
-
-
 
 void AddAttr (Collection* C, const char* Name, const char* Value)
 // Add an attribute to an alphabetically sorted attribute collection
@@ -207,8 +185,6 @@ void AddAttr (Collection* C, const char* Name, const char* Value)
     // Insert the attribute
     CollInsert (C, A, Index);
 }
-
-
 
 void SplitAddAttr (Collection* C, const char* Combined, const char* Name)
 /* Split a combined name/value pair and add it as an attribute to C. Some
@@ -237,8 +213,6 @@ void SplitAddAttr (Collection* C, const char* Combined, const char* Name)
         SB_Done (&N);
     }
 }
-
-
 
 Collection* ParseAttrList (const char* List, const char* const* NameList, unsigned NameCount)
 /* Parse a list containing name/value pairs into a sorted collection. Some
@@ -288,8 +262,6 @@ Collection* ParseAttrList (const char* List, const char* const* NameList, unsign
     // Return the collection with the attributes
     return C;
 }
-
-
 
 void FreeAttrList (Collection* C)
 // Free a list of attributes

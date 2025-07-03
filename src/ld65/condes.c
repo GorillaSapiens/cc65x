@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -50,13 +48,9 @@
 #include "segments.h"
 #include "spool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Struct describing one condes type
 typedef struct ConDesDesc ConDesDesc;
@@ -123,13 +117,9 @@ static ConDesDesc ConDes[CD_TYPE_COUNT] = {
     },
 };
 
-
-
 //***************************************************************************
 //           Internally used function to create the condes tables
 //***************************************************************************
-
-
 
 static int ConDesCompare (void* Data, const void* E1, const void* E2)
 // Compare function to sort the exports
@@ -166,8 +156,6 @@ static int ConDesCompare (void* Data, const void* E1, const void* E2)
         return -Cmp;
     }
 }
-
-
 
 static void ConDesCreateOne (ConDesDesc* CD)
 // Create one table if requested
@@ -232,13 +220,9 @@ static void ConDesCreateOne (ConDesDesc* CD)
     }
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void ConDesAddExport (struct Export* E)
 // Add the given export to the list of constructors/destructor
@@ -254,8 +238,6 @@ void ConDesAddExport (struct Export* E)
     }
 }
 
-
-
 void ConDesSetSegName (unsigned Type, unsigned SegName)
 // Set the segment name where the table should go
 {
@@ -268,8 +250,6 @@ void ConDesSetSegName (unsigned Type, unsigned SegName)
     // Set the name
     ConDes[Type].SegName = SegName;
 }
-
-
 
 const ConDesImport* ConDesGetImport (unsigned Type)
 /* Get the forced import for the given ConDes type. Returns NULL if there is
@@ -286,8 +266,6 @@ const ConDesImport* ConDesGetImport (unsigned Type)
     return (Import->Name != INVALID_STRING_ID)? Import : 0;
 }
 
-
-
 void ConDesSetImport (unsigned Type, const ConDesImport* Import)
 // Set the forced import for the given ConDes type
 {
@@ -300,8 +278,6 @@ void ConDesSetImport (unsigned Type, const ConDesImport* Import)
     // Set the import and its position
     ConDes[Type].Import = *Import;
 }
-
-
 
 void ConDesSetLabel (unsigned Type, unsigned Name)
 // Set the label for the given ConDes type
@@ -316,8 +292,6 @@ void ConDesSetLabel (unsigned Type, unsigned Name)
     ConDes[Type].Label = Name;
 }
 
-
-
 void ConDesSetCountSym (unsigned Type, unsigned Name)
 // Set the name for the given ConDes count symbol
 {
@@ -331,8 +305,6 @@ void ConDesSetCountSym (unsigned Type, unsigned Name)
     ConDes[Type].CountSym = Name;
 }
 
-
-
 void ConDesSetOrder (unsigned Type, ConDesOrder Order)
 // Set the sorting oder for the given ConDes table
 {
@@ -343,8 +315,6 @@ void ConDesSetOrder (unsigned Type, ConDesOrder Order)
     ConDes[Type].Order = Order;
 }
 
-
-
 int ConDesHasSegName (unsigned Type)
 // Return true if a segment name is already defined for this ConDes type
 {
@@ -354,8 +324,6 @@ int ConDesHasSegName (unsigned Type)
     return (ConDes[Type].SegName != INVALID_STRING_ID);
 }
 
-
-
 int ConDesHasLabel (unsigned Type)
 // Return true if a label is already defined for this ConDes type
 {
@@ -364,8 +332,6 @@ int ConDesHasLabel (unsigned Type)
 
     return (ConDes[Type].Label != INVALID_STRING_ID);
 }
-
-
 
 void ConDesCreate (void)
 // Create the condes tables if requested
@@ -377,8 +343,6 @@ void ConDesCreate (void)
         ConDesCreateOne (ConDes + Type);
     }
 }
-
-
 
 void ConDesDump (void)
 // Dump ConDes data to stdout for debugging

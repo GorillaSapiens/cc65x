@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 /* Check out if we have a spawn() function on the system, or if we must use
 ** our own.
 */
@@ -56,7 +54,6 @@
 #    define SPAWN_ARGV_CONST_CAST (const char* const *)
 #  endif
 #endif
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -83,13 +80,9 @@
 #include "global.h"
 #include "error.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Struct that describes a command
 typedef struct CmdDesc CmdDesc;
@@ -149,13 +142,9 @@ static int Module = 0;
 static char* TargetLib   = 0;
 static int   NoTargetLib = 0;
 
-
-
 //***************************************************************************
 //                Include the system specific spawn function
 //***************************************************************************
-
-
 
 #if defined(NEED_SPAWN)
 #  if defined(_AMIGA)
@@ -165,27 +154,19 @@ static int   NoTargetLib = 0;
 #  endif
 #endif
 
-
-
 //***************************************************************************
 //                        Credential functions
 //***************************************************************************
-
-
 
 static void DisableAssembling (void)
 {
     DoAssemble = 0;
 }
 
-
-
 static void DisableLinking (void)
 {
     DoLink = 0;
 }
-
-
 
 static void DisableAssemblingAndLinking (void)
 {
@@ -193,13 +174,9 @@ static void DisableAssemblingAndLinking (void)
     DisableLinking ();
 }
 
-
-
 //***************************************************************************
 //                        Command structure handling
 //***************************************************************************
-
-
 
 static char* CmdAllocArg (const char* Arg, unsigned Len)
 // Alloc (potentially quoted) argument
@@ -231,16 +208,12 @@ static char* CmdAllocArg (const char* Arg, unsigned Len)
     return Alloc;
 }
 
-
-
 static void CmdExpand (CmdDesc* Cmd)
 // Expand the argument vector
 {
     Cmd->ArgMax += 10;
     Cmd->Args    = xrealloc (Cmd->Args, Cmd->ArgMax * sizeof (char*));
 }
-
-
 
 static void CmdAddArg (CmdDesc* Cmd, const char* Arg)
 // Add a new argument to the command
@@ -258,16 +231,12 @@ static void CmdAddArg (CmdDesc* Cmd, const char* Arg)
     }
 }
 
-
-
 static void CmdAddArg2 (CmdDesc* Cmd, const char* Arg1, const char* Arg2)
 // Add a new argument pair to the command
 {
     CmdAddArg (Cmd, Arg1);
     CmdAddArg (Cmd, Arg2);
 }
-
-
 
 static void CmdAddArgList (CmdDesc* Cmd, const char* ArgList)
 // Add a list of arguments separated by commas
@@ -306,8 +275,6 @@ static void CmdAddArgList (CmdDesc* Cmd, const char* ArgList)
 
 }
 
-
-
 static void CmdDelArgs (CmdDesc* Cmd, unsigned LastValid)
 // Remove all arguments with an index greater than LastValid
 {
@@ -317,8 +284,6 @@ static void CmdDelArgs (CmdDesc* Cmd, unsigned LastValid)
         Cmd->Args [Cmd->ArgCount] = 0;
     }
 }
-
-
 
 static void CmdAddFile (CmdDesc* Cmd, const char* File)
 // Add a new file to the command
@@ -353,8 +318,6 @@ static void CmdAddFile (CmdDesc* Cmd, const char* File)
     }
 }
 
-
-
 static void CmdInit (CmdDesc* Cmd, const char* Path, const char* Name)
 // Initialize the command using the given path and name of the executable
 {
@@ -373,15 +336,11 @@ static void CmdInit (CmdDesc* Cmd, const char* Path, const char* Name)
     xfree (FullName);
 }
 
-
-
 static void CmdSetOutput (CmdDesc* Cmd, const char* File)
 // Set the output file in a command desc
 {
     CmdAddArg2 (Cmd, "-o", File);
 }
-
-
 
 static void CmdSetAsmOutput (CmdDesc* Cmd, const char* File)
 // Set the output asm file in a command desc for grc65
@@ -389,15 +348,11 @@ static void CmdSetAsmOutput (CmdDesc* Cmd, const char* File)
     CmdAddArg2 (Cmd, "-s", File);
 }
 
-
-
 static void CmdSetTarget (CmdDesc* Cmd, target_t Target)
 // Set the output file in a command desc
 {
     CmdAddArg2 (Cmd, "-t", GetTargetName (Target));
 }
-
-
 
 static void CmdPrint (CmdDesc* Cmd, FILE* F)
 // Output the command line encoded in the command desc
@@ -408,13 +363,9 @@ static void CmdPrint (CmdDesc* Cmd, FILE* F)
     }
 }
 
-
-
 //***************************************************************************
 //                              Target handling
 //***************************************************************************
-
-
 
 static void SetTargetFiles (void)
 // Set the target system files
@@ -429,13 +380,9 @@ static void SetTargetFiles (void)
     strcpy (TargetLib + TargetNameLen, ".lib");
 }
 
-
-
 //***************************************************************************
 //                               Subprocesses
 //***************************************************************************
-
-
 
 static void ExecProgram (CmdDesc* Cmd)
 // Execute a subprocess with the given name/parameters. Exit on errors.
@@ -462,8 +409,6 @@ static void ExecProgram (CmdDesc* Cmd)
     }
 }
 
-
-
 static void RemoveTempFiles (void)
 {
     unsigned I;
@@ -475,8 +420,6 @@ static void RemoveTempFiles (void)
         }
     }
 }
-
-
 
 static void Link (void)
 // Link the resulting executable
@@ -537,8 +480,6 @@ static void Link (void)
     ExecProgram (&LD65);
 }
 
-
-
 static void AssembleFile (const char* File, const char* TmpFile, unsigned ArgCount)
 /* Common routine to assemble a file. Will be called by Assemble() and
 ** AssembleIntermediate(). Adds options common for both routines and
@@ -591,8 +532,6 @@ static void AssembleFile (const char* File, const char* TmpFile, unsigned ArgCou
     CmdDelArgs (&CA65, ArgCount);
 }
 
-
-
 static void AssembleIntermediate (const char* SourceFile, const char* TmpFile)
 /* Assemble an intermediate file which was generated by a previous processing
 ** step with SourceFile as input. The -dep options won't be added and
@@ -619,8 +558,6 @@ static void AssembleIntermediate (const char* SourceFile, const char* TmpFile)
     xfree (AsmTmpName);
 }
 
-
-
 static void Assemble (const char* File)
 // Assemble the given file
 {
@@ -641,8 +578,6 @@ static void Assemble (const char* File)
     // Use the common routine
     AssembleFile (File, NULL, ArgCount);
 }
-
-
 
 static void Compile (const char* File)
 // Compile the given file
@@ -714,8 +649,6 @@ static void Compile (const char* File)
     }
 }
 
-
-
 static void CompileRes (const char* File)
 // Compile the given geos resource file
 {
@@ -762,8 +695,6 @@ static void CompileRes (const char* File)
     }
 }
 
-
-
 static void ConvertO65 (const char* File)
 // Convert an o65 object file into an assembler file
 {
@@ -798,13 +729,9 @@ static void ConvertO65 (const char* File)
     }
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void Usage (void)
 // Print usage information and exit
@@ -900,15 +827,12 @@ static void Usage (void)
             ProgName);
 }
 
-
-
 static void OptAddSource (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
 // Strict source code as comments to the generated asm code
 {
     CmdAddArg (&CC65, "-T");
 }
-
 
 static void OptAllCDecl  (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
@@ -917,15 +841,11 @@ static void OptAllCDecl  (const char* Opt attribute ((unused)),
     CmdAddArg (&CC65, "--all-cdecl");
 }
 
-
-
 static void OptAsmArgs (const char* Opt attribute ((unused)), const char* Arg)
 // Pass arguments to the assembler
 {
     CmdAddArgList (&CA65, Arg);
 }
-
-
 
 static void OptAsmDefine (const char* Opt attribute ((unused)), const char* Arg)
 // Define an assembler symbol (assembler)
@@ -933,15 +853,11 @@ static void OptAsmDefine (const char* Opt attribute ((unused)), const char* Arg)
     CmdAddArg2 (&CA65, "-D", Arg);
 }
 
-
-
 static void OptAsmIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 // Include directory (assembler)
 {
     CmdAddArg2 (&CA65, "-I", Arg);
 }
-
-
 
 static void OptBinIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 // Binary include directory (assembler)
@@ -949,15 +865,11 @@ static void OptBinIncludeDir (const char* Opt attribute ((unused)), const char* 
     CmdAddArg2 (&CA65, "--bin-include-dir", Arg);
 }
 
-
-
 static void OptBssLabel (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --bss-label option
 {
     CmdAddArg2 (&CO65, "--bss-label", Arg);
 }
-
-
 
 static void OptBssName (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --bss-name option
@@ -966,23 +878,17 @@ static void OptBssName (const char* Opt attribute ((unused)), const char* Arg)
     CmdAddArg2 (&CO65, "--bss-name", Arg);
 }
 
-
-
 static void OptCCArgs (const char* Opt attribute ((unused)), const char* Arg)
 // Pass arguments to the compiler
 {
     CmdAddArgList (&CC65, Arg);
 }
 
-
-
 static void OptCfgPath (const char* Opt attribute ((unused)), const char* Arg)
 // Config file search path (linker)
 {
     CmdAddArg2 (&LD65, "--cfg-path", Arg);
 }
-
-
 
 static void OptCheckStack (const char* Opt attribute ((unused)),
                            const char* Arg attribute ((unused)))
@@ -991,15 +897,11 @@ static void OptCheckStack (const char* Opt attribute ((unused)),
     CmdAddArg (&CC65, "--check-stack");
 }
 
-
-
 static void OptCodeLabel (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --code-label option
 {
     CmdAddArg2 (&CO65, "--code-label", Arg);
 }
-
-
 
 static void OptCodeName (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --code-name option
@@ -1008,15 +910,11 @@ static void OptCodeName (const char* Opt attribute ((unused)), const char* Arg)
     CmdAddArg2 (&CO65, "--code-name", Arg);
 }
 
-
-
 static void OptCodeSize (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --codesize option
 {
     CmdAddArg2 (&CC65, "--codesize", Arg);
 }
-
-
 
 static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
 // Config file (linker)
@@ -1027,8 +925,6 @@ static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
     LinkerConfig = Arg;
 }
 
-
-
 static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --cpu option
 {
@@ -1036,8 +932,6 @@ static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
     CmdAddArg2 (&CA65, "--cpu", Arg);
     CmdAddArg2 (&CC65, "--cpu", Arg);
 }
-
-
 
 static void OptCreateDep (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --create-dep option
@@ -1049,8 +943,6 @@ static void OptCreateDep (const char* Opt attribute ((unused)), const char* Arg)
     DepName = Arg;
 }
 
-
-
 static void OptCreateFullDep (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --create-full-dep option
 {
@@ -1061,15 +953,11 @@ static void OptCreateFullDep (const char* Opt attribute ((unused)), const char* 
     FullDepName = Arg;
 }
 
-
-
 static void OptDataLabel (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --data-label option
 {
     CmdAddArg2 (&CO65, "--data-label", Arg);
 }
-
-
 
 static void OptDataName (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --data-name option
@@ -1077,8 +965,6 @@ static void OptDataName (const char* Opt attribute ((unused)), const char* Arg)
     CmdAddArg2 (&CC65, "--data-name", Arg);
     CmdAddArg2 (&CO65, "--data-name", Arg);
 }
-
-
 
 static void OptDebug (const char* Opt attribute ((unused)),
                       const char* Arg attribute ((unused)))
@@ -1089,8 +975,6 @@ static void OptDebug (const char* Opt attribute ((unused)),
     Debug = 1;
 }
 
-
-
 static void OptDebugInfo (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
 // Debug Info - add to compiler and assembler
@@ -1100,23 +984,17 @@ static void OptDebugInfo (const char* Opt attribute ((unused)),
     CmdAddArg (&CO65, "-g");
 }
 
-
-
 static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
 // Emulation features for the assembler
 {
     CmdAddArg2 (&CA65, "--feature", Arg);
 }
 
-
-
 static void OptForceImport (const char* Opt attribute ((unused)), const char* Arg)
 // Emulation features for the assembler
 {
     CmdAddArg2 (&LD65, "-u", Arg);
 }
-
-
 
 static void OptHelp (const char* Opt attribute ((unused)),
                      const char* Arg attribute ((unused)))
@@ -1126,15 +1004,11 @@ static void OptHelp (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
-
-
 static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 // Include directory (compiler)
 {
     CmdAddArg2 (&CC65, "-I", Arg);
 }
-
-
 
 static void OptLdArgs (const char* Opt attribute ((unused)), const char* Arg)
 // Pass arguments to the linker
@@ -1142,15 +1016,11 @@ static void OptLdArgs (const char* Opt attribute ((unused)), const char* Arg)
     CmdAddArgList (&LD65, Arg);
 }
 
-
-
 static void OptLibPath (const char* Opt attribute ((unused)), const char* Arg)
 // Library search path (linker)
 {
     CmdAddArg2 (&LD65, "--lib-path", Arg);
 }
-
-
 
 static void OptListBytes (const char* Opt attribute ((unused)), const char* Arg)
 // Set the maximum number of bytes per asm listing line
@@ -1158,15 +1028,11 @@ static void OptListBytes (const char* Opt attribute ((unused)), const char* Arg)
     CmdAddArg2 (&CA65, "--list-bytes", Arg);
 }
 
-
-
 static void OptListing (const char* Opt attribute ((unused)), const char* Arg)
 // Create an assembler listing
 {
     CmdAddArg2 (&CA65, "-l", Arg);
 }
-
-
 
 static void OptListTargets (const char* Opt attribute ((unused)),
                             const char* Arg attribute ((unused)))
@@ -1183,16 +1049,12 @@ static void OptListTargets (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
-
-
 static void OptMapFile (const char* Opt attribute ((unused)), const char* Arg)
 // Create a map file
 {
     // Create a map file (linker)
     CmdAddArg2 (&LD65, "-m", Arg);
 }
-
-
 
 static void OptMemoryModel (const char* Opt attribute ((unused)), const char* Arg)
 // Set the memory model
@@ -1208,16 +1070,12 @@ static void OptMemoryModel (const char* Opt attribute ((unused)), const char* Ar
     }
 }
 
-
-
 static void OptModule (const char* Opt attribute ((unused)),
                        const char* Arg attribute ((unused)))
 // Link as a module
 {
     Module = 1;
 }
-
-
 
 static void OptModuleId (const char* Opt attribute ((unused)), const char* Arg)
 // Specify a module if for the linker
@@ -1226,8 +1084,6 @@ static void OptModuleId (const char* Opt attribute ((unused)), const char* Arg)
     CmdAddArg2 (&LD65, "--module-id", Arg);
 }
 
-
-
 static void OptNoTargetLib (const char* Opt attribute ((unused)),
                             const char* Arg attribute ((unused)))
 // Disable the target library
@@ -1235,15 +1091,11 @@ static void OptNoTargetLib (const char* Opt attribute ((unused)),
     NoTargetLib = 1;
 }
 
-
-
 static void OptO65Model (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --o65-model option
 {
     CmdAddArg2 (&CO65, "-m", Arg);
 }
-
-
 
 static void OptObj (const char* Opt attribute ((unused)), const char* Arg)
 // Object file follows (linker)
@@ -1251,15 +1103,11 @@ static void OptObj (const char* Opt attribute ((unused)), const char* Arg)
     CmdAddArg2 (&LD65, "--obj", Arg);
 }
 
-
-
 static void OptObjPath (const char* Opt attribute ((unused)), const char* Arg)
 // Object file search path (linker)
 {
     CmdAddArg2 (&LD65, "--obj-path", Arg);
 }
-
-
 
 static void OptPrintTargetPath (const char* Opt attribute ((unused)),
                                 const char* Arg attribute ((unused)))
@@ -1295,15 +1143,11 @@ static void OptPrintTargetPath (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
-
-
 static void OptRegisterSpace (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --register-space option
 {
     CmdAddArg2 (&CC65, "--register-space", Arg);
 }
-
-
 
 static void OptRegisterVars (const char* Opt attribute ((unused)),
                              const char* Arg attribute ((unused)))
@@ -1312,15 +1156,11 @@ static void OptRegisterVars (const char* Opt attribute ((unused)),
     CmdAddArg (&CC65, "-r");
 }
 
-
-
 static void OptRodataName (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --rodata-name option
 {
     CmdAddArg2 (&CC65, "--rodata-name", Arg);
 }
-
-
 
 static void OptSignedChars (const char* Opt attribute ((unused)),
                             const char* Arg attribute ((unused)))
@@ -1329,15 +1169,11 @@ static void OptSignedChars (const char* Opt attribute ((unused)),
     CmdAddArg (&CC65, "-j");
 }
 
-
-
 static void OptStandard (const char* Opt attribute ((unused)), const char* Arg)
 // Set the language standard
 {
     CmdAddArg2 (&CC65, "--standard", Arg);
 }
-
-
 
 static void OptStartAddr (const char* Opt attribute ((unused)), const char* Arg)
 // Set the default start address
@@ -1345,16 +1181,12 @@ static void OptStartAddr (const char* Opt attribute ((unused)), const char* Arg)
     CmdAddArg2 (&LD65, "-S", Arg);
 }
 
-
-
 static void OptStaticLocals (const char* Opt attribute ((unused)),
                              const char* Arg attribute ((unused)))
 // Place local variables in static storage
 {
     CmdAddArg (&CC65, "-Cl");
 }
-
-
 
 static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 // Set the target system
@@ -1370,8 +1202,6 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
     }
 }
 
-
-
 static void OptVerbose (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 // Verbose mode (compiler, assembler, linker)
@@ -1382,8 +1212,6 @@ static void OptVerbose (const char* Opt attribute ((unused)),
     CmdAddArg (&LD65, "-v");
 }
 
-
-
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 // Print version number
@@ -1392,23 +1220,17 @@ static void OptVersion (const char* Opt attribute ((unused)),
     exit(EXIT_SUCCESS);
 }
 
-
-
 static void OptZeropageLabel (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --zeropage-label option
 {
     CmdAddArg2 (&CO65, "--zeropage-label", Arg);
 }
 
-
-
 static void OptZeropageName (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --zeropage-name option
 {
     CmdAddArg2 (&CO65, "--zeropage-name", Arg);
 }
-
-
 
 int main (int argc, char* argv [])
 // Utility main program

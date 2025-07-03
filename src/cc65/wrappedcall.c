@@ -28,8 +28,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdarg.h>
 #include <string.h>
 
@@ -46,23 +44,16 @@
 #include "error.h"
 #include "wrappedcall.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
 // WrappedCalls
 static IntPtrStack WrappedCalls;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void PushWrappedCall (void *Ptr, unsigned int Val)
 // Push the current WrappedCall
@@ -74,8 +65,6 @@ void PushWrappedCall (void *Ptr, unsigned int Val)
     }
 }
 
-
-
 void PopWrappedCall (void)
 // Remove the current WrappedCall
 {
@@ -85,8 +74,6 @@ void PopWrappedCall (void)
         IPS_Drop (&WrappedCalls);
     }
 }
-
-
 
 void GetWrappedCall (void **Ptr, unsigned int *Val)
 // Get the current WrappedCall

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,13 +45,9 @@
 #include "error.h"
 #include "objfile.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // File descriptor
 static FILE* F = 0;
@@ -90,13 +84,9 @@ static ObjHeader Header = {
     0,                  // 32: Size of span table
 };
 
-
-
 //***************************************************************************
 //                         Internally used functions
 //***************************************************************************
-
-
 
 static void ObjWriteError (void)
 /* Called on a write error. Will try to close and remove the file, then
@@ -115,8 +105,6 @@ static void ObjWriteError (void)
     // Now abort with a fatal error
     Fatal ("Cannot write to output file '%s': %s", OutFile, strerror (Error));
 }
-
-
 
 static void ObjWriteHeader (void)
 // Write the object file header to the current file position
@@ -148,13 +136,9 @@ static void ObjWriteHeader (void)
     ObjWrite32 (Header.SpanSize);
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void ObjOpen (void)
 // Open the object file for writing, write a dummy header
@@ -176,8 +160,6 @@ void ObjOpen (void)
     // Write a dummy header
     ObjWriteHeader ();
 }
-
-
 
 void ObjClose (void)
 // Write an update header and close the object file.
@@ -201,8 +183,6 @@ void ObjClose (void)
     }
 }
 
-
-
 unsigned long ObjGetFilePos (void)
 // Get the current file position
 {
@@ -213,8 +193,6 @@ unsigned long ObjGetFilePos (void)
     return Pos;
 }
 
-
-
 void ObjSetFilePos (unsigned long Pos)
 // Set the file position
 {
@@ -222,8 +200,6 @@ void ObjSetFilePos (unsigned long Pos)
         ObjWriteError ();
     }
 }
-
-
 
 void ObjWrite8 (unsigned V)
 // Write an 8 bit value to the file
@@ -233,16 +209,12 @@ void ObjWrite8 (unsigned V)
     }
 }
 
-
-
 void ObjWrite16 (unsigned V)
 // Write a 16 bit value to the file
 {
     ObjWrite8 (V);
     ObjWrite8 (V >> 8);
 }
-
-
 
 void ObjWrite24 (unsigned long V)
 // Write a 24 bit value to the file
@@ -252,8 +224,6 @@ void ObjWrite24 (unsigned long V)
     ObjWrite8 (V >> 16);
 }
 
-
-
 void ObjWrite32 (unsigned long V)
 // Write a 32 bit value to the file
 {
@@ -262,8 +232,6 @@ void ObjWrite32 (unsigned long V)
     ObjWrite8 (V >> 16);
     ObjWrite8 (V >> 24);
 }
-
-
 
 void ObjWriteVar (unsigned long V)
 // Write a variable sized value to the file in special encoding
@@ -283,8 +251,6 @@ void ObjWriteVar (unsigned long V)
     } while (V != 0);
 }
 
-
-
 void ObjWriteStr (const char* S)
 // Write a string to the object file
 {
@@ -298,8 +264,6 @@ void ObjWriteStr (const char* S)
     ObjWriteData (S, Len);
 }
 
-
-
 void ObjWriteBuf (const StrBuf* S)
 // Write a string to the object file
 {
@@ -311,8 +275,6 @@ void ObjWriteBuf (const StrBuf* S)
     ObjWriteData (SB_GetConstBuf (S), SB_GetLen (S));
 }
 
-
-
 void ObjWriteData (const void* Data, unsigned Size)
 // Write literal data to the file
 {
@@ -320,8 +282,6 @@ void ObjWriteData (const void* Data, unsigned Size)
         ObjWriteError ();
     }
 }
-
-
 
 void ObjWritePos (const FilePos* Pos)
 // Write a file position to the object file
@@ -337,15 +297,11 @@ void ObjWritePos (const FilePos* Pos)
     }
 }
 
-
-
 void ObjStartOptions (void)
 // Mark the start of the option section
 {
     Header.OptionOffs = ftell (F);
 }
-
-
 
 void ObjEndOptions (void)
 // Mark the end of the option section
@@ -353,15 +309,11 @@ void ObjEndOptions (void)
     Header.OptionSize = ftell (F) - Header.OptionOffs;
 }
 
-
-
 void ObjStartFiles (void)
 // Mark the start of the files section
 {
     Header.FileOffs = ftell (F);
 }
-
-
 
 void ObjEndFiles (void)
 // Mark the end of the files section
@@ -369,15 +321,11 @@ void ObjEndFiles (void)
     Header.FileSize = ftell (F) - Header.FileOffs;
 }
 
-
-
 void ObjStartSegments (void)
 // Mark the start of the segment section
 {
     Header.SegOffs = ftell (F);
 }
-
-
 
 void ObjEndSegments (void)
 // Mark the end of the segment section
@@ -385,15 +333,11 @@ void ObjEndSegments (void)
     Header.SegSize = ftell (F) - Header.SegOffs;
 }
 
-
-
 void ObjStartImports (void)
 // Mark the start of the import section
 {
     Header.ImportOffs = ftell (F);
 }
-
-
 
 void ObjEndImports (void)
 // Mark the end of the import section
@@ -401,15 +345,11 @@ void ObjEndImports (void)
     Header.ImportSize = ftell (F) - Header.ImportOffs;
 }
 
-
-
 void ObjStartExports (void)
 // Mark the start of the export section
 {
     Header.ExportOffs = ftell (F);
 }
-
-
 
 void ObjEndExports (void)
 // Mark the end of the export section
@@ -417,15 +357,11 @@ void ObjEndExports (void)
     Header.ExportSize = ftell (F) - Header.ExportOffs;
 }
 
-
-
 void ObjStartDbgSyms (void)
 // Mark the start of the debug symbol section
 {
     Header.DbgSymOffs = ftell (F);
 }
-
-
 
 void ObjEndDbgSyms (void)
 // Mark the end of the debug symbol section
@@ -433,15 +369,11 @@ void ObjEndDbgSyms (void)
     Header.DbgSymSize = ftell (F) - Header.DbgSymOffs;
 }
 
-
-
 void ObjStartLineInfos (void)
 // Mark the start of the line info section
 {
     Header.LineInfoOffs = ftell (F);
 }
-
-
 
 void ObjEndLineInfos (void)
 // Mark the end of the line info section
@@ -449,15 +381,11 @@ void ObjEndLineInfos (void)
     Header.LineInfoSize = ftell (F) - Header.LineInfoOffs;
 }
 
-
-
 void ObjStartStrPool (void)
 // Mark the start of the string pool section
 {
     Header.StrPoolOffs = ftell (F);
 }
-
-
 
 void ObjEndStrPool (void)
 // Mark the end of the string pool section
@@ -465,15 +393,11 @@ void ObjEndStrPool (void)
     Header.StrPoolSize = ftell (F) - Header.StrPoolOffs;
 }
 
-
-
 void ObjStartAssertions (void)
 // Mark the start of the assertion table
 {
     Header.AssertOffs = ftell (F);
 }
-
-
 
 void ObjEndAssertions (void)
 // Mark the end of the assertion table
@@ -481,15 +405,11 @@ void ObjEndAssertions (void)
     Header.AssertSize = ftell (F) - Header.AssertOffs;
 }
 
-
-
 void ObjStartScopes (void)
 // Mark the start of the scope table
 {
     Header.ScopeOffs = ftell (F);
 }
-
-
 
 void ObjEndScopes (void)
 // Mark the end of the scope table
@@ -497,15 +417,11 @@ void ObjEndScopes (void)
     Header.ScopeSize = ftell (F) - Header.ScopeOffs;
 }
 
-
-
 void ObjStartSpans (void)
 // Mark the start of the span table
 {
     Header.SpanOffs = ftell (F);
 }
-
-
 
 void ObjEndSpans (void)
 // Mark the end of the span table

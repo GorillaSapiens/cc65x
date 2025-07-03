@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef FILEINFO_H
 #define FILEINFO_H
-
-
 
 #include <stdio.h>
 
@@ -47,13 +43,9 @@
 // ld65
 #include "objdata.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 typedef struct FileInfo FileInfo;
 struct FileInfo {
@@ -64,13 +56,9 @@ struct FileInfo {
     Collection      Modules;            // Modules that use this file
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 FileInfo* ReadFileInfo (FILE* F, ObjData* O);
 // Read a file info from a file and return it
@@ -83,8 +71,6 @@ void AssignFileInfoIds (void);
 
 void PrintDbgFileInfo (FILE* F);
 // Output the file info to a debug info file
-
-
 
 // End of fileinfo.h
 

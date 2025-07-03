@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COPTSHIFT_H
 #define COPTSHIFT_H
-
-
 
 // cc65
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //                              Optimize shifts
 //***************************************************************************
-
-
 
 unsigned OptShift1 (CodeSeg* S);
 /* A call to the shlaxN routine may get replaced by one or more asl insns
@@ -121,8 +113,6 @@ unsigned OptShift5 (CodeSeg* S);
 
 unsigned OptShift6 (CodeSeg* S);
 // Inline the shift subroutines.
-
-
 
 // End of coptshift.h
 

@@ -31,35 +31,23 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CODE_H
 #define CODE_H
 
-
-
 #include <stdint.h>
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 extern uint8_t CodeBuf[0x10000];        // Code buffer
 extern uint32_t CodeStart;              // Start address
 extern uint32_t CodeEnd;                // End address
 extern uint32_t PC;                     // Current PC
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void LoadCode (void);
 // Load the code from the given file
@@ -87,8 +75,6 @@ int CodeLeft (void);
 
 void ResetCode (void);
 // Reset the code input to start over for the next pass
-
-
 
 // End of code.h
 

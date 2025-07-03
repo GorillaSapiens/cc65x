@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // ca65
 #include "error.h"
 #include "expr.h"
@@ -43,13 +41,9 @@
 #include "symtab.h"
 #include "condasm.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Maximum count of nested .ifs
 #define MAX_IFS         256
@@ -66,13 +60,9 @@ enum {
 // The overall .IF condition
 int IfCond      = 1;
 
-
-
 //***************************************************************************
 //                               struct IfDesc
 //***************************************************************************
-
-
 
 // One .IF descriptor
 typedef struct IfDesc IfDesc;
@@ -86,8 +76,6 @@ struct IfDesc {
 static IfDesc IfStack [MAX_IFS];
 static unsigned IfCount = 0;
 
-
-
 static IfDesc* GetCurrentIf (void)
 // Return the current .IF descriptor
 {
@@ -97,8 +85,6 @@ static IfDesc* GetCurrentIf (void)
         return &IfStack[IfCount-1];
     }
 }
-
-
 
 static int GetOverallIfCond (void)
 // Get the overall condition based on all conditions on the stack.
@@ -111,15 +97,11 @@ static int GetOverallIfCond (void)
            ((IfStack[IfCount-1].Flags & (ifCond | ifParentCond)) == (ifCond | ifParentCond));
 }
 
-
-
 static void CalcOverallIfCond (void)
 // Calculate the overall condition, based on all conditions on the stack.
 {
     IfCond = GetOverallIfCond ();
 }
-
-
 
 static void SetIfCond (IfDesc* ID, int C)
 // Set the .IF condition
@@ -130,8 +112,6 @@ static void SetIfCond (IfDesc* ID, int C)
         ID->Flags &= ~ifCond;
     }
 }
-
-
 
 static int ElseClause (IfDesc* ID, const char* Directive)
 // Enter an .ELSE clause. Return true if this was ok, zero on errors.
@@ -154,8 +134,6 @@ static int ElseClause (IfDesc* ID, const char* Directive)
     ID->Flags ^= ifCond;
     return 1;
 }
-
-
 
 static IfDesc* AllocIf (const char* Directive, int NeedTerm)
 // Alloc a new element from the .IF stack
@@ -187,8 +165,6 @@ static IfDesc* AllocIf (const char* Directive, int NeedTerm)
     return ID;
 }
 
-
-
 static void FreeIf (void)
 // Free all .IF descriptors until we reach one with the NeedTerm bit set
 {
@@ -207,13 +183,9 @@ static void FreeIf (void)
     } while (!Done);
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void DoConditionals (void)
 // Catch all for conditional directives
@@ -534,8 +506,6 @@ void DoConditionals (void)
     } while (IfCond == 0 && CurTok.Tok != TOK_EOF);
 }
 
-
-
 int CheckConditionals (void)
 /* Check if the current token is one that starts a conditional directive, and
 ** call DoConditionals if so. Return true if a conditional directive was found,
@@ -576,8 +546,6 @@ int CheckConditionals (void)
     }
 }
 
-
-
 void CheckOpenIfs (void)
 /* Called from the scanner before closing an input file. Will check for any
 ** open .ifs in this file.
@@ -610,15 +578,11 @@ void CheckOpenIfs (void)
     CalcOverallIfCond ();
 }
 
-
-
 unsigned GetIfStack (void)
 // Get the current .IF stack pointer
 {
     return IfCount;
 }
-
-
 
 void CleanupIfStack (unsigned SP)
 // Cleanup the .IF stack, remove anything above the given stack pointer

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <inttypes.h>
 #include <limits.h>
 #include <stdio.h>
@@ -81,8 +79,6 @@
 //                                  Helpers
 //***************************************************************************
 
-
-
 static void _typeerror (char *func, int line, unsigned type)
 // Print an error message about an invalid operand type
 {
@@ -96,7 +92,6 @@ static void _typeerror (char *func, int line, unsigned type)
 
 #define typeerror(t)    _typeerror(__FILE__, __LINE__, t)
 
-
 static void CheckLocalOffs (unsigned Offs)
 // Check the offset into the stack for 8bit range
 {
@@ -105,8 +100,6 @@ static void CheckLocalOffs (unsigned Offs)
         Error ("Too many local variables");
     }
 }
-
-
 
 static const char* GetLabelName (unsigned Flags, uintptr_t Label, long Offs)
 {
@@ -175,13 +168,9 @@ static const char* GetLabelName (unsigned Flags, uintptr_t Label, long Offs)
     return Buf;
 }
 
-
-
 //***************************************************************************
 //                            Pre- and postamble
 //***************************************************************************
-
-
 
 void g_preamble (void)
 // Generate the assembler code preamble
@@ -234,8 +223,6 @@ void g_preamble (void)
     AddTextLine ("\t.macpack\tlongbranch");
 }
 
-
-
 void g_fileinfo (const char* Name, unsigned long Size, unsigned long MTime)
 // If debug info is enabled, place a file info into the source
 {
@@ -247,13 +234,9 @@ void g_fileinfo (const char* Name, unsigned long Size, unsigned long MTime)
     }
 }
 
-
-
 //***************************************************************************
 //                              Segment support
 //***************************************************************************
-
-
 
 void g_userodata (void)
 // Switch to the read only data segment
@@ -261,23 +244,17 @@ void g_userodata (void)
     UseDataSeg (SEG_RODATA);
 }
 
-
-
 void g_usedata (void)
 // Switch to the data segment
 {
     UseDataSeg (SEG_DATA);
 }
 
-
-
 void g_usebss (void)
 // Switch to the bss segment
 {
     UseDataSeg (SEG_BSS);
 }
-
-
 
 void g_segname (segment_t Seg)
 // Emit the name of a segment if necessary
@@ -304,13 +281,9 @@ void g_segname (segment_t Seg)
     }
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned sizeofarg (unsigned flags)
 // Return the size of a function argument type that is encoded in flags
@@ -336,23 +309,17 @@ unsigned sizeofarg (unsigned flags)
     }
 }
 
-
-
 int pop (unsigned flags)
 // Pop an argument of the given size
 {
     return StackPtr += sizeofarg (flags);
 }
 
-
-
 int push (unsigned flags)
 // Push an argument of the given size
 {
     return StackPtr -= sizeofarg (flags);
 }
-
-
 
 static unsigned MakeByteOffs (unsigned Flags, unsigned Offs)
 /* The value in Offs is an offset to an address in a/x. Make sure, an object
@@ -381,13 +348,9 @@ static unsigned MakeByteOffs (unsigned Flags, unsigned Offs)
     return Offs;
 }
 
-
-
 //***************************************************************************
 //                      Functions handling local labels
 //***************************************************************************
-
-
 
 void g_defcodelabel (unsigned label)
 // Define a local code label
@@ -395,21 +358,15 @@ void g_defcodelabel (unsigned label)
     CS_AddLabel (CS->Code, LocalLabelName (label));
 }
 
-
-
 void g_defdatalabel (unsigned label)
 // Define a local data label
 {
     AddDataLine ("%s:", LocalDataLabelName (label));
 }
 
-
-
 //***************************************************************************
 //                     Functions handling global labels
 //***************************************************************************
-
-
 
 void g_defgloblabel (const char* Name)
 // Define a global label with the given name
@@ -418,16 +375,12 @@ void g_defgloblabel (const char* Name)
     AddDataLine ("_%s:", Name);
 }
 
-
-
 void g_defliterallabel (unsigned label)
 // Define a literal data label
 {
     // Literal labels are always data labels
     AddDataLine ("%s:", PooledLiteralLabelName (label));
 }
-
-
 
 void g_aliasliterallabel (unsigned label, unsigned baselabel, long offs)
 // Define label as an alias for baselabel+offs
@@ -445,8 +398,6 @@ void g_aliasliterallabel (unsigned label, unsigned baselabel, long offs)
     SB_Done (&L);
 }
 
-
-
 void g_defexport (const char* Name, int ZP)
 // Export the given label
 {
@@ -456,8 +407,6 @@ void g_defexport (const char* Name, int ZP)
         AddTextLine ("\t.export\t\t_%s", Name);
     }
 }
-
-
 
 void g_defimport (const char* Name, int ZP)
 // Import the given label
@@ -469,15 +418,11 @@ void g_defimport (const char* Name, int ZP)
     }
 }
 
-
-
 void g_importstartup (void)
 // Forced import of the startup module
 {
     AddTextLine ("\t.forceimport\t__STARTUP__");
 }
-
-
 
 void g_importmainargs (void)
 /* Forced import of a special symbol that handles arguments to main. This will
@@ -486,13 +431,9 @@ void g_importmainargs (void)
     AddTextLine ("\t.forceimport\tinitmainargs");
 }
 
-
-
 //***************************************************************************
 //                          Function entry and exit
 //***************************************************************************
-
-
 
 /* Remember the argument size of a function. The variable is set by g_enter
 ** and used by g_leave. If the function gets its argument size by the caller
@@ -500,7 +441,6 @@ void g_importmainargs (void)
 ** value to -1.
 */
 static int funcargs;
-
 
 void g_enter (unsigned flags, unsigned argsize)
 // Function prologue
@@ -513,8 +453,6 @@ void g_enter (unsigned flags, unsigned argsize)
         AddCodeLine ("jsr enter");
     }
 }
-
-
 
 void g_leave (int DoCleanup)
 // Function epilogue
@@ -555,13 +493,9 @@ void g_leave (int DoCleanup)
     AddCodeLine ("rts");
 }
 
-
-
 //***************************************************************************
 //                            Register variables
 //***************************************************************************
-
-
 
 void g_swap_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 // Swap a register variable with a location on the stack
@@ -598,8 +532,6 @@ void g_swap_regvars (int StackOffs, int RegOffs, unsigned Bytes)
     }
 }
 
-
-
 void g_save_regvars (int RegOffs, unsigned Bytes)
 // Save register variables
 {
@@ -634,8 +566,6 @@ void g_save_regvars (int RegOffs, unsigned Bytes)
     // We pushed stuff, correct the stack pointer
     StackPtr -= Bytes;
 }
-
-
 
 void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 // Restore register variables
@@ -707,19 +637,14 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
     }
 }
 
-
-
 //***************************************************************************
 //                           Fetching memory cells
 //***************************************************************************
-
-
 
 void g_getimmed(unsigned Flags, uintptr_t Val, long Offs)
 // Load a constant into the primary register
 {
     unsigned char B1, B2, B3, B4;
-
 
     if ((Flags & CF_CONST) != 0) {
 
@@ -775,8 +700,6 @@ void g_getimmed(unsigned Flags, uintptr_t Val, long Offs)
 
     }
 }
-
-
 
 void g_getstatic (unsigned flags, uintptr_t label, long offs)
 // Fetch an static memory cell into the primary register
@@ -836,8 +759,6 @@ void g_getstatic (unsigned flags, uintptr_t label, long offs)
     }
 }
 
-
-
 void g_getlocal (unsigned Flags, int Offs)
 // Fetch specified local object (local var) into the primary register
 {
@@ -889,8 +810,6 @@ void g_getlocal (unsigned Flags, int Offs)
             typeerror (Flags);
     }
 }
-
-
 
 void g_getind (unsigned Flags, unsigned Offs)
 /* Fetch the specified object type indirect through the primary register
@@ -945,8 +864,6 @@ void g_getind (unsigned Flags, unsigned Offs)
 
     }
 }
-
-
 
 void g_leasp (int Offs)
 // Fetch the address of the specified symbol into the primary register
@@ -1010,8 +927,6 @@ void g_leasp (int Offs)
     }
 }
 
-
-
 void g_leavariadic (int Offs)
 /* Fetch the address of a parameter in a variadic function into the primary
 ** register
@@ -1055,13 +970,9 @@ void g_leavariadic (int Offs)
     }
 }
 
-
-
 //***************************************************************************
 //                             Store into memory
 //***************************************************************************
-
-
 
 void g_putstatic (unsigned flags, uintptr_t label, long offs)
 // Store the primary register into the specified static memory cell
@@ -1097,8 +1008,6 @@ void g_putstatic (unsigned flags, uintptr_t label, long offs)
 
     }
 }
-
-
 
 void g_putlocal (unsigned Flags, int Offs, long Val)
 // Put data into local object.
@@ -1161,8 +1070,6 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
 
     }
 }
-
-
 
 void g_putind (unsigned Flags, unsigned Offs)
 /* Store the specified object type in the primary register at the address
@@ -1239,13 +1146,9 @@ void g_putind (unsigned Flags, unsigned Offs)
     pop (CF_PTR);
 }
 
-
-
 //***************************************************************************
 //                    type conversion and similiar stuff
 //***************************************************************************
-
-
 
 void g_toslong (unsigned flags)
 // Make sure, the value on TOS is a long. Convert if necessary
@@ -1270,8 +1173,6 @@ void g_toslong (unsigned flags)
     }
 }
 
-
-
 void g_tosint (unsigned flags)
 // Make sure, the value on TOS is an int. Convert if necessary
 {
@@ -1291,8 +1192,6 @@ void g_tosint (unsigned flags)
     }
 }
 
-
-
 static void g_regchar (unsigned to)
 /* Treat the value in the primary register as a char with specified signedness
 ** and convert it to an int (whose representation is irrelevent of signedness).
@@ -1309,8 +1208,6 @@ static void g_regchar (unsigned to)
     */
     g_regint (to | CF_FORCECHAR);
 }
-
-
 
 void g_regint (unsigned from)
 /* Convert the value in the primary register to an int (whose representation
@@ -1352,8 +1249,6 @@ void g_regint (unsigned from)
             typeerror (from);
     }
 }
-
-
 
 void g_reglong (unsigned from)
 /* Convert the value in the primary register to a long (whose representation
@@ -1417,7 +1312,6 @@ void g_reglong (unsigned from)
     }
 }
 
-
 void g_regfloat (unsigned from)
 // Convert the value in the primary register to a float
 {
@@ -1460,7 +1354,6 @@ void g_regfloat (unsigned from)
     }
 }
 
-
 static unsigned g_intpromotion (unsigned flags)
 // Return new flags for integral promotions for types smaller than int.
 {
@@ -1490,8 +1383,6 @@ static unsigned g_intpromotion (unsigned flags)
         return flags;
     }
 }
-
-
 
 unsigned g_typeadjust (unsigned lhs, unsigned rhs)
 /* Adjust the integer operands before doing a binary operation. lhs is a flags
@@ -1603,8 +1494,6 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
     return const_flag | CF_INT;
 }
 
-
-
 unsigned g_typecast (unsigned to, unsigned from)
 /* Cast the value in the primary register to the specified operand size and
 ** signedness. Return the result flags.
@@ -1661,8 +1550,6 @@ unsigned g_typecast (unsigned to, unsigned from)
     return to;
 }
 
-
-
 void g_scale (unsigned flags, long val)
 /* Scale the value in the primary register by the given value. If val is positive,
 ** scale up, is val is negative, scale down. This function is used to scale
@@ -1692,13 +1579,9 @@ void g_scale (unsigned flags, long val)
     }
 }
 
-
-
 //***************************************************************************
 //              Adds and subs of variables fix a fixed address
 //***************************************************************************
-
-
 
 void g_addlocal (unsigned flags, int offs)
 // Add a local variable to ax
@@ -1747,8 +1630,6 @@ void g_addlocal (unsigned flags, int offs)
     }
 }
 
-
-
 void g_addstatic (unsigned flags, uintptr_t label, long offs)
 // Add a static variable to ax
 {
@@ -1791,13 +1672,9 @@ void g_addstatic (unsigned flags, uintptr_t label, long offs)
     }
 }
 
-
-
 //***************************************************************************
 //                           Special op= functions
 //***************************************************************************
-
-
 
 void g_addeqstatic (unsigned flags, uintptr_t label, long offs,
                     unsigned long val)
@@ -1926,8 +1803,6 @@ void g_addeqstatic (unsigned flags, uintptr_t label, long offs,
     }
 }
 
-
-
 void g_addeqlocal (unsigned flags, int Offs, unsigned long val)
 // Emit += for a local variable
 {
@@ -2020,8 +1895,6 @@ void g_addeqlocal (unsigned flags, int Offs, unsigned long val)
     }
 }
 
-
-
 void g_addeqind (unsigned flags, unsigned offs, unsigned long val)
 // Emit += for the location with address in ax
 {
@@ -2058,8 +1931,6 @@ void g_addeqind (unsigned flags, unsigned offs, unsigned long val)
             typeerror (flags);
     }
 }
-
-
 
 void g_subeqstatic (unsigned flags, uintptr_t label, long offs,
                     unsigned long val)
@@ -2203,8 +2074,6 @@ void g_subeqstatic (unsigned flags, uintptr_t label, long offs,
     }
 }
 
-
-
 void g_subeqlocal (unsigned flags, int Offs, unsigned long val)
 // Emit -= for a local variable
 {
@@ -2281,8 +2150,6 @@ void g_subeqlocal (unsigned flags, int Offs, unsigned long val)
     }
 }
 
-
-
 void g_subeqind (unsigned flags, unsigned offs, unsigned long val)
 // Emit -= for the location with address in ax
 {
@@ -2320,13 +2187,9 @@ void g_subeqind (unsigned flags, unsigned offs, unsigned long val)
     }
 }
 
-
-
 //***************************************************************************
 //                 Add a variable address to the value in ax
 //***************************************************************************
-
-
 
 void g_addaddr_local (unsigned flags attribute ((unused)), int offs)
 // Add the address of a local variable to ax
@@ -2369,8 +2232,6 @@ void g_addaddr_local (unsigned flags attribute ((unused)), int offs)
     }
 }
 
-
-
 void g_addaddr_static (unsigned flags, uintptr_t label, long offs)
 // Add the address of a static variable to ax
 {
@@ -2387,13 +2248,9 @@ void g_addaddr_static (unsigned flags, uintptr_t label, long offs)
     AddCodeLine ("tya");
 }
 
-
-
 //***************************************************************************
 //
 //***************************************************************************
-
-
 
 void g_save (unsigned flags)
 // Copy primary register to hold register.
@@ -2422,8 +2279,6 @@ void g_save (unsigned flags)
     }
 }
 
-
-
 void g_restore (unsigned flags)
 // Copy hold register to primary.
 {
@@ -2450,8 +2305,6 @@ void g_restore (unsigned flags)
             typeerror (flags);
     }
 }
-
-
 
 void g_cmp (unsigned flags, unsigned long val)
 /* Immediate compare. The primary register will not be changed, Z flag
@@ -2533,8 +2386,6 @@ static void oper (unsigned Flags, unsigned long Val, const char* const* Subs)
     pop (Flags);
 }
 
-
-
 void g_test (unsigned flags)
 // Test the value in the primary and set the condition codes
 {
@@ -2565,8 +2416,6 @@ void g_test (unsigned flags)
 
     }
 }
-
-
 
 void g_push (unsigned flags, unsigned long val)
 // Push the primary register or a constant value onto the stack
@@ -2654,7 +2503,6 @@ void g_push_float (unsigned flags, double val)
     push (flags);
 }
 
-
 void g_swap (unsigned flags)
 /* Swap the primary register and the top of the stack. flags give the type
 ** of *both* values (must have same size).
@@ -2677,8 +2525,6 @@ void g_swap (unsigned flags)
     }
 }
 
-
-
 void g_call (unsigned Flags, const char* Label, unsigned ArgSize)
 // Call the specified subroutine name
 {
@@ -2689,8 +2535,6 @@ void g_call (unsigned Flags, const char* Label, unsigned ArgSize)
     AddCodeLine ("jsr _%s", Label);
     StackPtr += ArgSize;                // callee pops args
 }
-
-
 
 void g_callind (unsigned Flags, unsigned ArgSize, int Offs)
 // Call subroutine indirect
@@ -2721,15 +2565,11 @@ void g_callind (unsigned Flags, unsigned ArgSize, int Offs)
     StackPtr += ArgSize;
 }
 
-
-
 void g_jump (unsigned Label)
 // Jump to specified internal label number
 {
     AddCodeLine ("jmp %s", LocalLabelName (Label));
 }
-
-
 
 void g_truejump (unsigned flags attribute ((unused)), unsigned label)
 // Jump to label if zero flag clear
@@ -2737,15 +2577,11 @@ void g_truejump (unsigned flags attribute ((unused)), unsigned label)
     AddCodeLine ("jne %s", LocalLabelName (label));
 }
 
-
-
 void g_falsejump (unsigned flags attribute ((unused)), unsigned label)
 // Jump to label if zero flag set
 {
     AddCodeLine ("jeq %s", LocalLabelName (label));
 }
-
-
 
 void g_branch (unsigned Label)
 /* Branch unconditionally to Label if the CPU has the BRA instruction.
@@ -2760,8 +2596,6 @@ void g_branch (unsigned Label)
         g_jump (Label);
     }
 }
-
-
 
 void g_lateadjustSP (unsigned label)
 // Adjust stack based on non-immediate data
@@ -2801,8 +2635,6 @@ void g_drop (unsigned Space)
     }
 }
 
-
-
 void g_space (int Space)
 // Create or drop space on the stack
 {
@@ -2830,23 +2662,17 @@ void g_space (int Space)
     }
 }
 
-
-
 void g_cstackcheck (void)
 // Check for a C stack overflow
 {
     AddCodeLine ("jsr cstkchk");
 }
 
-
-
 void g_stackcheck (void)
 // Check for a stack overflow
 {
     AddCodeLine ("jsr stkchk");
 }
-
-
 
 void g_add (unsigned flags, unsigned long val)
 // Primary = TOS + Primary
@@ -2866,8 +2692,6 @@ void g_add (unsigned flags, unsigned long val)
     oper (flags, val, ops);
 }
 
-
-
 void g_sub (unsigned flags, unsigned long val)
 // Primary = TOS - Primary
 {
@@ -2886,8 +2710,6 @@ void g_sub (unsigned flags, unsigned long val)
     oper (flags, val, ops);
 }
 
-
-
 void g_rsub (unsigned flags, unsigned long val)
 // Primary = Primary - TOS
 {
@@ -2900,8 +2722,6 @@ void g_rsub (unsigned flags, unsigned long val)
     };
     oper (flags, val, ops);
 }
-
-
 
 void g_mul (unsigned flags, unsigned long val)
 // Primary = TOS * Primary
@@ -3040,8 +2860,6 @@ void g_mul (unsigned flags, unsigned long val)
     oper (flags, val, ops);
 }
 
-
-
 void g_div (unsigned flags, unsigned long val)
 // Primary = TOS / Primary
 {
@@ -3157,8 +2975,6 @@ void g_div (unsigned flags, unsigned long val)
 
 }
 
-
-
 void g_mod (unsigned flags, unsigned long val)
 // Primary = TOS % Primary
 {
@@ -3185,8 +3001,6 @@ void g_mod (unsigned flags, unsigned long val)
         oper (flags, val, ops);
     }
 }
-
-
 
 void g_or (unsigned flags, unsigned long val)
 // Primary = TOS | Primary
@@ -3256,15 +3070,12 @@ void g_or (unsigned flags, unsigned long val)
     oper (flags, val, ops);
 }
 
-
-
 void g_xor (unsigned flags, unsigned long val)
 // Primary = TOS ^ Primary
 {
     static const char* const ops[OPER_IDX_NUM] = {
         "tosxorax", "tosxorax", "tosxoreax", "tosxoreax", NULL
     };
-
 
     /* If the right hand side is const, the lhs is not on stack but still
     ** in the primary register.
@@ -3323,8 +3134,6 @@ void g_xor (unsigned flags, unsigned long val)
     // Use long way over the stack
     oper (flags, val, ops);
 }
-
-
 
 void g_and (unsigned Flags, unsigned long Val)
 // Primary = TOS & Primary
@@ -3415,8 +3224,6 @@ void g_and (unsigned Flags, unsigned long Val)
     // Use long way over the stack
     oper (Flags, Val, ops);
 }
-
-
 
 void g_asr (unsigned flags, unsigned long val)
 // Primary = TOS >> Primary
@@ -3598,8 +3405,6 @@ void g_asr (unsigned flags, unsigned long val)
     oper (flags, val, ops);
 }
 
-
-
 void g_asl (unsigned flags, unsigned long val)
 // Primary = TOS << Primary
 {
@@ -3722,8 +3527,6 @@ void g_asl (unsigned flags, unsigned long val)
     oper (flags, val, ops);
 }
 
-
-
 void g_neg (unsigned Flags)
 // Primary = -Primary
 {
@@ -3756,8 +3559,6 @@ void g_neg (unsigned Flags)
     }
 }
 
-
-
 void g_bneg (unsigned flags)
 // Primary = !Primary
 {
@@ -3785,8 +3586,6 @@ void g_bneg (unsigned flags)
     }
 }
 
-
-
 void g_com (unsigned Flags)
 // Primary = ~Primary
 {
@@ -3811,8 +3610,6 @@ void g_com (unsigned Flags)
             typeerror (Flags);
     }
 }
-
-
 
 void g_inc (unsigned flags, unsigned long val)
 /* Increment the primary register by a given number
@@ -3918,8 +3715,6 @@ void g_inc (unsigned flags, unsigned long val)
     }
 }
 
-
-
 void g_dec (unsigned flags, unsigned long val)
 /* Decrement the primary register by a given number
    if flags contain CF_FLOAT, then val can be a raw binary float.
@@ -4017,15 +3812,11 @@ void g_dec (unsigned flags, unsigned long val)
     }
 }
 
-
-
 /*
 ** Following are the conditional operators. They compare the TOS against
 ** the primary and put a literal 1 in the primary if the condition is
 ** true, otherwise they clear the primary register
 */
-
-
 
 void g_eq (unsigned flags, unsigned long val)
 // Test for equal
@@ -4087,8 +3878,6 @@ void g_eq (unsigned flags, unsigned long val)
     oper (flags, val, ops);
 }
 
-
-
 void g_ne (unsigned flags, unsigned long val)
 // Test for not equal
 {
@@ -4148,8 +3937,6 @@ void g_ne (unsigned flags, unsigned long val)
     // Use long way over the stack
     oper (flags, val, ops);
 }
-
-
 
 void g_lt (unsigned flags, unsigned long val)
 // Test for less than
@@ -4323,8 +4110,6 @@ void g_lt (unsigned flags, unsigned long val)
     oper (flags, val, ops);
 }
 
-
-
 void g_le (unsigned flags, unsigned long val)
 // Test for less than or equal to
 {
@@ -4444,8 +4229,6 @@ void g_le (unsigned flags, unsigned long val)
     // Use long way over the stack
     oper (flags, val, ops);
 }
-
-
 
 void g_gt (unsigned flags, unsigned long val)
 // Test for greater than
@@ -4590,8 +4373,6 @@ void g_gt (unsigned flags, unsigned long val)
     // Use long way over the stack
     oper (flags, val, ops);
 }
-
-
 
 void g_ge (unsigned flags, unsigned long val)
 // Test for greater than or equal to
@@ -4764,21 +4545,15 @@ void g_ge (unsigned flags, unsigned long val)
     oper (flags, val, ops);
 }
 
-
-
 //***************************************************************************
 //                         Allocating static storage
 //***************************************************************************
-
-
 
 void g_res (unsigned n)
 // Reserve static storage, n bytes
 {
     AddDataLine ("\t.res\t%u,$00", n);
 }
-
-
 
 void g_defdata (unsigned flags, uintptr_t val, long offs)
 // Define data with the size given in flags
@@ -4903,8 +4678,6 @@ void g_defbytes (const void* Bytes, unsigned Count)
     }
 }
 
-
-
 void g_zerobytes (unsigned Count)
 // Output Count bytes of data initialized with zero
 {
@@ -4912,8 +4685,6 @@ void g_zerobytes (unsigned Count)
         AddDataLine ("\t.res\t%u,$00", Count);
     }
 }
-
-
 
 void g_initregister (unsigned Label, unsigned Reg, unsigned Size)
 // Initialize a register variable from static initialization data
@@ -4927,8 +4698,6 @@ void g_initregister (unsigned Label, unsigned Reg, unsigned Size)
     AddCodeLine ("dex");
     AddCodeLine ("bpl %s", LocalLabelName (CodeLabel));
 }
-
-
 
 void g_initauto (unsigned Label, unsigned Size)
 // Initialize a local variable at stack offset zero from static data
@@ -4953,8 +4722,6 @@ void g_initauto (unsigned Label, unsigned Size)
         AddCodeLine ("bne %s", LocalLabelName (CodeLabel));
     }
 }
-
-
 
 void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size)
 // Initialize a static local variable from static initialization data
@@ -4987,13 +4754,9 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size)
     }
 }
 
-
-
 //***************************************************************************
 //                                Bit-fields
 //***************************************************************************
-
-
 
 void g_testbitfield (ATTR_UNUSED(unsigned Flags), unsigned BitOffs, unsigned BitWidth)
 // Test bit-field in primary.
@@ -5104,8 +4867,6 @@ void g_testbitfield (ATTR_UNUSED(unsigned Flags), unsigned BitOffs, unsigned Bit
         AddCodeLine ("ora sreg+1");
     }
 }
-
-
 
 void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
                         unsigned BitOffs, unsigned BitWidth)
@@ -5266,13 +5027,9 @@ void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
     }
 }
 
-
-
 //***************************************************************************
 //                             Switch statement
 //***************************************************************************
-
-
 
 void g_switchsave (unsigned Depth)
 // Generate save code for a switch statement
@@ -5370,13 +5127,9 @@ void g_switch (Collection* Nodes, unsigned DefaultLabel, unsigned Depth)
     g_jump (DefaultLabel);
 }
 
-
-
 //***************************************************************************
 //                       User supplied assembler code
 //***************************************************************************
-
-
 
 void g_asmcode (struct StrBuf* B)
 // Output one line of assembler code.

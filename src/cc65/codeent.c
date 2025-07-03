@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <errno.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -56,24 +54,16 @@
 #include "output.h"
 #include "reginfo.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Empty argument
 static char EmptyArg[] = "";
-
-
 
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 static void FreeArg (char* Arg)
 // Free a code entry argument
@@ -82,8 +72,6 @@ static void FreeArg (char* Arg)
         xfree (Arg);
     }
 }
-
-
 
 static char* GetArgCopy (const char* Arg)
 // Create an argument copy for assignment
@@ -97,8 +85,6 @@ static char* GetArgCopy (const char* Arg)
     }
 }
 
-
-
 static void FreeParsedArg (char* ArgBase)
 // Free a code entry parsed argument
 {
@@ -106,8 +92,6 @@ static void FreeParsedArg (char* ArgBase)
         xfree (ArgBase);
     }
 }
-
-
 
 static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
 // Set the Use and Chg in E
@@ -325,13 +309,9 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
     }
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Name, long* Offset)
 /* Break the opcode argument string into a symbol name/label part plus an offset.
@@ -569,8 +549,6 @@ int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Nam
     return 1;
 }
 
-
-
 const char* MakeHexArg (unsigned Num)
 /* Convert Num into a string in the form $XY, suitable for passing it as an
 ** argument to NewCodeEntry, and return a pointer to the string.
@@ -583,8 +561,6 @@ const char* MakeHexArg (unsigned Num)
     xsprintf (Buf, sizeof (Buf), "$%02X", (unsigned char) Num);
     return Buf;
 }
-
-
 
 void PreparseArg (CodeEntry* E)
 // Parse the argument string and memorize the result for the code entry
@@ -611,8 +587,6 @@ void PreparseArg (CodeEntry* E)
         }
     }
 }
-
-
 
 CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg,
                          CodeLabel* JumpTo, LineInfo* LI)
@@ -655,8 +629,6 @@ CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg,
     return E;
 }
 
-
-
 void FreeCodeEntry (CodeEntry* E)
 // Free the given code entry
 {
@@ -679,8 +651,6 @@ void FreeCodeEntry (CodeEntry* E)
     xfree (E);
 }
 
-
-
 void CE_ReplaceOPC (CodeEntry* E, opc_t OPC)
 /* Replace the opcode of the instruction. This will also replace related info,
 ** Size, Use and Chg, but it will NOT update any arguments or labels.
@@ -696,15 +666,11 @@ void CE_ReplaceOPC (CodeEntry* E, opc_t OPC)
     SetUseChgInfo (E, D);
 }
 
-
-
 int CodeEntriesAreEqual (const CodeEntry* E1, const CodeEntry* E2)
 // Check if both code entries are equal
 {
     return (E1->OPC == E2->OPC && E1->AM == E2->AM && strcmp (E1->Arg, E2->Arg) == 0);
 }
-
-
 
 void CE_AttachLabel (CodeEntry* E, CodeLabel* L)
 // Attach the label to the entry
@@ -715,8 +681,6 @@ void CE_AttachLabel (CodeEntry* E, CodeLabel* L)
     // Tell the label about it's owner
     L->Owner = E;
 }
-
-
 
 void CE_ClearJumpTo (CodeEntry* E)
 /* Clear the JumpTo entry and the argument (which contained the name of the
@@ -731,8 +695,6 @@ void CE_ClearJumpTo (CodeEntry* E)
     CE_SetArg (E, 0);
 }
 
-
-
 void CE_MoveLabel (CodeLabel* L, CodeEntry* E)
 // Move the code label L from it's former owner to the code entry E.
 {
@@ -743,8 +705,6 @@ void CE_MoveLabel (CodeLabel* L, CodeEntry* E)
     CollAppend (&E->Labels, L);
     L->Owner = E;
 }
-
-
 
 void CE_SetArg (CodeEntry* E, const char* Arg)
 // Replace the whole argument by the new one.
@@ -764,8 +724,6 @@ void CE_SetArg (CodeEntry* E, const char* Arg)
     // Update the Use and Chg in E
     SetUseChgInfo (E, GetOPCDesc (E->OPC));
 }
-
-
 
 void CE_SetArgBaseAndOff (CodeEntry* E, const char* ArgBase, long ArgOff)
 /* Replace the new argument base and offset. Argument base is always applied.
@@ -828,8 +786,6 @@ void CE_SetArgBaseAndOff (CodeEntry* E, const char* ArgBase, long ArgOff)
     }
 }
 
-
-
 void CE_SetArgBase (CodeEntry* E, const char* ArgBase)
 /* Replace the argument base by the new one.
 ** The entry must have an existing base.
@@ -841,15 +797,11 @@ void CE_SetArgBase (CodeEntry* E, const char* ArgBase)
     CE_SetArgBaseAndOff (E, ArgBase, E->ArgOff);
 }
 
-
-
 void CE_SetArgOffset (CodeEntry* E, long ArgOff)
 // Replace the argument offset by the new one
 {
     CE_SetArgBaseAndOff (E, E->ArgBase, ArgOff);
 }
-
-
 
 void CE_SetNumArg (CodeEntry* E, long Num)
 /* Set a new numeric argument for the given code entry that must already
@@ -876,15 +828,11 @@ void CE_SetNumArg (CodeEntry* E, long Num)
     CE_SetArg (E, Buf);
 }
 
-
-
 int CE_IsArgStrParsed (const CodeEntry* E)
 // Return true if the argument of E was successfully parsed last time
 {
     return (E->ArgInfo & AIF_FAILURE) == 0;
 }
-
-
 
 int CE_HasArgBase (const CodeEntry* E)
 // Return true if the argument of E has a non-blank base name
@@ -892,23 +840,17 @@ int CE_HasArgBase (const CodeEntry* E)
     return (E->ArgInfo & AIF_HAS_NAME) != 0 && E->ArgBase[0] != '\0';
 }
 
-
-
 int CE_HasArgOffset (const CodeEntry* E)
 // Return true if the argument of E has a non-zero offset
 {
     return (E->ArgInfo & AIF_HAS_OFFSET) != 0 && E->ArgOff != 0;
 }
 
-
-
 int CE_IsConstImm (const CodeEntry* E)
 // Return true if the argument of E is a constant immediate value
 {
     return (E->AM == AM65_IMM && CE_HasNumArg (E));
 }
-
-
 
 int CE_IsKnownImm (const CodeEntry* E, unsigned long Num)
 /* Return true if the argument of E is a constant immediate value that is
@@ -917,8 +859,6 @@ int CE_IsKnownImm (const CodeEntry* E, unsigned long Num)
 {
     return (E->AM == AM65_IMM && CE_HasNumArg (E) && E->Num == Num);
 }
-
-
 
 int CE_UseLoadFlags (CodeEntry* E)
 /* Return true if the instruction uses any flags that are set by a load of
@@ -972,7 +912,6 @@ int CE_UseLoadFlags (CodeEntry* E)
                 // Will use the N or Z flags
                 return 1;
 
-
             case CMP_UGE:       // Uses only carry
             case CMP_ULT:       // Dito
             default:            // No bool transformer subroutine
@@ -989,8 +928,6 @@ int CE_UseLoadFlags (CodeEntry* E)
     return 0;
 }
 
-
-
 void CE_FreeRegInfo (CodeEntry* E)
 // Free an existing register info struct
 {
@@ -999,8 +936,6 @@ void CE_FreeRegInfo (CodeEntry* E)
         E->RI = 0;
     }
 }
-
-
 
 static void DeduceZ (RegContents* C, short Val)
 // Auto-set Z flag
@@ -1014,8 +949,6 @@ static void DeduceZ (RegContents* C, short Val)
         }
     }
 }
-
-
 
 static void DeduceZN (RegContents* C, short Val)
 // Auto-set Z/N flags
@@ -1031,8 +964,6 @@ static void DeduceZN (RegContents* C, short Val)
         }
     }
 }
-
-
 
 static short KnownOpADCDeduceCZVN (RegContents* Out, RegContents* In, short Rhs)
 /* Do the ADC and auto-set C/Z/V/N flags.
@@ -1061,8 +992,6 @@ static short KnownOpADCDeduceCZVN (RegContents* Out, RegContents* In, short Rhs)
     return UVal;
 }
 
-
-
 static short KnownOpSBCDeduceCZVN (RegContents* Out, RegContents* In, short Rhs)
 /* Do the SBC and auto-set C/Z/V/N flags.
 ** Both operands and the C flag must be known.
@@ -1090,8 +1019,6 @@ static short KnownOpSBCDeduceCZVN (RegContents* Out, RegContents* In, short Rhs)
     return UVal;
 }
 
-
-
 static short KnownOpCmpDeduceCZN (RegContents* C, short Lhs, short Rhs)
 /* Do the CMP and auto-set C/Z/N flags.
 ** Both operands must be known.
@@ -1108,8 +1035,6 @@ static short KnownOpCmpDeduceCZN (RegContents* C, short Lhs, short Rhs)
     return Val;
 }
 
-
-
 static short AnyOpASLDeduceCZN (RegContents* C, short Shiftee)
 // Do the ASL and auto-set C/Z/N flags
 {
@@ -1125,8 +1050,6 @@ static short AnyOpASLDeduceCZN (RegContents* C, short Shiftee)
     return Shiftee;
 }
 
-
-
 static short AnyOpLSRDeduceCZN (RegContents* C, short Shiftee)
 // Do the LSR and auto-set C/Z/N flags
 {
@@ -1141,8 +1064,6 @@ static short AnyOpLSRDeduceCZN (RegContents* C, short Shiftee)
 
     return Shiftee;
 }
-
-
 
 static short AnyOpROLDeduceCZN (RegContents* C, short PFlags, short Shiftee)
 // Do the ROL and auto-set C/Z/N flags
@@ -1164,8 +1085,6 @@ static short AnyOpROLDeduceCZN (RegContents* C, short PFlags, short Shiftee)
     return Shiftee;
 }
 
-
-
 static short AnyOpRORDeduceCZN (RegContents* C, short PFlags, short Shiftee)
 // Do the ROR and auto-set C/Z/N flags
 {
@@ -1186,8 +1105,6 @@ static short AnyOpRORDeduceCZN (RegContents* C, short PFlags, short Shiftee)
     return Shiftee;
 }
 
-
-
 static void BranchDeduceOnProcessorFlag (RegContents* True, RegContents* False, unsigned short PTrueFlag)
 // Auto-set the corresponding C/Z/V/N flag output for both True/Flase code flows
 {
@@ -1197,8 +1114,6 @@ static void BranchDeduceOnProcessorFlag (RegContents* True, RegContents* False, 
     True->PFlags  |= PTrueFlag;
     False->PFlags &= Mask;
 }
-
-
 
 static int MightAffectKnownZP (CodeEntry* E, RegContents* In)
 /* TODO: This is supposed to check if any builtin ZP could be affected.
@@ -1221,8 +1136,6 @@ static int MightAffectKnownZP (CodeEntry* E, RegContents* In)
     }
     return 1;
 }
-
-
 
 void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 /* Generate register info for this instruction. If an old info exists, it is
@@ -2398,8 +2311,6 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
     }
 }
 
-
-
 static char* RegInfoDesc (unsigned U, char* Buf)
 // Return a string containing register info
 {
@@ -2419,8 +2330,6 @@ static char* RegInfoDesc (unsigned U, char* Buf)
 
     return Buf;
 }
-
-
 
 static char* RegContentDesc (const RegContents* RC, char* Buf)
 // Return a string containing register contents
@@ -2514,8 +2423,6 @@ static char* RegContentDesc (const RegContents* RC, char* Buf)
 
     return Buf;
 }
-
-
 
 void CE_Output (const CodeEntry* E)
 // Output the code entry to the output file

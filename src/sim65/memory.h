@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #ifndef MEMORY_H
 #define MEMORY_H
 
@@ -43,8 +41,6 @@ extern uint8_t Mem[0x10000];
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void MemWriteByte (uint16_t Addr, uint8_t Val);
 // Write a byte to a memory location
@@ -66,8 +62,6 @@ uint16_t MemReadZPWord (uint8_t Addr);
 
 void MemInit (void);
 // Initialize the memory subsystem
-
-
 
 // End of memory.h
 

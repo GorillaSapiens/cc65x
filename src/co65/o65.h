@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 /* This files exports structures and constants to handle the o65 relocatable
 ** file format as defined by Andre Fachat. See the original document under
 **
@@ -41,23 +39,15 @@
 ** for more information.
 */
 
-
-
 #ifndef _O65_H
 #define _O65_H
-
-
 
 // common
 #include "coll.h"
 
-
-
 //***************************************************************************
 //                                  Defines
 //***************************************************************************
-
-
 
 // Define a structure for the o65 file header
 typedef struct O65Header O65Header;
@@ -121,8 +111,6 @@ struct O65Data {
     Collection      Imports;    // Imported symbols
     Collection      Exports;    // Exported symbols
 };
-
-
 
 // Marker, magic and version number
 #define O65_MARKER_0            0x01
@@ -205,13 +193,9 @@ struct O65Data {
 #define O65_OS_LUNIX            2
 #define O65_OS_CC65_MODULE      3
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 O65Data* ReadO65File (const char* Name);
 /* Read a complete o65 file into dynamically allocated memory and return the
@@ -226,8 +210,6 @@ const char* GetO65OptionText (const O65Option* O);
 ** a pointer to a static buffer that is reused on the next call, so if in doubt,
 ** make a copy (and no, the function is not thread safe).
 */
-
-
 
 // End of o65.h
 

@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -44,24 +42,16 @@
 // ld65
 #include "error.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Statistics
 unsigned WarningCount   = 0;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void Warning (const char* Format, ...)
 // Print a warning message
@@ -82,8 +72,6 @@ void Warning (const char* Format, ...)
     ++WarningCount;
 }
 
-
-
 void Error (const char* Format, ...)
 // Print an error message and die
 {
@@ -101,8 +89,6 @@ void Error (const char* Format, ...)
 
     exit (EXIT_FAILURE);
 }
-
-
 
 void Internal (const char* Format, ...)
 // Print an internal error message and die

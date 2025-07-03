@@ -31,29 +31,19 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ISTACK_H
 #define ISTACK_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Opaque pointer to an input stack
 typedef void* InputStack;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void PushInput (int (*Func) (void*), void* Data, const char* Desc);
 // Push an input function onto the input stack
@@ -82,8 +72,6 @@ InputStack RetrieveInputStack (void);
 
 void RestoreInputStack (InputStack S);
 // Restore an old input stack that was retrieved by RetrieveInputStack().
-
-
 
 // End of istack.h
 

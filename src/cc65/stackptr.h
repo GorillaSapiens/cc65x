@@ -31,42 +31,28 @@
 //
 //***************************************************************************
 
-
-
 #ifndef STACKPTR_H
 #define STACKPTR_H
 
-
-
 // cc65
 #include "datatype.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Compiler relative stackpointer
 extern int StackPtr;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void SP_Push (const Type* T);
 // Adjust the stackpointer for a push of an argument of the given type
 
 void SP_Pop (const Type* T);
 // Adjust the stackpointer for a pop of an argument of the given type
-
-
 
 // End of stackptr.h
 

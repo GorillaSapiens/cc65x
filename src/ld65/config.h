@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CONFIG_H
 #define CONFIG_H
-
-
 
 // common
 #include "coll.h"
@@ -46,13 +42,9 @@
 #include "lineinfo.h"
 #include "segments.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Forward for struct MemoryArea
 struct MemoryArea;
@@ -98,13 +90,9 @@ struct SegDesc {
 #define SF_FILLVAL      0x0800          // Segment has separate fill value
 #define SF_OVERWRITE    0x1000          // Segment can overwrite (part of) another one
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void CfgRead (void);
 // Read the configuration
@@ -120,8 +108,6 @@ unsigned CfgProcess (void);
 
 void CfgWriteTarget (void);
 // Write the target file(s)
-
-
 
 // End of config.h
 

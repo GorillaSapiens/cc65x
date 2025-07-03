@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef STRBUF_H
 #define STRBUF_H
-
-
 
 #include <stdarg.h>
 #include <string.h>
@@ -46,12 +42,9 @@
 #include "check.h"
 #include "inline.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
 
 // We want to track whether a character is "raw" or not.
 // "raw" characters should NOT be translated when translating a string.
@@ -81,13 +74,9 @@ extern const StrBuf EmptyStrBuf;
 // Initialize with a string literal (beware: evaluates str twice!)
 #define LIT_STRBUF_INITIALIZER(str)     { (char*)str, (char *)str, sizeof(str)-1, 0, 0 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 #if defined(HAVE_INLINE)
 INLINE StrBuf* SB_Init (StrBuf* B)
@@ -444,8 +433,6 @@ void SB_Printf (StrBuf* S, const char* Format, ...) attribute ((format (printf, 
 ** a matching size for the output. The function will call FAIL when problems
 ** are detected (anything that let xsnprintf return -1).
 */
-
-
 
 // End of strbuf.h
 

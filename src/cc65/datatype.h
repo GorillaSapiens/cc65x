@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef DATATYPE_H
 #define DATATYPE_H
-
-
 
 #include <stdio.h>
 
@@ -48,24 +44,16 @@
 // cc65
 #include "funcdesc.h"
 
-
-
 //***************************************************************************
 //                           Forward declarations
 //***************************************************************************
 
-
-
 struct StrBuf;
 struct SymEntry;
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Basic data types
 enum {
@@ -160,8 +148,6 @@ enum {
     T_SIZE_T    = T_UINT,
 };
 
-
-
 // Type code entry
 typedef unsigned long TypeCode;
 
@@ -233,13 +219,9 @@ extern const Type type_c_char_p[];
 extern const Type type_void_p[];
 extern const Type type_c_void_p[];
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned TypeLen (const Type* T);
 // Return the length of the type string
@@ -268,13 +250,9 @@ INLINE void CopyTypeAttr (const Type* Src, Type* Dest)
 #  define CopyTypeAttr(Src, Dest)       ((Dest)->A = (Src)->A)
 #endif
 
-
-
 //***************************************************************************
 //                           Type info extraction
 //***************************************************************************
-
-
 
 int SignExtendChar (int C);
 // Do correct sign extension of a character to an int
@@ -415,13 +393,9 @@ INLINE TypeCode GetRawSizeModifier (const Type* T)
 #  define GetRawSizeModifier(T) ((T)->C & T_MASK_SIZE)
 #endif
 
-
-
 //***************************************************************************
 //                             Type manipulation
 //***************************************************************************
-
-
 
 Type* GetImplicitFuncType (void);
 // Return a type string for an implicitly declared function
@@ -490,13 +464,9 @@ const Type* GetBitFieldDeclType (const Type* Type);
 const Type* GetBitFieldChunkType (const Type* Type);
 // Get the type needed to operate on the byte chunk containing the bit-field
 
-
-
 //***************************************************************************
 //                              Type Predicates
 //***************************************************************************
-
-
 
 #if defined(HAVE_INLINE)
 INLINE int IsRankChar (const Type* T)
@@ -853,13 +823,9 @@ INLINE int IsSignSigned (const Type* T)
 #  define IsSignSigned(T)       (GetSignedness (T) == T_SIGN_SIGNED)
 #endif
 
-
-
 //***************************************************************************
 //                             Qualifier helpers
 //***************************************************************************
-
-
 
 #if defined(HAVE_INLINE)
 INLINE int IsQualConst (const Type* T)
@@ -964,13 +930,9 @@ INLINE TypeCode DataAddrSizeQualifier (void)
 #  define DataAddrSizeQualifier()      (AddrSizeQualifier (DataAddrSize))
 #endif
 
-
-
 //***************************************************************************
 //                           Function type helpers
 //***************************************************************************
-
-
 
 int IsVariadicFunc (const Type* T) attribute ((const));
 /* Return true if this is a function type or pointer to function type with
@@ -999,13 +961,9 @@ Type* GetFuncReturnTypeModifiable (Type* T) attribute ((const));
 const FuncDesc* GetFuncDefinitionDesc (const Type* T) attribute ((const));
 // Get the function descriptor of the function definition
 
-
-
 //***************************************************************************
 //                            Array type helpers
 //***************************************************************************
-
-
 
 long GetElementCount (const Type* T);
 /* Get the element count of the array specified in T (which must be of
@@ -1029,13 +987,9 @@ const Type* GetBaseElementType (const Type* T);
 ** the element type that is not an array.
 */
 
-
-
 //***************************************************************************
 //                             ESU types helpers
 //***************************************************************************
-
-
 
 struct SymEntry* GetESUTagSym (const Type* T) attribute ((const));
 /* Get the tag symbol entry of the enum/struct/union type.
@@ -1045,13 +999,9 @@ struct SymEntry* GetESUTagSym (const Type* T) attribute ((const));
 void SetESUTagSym (Type* T, struct SymEntry* S);
 // Set the tag symbol entry of the enum/struct/union type
 
-
-
 //***************************************************************************
 //                                  Helpers
 //***************************************************************************
-
-
 
 const char* GetBasicTypeName (const Type* T);
 /* Return a const name string of the basic type.
@@ -1078,8 +1028,6 @@ void PrintFuncSig (FILE* F, const char* Name, const Type* T);
 
 void PrintRawType (FILE* F, const Type* T);
 // Print a type string in raw hex format (for debugging)
-
-
 
 // End of datatype.h
 

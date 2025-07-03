@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SEGMENT_H
 #define SEGMENT_H
-
-
 
 // common
 #include "coll.h"
@@ -47,13 +43,9 @@
 #include "fragment.h"
 #include "segdef.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Segment definition
 typedef struct Segment Segment;
@@ -85,13 +77,9 @@ extern Collection SegmentList;
 // Currently active segment
 extern Segment* ActiveSeg;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Fragment* GenFragment (unsigned char Type, unsigned short Len);
 // Generate a new fragment, add it to the current segment and return it.
@@ -168,8 +156,6 @@ void SetSegmentSizes (void);
 
 void WriteSegments (void);
 // Write the segment data to the object file
-
-
 
 // End of segment.h
 

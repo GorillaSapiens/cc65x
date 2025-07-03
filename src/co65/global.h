@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef GLOBAL_H
 #define GLOBAL_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // File names
 extern const char*      InputName;          // Name of input file
@@ -66,8 +60,6 @@ extern const char*      ZeropageLabel;      // Label for the zeropage segment
 // Flags
 extern unsigned char    DebugInfo;          // Enable debug info
 extern unsigned char    NoOutput;           // Suppress the actual conversion
-
-
 
 // End of global.h
 

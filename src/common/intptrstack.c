@@ -28,19 +28,13 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "check.h"
 #include "intptrstack.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void IPS_Get (const IntPtrStack* S, long *Val, void **Ptr)
 // Get the value on top of an int stack
@@ -50,8 +44,6 @@ void IPS_Get (const IntPtrStack* S, long *Val, void **Ptr)
     if (Ptr) *Ptr = S->Stack[S->Count-1].ptr;
 }
 
-
-
 void IPS_Set (IntPtrStack* S, long Val, void *Ptr)
 // Set the value on top of an int stack
 {
@@ -60,16 +52,12 @@ void IPS_Set (IntPtrStack* S, long Val, void *Ptr)
     S->Stack[S->Count-1].ptr = Ptr;
 }
 
-
-
 void IPS_Drop (IntPtrStack* S)
 // Drop a value from an int stack
 {
     PRECONDITION (S->Count > 0);
     --S->Count;
 }
-
-
 
 void IPS_Push (IntPtrStack* S, long Val, void *Ptr)
 // Push a value onto an int stack
@@ -78,8 +66,6 @@ void IPS_Push (IntPtrStack* S, long Val, void *Ptr)
     S->Stack[S->Count].val = Val;
     S->Stack[S->Count++].ptr = Ptr;
 }
-
-
 
 void IPS_Pop (IntPtrStack* S, long *Val, void **Ptr)
 // Pop a value from an int stack

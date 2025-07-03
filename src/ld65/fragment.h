@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef FRAGMENT_H
 #define FRAGMENT_H
-
-
 
 // common
 #include "coll.h"
@@ -45,23 +41,16 @@
 // Ld65
 #include "lineinfo.h"
 
-
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 struct ObjData;
 struct Section;
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Fragment structure
 typedef struct Fragment Fragment;
@@ -76,13 +65,9 @@ struct Fragment {
     unsigned char       LitBuf [1];     // Dynamically alloc'ed literal buffer
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Fragment* NewFragment (unsigned char Type, unsigned Size, struct Section* S);
 // Create a new fragment and insert it into the section S
@@ -106,8 +91,6 @@ INLINE unsigned GetFragmentSourceLine (const Fragment* F)
 #else
 #  define GetFragmentSourceLine(F)      GetSourceLineFromList (&(F)->LineInfos)
 #endif
-
-
 
 // End of fragment.h
 

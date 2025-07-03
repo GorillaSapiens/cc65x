@@ -31,29 +31,19 @@
 //
 //***************************************************************************
 
-
-
 // cc65
 #include "incpath.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 SearchPaths*    SysIncSearchPath;       // System include path
 SearchPaths*    UsrIncSearchPath;       // User include path
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void InitIncludePaths (void)
 // Initialize the include path search list
@@ -62,8 +52,6 @@ void InitIncludePaths (void)
     SysIncSearchPath = NewSearchPath ();
     UsrIncSearchPath = NewSearchPath ();
 }
-
-
 
 void FinishIncludePaths (void)
 // Finish creating the include path search lists.

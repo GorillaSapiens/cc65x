@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef TGTTRANS_H
 #define TGTTRANS_H
-
-
 
 // common
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void TgtTranslateInit (void);
 // Initialize the translation tables
@@ -82,8 +74,6 @@ int TgtTranslatePop (void);
 
 int TgtTranslateStackIsEmpty (void);
 // Returns 1 if the internal stack is empty
-
-
 
 // End of tgttrans.h
 

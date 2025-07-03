@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ANONNAME_H
 #define ANONNAME_H
-
-
 
 // common
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 StrBuf* AnonName (StrBuf* Buf, const char* Spec);
 /* Get a name for an anonymous scope, variable or type. Size is the size of
@@ -57,8 +49,6 @@ StrBuf* AnonName (StrBuf* Buf, const char* Spec);
 
 int IsAnonName (const StrBuf* Name);
 // Check if the given symbol name is that of an anonymous symbol
-
-
 
 // End of anonname.h
 

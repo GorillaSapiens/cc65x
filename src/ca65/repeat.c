@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -45,13 +43,9 @@
 #include "toklist.h"
 #include "repeat.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static TokList* CollectRepeatTokens (void)
 /* Collect all tokens inside the .REPEAT body in a token list and return
@@ -93,8 +87,6 @@ static TokList* CollectRepeatTokens (void)
     return List;
 }
 
-
-
 static void RepeatTokenCheck (TokList* L)
 /* Called each time a token from a repeat token list is set. Is used to check
 ** for and replace identifiers that are the repeat counter.
@@ -108,8 +100,6 @@ static void RepeatTokenCheck (TokList* L)
         CurTok.IVal = L->RepCount;
     }
 }
-
-
 
 void ParseRepeat (void)
 // Parse and handle the .REPEAT statement

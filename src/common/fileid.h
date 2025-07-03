@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef FILEID_H
 #define FILEID_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 /* An entry for a table that maps extensions to some sort of identifier. Such
 ** a table - sorted alphabetically - is passed to GetFileId.
@@ -53,13 +47,9 @@ struct FileId {
     int         Id;
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int CompareFileId (const void* Key, const void* Id);
 // Compare function used when calling bsearch with a table of FileIds
@@ -70,8 +60,6 @@ const FileId* GetFileId (const char* Name, const FileId* Table, unsigned Count);
 ** extension is found, a pointer to the matching table entry is returned. If
 ** no matching table entry was found, the function returns NULL.
 */
-
-
 
 // End of fileid.h
 

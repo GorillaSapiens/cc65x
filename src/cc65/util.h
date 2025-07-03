@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef UTIL_H
 #define UTIL_H
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 int PowerOf2 (unsigned long Val);
 /* Return the exponent if val is a power of two. Return -1 if val is not a
 ** power of two.
 */
-
-
 
 // End of util.h
 

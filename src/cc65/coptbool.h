@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COPTBOOL_H
 #define COPTBOOL_H
-
-
 
 // cc65
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //           Optimize bool comparison and transformer subroutines
 //***************************************************************************
-
-
 
 unsigned OptBoolCmp (CodeSeg* S);
 /* Search for calls to compare subroutines followed by a conditional branch
@@ -61,13 +53,9 @@ unsigned OptBoolTrans (CodeSeg* S);
 ** not really needed and change following branch condition accordingly.
 */
 
-
-
 //***************************************************************************
 //           Remove calls to the boolean cast/negation subroutines
 //***************************************************************************
-
-
 
 unsigned OptBoolUnary1 (CodeSeg* S);
 // Search for and remove bcastax adjacent to bnegax
@@ -91,13 +79,9 @@ unsigned OptBoolUnary3 (CodeSeg* S);
 ** if X == 0.
 */
 
-
-
 //***************************************************************************
 //                            bnega optimizations
 //***************************************************************************
-
-
 
 unsigned OptBNegA1 (CodeSeg* S);
 /* Check for
@@ -119,13 +103,9 @@ unsigned OptBNegA2 (CodeSeg* S);
 ** Adjust the conditional branch and remove the call to the subroutine.
 */
 
-
-
 //***************************************************************************
 //                            bnegax optimizations
 //***************************************************************************
-
-
 
 unsigned OptBNegAX1 (CodeSeg* S);
 /* On a call to bnegax, if X is zero, the result depends only on the value in
@@ -179,8 +159,6 @@ unsigned OptBNegAX4 (CodeSeg* S);
 **      <boolean test>
 **      jne/jeq ...
 */
-
-
 
 // End of coptbool.h
 

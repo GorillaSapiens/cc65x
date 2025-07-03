@@ -31,26 +31,18 @@
 //
 //***************************************************************************
 
-
-
 #ifndef PSEUDO_H
 #define PSEUDO_H
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void HandlePseudo (void);
 // Handle a pseudo instruction
 
 void CheckPseudo (void);
 // Check if the stacks are empty at end of assembly
-
-
 
 // End of pseudo.h
 

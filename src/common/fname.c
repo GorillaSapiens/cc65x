@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,13 +46,9 @@
 #include "xmalloc.h"
 #include "fname.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 const char* FindExt (const char* Name)
 // Return a pointer to the file extension in Name or NULL if there is none
@@ -82,8 +76,6 @@ const char* FindExt (const char* Name)
         return 0;
     }
 }
-
-
 
 const char* FindName (const char* Path)
 /* Return a pointer to the file name in Path. If there is no path leading to
@@ -146,8 +138,6 @@ char* MakeFilename (const char* Origin, const char* Ext)
     }
     return Out;
 }
-
-
 
 char* MakeTmpFilename (const char *Directory, const char *Origin, const char* Ext)
 /* Make a new temporary file name from Origin and Ext.

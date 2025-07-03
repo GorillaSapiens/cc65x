@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -57,13 +55,9 @@
 #include "model.h"
 #include "o65.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void Usage (void)
 // Print usage information and exit
@@ -96,8 +90,6 @@ static void Usage (void)
             ProgName);
 }
 
-
-
 static void CheckLabelName (const char* Label)
 // Check if the given label is a valid label name
 {
@@ -116,8 +108,6 @@ static void CheckLabelName (const char* Label)
     }
 }
 
-
-
 static void CheckSegName (const char* Seg)
 // Abort if the given name is not a valid segment name
 {
@@ -126,8 +116,6 @@ static void CheckSegName (const char* Seg)
         Error ("Segment name '%s' is invalid", Seg);
     }
 }
-
-
 
 static void OptBssLabel (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --bss-label option
@@ -139,8 +127,6 @@ static void OptBssLabel (const char* Opt attribute ((unused)), const char* Arg)
     BssLabel = xstrdup (Arg);
 }
 
-
-
 static void OptBssName (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --bss-name option
 {
@@ -150,8 +136,6 @@ static void OptBssName (const char* Opt attribute ((unused)), const char* Arg)
     // Set the name
     BssSeg = xstrdup (Arg);
 }
-
-
 
 static void OptCodeLabel (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --code-label option
@@ -163,8 +147,6 @@ static void OptCodeLabel (const char* Opt attribute ((unused)), const char* Arg)
     CodeLabel = xstrdup (Arg);
 }
 
-
-
 static void OptCodeName (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --code-name option
 {
@@ -174,8 +156,6 @@ static void OptCodeName (const char* Opt attribute ((unused)), const char* Arg)
     // Set the name
     CodeSeg = xstrdup (Arg);
 }
-
-
 
 static void OptDataLabel (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --data-label option
@@ -187,8 +167,6 @@ static void OptDataLabel (const char* Opt attribute ((unused)), const char* Arg)
     DataLabel = xstrdup (Arg);
 }
 
-
-
 static void OptDataName (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --data-name option
 {
@@ -199,8 +177,6 @@ static void OptDataName (const char* Opt attribute ((unused)), const char* Arg)
     DataSeg = xstrdup (Arg);
 }
 
-
-
 static void OptDebug (const char* Opt attribute ((unused)),
                       const char* Arg attribute ((unused)))
 // Enable debugging code
@@ -208,16 +184,12 @@ static void OptDebug (const char* Opt attribute ((unused)),
     ++Debug;
 }
 
-
-
 static void OptDebugInfo (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
 // Add debug info to the object file
 {
     DebugInfo = 1;
 }
-
-
 
 static void OptHelp (const char* Opt attribute ((unused)),
                      const char* Arg attribute ((unused)))
@@ -227,16 +199,12 @@ static void OptHelp (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
-
-
 static void OptNoOutput (const char* Opt attribute ((unused)),
                          const char* Arg attribute ((unused)))
 // Handle the --no-output option
 {
     NoOutput = 1;
 }
-
-
 
 static void OptO65Model (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --o65-model option
@@ -248,16 +216,12 @@ static void OptO65Model (const char* Opt attribute ((unused)), const char* Arg)
     }
 }
 
-
-
 static void OptVerbose (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 // Increase verbosity
 {
     ++Verbosity;
 }
-
-
 
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
@@ -266,8 +230,6 @@ static void OptVersion (const char* Opt attribute ((unused)),
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
     exit(EXIT_SUCCESS);
 }
-
-
 
 static void OptZeropageLabel (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --zeropage-label option
@@ -279,8 +241,6 @@ static void OptZeropageLabel (const char* Opt attribute ((unused)), const char* 
     ZeropageLabel = xstrdup (Arg);
 }
 
-
-
 static void OptZeropageName (const char* Opt attribute ((unused)), const char* Arg)
 // Handle the --zeropage-name option
 {
@@ -290,8 +250,6 @@ static void OptZeropageName (const char* Opt attribute ((unused)), const char* A
     // Set the name
     ZeropageSeg = xstrdup (Arg);
 }
-
-
 
 static void DoConversion (void)
 // Do file conversion
@@ -306,8 +264,6 @@ static void DoConversion (void)
     // ###
 
 }
-
-
 
 int main (int argc, char* argv [])
 // Converter main program

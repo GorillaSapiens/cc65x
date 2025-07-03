@@ -31,17 +31,11 @@
 //
 //***************************************************************************
 
-
-
 #include "bitops.h"
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned BitFind (unsigned long Val)
 // Find the first bit that is set in Val. Val must *not* be zero
@@ -61,8 +55,6 @@ unsigned BitFind (unsigned long Val)
     }
 }
 
-
-
 void BitSet (void* Data, unsigned Bit)
 // Set a bit in a char array
 {
@@ -72,8 +64,6 @@ void BitSet (void* Data, unsigned Bit)
     // Set the bit
     D [Bit / 8] |= 0x01 << (Bit % 8);
 }
-
-
 
 void BitReset (void* Data, unsigned Bit)
 // Reset a bit in a char array
@@ -85,8 +75,6 @@ void BitReset (void* Data, unsigned Bit)
     D [Bit / 8] &= ~(0x01 << (Bit % 8));
 }
 
-
-
 int BitIsSet (void* Data, unsigned Bit)
 // Check if a bit is set in a char array
 {
@@ -97,8 +85,6 @@ int BitIsSet (void* Data, unsigned Bit)
     return (D [Bit / 8] & (0x01 << (Bit % 8))) != 0;
 }
 
-
-
 int BitIsReset (void* Data, unsigned Bit)
 // Check if a bit is reset in a char array
 {
@@ -108,8 +94,6 @@ int BitIsReset (void* Data, unsigned Bit)
     // Check the bit state
     return (D [Bit / 8] & (0x01 << (Bit % 8))) == 0;
 }
-
-
 
 void BitMerge (void* Target, const void* Source, unsigned Size)
 // Merge the bits of two char arrays (that is, do an or for the full array)

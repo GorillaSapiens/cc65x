@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SEGMENT_H
 #define SEGMENT_H
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void AddAbsSegment (uint32_t Start, uint32_t End, const char* Name);
 // Add an absolute segment to the segment table
@@ -52,8 +46,6 @@ char* GetSegmentStartName (uint32_t Addr);
 
 unsigned GetSegmentAddrSize (uint32_t Addr);
 // Return the address size of the segment which starts at the given address
-
-
 
 // End of segment.h
 #endif

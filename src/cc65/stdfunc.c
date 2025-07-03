@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -56,13 +54,9 @@
 #include "stdnames.h"
 #include "typeconv.h"
 
-
-
 //***************************************************************************
 //                             Function forwards
 //***************************************************************************
-
-
 
 static void StdFunc_memcpy (FuncDesc*, ExprDesc*);
 static void StdFunc_memset (FuncDesc*, ExprDesc*);
@@ -70,13 +64,9 @@ static void StdFunc_strcmp (FuncDesc*, ExprDesc*);
 static void StdFunc_strcpy (FuncDesc*, ExprDesc*);
 static void StdFunc_strlen (FuncDesc*, ExprDesc*);
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 /* Table with all known functions and their handlers.
 ** CAUTION: table must be alphabetically sorted for bsearch
@@ -106,21 +96,15 @@ struct ArgDesc {
     unsigned    Flags;          // Code generation flags
 };
 
-
-
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 static int CmpFunc (const void* Key, const void* Elem)
 // Compare function for bsearch
 {
     return strcmp ((const char*) Key, ((const struct StdFuncDesc*) Elem)->Name);
 }
-
-
 
 static long ArrayElementCount (const ArgDesc* Arg)
 /* Check if the type of the given argument is an array. If so, and if the
@@ -140,8 +124,6 @@ static long ArrayElementCount (const ArgDesc* Arg)
     }
     return Count;
 }
-
-
 
 static void ParseArg (ArgDesc* Arg, const Type* Type, ExprDesc* Expr)
 /* Parse one argument but do not push it onto the stack. Make all fields in
@@ -192,8 +174,6 @@ static void ParseArg (ArgDesc* Arg, const Type* Type, ExprDesc* Expr)
     Expr->Flags |= Arg->Expr.Flags & E_MASK_VIRAL;
 }
 
-
-
 void AddCmpCodeIfSizeNot256 (const char* Code, long Size)
 /* Add a line of Assembly code that compares an index register
 ** only if it isn't comparing to #<256.  (If the next line
@@ -205,13 +185,9 @@ void AddCmpCodeIfSizeNot256 (const char* Code, long Size)
     }
 }
 
-
-
 //***************************************************************************
 //                                  memcpy
 //***************************************************************************
-
-
 
 static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 // Handle the memcpy function
@@ -547,13 +523,9 @@ ExitPoint:
     ConsumeRParen ();
 }
 
-
-
 //***************************************************************************
 //                                  memset
 //***************************************************************************
-
-
 
 static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 // Handle the memset function
@@ -772,13 +744,9 @@ ExitPoint:
     ConsumeRParen ();
 }
 
-
-
 //***************************************************************************
 //                                  strcmp
 //***************************************************************************
-
-
 
 static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 // Handle the strcmp function
@@ -970,13 +938,9 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     ConsumeRParen ();
 }
 
-
-
 //***************************************************************************
 //                                  strcpy
 //***************************************************************************
-
-
 
 static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 // Handle the strcpy function
@@ -1166,13 +1130,9 @@ ExitPoint:
     ConsumeRParen ();
 }
 
-
-
 //***************************************************************************
 //                                  strlen
 //***************************************************************************
-
-
 
 static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 // Handle the strlen function
@@ -1371,13 +1331,9 @@ ExitPoint:
     Expr->Flags |= Arg.Flags & E_MASK_VIRAL;
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int FindStdFunc (const char* Name)
 /* Determine if the given function is a known standard function that may be
@@ -1395,8 +1351,6 @@ int FindStdFunc (const char* Name)
         return D - StdFuncs;
     }
 }
-
-
 
 void HandleStdFunc (int Index, FuncDesc* F, ExprDesc* lval)
 // Generate code for a known standard function.

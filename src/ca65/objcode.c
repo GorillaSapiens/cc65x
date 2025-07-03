@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 #include <errno.h>
 
@@ -42,13 +40,9 @@
 #include "objcode.h"
 #include "segment.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void Emit0 (unsigned char OPC)
 // Emit an instruction with a zero sized operand
@@ -56,8 +50,6 @@ void Emit0 (unsigned char OPC)
     Fragment* F = GenFragment (FRAG_LITERAL, 1);
     F->V.Data[0] = OPC;
 }
-
-
 
 void Emit1 (unsigned char OPC, ExprNode* Value)
 // Emit an instruction with an one byte argument
@@ -88,8 +80,6 @@ void Emit1 (unsigned char OPC, ExprNode* Value)
         F->V.Expr = Value;
     }
 }
-
-
 
 void Emit2 (unsigned char OPC, ExprNode* Value)
 // Emit an instruction with a two byte argument
@@ -122,16 +112,12 @@ void Emit2 (unsigned char OPC, ExprNode* Value)
     }
 }
 
-
-
 void Emit3 (unsigned char OPC, ExprNode* Expr)
 // Emit an instruction with a three byte argument
 {
     Emit0 (OPC);
     EmitFarAddr (Expr);
 }
-
-
 
 void EmitSigned (ExprNode* Expr, unsigned Size)
 // Emit a signed expression with the given size
@@ -140,16 +126,12 @@ void EmitSigned (ExprNode* Expr, unsigned Size)
     F->V.Expr = Expr;
 }
 
-
-
 void EmitPCRel (unsigned char OPC, ExprNode* Expr, unsigned Size)
 // Emit an opcode with a PC relative argument of one or two bytes
 {
     Emit0 (OPC);
     EmitSigned (Expr, Size);
 }
-
-
 
 void EmitData (const void* D, unsigned Size)
 // Emit data into the current segment
@@ -180,16 +162,12 @@ void EmitData (const void* D, unsigned Size)
     }
 }
 
-
-
 void EmitStrBuf (const StrBuf* Data)
 // Emit a string into the current segment
 {
     // Use EmitData to output the data
     EmitData (SB_GetConstBuf (Data), SB_GetLen (Data));
 }
-
-
 
 void EmitByte (ExprNode* Expr)
 // Emit one byte
@@ -213,8 +191,6 @@ void EmitByte (ExprNode* Expr)
         F->V.Expr = Expr;
     }
 }
-
-
 
 void EmitWord (ExprNode* Expr)
 // Emit one word
@@ -240,8 +216,6 @@ void EmitWord (ExprNode* Expr)
     }
 }
 
-
-
 void EmitFarAddr (ExprNode* Expr)
 // Emit a 24 bit expression
 {
@@ -252,8 +226,6 @@ void EmitFarAddr (ExprNode* Expr)
     F->V.Expr = Expr;
 }
 
-
-
 void EmitDWord (ExprNode* Expr)
 // Emit one dword
 {
@@ -263,8 +235,6 @@ void EmitDWord (ExprNode* Expr)
     // Set the data
     F->V.Expr = Expr;
 }
-
-
 
 void EmitFill (unsigned long Count)
 // Emit Count fill bytes

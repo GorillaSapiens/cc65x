@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ASM_H
 #define ASM_H
-
-
 
 // common
 #include "coll.h"
@@ -45,18 +41,12 @@
 // sp65
 #include "bitmap.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 void WriteAsmFile (const StrBuf* Data, const Collection* A, const Bitmap* B);
 // Write the contents of Data to a file in assembler (ca65) format
-
-
 
 // End of asm.h
 

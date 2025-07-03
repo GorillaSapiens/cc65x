@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef TARGET_H
 #define TARGET_H
-
-
 
 // common
 #include "cpu.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Supported target systems
 typedef enum {
@@ -112,13 +104,9 @@ extern target_t         Target;
 #define BINFMT_O65              2       // Andre Fachat's o65 format
 #define BINFMT_ATARIEXE         3       // Standard Atari binary load
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 target_t FindTarget (const char* Name);
 /* Find a target by name and return the target id. TGT_UNKNOWN is returned if
@@ -130,8 +118,6 @@ const TargetProperties* GetTargetProperties (target_t Target);
 
 const char* GetTargetName (target_t Target);
 // Return the name of a target
-
-
 
 // End of target.h
 #endif

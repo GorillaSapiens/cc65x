@@ -65,12 +65,9 @@
 #include "typeconv.h"
 #include "initdata.h"
 
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 typedef struct StructInitData StructInitData;
 struct StructInitData {
@@ -80,24 +77,16 @@ struct StructInitData {
     unsigned    ValBits;                // Valid bits in Val
 };
 
-
-
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 static unsigned ParseInitInternal (Type* T, int* Braces, int AllowFlexibleMembers);
 // Parse initialization of variables. Return the number of data bytes.
-
-
 
 //***************************************************************************
 //                                   code
 //***************************************************************************
-
-
 
 static void SkipInitializer (int BracesExpected)
 /* Skip the remainder of an initializer in case of errors. Try to be somewhat
@@ -116,8 +105,6 @@ static void SkipInitializer (int BracesExpected)
     }
 }
 
-
-
 static unsigned OpeningCurlyBraces (unsigned BracesNeeded)
 /* Accept any number of opening curly braces around an initialization, skip
 ** them and return the number. If the number of curly braces is less than
@@ -134,8 +121,6 @@ static unsigned OpeningCurlyBraces (unsigned BracesNeeded)
     }
     return BraceCount;
 }
-
-
 
 static void ClosingCurlyBraces (unsigned BracesExpected)
 /* Accept and skip the given number of closing curly braces together with
@@ -157,8 +142,6 @@ static void ClosingCurlyBraces (unsigned BracesExpected)
         --BracesExpected;
     }
 }
-
-
 
 static void DefineData (ExprDesc* Expr)
 // Output a data definition for the given expression
@@ -229,8 +212,6 @@ static void DefineData (ExprDesc* Expr)
     }
 }
 
-
-
 static void DefineBitFieldData (StructInitData* SI)
 // Output bit field data
 {
@@ -252,15 +233,11 @@ static void DefineBitFieldData (StructInitData* SI)
     }
 }
 
-
-
 static void DefineStrData (Literal* Lit, unsigned Count)
 {
     // Output the data
     g_defbytes (GetLiteralStr (Lit), Count);
 }
-
-
 
 static ExprDesc ParseScalarInitInternal (const Type* T)
 /* Parse initializaton for scalar data types. This function will not output the
@@ -287,8 +264,6 @@ static ExprDesc ParseScalarInitInternal (const Type* T)
     return ED;
 }
 
-
-
 static unsigned ParseScalarInit (const Type* T)
 // Parse initializaton for scalar data types. Return the number of data bytes.
 {
@@ -304,8 +279,6 @@ static unsigned ParseScalarInit (const Type* T)
     // Done
     return SizeOf (T);
 }
-
-
 
 static unsigned ParsePointerInit (const Type* T)
 // Parse initializaton for pointer data types. Return the number of data bytes.
@@ -336,8 +309,6 @@ static unsigned ParsePointerInit (const Type* T)
     // Done
     return SIZEOF_PTR;
 }
-
-
 
 static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
 // Parse initializaton for arrays. Return the number of data bytes.
@@ -458,8 +429,6 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
     return ElementCount * ElementSize;
 }
 
-
-
 static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
 // Parse initialization of a struct or union. Return the number of data bytes.
 {
@@ -468,7 +437,6 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
     StructInitData  SI;
     int             HasCurly  = 0;
     int             SkipComma = 0;
-
 
     // Fields can be initialized without a pair of curly braces
     if (*Braces == 0 || CurTok.Tok == TOK_LCURLY) {
@@ -681,8 +649,6 @@ NextMember:
     return SI.Offs;
 }
 
-
-
 static unsigned ParseVoidInit (Type* T)
 /* Parse an initialization of a void variable (special cc65 extension).
 ** Return the number of bytes initialized.
@@ -760,8 +726,6 @@ static unsigned ParseVoidInit (Type* T)
     return Size;
 }
 
-
-
 static unsigned ParseInitInternal (Type* T, int *Braces, int AllowFlexibleMembers)
 // Parse initialization of variables. Return the number of data bytes.
 {
@@ -808,8 +772,6 @@ static unsigned ParseInitInternal (Type* T, int *Braces, int AllowFlexibleMember
 
     }
 }
-
-
 
 unsigned ParseInit (Type* T)
 // Parse initialization of variables. Return the number of data bytes.

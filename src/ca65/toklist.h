@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef TOKLIST_H
 #define TOKLIST_H
-
-
 
 // common
 #include "strbuf.h"
@@ -45,13 +41,9 @@
 #include "lineinfo.h"
 #include "scanner.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Struct holding a token
 typedef struct TokNode TokNode;
@@ -74,8 +66,6 @@ struct TokList {
     LineInfo*   LI;                     // Line info for replay
 };
 
-
-
 // Return codes for TokCmp - higher numeric code means better match
 enum TC {
     tcDifferent,                        // Different tokents
@@ -83,13 +73,9 @@ enum TC {
     tcIdentical                         // Identical (token + attribute)
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 TokNode* NewTokNode (void);
 // Create and return a token node with the current token value
@@ -123,8 +109,6 @@ void PushTokList (TokList* List, const char* Desc);
 ** several initializations needed in the token list structure, so don't use
 ** PushInput directly.
 */
-
-
 
 // End of toklist.h
 

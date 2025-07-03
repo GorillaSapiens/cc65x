@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 
@@ -46,13 +44,9 @@
 #include "preproc.h"
 #include "macrotab.h"
 
-
-
 //***************************************************************************
 //                                   data
 //***************************************************************************
-
-
 
 // The macro hash table
 #define MACRO_TAB_SIZE  211
@@ -67,13 +61,9 @@ static Macro* UndefinedMacrosListHead;
 #define NAME_ONLY       0
 #define FULL_DEFINITION 1
 
-
-
 //***************************************************************************
 //                                  helpers
 //***************************************************************************
-
-
 
 static void OutputMacro (const Macro* M, int Full)
 // Output one macro. If Full is true, the replacement is also output.
@@ -105,8 +95,6 @@ static void OutputMacro (const Macro* M, int Full)
     WriteOutput ("\n");
 }
 
-
-
 static void OutputMacros (int Predefined, int Full)
 // Output macros to the output file depending on the flags given.
 {
@@ -125,13 +113,9 @@ static void OutputMacros (int Predefined, int Full)
     }
 }
 
-
-
 //***************************************************************************
 //                                   code
 //***************************************************************************
-
-
 
 Macro* NewMacro (const char* Name, unsigned char Predefined)
 /* Allocate a macro structure with the given name. The structure is not
@@ -157,8 +141,6 @@ Macro* NewMacro (const char* Name, unsigned char Predefined)
     return M;
 }
 
-
-
 void FreeMacro (Macro* M)
 /* Delete a macro definition. The function will NOT remove the macro from the
 ** table, use UndefineMacro for that.
@@ -173,8 +155,6 @@ void FreeMacro (Macro* M)
     SB_Done (&M->Replacement);
     xfree (M);
 }
-
-
 
 Macro* CloneMacro (const Macro* M)
 /* Clone a macro definition. The function is not insert the macro into the
@@ -197,8 +177,6 @@ Macro* CloneMacro (const Macro* M)
     return New;
 }
 
-
-
 void DefineNumericMacro (const char* Name, long Val)
 // Define a predefined macro for a numeric constant
 {
@@ -210,8 +188,6 @@ void DefineNumericMacro (const char* Name, long Val)
     // Handle as text macro
     DefineTextMacro (Name, Buf);
 }
-
-
 
 void DefineTextMacro (const char* Name, const char* Val)
 // Define a predefined macro for a textual constant
@@ -226,8 +202,6 @@ void DefineTextMacro (const char* Name, const char* Val)
     InsertMacro (M);
 }
 
-
-
 void InsertMacro (Macro* M)
 // Insert the given macro into the macro table.
 {
@@ -238,8 +212,6 @@ void InsertMacro (Macro* M)
     M->Next = MacroTab[Hash];
     MacroTab[Hash] = M;
 }
-
-
 
 Macro* UndefineMacro (const char* Name)
 /* Search for the macro with the given name, if it exists, remove it from
@@ -282,8 +254,6 @@ Macro* UndefineMacro (const char* Name)
     return 0;
 }
 
-
-
 void FreeUndefinedMacros (void)
 // Free all undefined macros
 {
@@ -298,8 +268,6 @@ void FreeUndefinedMacros (void)
         UndefinedMacrosListHead = Next;
     }
 }
-
-
 
 Macro* FindMacro (const char* Name)
 // Find a macro with the given name. Return the macro definition or NULL
@@ -327,8 +295,6 @@ Macro* FindMacro (const char* Name)
     return 0;
 }
 
-
-
 int FindMacroParam (const Macro* M, const char* Param)
 /* Search for a macro parameter. If found, return the index of the parameter.
 ** If the parameter was not found, return -1.
@@ -345,8 +311,6 @@ int FindMacroParam (const Macro* M, const char* Param)
     // Not found
     return -1;
 }
-
-
 
 void AddMacroParam (Macro* M, const char* Param)
 // Add a macro parameter.
@@ -368,8 +332,6 @@ void AddMacroParam (Macro* M, const char* Param)
     CollAppend (&M->Params, xstrdup (Param));
     ++M->ParamCount;
 }
-
-
 
 int MacroCmp (const Macro* M1, const Macro* M2)
 // Compare two macros and return zero if both are identical.
@@ -393,8 +355,6 @@ int MacroCmp (const Macro* M1, const Macro* M2)
     return SB_Compare (&M1->Replacement, &M2->Replacement);
 }
 
-
-
 void PrintMacroStats (FILE* F)
 // Print macro statistics to the given text file.
 {
@@ -417,15 +377,11 @@ void PrintMacroStats (FILE* F)
     }
 }
 
-
-
 void OutputPredefMacros (void)
 // Output all predefined macros to the output file
 {
     OutputMacros (PREDEF_MACROS, FULL_DEFINITION);
 }
-
-
 
 void OutputUserMacros (void)
 // Output all user defined macros to the output file

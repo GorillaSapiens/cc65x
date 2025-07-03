@@ -31,34 +31,22 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SIZEOF_H
 #define SIZEOF_H
 
-
-
 // common
 #include "strbuf.h"
-
-
 
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 struct SymEntry;
 struct SymTable;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 int IsSizeOfSymbol (const struct SymEntry* Sym);
 /* Return true if the given symbol is the one that encodes the size of some
@@ -91,8 +79,6 @@ struct SymEntry* DefSizeOfScope (struct SymTable* Scope, long Size);
 
 struct SymEntry* DefSizeOfSymbol (struct SymEntry* Sym, long Size);
 // Define the size of a symbol and return the size symbol
-
-
 
 // End of sizeof.h
 

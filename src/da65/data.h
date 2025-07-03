@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef DATA_H
 #define DATA_H
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 uint32_t ByteTable (void);
 // Output a table of bytes
@@ -64,8 +58,6 @@ uint32_t RtsTable (void);
 
 uint32_t TextTable (void);
 // Output a table of text messages
-
-
 
 // End of data.h
 

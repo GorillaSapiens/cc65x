@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef TYPECONV_H
 #define TYPECONV_H
-
-
 
 // cc65
 #include "exprdesc.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void TypeConversion (ExprDesc* Expr, const Type* NewType);
 /* Do an automatic conversion of the given expression to the new type. Output
@@ -62,8 +54,6 @@ void TypeComposition (Type* lhs, const Type* rhs);
 /* Recursively compose two types into lhs. The two types must have compatible
 ** type or this fails with a critical check.
 */
-
-
 
 // End of typeconv.h
 

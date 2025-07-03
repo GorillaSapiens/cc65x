@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef FILETAB_H
 #define FILETAB_H
-
-
 
 // common
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 /* An enum that describes different types of input files. The members are
 ** choosen so that it is possible to combine them to bitsets
@@ -59,13 +51,9 @@ typedef enum {
     FT_DBGINFO  = 0x08,         // File from debug info
 } FileType;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 const StrBuf* GetFileName (unsigned Name);
 // Get the name of a file where the name index is known
@@ -84,8 +72,6 @@ void WriteFiles (void);
 
 void CreateDependencies (void);
 // Create dependency files requested by the user
-
-
 
 // End of filetab.h
 

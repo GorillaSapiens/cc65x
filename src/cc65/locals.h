@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef LOCALS_H
 #define LOCALS_H
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void InitRegVars (void);
 // Initialize register variable control data
@@ -58,8 +52,6 @@ void RestoreRegVars (int HaveResult);
 ** The parameter tells us if there is a return value in ax, in that case,
 ** the accumulator must be saved across the restore.
 */
-
-
 
 // End of locals.h
 

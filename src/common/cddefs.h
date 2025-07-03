@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef CDDEFS_H
 #define CDDEFS_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // ConDes types. Count is only 7 because we want to encode 0..count in 3 bits
 #define CD_TYPE_COUNT   7               // Number of table types
@@ -70,8 +64,6 @@
 
 // Macro to build the byte value:
 #define CD_BUILD(type,prio)     ((((type) & 0x07) << 5) | (((prio) - 1) & 0x1F))
-
-
 
 // End of cddefs.h
 

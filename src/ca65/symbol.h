@@ -31,33 +31,21 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SYMBOL_H
 #define SYMBOL_H
 
-
-
 // cc65
 #include "symtab.h"
-
-
 
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 struct StrBuf;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 struct SymTable* ParseScopedIdent (struct StrBuf* Name, struct StrBuf* FullName);
 /* Parse a (possibly scoped) identifer. The scope of the name must exist and
@@ -82,8 +70,6 @@ struct SymEntry* ParseAnySymName (SymFindAction Action);
 /* Parse a cheap local symbol or a a (possibly scoped) symbol name, search
 ** for it in the symbol table and return the symbol table entry.
 */
-
-
 
 // End of symbol.h
 

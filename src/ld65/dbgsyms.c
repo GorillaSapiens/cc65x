@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -55,13 +53,9 @@
 #include "spool.h"
 #include "tpool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Definition of the debug symbol structure
 struct DbgSym {
@@ -95,13 +89,9 @@ struct HLLDbgSym {
 */
 static DbgSym*  DbgSymPool[256];
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static DbgSym* NewDbgSym (unsigned Id, unsigned Type, unsigned char AddrSize,
                           ObjData* O)
@@ -128,16 +118,12 @@ static DbgSym* NewDbgSym (unsigned Id, unsigned Type, unsigned char AddrSize,
     return D;
 }
 
-
-
 static HLLDbgSym* NewHLLDbgSym (void)
 // Create a new HLLDbgSym and return it
 {
     // Allocate memory and return it
     return xmalloc (sizeof (HLLDbgSym));
 }
-
-
 
 static DbgSym* GetDbgSym (DbgSym* D, long Val)
 /* Check if we find the same debug symbol in the table. If we find it, return
@@ -167,8 +153,6 @@ static DbgSym* GetDbgSym (DbgSym* D, long Val)
     return 0;
 }
 
-
-
 static void InsertDbgSym (DbgSym* D, long Val)
 // Insert the symbol into the hashed symbol pool
 {
@@ -182,8 +166,6 @@ static void InsertDbgSym (DbgSym* D, long Val)
     D->Next = DbgSymPool [Hash];
     DbgSymPool [Hash] = D;
 }
-
-
 
 DbgSym* ReadDbgSym (FILE* F, ObjData* O, unsigned Id)
 // Read a debug symbol from a file, insert and return it
@@ -234,8 +216,6 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O, unsigned Id)
     return D;
 }
 
-
-
 HLLDbgSym* ReadHLLDbgSym (FILE* F, ObjData* O, unsigned Id attribute ((unused)))
 // Read a hll debug symbol from a file, insert and return it
 {
@@ -266,8 +246,6 @@ HLLDbgSym* ReadHLLDbgSym (FILE* F, ObjData* O, unsigned Id attribute ((unused)))
     return S;
 }
 
-
-
 static void ClearDbgSymTable (void)
 // Clear the debug symbol table
 {
@@ -283,16 +261,12 @@ static void ClearDbgSymTable (void)
     }
 }
 
-
-
 static long GetDbgSymVal (const DbgSym* D)
 // Get the value of this symbol
 {
     CHECK (D->Expr != 0);
     return GetExprVal (D->Expr);
 }
-
-
 
 static void PrintLineInfo (FILE* F, const Collection* LineInfos, const char* Format)
 // Output an attribute with line infos
@@ -307,8 +281,6 @@ static void PrintLineInfo (FILE* F, const Collection* LineInfos, const char* For
         }
     }
 }
-
-
 
 unsigned DbgSymCount (void)
 // Return the total number of debug symbols
@@ -327,8 +299,6 @@ unsigned DbgSymCount (void)
     return Count;
 }
 
-
-
 unsigned HLLDbgSymCount (void)
 // Return the total number of high level language debug symbols
 {
@@ -345,8 +315,6 @@ unsigned HLLDbgSymCount (void)
     }
     return Count;
 }
-
-
 
 void PrintDbgSyms (FILE* F)
 // Print the debug symbols in a debug file
@@ -440,8 +408,6 @@ void PrintDbgSyms (FILE* F)
     }
 }
 
-
-
 void PrintHLLDbgSyms (FILE* F)
 // Print the high level language debug symbols in a debug file
 {
@@ -492,8 +458,6 @@ void PrintHLLDbgSyms (FILE* F)
         }
     }
 }
-
-
 
 void PrintDbgSymLabels (FILE* F)
 // Print the debug symbols in a VICE label file

@@ -31,19 +31,13 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "check.h"
 #include "intstack.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 long IS_Get (const IntStack* S)
 // Get the value on top of an int stack
@@ -52,16 +46,12 @@ long IS_Get (const IntStack* S)
     return S->Stack[S->Count-1];
 }
 
-
-
 void IS_Set (IntStack* S, long Val)
 // Set the value on top of an int stack
 {
     PRECONDITION (S->Count > 0);
     S->Stack[S->Count-1] = Val;
 }
-
-
 
 void IS_Drop (IntStack* S)
 // Drop a value from an int stack
@@ -70,16 +60,12 @@ void IS_Drop (IntStack* S)
     --S->Count;
 }
 
-
-
 void IS_Push (IntStack* S, long Val)
 // Push a value onto an int stack
 {
     PRECONDITION (S->Count < sizeof (S->Stack) / sizeof (S->Stack[0]));
     S->Stack[S->Count++] = Val;
 }
-
-
 
 long IS_Pop (IntStack* S)
 // Pop a value from an int stack

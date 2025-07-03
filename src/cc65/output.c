@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
@@ -49,13 +47,9 @@
 #include "global.h"
 #include "output.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Name of the output file. Dynamically allocated and read only.
 const char* OutputFilename = 0;
@@ -63,21 +57,15 @@ const char* OutputFilename = 0;
 // Output file handle
 FILE* OutputFile = 0;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void SetOutputName (const char* Name)
 // Sets the name of the output file.
 {
     OutputFilename = Name;
 }
-
-
 
 void MakeDefaultOutputName (const char* InputFilename)
 /* If the name of the output file is empty or NULL, the name of the output
@@ -90,8 +78,6 @@ void MakeDefaultOutputName (const char* InputFilename)
         OutputFilename = MakeFilename (InputFilename, Ext);
     }
 }
-
-
 
 void OpenOutputFile ()
 // Open the output file. Will call Fatal() in case of failures.
@@ -106,8 +92,6 @@ void OpenOutputFile ()
     }
     Print (stdout, 1, "Opened output file '%s'\n", OutputFilename);
 }
-
-
 
 void OpenDebugOutputFile (const char* Name)
 /* Open an output file for debugging purposes. Will call Fatal() in case of
@@ -125,8 +109,6 @@ void OpenDebugOutputFile (const char* Name)
     Print (stdout, 1, "Opened debug output file '%s'\n", Name);
 }
 
-
-
 void CloseOutputFile ()
 // Close the output file. Will call Fatal() in case of failures.
 {
@@ -142,8 +124,6 @@ void CloseOutputFile ()
 
     OutputFile = 0;
 }
-
-
 
 int WriteOutput (const char* Format, ...)
 /* Write to the output file using printf like formatting. Returns the number

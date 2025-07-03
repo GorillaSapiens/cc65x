@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "check.h"
 #include "strbuf.h"
@@ -45,13 +43,9 @@
 #include "stackptr.h"
 #include "symentry.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 ExprDesc* ED_Init (ExprDesc* Expr)
 // Initialize an ExprDesc
@@ -65,13 +59,9 @@ ExprDesc* ED_Init (ExprDesc* Expr)
     return Expr;
 }
 
-
-
 //***************************************************************************
 //                              Info Extraction
 //***************************************************************************
-
-
 
 const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
 /* Return the assembler label name of the given expression. Beware: This
@@ -134,8 +124,6 @@ const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
     return SB_GetConstBuf (&Buf);
 }
 
-
-
 int ED_GetStackOffs (const ExprDesc* Expr, int Offs)
 /* Get the stack offset of an address on the stack in Expr taking into account
 ** an additional offset in Offs.
@@ -147,13 +135,9 @@ int ED_GetStackOffs (const ExprDesc* Expr, int Offs)
     return Offs;
 }
 
-
-
 //***************************************************************************
 //                                Predicates
 //***************************************************************************
-
-
 
 #if !defined(HAVE_INLINE)
 int ED_IsLocQuasiConst (const ExprDesc* Expr)
@@ -165,8 +149,6 @@ int ED_IsLocQuasiConst (const ExprDesc* Expr)
 }
 #endif
 
-
-
 int ED_IsLocZP (const ExprDesc* Expr)
 // Return true if the expression is in a location on a zeropage
 {
@@ -176,8 +158,6 @@ int ED_IsLocZP (const ExprDesc* Expr)
             (Expr->Sym->Flags & SC_ZEROPAGE) != 0);
 }
 
-
-
 #if !defined(HAVE_INLINE)
 int ED_IsLocPrimaryOrExpr (const ExprDesc* Expr)
 // Return true if the expression is E_LOC_PRIMARY or E_LOC_EXPR
@@ -185,8 +165,6 @@ int ED_IsLocPrimaryOrExpr (const ExprDesc* Expr)
     return ED_IsLocPrimary (Expr) || ED_IsLocExpr (Expr);
 }
 #endif
-
-
 
 #if !defined(HAVE_INLINE)
 int ED_IsIndExpr (const ExprDesc* Expr)
@@ -197,8 +175,6 @@ int ED_IsIndExpr (const ExprDesc* Expr)
 }
 #endif
 
-
-
 int ED_YetToLoad (const ExprDesc* Expr)
 // Check if the expression needs to be loaded somehow.
 {
@@ -206,8 +182,6 @@ int ED_YetToLoad (const ExprDesc* Expr)
            ED_YetToTest (Expr)      ||
            (ED_IsLVal (Expr) && IsQualVolatile (Expr->Type));
 }
-
-
 
 #if !defined(HAVE_INLINE)
 int ED_IsAbs (const ExprDesc* Expr)
@@ -217,8 +191,6 @@ int ED_IsAbs (const ExprDesc* Expr)
            (Expr->Flags & (E_MASK_LOC|E_ADDRESS_OF)) == (E_LOC_ABS|E_ADDRESS_OF);
 }
 #endif
-
-
 
 #if !defined(HAVE_INLINE)
 int ED_IsConstAbs (const ExprDesc* Expr)
@@ -230,23 +202,17 @@ int ED_IsConstAbs (const ExprDesc* Expr)
 }
 #endif
 
-
-
 int ED_IsConstAbsInt (const ExprDesc* Expr)
 // Return true if the expression is a constant (numeric) integer.
 {
     return ED_IsConstAbs (Expr) && IsClassInt (Expr->Type);
 }
 
-
-
 int ED_IsConstBool (const ExprDesc* Expr)
 // Return true if the expression can be constantly evaluated as a boolean.
 {
     return ED_IsConstAbsInt (Expr) || ED_IsAddrExpr (Expr);
 }
-
-
 
 int ED_IsConstTrue (const ExprDesc* Expr)
 /* Return true if the constant expression can be evaluated as boolean true at
@@ -258,8 +224,6 @@ int ED_IsConstTrue (const ExprDesc* Expr)
            ED_IsEntityAddr (Expr);
 }
 
-
-
 int ED_IsConstFalse (const ExprDesc* Expr)
 /* Return true if the constant expression can be evaluated as boolean false at
 ** compile time.
@@ -270,8 +234,6 @@ int ED_IsConstFalse (const ExprDesc* Expr)
            ED_IsNullPtr (Expr);
 }
 
-
-
 int ED_IsConst (const ExprDesc* Expr)
 /* Return true if the expression denotes a constant of some sort. This can be a
 ** numeric constant, the address of a global variable (maybe with offset) or
@@ -281,8 +243,6 @@ int ED_IsConst (const ExprDesc* Expr)
     return (Expr->Flags & E_MASK_LOC) == E_LOC_NONE || ED_IsConstAddr (Expr);
 }
 
-
-
 int ED_IsQuasiConst (const ExprDesc* Expr)
 /* Return true if the expression denotes a quasi-constant of some sort. This
 ** can be a numeric constant, a constant address or a stack variable address.
@@ -290,8 +250,6 @@ int ED_IsQuasiConst (const ExprDesc* Expr)
 {
     return (Expr->Flags & E_MASK_LOC) == E_LOC_NONE || ED_IsQuasiConstAddr (Expr);
 }
-
-
 
 int ED_IsConstAddr (const ExprDesc* Expr)
 /* Return true if the expression denotes a constant address of some sort. This
@@ -301,8 +259,6 @@ int ED_IsConstAddr (const ExprDesc* Expr)
     return ED_IsAddrExpr (Expr) && ED_IsLocConst (Expr);
 }
 
-
-
 int ED_IsQuasiConstAddr (const ExprDesc* Expr)
 /* Return true if the expression denotes a quasi-constant address of some sort.
 ** This can be a constant address or a stack variable address.
@@ -311,24 +267,17 @@ int ED_IsQuasiConstAddr (const ExprDesc* Expr)
     return ED_IsAddrExpr (Expr) && ED_IsLocQuasiConst (Expr);
 }
 
-
-
-
 int ED_IsStackAddr (const ExprDesc* Expr)
 // Return true if the expression denotes a fixed address on stack
 {
     return ED_IsAddrExpr (Expr) && ED_IsLocStack (Expr);
 }
 
-
-
 int ED_IsZPInd (const ExprDesc* Expr)
 // Return true if the expression is located on the zeropage
 {
     return ED_IsIndExpr (Expr) && ED_IsLocZP (Expr);
 }
-
-
 
 int ED_IsNullPtr (const ExprDesc* Expr)
 /* Return true if the given expression is a null pointer.
@@ -339,8 +288,6 @@ int ED_IsNullPtr (const ExprDesc* Expr)
            Expr->IVal == 0      &&
            (IsClassInt (Expr->Type) || IsTypePtr (Expr->Type));
 }
-
-
 
 int ED_IsNullPtrConstant (const ExprDesc* Expr)
 /* Return true if the given expression is a null pointer constant.
@@ -357,8 +304,6 @@ int ED_IsNullPtrConstant (const ExprDesc* Expr)
              GetQualifier (Expr->Type + 1) == T_QUAL_NONE));
 }
 
-
-
 int ED_IsEntityAddr (const ExprDesc* Expr)
 /* Return true if the expression denotes the address of an object or function.
 */
@@ -367,8 +312,6 @@ int ED_IsEntityAddr (const ExprDesc* Expr)
            Expr->Sym != 0       &&
            (IsClassPtr (Expr->Type) || IsTypeFunc (Expr->Type));
 }
-
-
 
 int ED_IsBool (const ExprDesc* Expr)
 /* Return true if the expression can be treated as a boolean, that is, it can
@@ -382,13 +325,9 @@ int ED_IsBool (const ExprDesc* Expr)
            IsClassFunc (Expr->Type);
 }
 
-
-
 //***************************************************************************
 //                               Manipulation
 //***************************************************************************
-
-
 
 ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, const Type* Type)
 // Replace Expr with an absolute const with the given value and type
@@ -402,8 +341,6 @@ ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, const Type* Type)
     return Expr;
 }
 
-
-
 ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value)
 // Replace Expr with a constant integer expression with the given value
 {
@@ -415,8 +352,6 @@ ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value)
     memset (&Expr->V, 0, sizeof (Expr->V));
     return Expr;
 }
-
-
 
 ExprDesc* ED_MakeConstBool (ExprDesc* Expr, long Value)
 // Replace Expr with a constant boolean expression with the given value
@@ -430,8 +365,6 @@ ExprDesc* ED_MakeConstBool (ExprDesc* Expr, long Value)
     return Expr;
 }
 
-
-
 ExprDesc* ED_FinalizeRValLoad (ExprDesc* Expr)
 // Finalize the result of LoadExpr to be an rvalue in the primary register
 {
@@ -444,8 +377,6 @@ ExprDesc* ED_FinalizeRValLoad (ExprDesc* Expr)
     memset (&Expr->V, 0, sizeof (Expr->V));
     return Expr;
 }
-
-
 
 void ED_AddrExpr (ExprDesc* Expr)
 // Take address of Expr. The result is always an rvalue
@@ -477,8 +408,6 @@ void ED_AddrExpr (ExprDesc* Expr)
             break;
     }
 }
-
-
 
 void ED_IndExpr (ExprDesc* Expr)
 // Dereference Expr
@@ -516,15 +445,11 @@ void ED_IndExpr (ExprDesc* Expr)
     }
 }
 
-
-
 void ED_MarkForUneval (ExprDesc* Expr)
 // Mark the expression as not to be evaluated
 {
     Expr->Flags = (Expr->Flags & ~E_MASK_EVAL) | E_EVAL_UNEVAL;
 }
-
-
 
 const Type* ReplaceType (ExprDesc* Expr, const Type* NewType)
 // Replace the type of Expr by a copy of Newtype and return the old type string
@@ -534,13 +459,9 @@ const Type* ReplaceType (ExprDesc* Expr, const Type* NewType)
     return OldType;
 }
 
-
-
 //***************************************************************************
 //                               Other Helpers
 //***************************************************************************
-
-
 
 void PrintExprDesc (FILE* F, ExprDesc* E)
 // Print an ExprDesc
@@ -644,8 +565,6 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
     fprintf (F, "\nName:     0x%08lX\n", (unsigned long)E->Name);
 }
 
-
-
 void ED_SetCodeRange (ExprDesc* Expr, const CodeMark* Start, const CodeMark* End)
 // Set the code range for this expression
 {
@@ -653,8 +572,6 @@ void ED_SetCodeRange (ExprDesc* Expr, const CodeMark* Start, const CodeMark* End
     Expr->Start = *Start;
     Expr->End   = *End;
 }
-
-
 
 int ED_CodeRangeIsEmpty (const ExprDesc* Expr)
 // Return true if no code was output for this expression

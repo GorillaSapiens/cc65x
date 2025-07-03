@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -53,13 +51,9 @@
 #include "trace.h"
 #include "profile.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Name of program file
 const char* ProgramFile;
@@ -81,12 +75,9 @@ static const unsigned char HeaderSignature[] = {
 
 static const unsigned char HeaderVersion = 2;
 
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static void Usage (void)
 {
@@ -110,8 +101,6 @@ static void Usage (void)
             ProgName);
 }
 
-
-
 static void OptHelp (const char* Opt attribute ((unused)),
                      const char* Arg attribute ((unused)))
 // Print usage information and exit
@@ -119,8 +108,6 @@ static void OptHelp (const char* Opt attribute ((unused)),
     Usage ();
     exit (EXIT_SUCCESS);
 }
-
-
 
 static void OptCPU (const char* Opt, const char* Arg)
 // Set CPU type
@@ -140,16 +127,12 @@ static void OptCPU (const char* Opt, const char* Arg)
     }
 }
 
-
-
 static void OptTrace (const char* Opt attribute ((unused)),
                       const char* Arg attribute ((unused)))
 // Enable trace mode
 {
     TraceMode = TRACE_ENABLE_FULL; // Enable full trace mode.
 }
-
-
 
 static void OptVerbose (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
@@ -158,16 +141,12 @@ static void OptVerbose (const char* Opt attribute ((unused)),
     ++Verbosity;
 }
 
-
-
 static void OptCycles (const char* Opt attribute ((unused)),
                        const char* Arg attribute ((unused)))
 // Set flag to print amount of cycles at the end
 {
     PrintCycles = 1;
 }
-
-
 
 static void OptProfile (const char* Opt attribute ((unused)),
                         const char* Arg)
@@ -177,8 +156,6 @@ static void OptProfile (const char* Opt attribute ((unused)),
     symInfoFile = strdup(Arg);
 }
 
-
-
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 // Print the simulator version
@@ -187,16 +164,12 @@ static void OptVersion (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
-
-
 static void OptQuitXIns (const char* Opt attribute ((unused)),
                         const char* Arg)
 // Quit after MaxCycles cycles
 {
     MaxCycles = strtoull(Arg, NULL, 0);
 }
-
-
 
 static unsigned char ReadProgramFile (void)
 // Load program into memory
@@ -287,8 +260,6 @@ static unsigned char ReadProgramFile (void)
     MemWriteWord(0xFFFC, Reset);
     return SPAddr;
 }
-
-
 
 int main (int argc, char* argv[])
 {

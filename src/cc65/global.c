@@ -31,17 +31,11 @@
 //
 //***************************************************************************
 
-
-
 #include "global.h"
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 unsigned char AddSource         = 0;    // Add source lines as comments
 unsigned char AllowNewComments  = 0;    // Allow new style comments in C89 mode

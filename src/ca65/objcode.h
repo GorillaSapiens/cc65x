@@ -31,24 +31,16 @@
 //
 //***************************************************************************
 
-
-
 #ifndef OBJCODE_H
 #define OBJCODE_H
-
-
 
 // ca65
 #include "expr.h"
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void Emit0 (unsigned char OPC);
 // Emit an instruction with a zero sized operand
@@ -88,8 +80,6 @@ void EmitDWord (ExprNode* Expr);
 
 void EmitFill (unsigned long Count);
 // Emit Count fill bytes
-
-
 
 // End of objcode.h
 

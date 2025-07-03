@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SCOPES_H
 #define SCOPES_H
-
-
 
 #include <stdio.h>
 
@@ -47,13 +43,9 @@
 // ld65
 #include "objdata.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Debug symbol structure
 typedef struct Scope Scope;
@@ -70,13 +62,9 @@ struct Scope {
     unsigned*           Spans;          // Spans for this scope
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id);
 // Read a scope from a file, insert and return it
@@ -86,8 +74,6 @@ unsigned ScopeCount (void);
 
 void PrintDbgScopes (FILE* F);
 // Output the scopes to a debug info file
-
-
 
 // End of scopes.h
 

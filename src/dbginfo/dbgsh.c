@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -49,13 +47,9 @@
 // dbginfo
 #include "dbginfo.h"
 
-
-
 //***************************************************************************
 //                         Command handler forwards
 //***************************************************************************
-
-
 
 static void CmdHelp (Collection* Args attribute ((unused)));
 // Output a help text
@@ -117,13 +111,9 @@ static void CmdShowType (Collection* Args);
 static void CmdUnload (Collection* Args attribute ((unused)));
 // Unload a debug info file
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Terminate flag - end program when set to true
 static int Terminate = 0;
@@ -284,21 +274,15 @@ static const CmdEntry ShowCmds[] = {
     },
 };
 
-
-
 //***************************************************************************
 //                                  Helpers
 //***************************************************************************
-
-
 
 static void NewLine (void)
 // Output a newline
 {
     putchar ('\n');
 }
-
-
 
 static void Print (const char* Format, ...) attribute((format(printf,1,2)));
 static void Print (const char* Format, ...)
@@ -309,8 +293,6 @@ static void Print (const char* Format, ...)
     vprintf (Format, ap);
     va_end (ap);
 }
-
-
 
 static void PrintLine (const char* Format, ...) attribute((format(printf,1,2)));
 static void PrintLine (const char* Format, ...)
@@ -323,15 +305,11 @@ static void PrintLine (const char* Format, ...)
     va_end (ap);
 }
 
-
-
 static void PrintSeparator (void)
 // Print a separator line
 {
     PrintLine ("---------------------------------------------------------------------------");
 }
-
-
 
 static void FileError (const cc65_parseerror* Info)
 // Callback function - is called in case of errors
@@ -350,8 +328,6 @@ static void FileError (const cc65_parseerror* Info)
     }
 }
 
-
-
 static const CmdEntry* FindCmd (const char* Cmd, const CmdEntry* Tab, unsigned Count)
 // Search for a command in the given table
 {
@@ -363,8 +339,6 @@ static const CmdEntry* FindCmd (const char* Cmd, const CmdEntry* Tab, unsigned C
     }
     return 0;
 }
-
-
 
 static void ExecCmd (Collection* Args, const CmdEntry* Tab, unsigned Count)
 /* Search for the command in slot 0 of the given collection. If found, check
@@ -421,8 +395,6 @@ static void ExecCmd (Collection* Args, const CmdEntry* Tab, unsigned Count)
     }
 }
 
-
-
 static void PrintHelp (const CmdEntry* Tab, unsigned Count)
 // Output help for one command table
 {
@@ -434,8 +406,6 @@ static void PrintHelp (const CmdEntry* Tab, unsigned Count)
         ++Tab;
     }
 }
-
-
 
 static unsigned FindIdType (const char* TypeName)
 // Find an id type by its name. Returns the type or InvalidId.
@@ -475,8 +445,6 @@ static unsigned FindIdType (const char* TypeName)
     return InvalidId;
 }
 
-
-
 static int GetId (const char* S, unsigned* Id, unsigned* IdType)
 /* Parse a string for an id. If a valid id is found, it is placed in Id and
 ** the function returns true. If an optional type is found, it is placed in
@@ -499,13 +467,9 @@ static int GetId (const char* S, unsigned* Id, unsigned* IdType)
     return 0;
 }
 
-
-
 //***************************************************************************
 //                      Output functions for item lists
 //***************************************************************************
-
-
 
 static void PrintAddr (cc65_addr Addr, unsigned FieldWidth)
 // Output an address
@@ -516,8 +480,6 @@ static void PrintAddr (cc65_addr Addr, unsigned FieldWidth)
     }
 }
 
-
-
 static void PrintNumber (long Num, unsigned Width, unsigned FieldWidth)
 // Output a number
 {
@@ -526,8 +488,6 @@ static void PrintNumber (long Num, unsigned Width, unsigned FieldWidth)
         Print ("%*s", FieldWidth - Width, "");
     }
 }
-
-
 
 static void PrintId (unsigned Id, unsigned FieldWidth)
 // Output an id field
@@ -542,8 +502,6 @@ static void PrintId (unsigned Id, unsigned FieldWidth)
     }
 }
 
-
-
 static void PrintSize (cc65_size Size, unsigned FieldWidth)
 // Output a size
 {
@@ -552,8 +510,6 @@ static void PrintSize (cc65_size Size, unsigned FieldWidth)
         Print ("%*s", FieldWidth - 5, "");
     }
 }
-
-
 
 static void PrintTime (time_t T, unsigned FieldWidth)
 // Output a time stamp of some sort
@@ -569,8 +525,6 @@ static void PrintTime (time_t T, unsigned FieldWidth)
     }
 }
 
-
-
 static void PrintCSymbolHeader (void)
 // Output a header for a list of C symbols
 {
@@ -578,8 +532,6 @@ static void PrintCSymbolHeader (void)
     PrintLine ("  id  name                        type  kind   sc   offs  symbol scope");
     PrintSeparator ();
 }
-
-
 
 static void PrintCSymbols (const cc65_csyminfo* S)
 // Output a list of C symbols
@@ -601,16 +553,12 @@ static void PrintCSymbols (const cc65_csyminfo* S)
     }
 }
 
-
-
 static void PrintLibraryHeader (void)
 // Output the header for a library list
 {
     PrintLine ("  id    name");
     PrintSeparator ();
 }
-
-
 
 static void PrintLibraries (const cc65_libraryinfo* L)
 // Output a list of libraries
@@ -626,8 +574,6 @@ static void PrintLibraries (const cc65_libraryinfo* L)
     }
 }
 
-
-
 static void PrintLineHeader (void)
 // Output a header for a line list
 {
@@ -635,8 +581,6 @@ static void PrintLineHeader (void)
     PrintLine ("  id    source  line    type  count");
     PrintSeparator ();
 }
-
-
 
 static void PrintLines (const cc65_lineinfo* L)
 // Output a list of lines
@@ -655,8 +599,6 @@ static void PrintLines (const cc65_lineinfo* L)
     }
 }
 
-
-
 static void PrintModuleHeader (void)
 // Output a header for a module list
 {
@@ -664,8 +606,6 @@ static void PrintModuleHeader (void)
     PrintLine ("  id    name                    source  library  scope");
     PrintSeparator ();
 }
-
-
 
 static void PrintModules (const cc65_moduleinfo* M)
 // Output a list of modules
@@ -684,8 +624,6 @@ static void PrintModules (const cc65_moduleinfo* M)
     }
 }
 
-
-
 static void PrintScopeHeader (void)
 // Output a header for a list of scopes
 {
@@ -693,8 +631,6 @@ static void PrintScopeHeader (void)
     PrintLine ("  id    name                    type    size   parent  symbol  module");
     PrintSeparator ();
 }
-
-
 
 static void PrintScopes (const cc65_scopeinfo* S)
 // Output a list of scopes
@@ -715,8 +651,6 @@ static void PrintScopes (const cc65_scopeinfo* S)
     }
 }
 
-
-
 static void PrintSegmentHeader (void)
 // Output a header for a list of segments
 {
@@ -724,8 +658,6 @@ static void PrintSegmentHeader (void)
     PrintLine ("  id    name            address  size   output file     offs   bank");
     PrintSeparator ();
 }
-
-
 
 static void PrintSegments (const cc65_segmentinfo* S)
 // Output a list of segments
@@ -746,8 +678,6 @@ static void PrintSegments (const cc65_segmentinfo* S)
     }
 }
 
-
-
 static void PrintSourceHeader (void)
 // Output a header for a list of source files
 {
@@ -755,8 +685,6 @@ static void PrintSourceHeader (void)
     PrintLine ("  id    name                            size   modification time");
     PrintSeparator ();
 }
-
-
 
 static void PrintSources (const cc65_sourceinfo* S)
 // Output a list of sources
@@ -774,8 +702,6 @@ static void PrintSources (const cc65_sourceinfo* S)
     }
 }
 
-
-
 static void PrintSpanHeader (void)
 // Output a header for a list of spans
 {
@@ -783,8 +709,6 @@ static void PrintSpanHeader (void)
     PrintLine ("  id    start    end     seg   type   lines  scopes");
     PrintSeparator ();
 }
-
-
 
 static void PrintSpans (const cc65_spaninfo* S)
 // Output a list of spans
@@ -805,8 +729,6 @@ static void PrintSpans (const cc65_spaninfo* S)
     }
 }
 
-
-
 static void PrintSymbolHeader (void)
 // Output a header for a list of symbols
 {
@@ -814,8 +736,6 @@ static void PrintSymbolHeader (void)
     PrintLine ("  id  name                    type  size  value  export  seg  scope parent");
     PrintSeparator ();
 }
-
-
 
 static void PrintSymbols (const cc65_symbolinfo* S)
 // Output a list of symbols
@@ -838,8 +758,6 @@ static void PrintSymbols (const cc65_symbolinfo* S)
     }
 }
 
-
-
 static void PrintTypeHeader (void)
 // Output a header for a list of types
 {
@@ -847,8 +765,6 @@ static void PrintTypeHeader (void)
     PrintLine ("  id  description");
     PrintSeparator ();
 }
-
-
 
 static void PrintType (unsigned Id, const cc65_typedata* T)
 // Output one type
@@ -904,13 +820,9 @@ ExitPoint:
     NewLine ();
 }
 
-
-
 //***************************************************************************
 //                            Debug file handling
 //***************************************************************************
-
-
 
 static void UnloadFile (void)
 // Unload the debug info file
@@ -920,8 +832,6 @@ static void UnloadFile (void)
         Info = 0;
     }
 }
-
-
 
 static int FileIsLoaded (void)
 /* Return true if the file is open and has loaded without errors: If not,
@@ -949,21 +859,15 @@ static int FileIsLoaded (void)
     return 1;
 }
 
-
-
 //***************************************************************************
 //                             Command handlers
 //***************************************************************************
-
-
 
 static void CmdHelp (Collection* Args attribute ((unused)))
 // Output a help text
 {
     PrintHelp (MainCmds, sizeof (MainCmds) / sizeof (MainCmds[0]));
 }
-
-
 
 static void CmdLoad (Collection* Args)
 // Load a debug info file
@@ -988,16 +892,12 @@ static void CmdLoad (Collection* Args)
     }
 }
 
-
-
 static void CmdQuit (Collection* Args attribute ((unused)))
 // Terminate the application
 {
     UnloadFile ();
     Terminate = 1;
 }
-
-
 
 static void CmdShow (Collection* Args)
 // Show items from the debug info file
@@ -1006,15 +906,11 @@ static void CmdShow (Collection* Args)
     ExecCmd (Args, ShowCmds, sizeof (ShowCmds) / sizeof (ShowCmds[0]));
 }
 
-
-
 static void CmdShowHelp (Collection* Args attribute ((unused)))
 // Print help for the show command
 {
     PrintHelp (ShowCmds, sizeof (ShowCmds) / sizeof (ShowCmds[0]));
 }
-
-
 
 static void CmdShowChildScopes (Collection* Args)
 // Show child scopes from the debug info file
@@ -1059,8 +955,6 @@ static void CmdShowChildScopes (Collection* Args)
         }
     }
 }
-
-
 
 static void CmdShowCSymbol (Collection* Args)
 // Show C symbols from the debug info file
@@ -1124,8 +1018,6 @@ static void CmdShowCSymbol (Collection* Args)
     }
 }
 
-
-
 static void CmdShowFunction (Collection* Args)
 // Show C functions from the debug info file
 {
@@ -1169,8 +1061,6 @@ static void CmdShowFunction (Collection* Args)
         }
     }
 }
-
-
 
 static void CmdShowLine (Collection* Args)
 // Show lines from the debug info file
@@ -1232,8 +1122,6 @@ static void CmdShowLine (Collection* Args)
     }
 }
 
-
-
 static void CmdShowLibrary (Collection* Args)
 // Show libraries from the debug info file
 {
@@ -1291,8 +1179,6 @@ static void CmdShowLibrary (Collection* Args)
         }
     }
 }
-
-
 
 static void CmdShowModule (Collection* Args)
 // Show modules from the debug info file
@@ -1352,8 +1238,6 @@ static void CmdShowModule (Collection* Args)
         }
     }
 }
-
-
 
 static void CmdShowScope (Collection* Args)
 // Show scopes from the debug info file
@@ -1416,8 +1300,6 @@ static void CmdShowScope (Collection* Args)
     }
 }
 
-
-
 static void CmdShowSegment (Collection* Args)
 // Show segments from the debug info file
 {
@@ -1475,8 +1357,6 @@ static void CmdShowSegment (Collection* Args)
         }
     }
 }
-
-
 
 static void CmdShowSource (Collection* Args)
 // Show source files from the debug info file
@@ -1539,8 +1419,6 @@ static void CmdShowSource (Collection* Args)
     }
 }
 
-
-
 static void CmdShowSpan (Collection* Args)
 // Show spans from the debug info file
 {
@@ -1591,8 +1469,6 @@ static void CmdShowSpan (Collection* Args)
     }
 }
 
-
-
 static void CmdShowSymbol (Collection* Args)
 // Show symbols from the debug info file
 {
@@ -1642,8 +1518,6 @@ static void CmdShowSymbol (Collection* Args)
     }
 }
 
-
-
 static void CmdShowSymDef (Collection* Args)
 // Show symbol definitions from the debug info file
 {
@@ -1689,8 +1563,6 @@ static void CmdShowSymDef (Collection* Args)
     }
 }
 
-
-
 static void CmdShowSymRef (Collection* Args)
 // Show symbol references from the debug info file
 {
@@ -1735,8 +1607,6 @@ static void CmdShowSymRef (Collection* Args)
         }
     }
 }
-
-
 
 static void CmdShowType (Collection* Args)
 // Show types from the debug info file
@@ -1793,21 +1663,15 @@ static void CmdShowType (Collection* Args)
     }
 }
 
-
-
 static void CmdUnload (Collection* Args attribute ((unused)))
 // Unload a debug info file
 {
     UnloadFile ();
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static int Parse (char* CmdLine, Collection* Args)
 /* Parse the command line and store the arguments in Args. Return true if ok,
@@ -1864,8 +1728,6 @@ static int Parse (char* CmdLine, Collection* Args)
     return 1;
 }
 
-
-
 int main (int argc, char* argv[])
 // Main program
 {
@@ -1910,6 +1772,4 @@ int main (int argc, char* argv[])
     DoneCollection (&Args);
     return 0;
 }
-
-
 

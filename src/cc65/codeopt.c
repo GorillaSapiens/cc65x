@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
@@ -73,13 +71,9 @@
 #include "global.h"
 #include "output.h"
 
-
-
 //***************************************************************************
 //                              struct OptFunc
 //***************************************************************************
-
-
 
 typedef struct OptFunc OptFunc;
 struct OptFunc {
@@ -93,13 +87,9 @@ struct OptFunc {
     char           Disabled;            // True if function disabled
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 // A list of all the function descriptions
 // CAUTION: should be sorted by "name"
@@ -221,7 +211,6 @@ static OptFunc DOptTransfers4   = { OptTransfers4,   "OptTransfers4",    65, 0, 
 static OptFunc DOptUnusedLoads  = { OptUnusedLoads,  "OptUnusedLoads",    0, 0, 0, 0, 0, 0 };
 static OptFunc DOptUnusedStores = { OptUnusedStores, "OptUnusedStores",   0, 0, 0, 0, 0, 0 };
 // END DECL SORTED_CODEOPT.SH
-
 
 // Table containing all the steps in alphabetical order
 // CAUTION: table must be sorted for bsearch
@@ -347,15 +336,11 @@ static OptFunc* OptFuncs[] = {
 };
 #define OPTFUNC_COUNT  (sizeof(OptFuncs) / sizeof(OptFuncs[0]))
 
-
-
 static int CmpOptStep (const void* Key, const void* Func)
 // Compare function for bsearch
 {
     return strcmp (Key, (*(const OptFunc**)Func)->Name);
 }
-
-
 
 static OptFunc* FindOptFunc (const char* Name)
 /* Find an optimizer step by name in the table and return a pointer. Return
@@ -366,8 +351,6 @@ static OptFunc* FindOptFunc (const char* Name)
     OptFunc** O = bsearch (Name, OptFuncs, OPTFUNC_COUNT, sizeof (OptFuncs[0]), CmpOptStep);
     return O? *O : 0;
 }
-
-
 
 static OptFunc* GetOptFunc (const char* Name)
 /* Find an optimizer step by name in the table and return a pointer. Print an
@@ -383,8 +366,6 @@ static OptFunc* GetOptFunc (const char* Name)
     return F;
 }
 
-
-
 void DisableOpt (const char* Name)
 // Disable the optimization with the given name
 {
@@ -397,8 +378,6 @@ void DisableOpt (const char* Name)
         GetOptFunc(Name)->Disabled = 1;
     }
 }
-
-
 
 void EnableOpt (const char* Name)
 // Enable the optimization with the given name
@@ -413,8 +392,6 @@ void EnableOpt (const char* Name)
     }
 }
 
-
-
 void ListOptSteps (FILE* F)
 // List all optimization steps
 {
@@ -427,8 +404,6 @@ void ListOptSteps (FILE* F)
         }
     }
 }
-
-
 
 static void ReadOptStats (const char* Name)
 // Read the optimizer statistics file
@@ -495,8 +470,6 @@ static void ReadOptStats (const char* Name)
     fclose (F);
 }
 
-
-
 static void WriteOptStats (const char* Name)
 // Write the optimizer statistics file
 {
@@ -514,7 +487,6 @@ static void WriteOptStats (const char* Name)
              "; Optimizer               Total      Last       Total      Last\n"
              ";   Step                  Runs       Runs        Chg       Chg\n");
 
-
     // Write the data
     for (I = 0; I < OPTFUNC_COUNT; ++I) {
         const OptFunc* O = OptFuncs[I];
@@ -530,8 +502,6 @@ static void WriteOptStats (const char* Name)
     // Close the file, ignore errors here.
     fclose (F);
 }
-
-
 
 static void OpenDebugFile (const CodeSeg* S)
 // Open the debug file for the given segment if the flag is on
@@ -549,8 +519,6 @@ static void OpenDebugFile (const CodeSeg* S)
         SB_Done (&Name);
     }
 }
-
-
 
 static void WriteDebugOutput (CodeSeg* S, const char* Step)
 // Write a separator line into the debug file if the flag is on
@@ -572,8 +540,6 @@ static void WriteDebugOutput (CodeSeg* S, const char* Step)
         CS_Output (S);
     }
 }
-
-
 
 static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
 // Run one optimizer function Max times or until there are no more changes
@@ -615,8 +581,6 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
     // Return the number of changes
     return Changes;
 }
-
-
 
 static unsigned RunOptGroup1 (CodeSeg* S)
 /* Run the first group of optimization steps. These steps translate known
@@ -673,8 +637,6 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     return Changes;
 }
 
-
-
 static unsigned RunOptGroup2 (CodeSeg* S)
 /* Run one group of optimization steps. This step involves just decoupling
 ** instructions by replacing them by instructions that do not depend on
@@ -689,8 +651,6 @@ static unsigned RunOptGroup2 (CodeSeg* S)
     // Return the number of changes
     return Changes;
 }
-
-
 
 static unsigned RunOptGroup3 (CodeSeg* S)
 /* Run one group of optimization steps. These steps depend on each other,
@@ -777,8 +737,6 @@ static unsigned RunOptGroup3 (CodeSeg* S)
     return Changes;
 }
 
-
-
 static unsigned RunOptGroup4 (CodeSeg* S)
 /* Run another round of pattern replacements. These are done late, since there
 ** may be better replacements before.
@@ -801,8 +759,6 @@ static unsigned RunOptGroup4 (CodeSeg* S)
     return Changes;
 }
 
-
-
 static unsigned RunOptGroup5 (CodeSeg* S)
 // 65C02 specific optimizations.
 {
@@ -824,8 +780,6 @@ static unsigned RunOptGroup5 (CodeSeg* S)
     // Return the number of changes
     return Changes;
 }
-
-
 
 static unsigned RunOptGroup6 (CodeSeg* S)
 /* This one is quite special. It tries to replace "lda (c_sp),y" by "lda (c_sp,x)".
@@ -850,8 +804,6 @@ static unsigned RunOptGroup6 (CodeSeg* S)
     // Return the number of changes
     return Changes;
 }
-
-
 
 static unsigned RunOptGroup7 (CodeSeg* S)
 /* The last group of optimization steps. Adjust branches, do size optimizations.
@@ -918,8 +870,6 @@ static unsigned RunOptGroup7 (CodeSeg* S)
     // Return the number of changes
     return Changes;
 }
-
-
 
 void RunOpt (CodeSeg* S)
 // Run the optimizer

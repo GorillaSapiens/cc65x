@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 #include <ctype.h>
 
@@ -43,24 +41,16 @@
 #include "xmalloc.h"
 #include "xsprintf.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // An empty string buf
 const StrBuf EmptyStrBuf = STATIC_STRBUF_INITIALIZER;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 #if !defined(HAVE_INLINE)
 StrBuf* SB_Init (StrBuf* B)
@@ -70,8 +60,6 @@ StrBuf* SB_Init (StrBuf* B)
     return B;
 }
 #endif
-
-
 
 StrBuf* SB_InitFromString (StrBuf* B, const char* S)
 /* Initialize a string buffer from a literal string. Beware: The buffer won't
@@ -86,8 +74,6 @@ StrBuf* SB_InitFromString (StrBuf* B, const char* S)
     return B;
 }
 
-
-
 void SB_Done (StrBuf* B)
 // Free the data of a string buffer (but not the struct itself)
 {
@@ -96,8 +82,6 @@ void SB_Done (StrBuf* B)
         xfree (B->Cooked);
     }
 }
-
-
 
 StrBuf* NewStrBuf (void)
 // Allocate, initialize and return a new StrBuf
@@ -112,8 +96,6 @@ StrBuf* NewStrBuf (void)
     return B;
 }
 
-
-
 void FreeStrBuf (StrBuf* B)
 // Free a string buffer
 {
@@ -123,8 +105,6 @@ void FreeStrBuf (StrBuf* B)
         xfree (B);
     }
 }
-
-
 
 void SB_Realloc (StrBuf* B, unsigned NewSize)
 /* Reallocate the string buffer space, make sure at least NewSize bytes are
@@ -160,8 +140,6 @@ void SB_Realloc (StrBuf* B, unsigned NewSize)
     B->Allocated = NewAllocated;
 }
 
-
-
 static void SB_CheapRealloc (StrBuf* B, unsigned NewSize)
 /* Reallocate the string buffer space, make sure at least NewSize bytes are
 ** available. This function won't copy the old buffer contents over to the new
@@ -193,8 +171,6 @@ static void SB_CheapRealloc (StrBuf* B, unsigned NewSize)
     B->Allocated = NewAllocated;
 }
 
-
-
 #if !defined(HAVE_INLINE)
 char SB_At (const StrBuf* B, unsigned Index)
 // Get a character from the buffer
@@ -203,8 +179,6 @@ char SB_At (const StrBuf* B, unsigned Index)
     return B->Buf[Index];
 }
 #endif
-
-
 
 void SB_Drop (StrBuf* B, unsigned Count)
 // Drop characters from the end of the string.
@@ -215,8 +189,6 @@ void SB_Drop (StrBuf* B, unsigned Count)
         B->Index = B->Len;
     }
 }
-
-
 
 void SB_Terminate (StrBuf* B)
 /* Zero terminate the given string buffer. NOTE: The terminating zero is not
@@ -231,8 +203,6 @@ void SB_Terminate (StrBuf* B)
     B->Cooked[B->Len] = '\0';
 }
 
-
-
 void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size)
 // Copy Buf to Target, discarding the old contents of Target
 {
@@ -245,8 +215,6 @@ void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size)
     }
     Target->Len = Size;
 }
-
-
 
 void SB_CopyBufCooked (StrBuf* Target, const char* Buf, const char* Cooked, unsigned Size)
 // Copy Buf and Cooked to Target, discarding the old contents of Target
@@ -261,8 +229,6 @@ void SB_CopyBufCooked (StrBuf* Target, const char* Buf, const char* Cooked, unsi
     Target->Len = Size;
 }
 
-
-
 #if !defined(HAVE_INLINE)
 void SB_CopyStr (StrBuf* Target, const char* S)
 // Copy S to Target, discarding the old contents of Target
@@ -270,8 +236,6 @@ void SB_CopyStr (StrBuf* Target, const char* S)
     SB_CopyBuf (Target, S, strlen (S));
 }
 #endif
-
-
 
 #if !defined(HAVE_INLINE)
 void SB_Copy (StrBuf* Target, const StrBuf* Source)
@@ -281,8 +245,6 @@ void SB_Copy (StrBuf* Target, const StrBuf* Source)
     Target->Index = Source->Index;
 }
 #endif
-
-
 
 void SB_AppendChar (StrBuf* B, int C)
 // Append a character to a string buffer
@@ -296,8 +258,6 @@ void SB_AppendChar (StrBuf* B, int C)
     B->Len = NewLen;
 }
 
-
-
 void SB_AppendCharCooked (StrBuf* B, int C, int Cooked)
 // Append a character to a string buffer
 {
@@ -309,8 +269,6 @@ void SB_AppendCharCooked (StrBuf* B, int C, int Cooked)
     B->Cooked[B->Len] = (char) (Cooked ? C : 0);
     B->Len = NewLen;
 }
-
-
 
 void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size)
 // Append a character buffer to the end of the string buffer
@@ -324,8 +282,6 @@ void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size)
     B->Len = NewLen;
 }
 
-
-
 #if !defined(HAVE_INLINE)
 void SB_AppendStr (StrBuf* B, const char* S)
 // Append a string to the end of the string buffer
@@ -333,8 +289,6 @@ void SB_AppendStr (StrBuf* B, const char* S)
     SB_AppendBuf (B, S, strlen (S));
 }
 #endif
-
-
 
 #if !defined(HAVE_INLINE)
 void SB_Append (StrBuf* Target, const StrBuf* Source)
@@ -350,8 +304,6 @@ void SB_Append (StrBuf* Target, const StrBuf* Source)
 }
 #endif
 
-
-
 #if !defined(HAVE_INLINE)
 void SB_Cut (StrBuf* B, unsigned Len)
 /* Cut the contents of B at the given length. If the current length of the
@@ -363,8 +315,6 @@ void SB_Cut (StrBuf* B, unsigned Len)
     }
 }
 #endif
-
-
 
 void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Len)
 /* Copy a slice from Source into Target. The current contents of Target are
@@ -393,8 +343,6 @@ void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Le
     Target->Len = Len;
 }
 
-
-
 void SB_Move (StrBuf* Target, StrBuf* Source)
 /* Move the complete contents of Source to target. This will delete the old
 ** contents of Target, and Source will be empty after the call.
@@ -412,8 +360,6 @@ void SB_Move (StrBuf* Target, StrBuf* Source)
     SB_Init (Source);
 }
 
-
-
 void SB_ToLower (StrBuf* S)
 // Convert all characters in S to lower case
 {
@@ -426,8 +372,6 @@ void SB_ToLower (StrBuf* S)
     }
 }
 
-
-
 void SB_ToUpper (StrBuf* S)
 // Convert all characters in S to upper case
 {
@@ -439,8 +383,6 @@ void SB_ToUpper (StrBuf* S)
         }
     }
 }
-
-
 
 int SB_Compare (const StrBuf* S1, const StrBuf* S2)
 // Do a lexical compare of S1 and S2. See strcmp for result codes.
@@ -464,8 +406,6 @@ int SB_Compare (const StrBuf* S1, const StrBuf* S2)
     return Result;
 }
 
-
-
 int SB_CompareStr (const StrBuf* S1, const char* S2)
 // Do a lexical compare of S1 and S2. See strcmp for result codes.
 {
@@ -488,8 +428,6 @@ int SB_CompareStr (const StrBuf* S1, const char* S2)
     }
     return Result;
 }
-
-
 
 void SB_VPrintf (StrBuf* S, const char* Format, va_list ap)
 /* printf function with S as target. The function is safe, which means that
@@ -523,8 +461,6 @@ void SB_VPrintf (StrBuf* S, const char* Format, va_list ap)
     S->Len = SizeNeeded;
     S->Index = 0;
 }
-
-
 
 void SB_Printf (StrBuf* S, const char* Format, ...)
 /* vprintf function with S as target. The function is safe, which means that

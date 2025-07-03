@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef LITPOOL_H
 #define LITPOOL_H
-
-
 
 #include <stdio.h>
 
 // common
 #include "strbuf.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Forward for struct SymEntry
 struct SymEntry;
@@ -60,13 +52,9 @@ typedef struct Literal Literal;
 // Forward for a literal pool
 typedef struct LiteralPool LiteralPool;
 
-
-
 //***************************************************************************
 //                              struct Literal
 //***************************************************************************
-
-
 
 Literal* UseLiteral (Literal* L);
 // Increase the reference counter for the literal and return it
@@ -92,13 +80,9 @@ const StrBuf* GetLiteralStrBuf (const Literal* L);
 unsigned GetLiteralSize (const Literal* L);
 // Get the size of a literal string
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void InitLiteralPool (void);
 // Initialize the literal pool
@@ -127,8 +111,6 @@ Literal* AddLiteral (const char* S);
 
 Literal* AddLiteralStr (const StrBuf* S);
 // Add a literal string to the literal pool. Return the literal.
-
-
 
 // End of litpool.h
 

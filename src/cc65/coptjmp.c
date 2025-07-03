@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "cpu.h"
 
@@ -43,13 +41,9 @@
 #include "codeopt.h"
 #include "error.h"
 
-
-
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 static int GetBranchDist (CodeSeg* S, unsigned From, CodeEntry* To)
 /* Get the branch distance between the two entries and return it. The distance
@@ -81,15 +75,11 @@ static int GetBranchDist (CodeSeg* S, unsigned From, CodeEntry* To)
     return Distance;
 }
 
-
-
 static int IsShortDist (int Distance)
 // Return true if the given distance is a short branch distance
 {
     return (Distance >= -125 && Distance <= 125);
 }
-
-
 
 static short ZPRegVal (unsigned short Use, const RegContents* RC)
 // Return the contents of the given zeropage register
@@ -109,8 +99,6 @@ static short ZPRegVal (unsigned short Use, const RegContents* RC)
     }
 }
 
-
-
 static short RegVal (unsigned short Use, const RegContents* RC)
 // Return the contents of the given register
 {
@@ -125,13 +113,9 @@ static short RegVal (unsigned short Use, const RegContents* RC)
     }
 }
 
-
-
 //***************************************************************************
 //                           Optimize branch types
 //***************************************************************************
-
-
 
 unsigned OptBranchDist (CodeSeg* S)
 // Change branches for the distance needed.
@@ -192,8 +176,6 @@ unsigned OptBranchDist (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptBranchDist2 (CodeSeg* S)
 // Change BRA to JMP if target is an external symbol
 {
@@ -223,13 +205,9 @@ unsigned OptBranchDist2 (CodeSeg* S)
     return Changes;
 }
 
-
-
 //***************************************************************************
 //                        Replace jumps to RTS by RTS
 //***************************************************************************
-
-
 
 unsigned OptRTSJumps1 (CodeSeg* S)
 // Replace jumps to RTS by RTS
@@ -269,8 +247,6 @@ unsigned OptRTSJumps1 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptRTSJumps2 (CodeSeg* S)
 // Replace long conditional jumps to RTS or to a final target
 {
@@ -287,7 +263,6 @@ unsigned OptRTSJumps2 (CodeSeg* S)
         if ((E->Info & OF_CBRA) != 0            &&   // Conditional branch
             (E->Info & OF_LBRA) != 0            &&   // Long branch
             E->JumpTo != 0) {                        // Local label
-
 
             /* Get the jump target and the next entry. There's always a next
             ** entry, because we don't cover the last entry in the loop.
@@ -354,13 +329,9 @@ unsigned OptRTSJumps2 (CodeSeg* S)
     return Changes;
 }
 
-
-
 //***************************************************************************
 //                             Remove dead jumps
 //***************************************************************************
-
-
 
 unsigned OptDeadJumps (CodeSeg* S)
 // Remove dead jumps (jumps to the next instruction)
@@ -399,13 +370,9 @@ unsigned OptDeadJumps (CodeSeg* S)
     return Changes;
 }
 
-
-
 //***************************************************************************
 //                             Remove dead code
 //***************************************************************************
-
-
 
 unsigned OptDeadCode (CodeSeg* S)
 /* Remove dead code (code that follows an unconditional jump or an rts/rti
@@ -454,13 +421,9 @@ unsigned OptDeadCode (CodeSeg* S)
     return Changes;
 }
 
-
-
 //***************************************************************************
 //                          Optimize jump cascades
 //***************************************************************************
-
-
 
 unsigned OptJumpCascades (CodeSeg* S)
 /* Optimize jump cascades (jumps to jumps). In such a case, the jump is
@@ -590,13 +553,9 @@ NextEntry:
     return Changes;
 }
 
-
-
 //***************************************************************************
 //                             Optimize jsr/rts
 //***************************************************************************
-
-
 
 unsigned OptRTS (CodeSeg* S)
 /* Optimize subroutine calls followed by an RTS. The subroutine call will get
@@ -638,13 +597,9 @@ unsigned OptRTS (CodeSeg* S)
     return Changes;
 }
 
-
-
 //***************************************************************************
 //                           Optimize jump targets
 //***************************************************************************
-
-
 
 unsigned OptJumpTarget1 (CodeSeg* S)
 /* If the instruction preceeding an unconditional branch is the same as the
@@ -731,8 +686,6 @@ NextEntry:
     return Changes;
 }
 
-
-
 unsigned OptJumpTarget2 (CodeSeg* S)
 /* If a bcs jumps to a sec insn or a bcc jumps to clc, skip this insn, since
 ** it's job is already done.
@@ -807,8 +760,6 @@ NextEntry:
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptJumpTarget3 (CodeSeg* S)
 /* Jumps to load instructions of a register, that do already have the matching
@@ -890,13 +841,9 @@ unsigned OptJumpTarget3 (CodeSeg* S)
     return Changes;
 }
 
-
-
 //***************************************************************************
 //                       Optimize conditional branches
 //***************************************************************************
-
-
 
 unsigned OptCondBranch1 (CodeSeg* S)
 /* Performs some optimization steps:
@@ -964,8 +911,6 @@ unsigned OptCondBranch1 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptCondBranch2 (CodeSeg* S)
 /* If a conditional branch jumps around an unconditional branch, remove the
 ** conditional branch and make the jump a conditional branch with the inverse
@@ -1013,8 +958,6 @@ unsigned OptCondBranch2 (CodeSeg* S)
     return Changes;
 }
 
-
-
 unsigned OptCondBranch3 (CodeSeg* S)
 /* If the conditional branch is always taken because it follows an inverse
 ** conditional branch, replace it by a jmp.
@@ -1056,8 +999,6 @@ unsigned OptCondBranch3 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptCondBranchC (CodeSeg* S)
 /* If on entry to a "rol a" instruction the accu is zero, and a beq/bne follows,

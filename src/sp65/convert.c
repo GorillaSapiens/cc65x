@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 
 // sp65
@@ -46,13 +44,9 @@
 #include "raw.h"
 #include "vic2sprite.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Type of the entry in the converter table
 typedef struct ConverterMapEntry ConverterMapEntry;
@@ -74,21 +68,15 @@ static const ConverterMapEntry ConverterMap[] = {
 // END SORTED.SH
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static int Compare (const void* Key, const void* MapEntry)
 // Compare function for bsearch
 {
     return strcmp (Key, ((const ConverterMapEntry*) MapEntry)->Format);
 }
-
-
 
 StrBuf* ConvertTo (const Bitmap* B, const Collection* A)
 /* Convert the bitmap B into some sort of other binary format. The output is
@@ -115,8 +103,6 @@ StrBuf* ConvertTo (const Bitmap* B, const Collection* A)
     // Do the conversion
     return E->ConvertFunc (B, A);
 }
-
-
 
 void ListConversionTargets (FILE* F)
 // Output a list of conversion targets

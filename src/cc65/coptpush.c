@@ -31,20 +31,14 @@
 //
 //***************************************************************************
 
-
-
 // cc65
 #include "codeent.h"
 #include "codeinfo.h"
 #include "coptpush.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 unsigned OptPush1 (CodeSeg* S)
 /* Given a sequence
@@ -125,8 +119,6 @@ unsigned OptPush1 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptPush2 (CodeSeg* S)
 /* A sequence

@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef MODEL_H
 #define MODEL_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Supported models
 typedef enum {
@@ -55,18 +49,12 @@ typedef enum {
     O65_MODEL_COUNT             // Number of available models
 } O65Model;
 
-
-
 // Current model
 extern O65Model Model;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 const char* GetModelName (O65Model M);
 // Map the model to its name.
@@ -75,8 +63,6 @@ O65Model FindModel (const char* ModelName);
 /* Map a model name to its identifier. Return O65_MODEL_INVALID if the name
 ** could not be found. Case is ignored when comparing names.
 */
-
-
 
 // End of model.h
 

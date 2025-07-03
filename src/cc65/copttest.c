@@ -31,20 +31,14 @@
 //
 //***************************************************************************
 
-
-
 // cc65
 #include "codeent.h"
 #include "codeinfo.h"
 #include "copttest.h"
 
-
-
 //***************************************************************************
 //                              Optimize tests
 //***************************************************************************
-
-
 
 unsigned OptTest1 (CodeSeg* S)
 /* Given a sequence
@@ -125,8 +119,6 @@ unsigned OptTest1 (CodeSeg* S)
     // Return the number of changes made
     return Changes;
 }
-
-
 
 unsigned OptTest2 (CodeSeg* S)
 /* Search for an inc/dec operation followed by a load and a conditional

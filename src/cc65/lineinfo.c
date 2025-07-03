@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 
 // common
@@ -45,13 +43,9 @@
 #include "input.h"
 #include "lineinfo.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Global pointer to line information for the current line
 static LineInfo* CurLineInfo = 0;
@@ -59,13 +53,9 @@ static LineInfo* CurLineInfo = 0;
 // Global pointer to previously checked line information about file inclusion hierarchy
 static LineInfo* PrevCheckedLI = 0;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static LineInfo* NewLineInfo (const StrBuf* Line)
 // Create and return a new line info. Ref count will be 1.
@@ -116,16 +106,12 @@ static LineInfo* NewLineInfo (const StrBuf* Line)
     return LI;
 }
 
-
-
 static void FreeLineInfo (LineInfo* LI)
 // Free a LineInfo structure
 {
     FreeFileInclusionInfo (LI);
     xfree (LI);
 }
-
-
 
 LineInfo* UseLineInfo (LineInfo* LI)
 // Increase the reference count of the given line info and return it.
@@ -134,8 +120,6 @@ LineInfo* UseLineInfo (LineInfo* LI)
     ++LI->RefCount;
     return LI;
 }
-
-
 
 void ReleaseLineInfo (LineInfo* LI)
 /* Release a reference to the given line info, free the structure if the
@@ -149,8 +133,6 @@ void ReleaseLineInfo (LineInfo* LI)
     }
 }
 
-
-
 LineInfo* GetCurLineInfo (void)
 /* Return a pointer to the current line info. The reference count is NOT
 ** increased, use UseLineInfo for that purpose.
@@ -158,8 +140,6 @@ LineInfo* GetCurLineInfo (void)
 {
     return CurLineInfo;
 }
-
-
 
 void UpdateCurrentLineInfo (const StrBuf* Line)
 // Update the current line info - called if a new line is read
@@ -180,8 +160,6 @@ void UpdateCurrentLineInfo (const StrBuf* Line)
     CurLineInfo = NewLineInfo (Line);
 }
 
-
-
 void RememberCheckedLI (LineInfo* LI)
 // Remember the latest checked line info struct
 {
@@ -193,15 +171,11 @@ void RememberCheckedLI (LineInfo* LI)
     }
 }
 
-
-
 LineInfo* GetPrevCheckedLI (void)
 // Get the latest checked line info struct
 {
     return PrevCheckedLI;
 }
-
-
 
 const char* GetPresumedFileName (const LineInfo* LI)
 // Return the presumed file name from a line info
@@ -210,8 +184,6 @@ const char* GetPresumedFileName (const LineInfo* LI)
     return LI->File->Name;
 }
 
-
-
 unsigned GetPresumedLineNum (const LineInfo* LI)
 // Return the presumed line number from a line info
 {
@@ -219,15 +191,11 @@ unsigned GetPresumedLineNum (const LineInfo* LI)
     return LI->File->LineNum;
 }
 
-
-
 const char* GetActualFileName (const struct LineInfo* LI)
 // Return the actual name of the source file from a line info struct
 {
     return LI->File != 0 ? GetInputFileName (LI->File->InputFile) : "<out of filescope>";
 }
-
-
 
 unsigned GetActualLineNum (const struct LineInfo* LI)
 // Return the actual line number of the source file from a line info struct

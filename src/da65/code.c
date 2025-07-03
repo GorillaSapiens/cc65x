@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -45,33 +43,24 @@
 #include "error.h"
 #include "global.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 uint8_t CodeBuf[0x10000];               // Code buffer
 uint32_t CodeStart;                     // Start address
 uint32_t CodeEnd;                       // End address
 uint32_t PC;                            // Current PC
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void LoadCode (void)
 // Load the code from the given file
 {
     long Count, MaxCount, Size;
     FILE* F;
-
 
     PRECONDITION (StartAddr < 0x10000);
 
@@ -154,16 +143,12 @@ void LoadCode (void)
     CodeEnd = CodeStart + Count - 1;    // CodeEnd is inclusive
 }
 
-
-
 uint8_t GetCodeByte (uint32_t Addr)
 // Get a byte from the given address
 {
     PRECONDITION (Addr <= CodeEnd);
     return CodeBuf [Addr];
 }
-
-
 
 uint16_t GetCodeDByte (uint32_t Addr)
 // Get a dbyte from the given address
@@ -173,8 +158,6 @@ uint16_t GetCodeDByte (uint32_t Addr)
     return (Lo <<8) | Hi;
 }
 
-
-
 uint16_t GetCodeWord (uint32_t Addr)
 // Get a word from the given address
 {
@@ -182,8 +165,6 @@ uint16_t GetCodeWord (uint32_t Addr)
     uint16_t Hi = GetCodeByte (Addr+1);
     return Lo | (Hi << 8);
 }
-
-
 
 uint32_t GetCodeDWord (uint32_t Addr)
 // Get a dword from the given address
@@ -193,8 +174,6 @@ uint32_t GetCodeDWord (uint32_t Addr)
     return Lo | (Hi << 16);
 }
 
-
-
 uint32_t GetCodeLongAddr (uint32_t Addr)
 // Get a word from the given address
 {
@@ -203,8 +182,6 @@ uint32_t GetCodeLongAddr (uint32_t Addr)
     uint32_t Hi = GetCodeByte (Addr+2);
     return Lo | (Mid << 8) | (Hi << 16);
 }
-
-
 
 uint32_t GetRemainingBytes (void)
 // Return the number of remaining code bytes
@@ -216,15 +193,11 @@ uint32_t GetRemainingBytes (void)
     }
 }
 
-
-
 int CodeLeft (void)
 // Return true if there are code bytes left
 {
     return (PC <= CodeEnd);
 }
-
-
 
 void ResetCode (void)
 // Reset the code input to start over for the next pass

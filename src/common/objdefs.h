@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 #ifndef OBJDEFS_H
 #define OBJDEFS_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Defines for magic and version
 #define OBJ_MAGIC       0x616E7A55
@@ -54,8 +48,6 @@
 // Flag bits
 #define OBJ_FLAGS_DBGINFO       0x0001  // File has debug info
 #define OBJ_HAS_DBGINFO(x)      (((x) & OBJ_FLAGS_DBGINFO) != 0)
-
-
 
 // Header structure
 typedef struct ObjHeader ObjHeader;
@@ -86,8 +78,6 @@ struct ObjHeader {
     unsigned long       SpanOffs;       // 32: Offset into span table
     unsigned long       SpanSize;       // 32: Size of span table
 };
-
-
 
 // End of objdefs.h
 

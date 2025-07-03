@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef FILEIO_H
 #define FILEIO_H
-
-
 
 #include <stdio.h>
 
 // common
 #include "filepos.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void FileSetPos (FILE* F, unsigned long Pos);
 // Seek to the given absolute position, fail on errors
@@ -112,8 +104,6 @@ FilePos* ReadFilePos (FILE* F, FilePos* Pos);
 
 void* ReadData (FILE* F, void* Data, unsigned Size);
 // Read data from the file
-
-
 
 // End of fileio.h
 

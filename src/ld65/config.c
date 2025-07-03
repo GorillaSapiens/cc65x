@@ -35,8 +35,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -70,13 +68,9 @@
 #include "spool.h"
 #include "xex.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Remember which sections we had encountered
 static enum {
@@ -88,8 +82,6 @@ static enum {
     SE_FORMATS  = 0x0010,
     SE_SYMBOLS  = 0x0020
 } SectionsEncountered = SE_NONE;
-
-
 
 // File list
 static Collection       FileList = STATIC_COLLECTION_INITIALIZER;
@@ -152,24 +144,16 @@ static BinDesc* BinFmtDesc      = 0;
 static O65Desc* O65FmtDesc      = 0;
 static XexDesc* XexFmtDesc      = 0;
 
-
-
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
 
-
-
 static File* NewFile (unsigned Name);
 // Create a new file descriptor and insert it into the list
-
-
 
 //***************************************************************************
 //                              List management
 //***************************************************************************
-
-
 
 static File* FindFile (unsigned Name)
 // Find a file with a given name.
@@ -184,8 +168,6 @@ static File* FindFile (unsigned Name)
     return 0;
 }
 
-
-
 static File* GetFile (unsigned Name)
 // Get a file entry with the given name. Create a new one if needed.
 {
@@ -197,16 +179,12 @@ static File* GetFile (unsigned Name)
     return F;
 }
 
-
-
 static void FileInsert (File* F, MemoryArea* M)
 // Insert the memory area into the files list
 {
     M->F = F;
     CollAppend (&F->MemoryAreas, M);
 }
-
-
 
 static MemoryArea* CfgFindMemory (unsigned Name)
 // Find the memory are with the given name. Return NULL if not found
@@ -221,8 +199,6 @@ static MemoryArea* CfgFindMemory (unsigned Name)
     return 0;
 }
 
-
-
 static MemoryArea* CfgGetMemory (unsigned Name)
 // Find the memory are with the given name. Print an error on an invalid name
 {
@@ -232,8 +208,6 @@ static MemoryArea* CfgGetMemory (unsigned Name)
     }
     return M;
 }
-
-
 
 static SegDesc* CfgFindSegDesc (unsigned Name)
 // Find the segment descriptor with the given name, return NULL if not found.
@@ -251,8 +225,6 @@ static SegDesc* CfgFindSegDesc (unsigned Name)
     return 0;
 }
 
-
-
 static void MemoryInsert (MemoryArea* M, SegDesc* S)
 // Insert the segment descriptor into the memory area list
 {
@@ -260,13 +232,9 @@ static void MemoryInsert (MemoryArea* M, SegDesc* S)
     CollAppend (&M->SegList, S);
 }
 
-
-
 //***************************************************************************
 //                         Constructors/Destructors
 //***************************************************************************
-
-
 
 static CfgSymbol* NewCfgSymbol (CfgSymType Type, unsigned Name)
 /* Create a new CfgSymbol structure with the given type and name. The
@@ -291,8 +259,6 @@ static CfgSymbol* NewCfgSymbol (CfgSymType Type, unsigned Name)
     return Sym;
 }
 
-
-
 static File* NewFile (unsigned Name)
 // Create a new file descriptor and insert it into the list
 {
@@ -312,8 +278,6 @@ static File* NewFile (unsigned Name)
     // ...and return it
     return F;
 }
-
-
 
 static MemoryArea* CreateMemoryArea (const FilePos* Pos, unsigned Name)
 // Create a new memory area and insert it into the list
@@ -335,8 +299,6 @@ static MemoryArea* CreateMemoryArea (const FilePos* Pos, unsigned Name)
     // ...and return it
     return M;
 }
-
-
 
 static SegDesc* NewSegDesc (unsigned Name)
 // Create a segment descriptor and insert it into the list
@@ -368,8 +330,6 @@ static SegDesc* NewSegDesc (unsigned Name)
     return S;
 }
 
-
-
 static void FreeSegDesc (SegDesc* S)
 // Free a segment descriptor
 {
@@ -377,13 +337,9 @@ static void FreeSegDesc (SegDesc* S)
     xfree (S);
 }
 
-
-
 //***************************************************************************
 //                            Config file parsing
 //***************************************************************************
-
-
 
 static void FlagAttr (unsigned* Flags, unsigned Mask, const char* Name)
 /* Check if the item is already defined. Print an error if so. If not, set
@@ -396,8 +352,6 @@ static void FlagAttr (unsigned* Flags, unsigned Mask, const char* Name)
     *Flags |= Mask;
 }
 
-
-
 static void AttrCheck (unsigned Attr, unsigned Mask, const char* Name)
 // Check that a mandatory attribute was given
 {
@@ -405,8 +359,6 @@ static void AttrCheck (unsigned Attr, unsigned Mask, const char* Name)
         CfgError (&CfgErrorPos, "%s attribute is missing", Name);
     }
 }
-
-
 
 static void ParseMemory (void)
 // Parse a MEMORY section
@@ -536,8 +488,6 @@ static void ParseMemory (void)
     SectionsEncountered |= SE_MEMORY;
 }
 
-
-
 static void ParseFiles (void)
 // Parse a FILES section
 {
@@ -550,7 +500,6 @@ static void ParseFiles (void)
         {   "BIN",      CFGTOK_BIN      },
         {   "BINARY",   CFGTOK_BIN      },
     };
-
 
     // The MEMORY section must preceed the FILES section
     if ((SectionsEncountered & SE_MEMORY) == 0) {
@@ -637,8 +586,6 @@ static void ParseFiles (void)
     // Remember we had this section
     SectionsEncountered |= SE_FILES;
 }
-
-
 
 static void ParseSegments (void)
 // Parse a SEGMENTS section
@@ -835,8 +782,6 @@ static void ParseSegments (void)
     SectionsEncountered |= SE_SEGMENTS;
 }
 
-
-
 static void ParseO65 (void)
 // Parse the o65 format section
 {
@@ -1007,8 +952,6 @@ static void ParseO65 (void)
     O65SetOS (O65FmtDesc, OS, Version, ModuleId);
 }
 
-
-
 static void ParseXex (void)
 // Parse the o65 format section
 {
@@ -1088,8 +1031,6 @@ static void ParseXex (void)
         XexSetRunAd (XexFmtDesc, RunAd);
 }
 
-
-
 static void ParseFormats (void)
 // Parse a target format section
 {
@@ -1134,12 +1075,9 @@ static void ParseFormats (void)
         CfgConsumeSemi ();
     }
 
-
     // Remember we had this section
     SectionsEncountered |= SE_FORMATS;
 }
-
-
 
 static void ParseConDes (void)
 // Parse the CONDES feature
@@ -1309,15 +1247,12 @@ static void ParseConDes (void)
     }
 }
 
-
-
 static void ParseStartAddress (void)
 // Parse the STARTADDRESS feature
 {
     static const IdentTok Attributes [] = {
         {   "DEFAULT",  CFGTOK_DEFAULT },
     };
-
 
     // Attribute values.
     unsigned long DefStartAddr = 0;
@@ -1375,8 +1310,6 @@ static void ParseStartAddress (void)
     }
 }
 
-
-
 static void ParseFeatures (void)
 // Parse a features section
 {
@@ -1407,7 +1340,6 @@ static void ParseFeatures (void)
                 ParseStartAddress ();
                 break;
 
-
             default:
                 FAIL ("Unexpected feature token");
         }
@@ -1419,8 +1351,6 @@ static void ParseFeatures (void)
     // Remember we had this section
     SectionsEncountered |= SE_FEATURES;
 }
-
-
 
 static void ParseSymbols (void)
 // Parse a symbols section
@@ -1588,8 +1518,6 @@ static void ParseSymbols (void)
     SectionsEncountered |= SE_SYMBOLS;
 }
 
-
-
 static void ParseConfig (void)
 // Parse the config file
 {
@@ -1651,8 +1579,6 @@ static void ParseConfig (void)
     } while (CfgTok != CFGTOK_EOF);
 }
 
-
-
 void CfgRead (void)
 // Read the configuration
 {
@@ -1673,13 +1599,9 @@ void CfgRead (void)
     CfgCloseInput ();
 }
 
-
-
 //***************************************************************************
 //                          Config file processing
 //***************************************************************************
-
-
 
 static void ProcessSegments (void)
 // Process the SEGMENTS section
@@ -1743,8 +1665,6 @@ static void ProcessSegments (void)
         }
     }
 }
-
-
 
 static void ProcessSymbols (void)
 // Process the SYMBOLS section
@@ -1830,8 +1750,6 @@ static void ProcessSymbols (void)
 
 }
 
-
-
 static void CreateRunDefines (SegDesc* S, unsigned long SegAddr)
 // Create the defines for a RUN segment
 {
@@ -1852,8 +1770,6 @@ static void CreateRunDefines (SegDesc* S, unsigned long SegAddr)
     SB_Done (&Buf);
 }
 
-
-
 static void CreateLoadDefines (SegDesc* S, unsigned long SegAddr)
 // Create the defines for a LOAD segment
 {
@@ -1868,8 +1784,6 @@ static void CreateLoadDefines (SegDesc* S, unsigned long SegAddr)
     S->Flags |= SF_LOAD_DEF;
     SB_Done (&Buf);
 }
-
-
 
 unsigned CfgProcess (void)
 /* Process the config file, after reading in object files and libraries. This
@@ -2185,8 +2099,6 @@ unsigned CfgProcess (void)
     // Return the number of memory area overflows
     return Overflows;
 }
-
-
 
 void CfgWriteTarget (void)
 // Write the target file(s)

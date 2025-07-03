@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SEGMENTS_H
 #define SEGMENTS_H
-
-
 
 #include <stdio.h>
 
@@ -46,12 +42,9 @@
 // cc65
 #include "opcodes.h"
 
-
 //***************************************************************************
 //                                 Forwards
 //***************************************************************************
-
-
 
 struct CodeEntry;
 struct CodeLabel;
@@ -60,13 +53,9 @@ struct DataSeg;
 struct TextSeg;
 struct SymEntry;
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Segment types
 typedef enum segment_t {
@@ -96,12 +85,9 @@ extern SegContext* CS;
 // Pointer to the global segment context
 extern SegContext* GS;
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
 
 void InitSegAddrSizes (void);
 // Initialize the segment address sizes
@@ -167,8 +153,6 @@ void RemoveGlobalCode (void);
 
 void OutputSegments (const SegContext* S);
 // Output the given segments to the output file
-
-
 
 // End of segments.h
 

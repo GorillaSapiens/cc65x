@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef SEGDEF_H
 #define SEGDEF_H
-
-
 
 // common
 #include "addrsize.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Segment definition
 typedef struct SegDef SegDef;
@@ -59,13 +51,9 @@ struct SegDef {
 // Initializer for static SegDefs
 #define STATIC_SEGDEF_INITIALIZER(name, addrsize) { name, addrsize }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 SegDef* NewSegDef (const char* Name, unsigned char AddrSize);
 // Create a new segment definition and return it
@@ -75,8 +63,6 @@ void FreeSegDef (SegDef* D);
 
 SegDef* DupSegDef (const SegDef* D);
 // Duplicate a segment definition and return it
-
-
 
 // End of segdef.h
 

@@ -31,18 +31,12 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "filepos.h"
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void InitFilePos (FilePos* P)
 // Initialize the file position (set all fields to zero)
@@ -51,8 +45,6 @@ void InitFilePos (FilePos* P)
     P->Col  = 0;
     P->Name = 0;
 }
-
-
 
 int CompareFilePos (const FilePos* P1, const FilePos* P2)
 /* Compare two file positions. Return zero if both are equal, return a value

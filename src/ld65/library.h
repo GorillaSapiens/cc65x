@@ -31,29 +31,19 @@
 //
 //***************************************************************************
 
-
-
 #ifndef LIBRARY_H
 #define LIBRARY_H
-
-
 
 //***************************************************************************
 //                                   Data
 //***************************************************************************
 
-
-
 // Opaque structure
 struct Library;
-
-
 
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void LibAdd (FILE* F, const char* Name);
 /* Add files from the library to the list if there are references that could
@@ -86,8 +76,6 @@ unsigned LibraryCount (void);
 
 void PrintDbgLibraries (FILE* F);
 // Output the libraries to a debug info file
-
-
 
 // End of library.h
 

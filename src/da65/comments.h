@@ -31,33 +31,23 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COMMENTS_H
 #define COMMENTS_H
-
-
 
 #include <stdint.h>
 
 // da65
 #include "attrtab.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void SetComment (uint32_t Addr, const char* Text);
 // Set a comment for the given address
 
 const char* GetComment (uint32_t Addr);
 // Return the comment for an address
-
-
 
 // End of comments.h
 

@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef OBJFILE_H
 #define OBJFILE_H
-
-
 
 #include <stdio.h>
 
@@ -46,13 +42,9 @@
 // ld65
 #include "objdata.h"
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void ObjReadFiles (FILE* F, unsigned long Pos, ObjData* O);
 // Read the files list from a file at the given position
@@ -86,8 +78,6 @@ void ObjReadSpans (FILE* F, unsigned long Pos, ObjData* O);
 
 void ObjAdd (FILE* F, const char* Name);
 // Add an object file to the module list
-
-
 
 // End of objfile.h
 

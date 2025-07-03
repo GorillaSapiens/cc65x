@@ -31,12 +31,8 @@
 //
 //***************************************************************************
 
-
-
 #ifndef ERROR_H
 #define ERROR_H
-
-
 
 #include <stdio.h>
 
@@ -47,13 +43,9 @@
 // cc65
 #include "lineinfo.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Error categories
 typedef enum errcat_t errcat_t;
@@ -61,8 +53,6 @@ enum errcat_t {
     EC_PP,      // Pre-parser phases
     EC_PARSER,  // Parser and later phases
 };
-
-
 
 // Count of errors/warnings
 extern unsigned PPErrorCount;           // Pre-parser errors
@@ -92,13 +82,9 @@ extern IntStack WarnConstOverflow;      // - overflow conversion of numerical co
 // Forward
 struct StrBuf;
 
-
-
 //***************************************************************************
 //                                   code
 //***************************************************************************
-
-
 
 void PrintFileInclusionInfo (const LineInfo* LI);
 // Print hierarchy of file inclusion
@@ -177,8 +163,6 @@ void DoneDiagnosticStrBufs (void);
 
 struct StrBuf* NewDiagnosticStrBuf (void);
 // Get a new tracked string buffer
-
-
 
 // End of error.h
 

@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef DBGINFO_H
 #define DBGINFO_H
-
-
 
 // Allow usage from C++
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 /* Data types used for addresses, sizes and line numbers. Change to "unsigned
 ** long" if you ever want to run the code on a 16-bit machine.
@@ -61,13 +53,9 @@ typedef unsigned cc65_size;             // Used to store (65xx) sizes
 // A value that is used to mark invalid ids
 #define CC65_INV_ID     (~0U)
 
-
-
 //***************************************************************************
 //                             Debug info files
 //***************************************************************************
-
-
 
 // Severity for cc65_parseerror
 typedef enum {
@@ -93,8 +81,6 @@ typedef void (*cc65_errorfunc) (const cc65_parseerror*);
 */
 typedef const void* cc65_dbginfo;
 
-
-
 cc65_dbginfo cc65_read_dbginfo (const char* filename, cc65_errorfunc errorfunc);
 /* Parse the debug info file with the given name. On success, the function
 ** will return a pointer to an opaque cc65_dbginfo structure, that must be
@@ -106,13 +92,9 @@ cc65_dbginfo cc65_read_dbginfo (const char* filename, cc65_errorfunc errorfunc);
 void cc65_free_dbginfo (cc65_dbginfo Handle);
 // Free debug information read from a file
 
-
-
 //***************************************************************************
 //                                 C Symbols
 //***************************************************************************
-
-
 
 // C symbol kinds
 typedef enum {
@@ -147,8 +129,6 @@ struct cc65_csyminfo {
     cc65_csymdata       data[1];        // Data sets, number is dynamic
 };
 
-
-
 const cc65_csyminfo* cc65_get_csymlist (cc65_dbginfo handle);
 // Return a list of all c symbols
 
@@ -178,13 +158,9 @@ const cc65_csyminfo* cc65_csym_byscope (cc65_dbginfo handle, unsigned scope_id);
 void cc65_free_csyminfo (cc65_dbginfo handle, const cc65_csyminfo* info);
 // Free a c symbol info record
 
-
-
 //***************************************************************************
 //                                 Libraries
 //***************************************************************************
-
-
 
 // Library information
 typedef struct cc65_librarydata cc65_librarydata;
@@ -199,8 +175,6 @@ struct cc65_libraryinfo {
     cc65_librarydata    data[1];        // Data sets, number is dynamic
 };
 
-
-
 const cc65_libraryinfo* cc65_get_librarylist (cc65_dbginfo handle);
 // Return a list of all libraries
 
@@ -214,13 +188,9 @@ const cc65_libraryinfo* cc65_library_byid (cc65_dbginfo handle, unsigned id);
 void cc65_free_libraryinfo (cc65_dbginfo handle, const cc65_libraryinfo* info);
 // Free a library info record
 
-
-
 //***************************************************************************
 //                                 Line info
 //***************************************************************************
-
-
 
 // Type of line
 typedef enum {
@@ -244,8 +214,6 @@ struct cc65_lineinfo {
     unsigned            count;          // Number of data sets that follow
     cc65_linedata       data[1];        // Data sets, number is dynamic
 };
-
-
 
 const cc65_lineinfo* cc65_line_byid (cc65_dbginfo handle, unsigned id);
 /* Return information about a line with a specific id. The function
@@ -285,13 +253,9 @@ const cc65_lineinfo* cc65_line_byspan (cc65_dbginfo handle, unsigned span_id);
 void cc65_free_lineinfo (cc65_dbginfo handle, const cc65_lineinfo* info);
 // Free line info returned by one of the other functions
 
-
-
 //***************************************************************************
 //                                  Modules
 //***************************************************************************
-
-
 
 /* Module information
 ** Notes:
@@ -313,8 +277,6 @@ struct cc65_moduleinfo {
     cc65_moduledata     data[1];        // Data sets, number is dynamic
 };
 
-
-
 const cc65_moduleinfo* cc65_get_modulelist (cc65_dbginfo handle);
 // Return a list of all modules
 
@@ -328,13 +290,9 @@ const cc65_moduleinfo* cc65_module_byid (cc65_dbginfo handle, unsigned id);
 void cc65_free_moduleinfo (cc65_dbginfo handle, const cc65_moduleinfo* info);
 // Free a module info record
 
-
-
 //***************************************************************************
 //                                   Spans
 //***************************************************************************
-
-
 
 // Span information
 typedef struct cc65_spandata cc65_spandata;
@@ -353,8 +311,6 @@ struct cc65_spaninfo {
     unsigned            count;          // Number of data sets that follow
     cc65_spandata       data[1];        // Data sets, number is dynamic
 };
-
-
 
 const cc65_spaninfo* cc65_get_spanlist (cc65_dbginfo handle);
 // Return a list of all spans. BEWARE: Large!
@@ -385,13 +341,9 @@ const cc65_spaninfo* cc65_span_byscope (cc65_dbginfo handle, unsigned scope_id);
 void cc65_free_spaninfo (cc65_dbginfo handle, const cc65_spaninfo* info);
 // Free a span info record
 
-
-
 //***************************************************************************
 //                               Source files
 //***************************************************************************
-
-
 
 // Source file information
 typedef struct cc65_sourcedata cc65_sourcedata;
@@ -407,8 +359,6 @@ struct cc65_sourceinfo {
     unsigned            count;          // Number of data sets that follow
     cc65_sourcedata     data[1];        // Data sets, number is dynamic
 };
-
-
 
 const cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo handle);
 // Return a list of all source files
@@ -430,13 +380,9 @@ const cc65_sourceinfo* cc65_source_bymodule (cc65_dbginfo handle,
 void cc65_free_sourceinfo (cc65_dbginfo handle, const cc65_sourceinfo* info);
 // Free a source info record
 
-
-
 //***************************************************************************
 //                                  Scopes
 //***************************************************************************
-
-
 
 // Scope information
 typedef enum {
@@ -463,8 +409,6 @@ struct cc65_scopeinfo {
     unsigned            count;          // Number of data sets that follow
     cc65_scopedata      data[1];        // Data sets, number is dynamic
 };
-
-
 
 const cc65_scopeinfo* cc65_get_scopelist (cc65_dbginfo handle);
 // Return a list of all scopes in the debug information
@@ -498,13 +442,9 @@ const cc65_scopeinfo* cc65_childscopes_byid (cc65_dbginfo handle, unsigned id);
 void cc65_free_scopeinfo (cc65_dbginfo Handle, const cc65_scopeinfo* Info);
 // Free a scope info record
 
-
-
 //***************************************************************************
 //                                 Segments
 //***************************************************************************
-
-
 
 /* Segment information.
 ** Notes:
@@ -530,8 +470,6 @@ struct cc65_segmentinfo {
     cc65_segmentdata    data[1];        // Data sets, number is dynamic
 };
 
-
-
 const cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo handle);
 // Return a list of all segments referenced in the debug information
 
@@ -552,13 +490,9 @@ const cc65_segmentinfo* cc65_segment_byname (cc65_dbginfo handle,
 void cc65_free_segmentinfo (cc65_dbginfo handle, const cc65_segmentinfo* info);
 // Free a segment info record
 
-
-
 //***************************************************************************
 //                                  Symbols
 //***************************************************************************
-
-
 
 // Symbol information
 typedef enum {
@@ -599,8 +533,6 @@ struct cc65_symbolinfo {
     cc65_symboldata     data[1];        // Data sets, number is dynamic
 };
 
-
-
 const cc65_symbolinfo* cc65_symbol_byid (cc65_dbginfo handle, unsigned id);
 /* Return the symbol with a given id. The function returns NULL if no symbol
 ** with this id was found.
@@ -629,13 +561,9 @@ const cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo handle,
 void cc65_free_symbolinfo (cc65_dbginfo handle, const cc65_symbolinfo* info);
 // Free a symbol info record
 
-
-
 //***************************************************************************
 //                                   Types
 //***************************************************************************
-
-
 
 // Type information
 typedef enum {
@@ -653,7 +581,6 @@ typedef enum {
     CC65_TYPE_STRUCT,
     CC65_TYPE_FUNC,
 } cc65_typetoken;
-
 
 /* A type is a linked list of typedata structures. In case of arrays, the
 ** structure will contain an element count and the element type. In case of
@@ -685,8 +612,6 @@ struct cc65_typedata {
     } data;
 };
 
-
-
 const cc65_typedata* cc65_type_byid (cc65_dbginfo handle, unsigned id);
 /* Return the data for the type with the given id. The function returns NULL
 ** if no type with this id was found.
@@ -695,17 +620,11 @@ const cc65_typedata* cc65_type_byid (cc65_dbginfo handle, unsigned id);
 void cc65_free_typedata (cc65_dbginfo Handle, const cc65_typedata* data);
 // Free a symbol info record
 
-
-
 // Allow usage from C++
 #ifdef __cplusplus
 }
 #endif
 
-
-
 // End of dbginfo.h
 #endif
-
-
 

@@ -30,8 +30,6 @@
 //
 //***************************************************************************
 
-
-
 // common
 #include "addrsize.h"
 #include "scopedefs.h"
@@ -48,26 +46,18 @@
 #include "symtab.h"
 #include "struct.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 enum {
     STRUCT,
     UNION
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static long Member (long AllocSize)
 // Read one struct member and return its size
@@ -93,8 +83,6 @@ static long Member (long AllocSize)
     // Return the size
     return AllocSize;
 }
-
-
 
 static long DoStructInternal (long Offs, unsigned Type)
 // Handle the .STRUCT command
@@ -284,8 +272,6 @@ static long DoStructInternal (long Offs, unsigned Type)
     return Size;
 }
 
-
-
 long GetStructSize (SymTable* Struct)
 // Get the size of a struct or union
 {
@@ -298,15 +284,11 @@ long GetStructSize (SymTable* Struct)
     }
 }
 
-
-
 void DoStruct (void)
 // Handle the .STRUCT command
 {
     DoStructInternal (0, STRUCT);
 }
-
-
 
 void DoUnion (void)
 // Handle the .UNION command

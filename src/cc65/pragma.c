@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -54,13 +52,9 @@
 #include "pragma.h"
 #include "wrappedcall.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Tokens for the #pragmas
 typedef enum {
@@ -156,13 +150,9 @@ typedef enum {
     PES_ALL,                    // All
 } pragma_scope_t;
 
-
-
 //***************************************************************************
 //                             Helper functions
 //***************************************************************************
-
-
 
 static void PragmaErrorSkip (void)
 /* Called in case of an error, skips tokens until the closing paren or a
@@ -173,15 +163,11 @@ static void PragmaErrorSkip (void)
     SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
 }
 
-
-
 static int CmpKey (const void* Key, const void* Elem)
 // Compare function for bsearch
 {
     return strcmp ((const char*) Key, ((const struct Pragma*) Elem)->Key);
 }
-
-
 
 static pragma_t FindPragma (const StrBuf* Key)
 /* Find a pragma and return the token. Return PRAGMA_ILLEGAL if the keyword is
@@ -192,8 +178,6 @@ static pragma_t FindPragma (const StrBuf* Key)
     P = bsearch (SB_GetConstBuf (Key), Pragmas, PRAGMA_COUNT, sizeof (Pragmas[0]), CmpKey);
     return P? P->Tok : PRAGMA_ILLEGAL;
 }
-
-
 
 static int GetComma (StrBuf* B)
 /* Expects and skips a comma in B. Prints an error and returns zero if no
@@ -209,8 +193,6 @@ static int GetComma (StrBuf* B)
     return 1;
 }
 
-
-
 static int GetString (StrBuf* B, StrBuf* S)
 /* Expects and skips a string in B. Prints an error and returns zero if no
 ** string is found. Returns a value <> 0 otherwise.
@@ -223,8 +205,6 @@ static int GetString (StrBuf* B, StrBuf* S)
     return 1;
 }
 
-
-
 static int GetNumber (StrBuf* B, long* Val)
 /* Expects and skips a number in B. Prints an eror and returns zero if no
 ** number is found. Returns a value <> 0 otherwise.
@@ -236,8 +216,6 @@ static int GetNumber (StrBuf* B, long* Val)
     }
     return 1;
 }
-
-
 
 static IntStack* GetWarning (StrBuf* B)
 /* Get a warning name from the string buffer. Returns a pointer to the intstack
@@ -267,8 +245,6 @@ static IntStack* GetWarning (StrBuf* B)
     return S;
 }
 
-
-
 static int HasStr (StrBuf* B, const char* E)
 // Checks if E follows in B. If so, skips it and returns true
 {
@@ -282,8 +258,6 @@ static int HasStr (StrBuf* B, const char* E)
     }
     return 0;
 }
-
-
 
 static PushPopResult ParsePushPop (StrBuf* B)
 /* Check for and parse the "push" and "pop" keywords. In case of "push", a
@@ -327,8 +301,6 @@ static PushPopResult ParsePushPop (StrBuf* B)
     return Res;
 }
 
-
-
 static void PopInt (IntStack* S)
 // Pops an integer from an IntStack. Prints an error if the stack is empty
 {
@@ -339,8 +311,6 @@ static void PopInt (IntStack* S)
     }
 }
 
-
-
 static void PushInt (IntStack* S, long Val)
 // Pushes an integer onto an IntStack. Prints an error if the stack is full
 {
@@ -350,8 +320,6 @@ static void PushInt (IntStack* S, long Val)
         IS_Push (S, Val);
     }
 }
-
-
 
 static int IsBoolKeyword (StrBuf* Ident)
 /* Check if the identifier in Ident is a keyword for a boolean value. Currently
@@ -376,8 +344,6 @@ static int IsBoolKeyword (StrBuf* Ident)
     return 0;
 }
 
-
-
 static void ApplyPragma (int PushPop, IntStack* Stack, long Val)
 // Apply a pragma immediately
 {
@@ -392,8 +358,6 @@ static void ApplyPragma (int PushPop, IntStack* Stack, long Val)
         IS_Set (Stack, Val);
     }
 }
-
-
 
 static void ApplySegNamePragma (pragma_t Token, int PushPop, const char* Name, unsigned char AddrSize)
 // Process a segname pragma
@@ -439,13 +403,9 @@ static void ApplySegNamePragma (pragma_t Token, int PushPop, const char* Name, u
     g_segname (Seg);
 }
 
-
-
 //***************************************************************************
 //                         Pragma handling functions
 //***************************************************************************
-
-
 
 static void StringPragma (pragma_scope_t Scope, StrBuf* B, void (*Func) (const char*))
 // Handle a pragma that expects a string parameter
@@ -464,8 +424,6 @@ static void StringPragma (pragma_scope_t Scope, StrBuf* B, void (*Func) (const c
     // Call the string buf destructor
     SB_Done (&S);
 }
-
-
 
 static void SegNamePragma (pragma_scope_t Scope, pragma_t Token, StrBuf* B)
 // Handle a pragma that expects a segment name parameter
@@ -553,8 +511,6 @@ ExitPoint:
     SB_Done (&A);
 }
 
-
-
 static void WrappedCallPragma (pragma_scope_t Scope, StrBuf* B)
 // Handle the wrapped-call pragma
 {
@@ -639,8 +595,6 @@ ExitPoint:
     SB_Done (&S);
 }
 
-
-
 static void CharMapPragma (pragma_scope_t Scope, StrBuf* B)
 // Change the character map
 {
@@ -687,8 +641,6 @@ static void CharMapPragma (pragma_scope_t Scope, StrBuf* B)
     // Remap the character
     TgtTranslateSet ((unsigned) Index, (unsigned char) C);
 }
-
-
 
 static void WarnPragma (pragma_scope_t Scope, StrBuf* B)
 // Enable/disable warnings
@@ -753,8 +705,6 @@ static void WarnPragma (pragma_scope_t Scope, StrBuf* B)
     }
 }
 
-
-
 static void FlagPragma (pragma_scope_t Scope, pragma_t Token, StrBuf* B, IntStack* Stack)
 // Handle a pragma that expects a boolean parameter
 {
@@ -801,8 +751,6 @@ ExitPoint:
     // Free the identifier
     SB_Done (&Ident);
 }
-
-
 
 static void IntPragma (pragma_scope_t Scope, pragma_t Token, StrBuf* B, IntStack* Stack, long Low, long High)
 // Handle a pragma that expects an int parameter
@@ -854,8 +802,6 @@ static void IntPragma (pragma_scope_t Scope, pragma_t Token, StrBuf* B, IntStack
     ApplyPragma (Push, Stack, Val);
 }
 
-
-
 static void NoteMessagePragma (const char* Message)
 /* Wrapper for printf-like Note() function protected from user-provided format
 ** specifiers.
@@ -863,8 +809,6 @@ static void NoteMessagePragma (const char* Message)
 {
     Note ("%s", Message);
 }
-
-
 
 static void ParsePragmaString (void)
 // Parse the contents of _Pragma
@@ -874,7 +818,6 @@ static void ParsePragmaString (void)
 
     // Create a string buffer from the string literal
     StrBuf B = AUTO_STRBUF_INITIALIZER;
-
 
     SB_Append (&B, GetLiteralStrBuf (CurTok.SVal));
 
@@ -1047,13 +990,9 @@ ExitPoint:
     SB_Done (&Ident);
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void ConsumePragma (void)
 /* Parse a pragma. The pragma comes always in the form of the new C99 _Pragma()

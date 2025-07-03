@@ -31,23 +31,15 @@
 //
 //***************************************************************************
 
-
-
 #ifndef COPTTEST_H
 #define COPTTEST_H
-
-
 
 // cc65
 #include "codeseg.h"
 
-
-
 //***************************************************************************
 //                              Optimize tests
 //***************************************************************************
-
-
 
 unsigned OptTest1 (CodeSeg* S);
 /* Given a sequence
@@ -74,8 +66,6 @@ unsigned OptTest2 (CodeSeg* S);
 ** branch based on the flags from the load. Remove the load if the insn
 ** isn't used later.
 */
-
-
 
 // End of copttest.h
 

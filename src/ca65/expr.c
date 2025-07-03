@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <string.h>
 #include <time.h>
 
@@ -64,13 +62,9 @@
 #include "ulabel.h"
 #include "macro.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 /* Since all expressions are first packed into expression trees, and each
 ** expression tree node is allocated on the heap, we add some type of special
@@ -82,13 +76,9 @@
 static ExprNode*        FreeExprNodes = 0;
 static unsigned         FreeNodeCount = 0;
 
-
-
 //***************************************************************************
 //                                  Helpers
 //***************************************************************************
-
-
 
 static ExprNode* NewExprNode (unsigned Op)
 // Create a new expression node
@@ -112,8 +102,6 @@ static ExprNode* NewExprNode (unsigned Op)
     return N;
 }
 
-
-
 static void FreeExprNode (ExprNode* E)
 // Free a node
 {
@@ -135,17 +123,11 @@ static void FreeExprNode (ExprNode* E)
     }
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
 
-
-
 static ExprNode* Expr0 (void);
-
-
 
 int IsByteRange (long Val)
 // Return true if this is a byte value
@@ -153,23 +135,17 @@ int IsByteRange (long Val)
     return (Val & ~0xFFL) == 0;
 }
 
-
-
 int IsWordRange (long Val)
 // Return true if this is a word value
 {
     return (Val & ~0xFFFFL) == 0;
 }
 
-
-
 int IsFarRange (long Val)
 // Return true if this is a far (24 bit) value
 {
     return (Val & ~0xFFFFFFL) == 0;
 }
-
-
 
 static const ExprNode* ResolveSymbolChain(const ExprNode* E)
 // Recursive helper function for IsEasyConst
@@ -187,8 +163,6 @@ static const ExprNode* ResolveSymbolChain(const ExprNode* E)
     }
     return E;
 }
-
-
 
 int IsEasyConst (const ExprNode* E, long* Val)
 /* Do some light checking if the given node is a constant. Don't care if E is
@@ -215,8 +189,6 @@ int IsEasyConst (const ExprNode* E, long* Val)
     return 0;
 }
 
-
-
 static ExprNode* LoByte (ExprNode* Operand)
 // Return the low byte of the given expression
 {
@@ -234,8 +206,6 @@ static ExprNode* LoByte (ExprNode* Operand)
     }
     return Expr;
 }
-
-
 
 static ExprNode* HiByte (ExprNode* Operand)
 // Return the high byte of the given expression
@@ -255,8 +225,6 @@ static ExprNode* HiByte (ExprNode* Operand)
     return Expr;
 }
 
-
-
 static ExprNode* Bank (ExprNode* Operand)
 // Return the bank of the given segmented expression
 {
@@ -267,8 +235,6 @@ static ExprNode* Bank (ExprNode* Operand)
     // Return the result
     return Expr;
 }
-
-
 
 static ExprNode* BankByte (ExprNode* Operand)
 // Return the bank byte of the given expression
@@ -288,8 +254,6 @@ static ExprNode* BankByte (ExprNode* Operand)
     return Expr;
 }
 
-
-
 static ExprNode* LoWord (ExprNode* Operand)
 // Return the low word of the given expression
 {
@@ -308,8 +272,6 @@ static ExprNode* LoWord (ExprNode* Operand)
     return Expr;
 }
 
-
-
 static ExprNode* HiWord (ExprNode* Operand)
 // Return the high word of the given expression
 {
@@ -327,8 +289,6 @@ static ExprNode* HiWord (ExprNode* Operand)
     }
     return Expr;
 }
-
-
 
 static ExprNode* Symbol (SymEntry* S)
 // Reference a symbol and return an expression for it
@@ -351,23 +311,17 @@ static ExprNode* Symbol (SymEntry* S)
     }
 }
 
-
-
 ExprNode* FuncBank (void)
 // Handle the .BANK builtin function
 {
     return Bank (Expression ());
 }
 
-
-
 ExprNode* FuncBankByte (void)
 // Handle the .BANKBYTE builtin function
 {
     return BankByte (Expression ());
 }
-
-
 
 static ExprNode* FuncBlank (void)
 // Handle the .BLANK builtin function
@@ -403,8 +357,6 @@ static ExprNode* FuncBlank (void)
     return GenLiteralExpr (Count == 0);
 }
 
-
-
 static ExprNode* FuncConst (void)
 // Handle the .CONST builtin function
 {
@@ -421,8 +373,6 @@ static ExprNode* FuncConst (void)
     return Result;
 }
 
-
-
 static ExprNode* FuncDefined (void)
 // Handle the .DEFINED builtin function
 {
@@ -432,8 +382,6 @@ static ExprNode* FuncDefined (void)
     // Check if the symbol is defined
     return GenLiteralExpr (Sym != 0 && SymIsDef (Sym));
 }
-
-
 
 static ExprNode* FuncDefinedMacro (void)
 // Handle the .DEFINEDMACRO builtin function
@@ -453,23 +401,17 @@ static ExprNode* FuncDefinedMacro (void)
     return GenLiteralExpr (Mac != 0);
 }
 
-
-
 ExprNode* FuncHiByte (void)
 // Handle the .HIBYTE builtin function
 {
     return HiByte (Expression ());
 }
 
-
-
 static ExprNode* FuncHiWord (void)
 // Handle the .HIWORD builtin function
 {
     return HiWord (Expression ());
 }
-
-
 
 static ExprNode* FuncIsMnemonic (void)
 // Handle the .ISMNEMONIC, .ISMNEM builtin function
@@ -499,23 +441,17 @@ static ExprNode* FuncIsMnemonic (void)
     return GenLiteralExpr (Instr >= 0);
 }
 
-
-
 ExprNode* FuncLoByte (void)
 // Handle the .LOBYTE builtin function
 {
     return LoByte (Expression ());
 }
 
-
-
 static ExprNode* FuncLoWord (void)
 // Handle the .LOWORD builtin function
 {
     return LoWord (Expression ());
 }
-
-
 
 static ExprNode* DoMatch (enum TC EqualityLevel)
 // Handle the .MATCH and .XMATCH builtin functions
@@ -617,15 +553,11 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     return GenLiteralExpr (Result);
 }
 
-
-
 static ExprNode* FuncMatch (void)
 // Handle the .MATCH function
 {
     return DoMatch (tcSameToken);
 }
-
-
 
 static ExprNode* FuncMax (void)
 // Handle the .MAX function
@@ -654,8 +586,6 @@ static ExprNode* FuncMax (void)
     return Expr;
 }
 
-
-
 static ExprNode* FuncMin (void)
 // Handle the .MIN function
 {
@@ -683,8 +613,6 @@ static ExprNode* FuncMin (void)
     return Expr;
 }
 
-
-
 static ExprNode* FuncReferenced (void)
 // Handle the .REFERENCED builtin function
 {
@@ -695,8 +623,6 @@ static ExprNode* FuncReferenced (void)
     return GenLiteralExpr (Sym != 0 && SymIsRef (Sym));
 }
 
-
-
 static ExprNode* FuncAddrSize (void)
 // Handle the .ADDRSIZE function
 {
@@ -705,7 +631,6 @@ static ExprNode* FuncAddrSize (void)
     SymEntry* Sym;
     int       AddrSize;
     int       NoScope;
-
 
     // Assume we don't know the size
     AddrSize = 0;
@@ -774,8 +699,6 @@ static ExprNode* FuncAddrSize (void)
     return GenLiteralExpr (AddrSize);
 }
 
-
-
 static ExprNode* FuncSizeOf (void)
 // Handle the .SIZEOF function
 {
@@ -786,7 +709,6 @@ static ExprNode* FuncSizeOf (void)
     SymEntry* SizeSym;
     long      Size;
     int       NoScope;
-
 
     // Assume an error
     SizeSym = 0;
@@ -869,8 +791,6 @@ static ExprNode* FuncSizeOf (void)
     return GenLiteralExpr (Size);
 }
 
-
-
 static ExprNode* FuncStrAt (void)
 // Handle the .STRAT function
 {
@@ -914,8 +834,6 @@ ExitPoint:
     return GenLiteralExpr (C);
 }
 
-
-
 static ExprNode* FuncStrLen (void)
 // Handle the .STRLEN function
 {
@@ -943,8 +861,6 @@ static ExprNode* FuncStrLen (void)
     // Return the length
     return GenLiteralExpr (Len);
 }
-
-
 
 static ExprNode* FuncTCount (void)
 // Handle the .TCOUNT function
@@ -980,15 +896,11 @@ static ExprNode* FuncTCount (void)
     return GenLiteralExpr (Count);
 }
 
-
-
 static ExprNode* FuncXMatch (void)
 // Handle the .XMATCH function
 {
     return DoMatch (tcIdentical);
 }
-
-
 
 static ExprNode* Function (ExprNode* (*F) (void))
 // Handle builtin functions
@@ -1015,8 +927,6 @@ static ExprNode* Function (ExprNode* (*F) (void))
     // Return the result of the actual function
     return E;
 }
-
-
 
 static ExprNode* Factor (void)
 {
@@ -1236,8 +1146,6 @@ static ExprNode* Factor (void)
     return N;
 }
 
-
-
 static ExprNode* Term (void)
 {
     // Read left hand side
@@ -1340,8 +1248,6 @@ static ExprNode* Term (void)
     return Root;
 }
 
-
-
 static ExprNode* SimpleExpr (void)
 {
     // Read left hand side
@@ -1401,8 +1307,6 @@ static ExprNode* SimpleExpr (void)
     // Return the expression tree we've created
     return Root;
 }
-
-
 
 static ExprNode* BoolExpr (void)
 // Evaluate a boolean expression
@@ -1471,8 +1375,6 @@ static ExprNode* BoolExpr (void)
     return Root;
 }
 
-
-
 static ExprNode* Expr2 (void)
 // Boolean operators: AND and XOR
 {
@@ -1530,8 +1432,6 @@ static ExprNode* Expr2 (void)
     return Root;
 }
 
-
-
 static ExprNode* Expr1 (void)
 // Boolean operators: OR
 {
@@ -1587,8 +1487,6 @@ static ExprNode* Expr1 (void)
     return Root;
 }
 
-
-
 static ExprNode* Expr0 (void)
 // Boolean operators: NOT
 {
@@ -1626,8 +1524,6 @@ static ExprNode* Expr0 (void)
     return Root;
 }
 
-
-
 ExprNode* Expression (void)
 /* Evaluate an expression, build the expression tree on the heap and return
 ** a pointer to the root of the tree.
@@ -1635,8 +1531,6 @@ ExprNode* Expression (void)
 {
     return Expr0 ();
 }
-
-
 
 long ConstExpression (void)
 /* Parse an expression. Check if the expression is const, and print an error
@@ -1670,8 +1564,6 @@ long ConstExpression (void)
     return Val;
 }
 
-
-
 void FreeExpr (ExprNode* Root)
 // Free the expression, Root is pointing to.
 {
@@ -1681,8 +1573,6 @@ void FreeExpr (ExprNode* Root)
         FreeExprNode (Root);
     }
 }
-
-
 
 ExprNode* SimplifyExpr (ExprNode* Expr, const ExprDesc* D)
 // Try to simplify the given expression tree
@@ -1695,8 +1585,6 @@ ExprNode* SimplifyExpr (ExprNode* Expr, const ExprDesc* D)
     return Expr;
 }
 
-
-
 ExprNode* GenLiteralExpr (long Val)
 // Return an expression tree that encodes the given literal value
 {
@@ -1705,15 +1593,11 @@ ExprNode* GenLiteralExpr (long Val)
     return Expr;
 }
 
-
-
 ExprNode* GenLiteral0 (void)
 // Return an expression tree that encodes the number zero
 {
     return GenLiteralExpr (0);
 }
-
-
 
 ExprNode* GenSymExpr (SymEntry* Sym)
 // Return an expression node that encodes the given symbol
@@ -1724,8 +1608,6 @@ ExprNode* GenSymExpr (SymEntry* Sym)
     return Expr;
 }
 
-
-
 static ExprNode* GenSectionExpr (unsigned SecNum)
 // Return an expression node for the given section
 {
@@ -1734,8 +1616,6 @@ static ExprNode* GenSectionExpr (unsigned SecNum)
     return Expr;
 }
 
-
-
 static ExprNode* GenBankExpr (unsigned SecNum)
 // Return an expression node for the given bank
 {
@@ -1743,8 +1623,6 @@ static ExprNode* GenBankExpr (unsigned SecNum)
     Expr->V.SecNum = SecNum;
     return Expr;
 }
-
-
 
 ExprNode* GenAddExpr (ExprNode* Left, ExprNode* Right)
 // Generate an addition from the two operands
@@ -1764,8 +1642,6 @@ ExprNode* GenAddExpr (ExprNode* Left, ExprNode* Right)
     }
 }
 
-
-
 ExprNode* GenCurrentPC (void)
 // Return the current program counter as expression
 {
@@ -1783,8 +1659,6 @@ ExprNode* GenCurrentPC (void)
     return Root;
 }
 
-
-
 ExprNode* GenSwapExpr (ExprNode* Expr)
 // Return an extended expression with lo and hi bytes swapped
 {
@@ -1792,8 +1666,6 @@ ExprNode* GenSwapExpr (ExprNode* Expr)
     N->Left = Expr;
     return N;
 }
-
-
 
 ExprNode* GenBranchExpr (unsigned Offs)
 /* Return an expression that encodes the difference between current PC plus
@@ -1850,8 +1722,6 @@ ExprNode* GenBranchExpr (unsigned Offs)
     return Root;
 }
 
-
-
 ExprNode* GenULabelExpr (unsigned Num)
 // Return an expression for an unnamed label with the given index
 {
@@ -1862,8 +1732,6 @@ ExprNode* GenULabelExpr (unsigned Num)
     return Node;
 }
 
-
-
 ExprNode* GenByteExpr (ExprNode* Expr)
 // Force the given expression into a byte and return the result
 {
@@ -1871,16 +1739,12 @@ ExprNode* GenByteExpr (ExprNode* Expr)
     return LoByte (Expr);
 }
 
-
-
 ExprNode* GenWordExpr (ExprNode* Expr)
 // Force the given expression into a word and return the result.
 {
     // Use the low byte operator to force the expression into word size
     return LoWord (Expr);
 }
-
-
 
 ExprNode* GenNearAddrExpr (ExprNode* Expr)
 // A word sized expression that will error if given a far expression at assemble time.
@@ -1902,8 +1766,6 @@ ExprNode* GenNearAddrExpr (ExprNode* Expr)
     return Expr;
 }
 
-
-
 ExprNode* GenFarAddrExpr (ExprNode* Expr)
 // Force the given expression into a far address and return the result.
 {
@@ -1920,8 +1782,6 @@ ExprNode* GenFarAddrExpr (ExprNode* Expr)
     }
     return Expr;
 }
-
-
 
 ExprNode* GenDWordExpr (ExprNode* Expr)
 // Force the given expression into a dword and return the result.
@@ -1940,8 +1800,6 @@ ExprNode* GenDWordExpr (ExprNode* Expr)
     return Expr;
 }
 
-
-
 ExprNode* GenNE (ExprNode* Expr, long Val)
 // Generate an expression that compares Expr and Val for inequality
 {
@@ -1953,8 +1811,6 @@ ExprNode* GenNE (ExprNode* Expr, long Val)
     // Return the result
     return Root;
 }
-
-
 
 int IsConstExpr (ExprNode* Expr, long* Val)
 /* Return true if the given expression is a constant expression, that is, one
@@ -1979,8 +1835,6 @@ int IsConstExpr (ExprNode* Expr, long* Val)
     ED_Done (&D);
     return IsConst;
 }
-
-
 
 ExprNode* CloneExpr (ExprNode* Expr)
 /* Clone the given expression tree. The function will simply clone symbol
@@ -2030,8 +1884,6 @@ ExprNode* CloneExpr (ExprNode* Expr)
     return Clone;
 }
 
-
-
 void WriteExpr (ExprNode* Expr)
 // Write the given expression to the object file
 {
@@ -2079,8 +1931,6 @@ void WriteExpr (ExprNode* Expr)
     }
 }
 
-
-
 void ExprGuessedAddrSize (const ExprNode* Expr, unsigned char AddrSize)
 /* Mark the address size of the given expression tree as guessed. The address
 ** size passed as argument is the one NOT used, because the actual address
@@ -2117,8 +1967,6 @@ void ExprGuessedAddrSize (const ExprNode* Expr, unsigned char AddrSize)
     }
 }
 
-
-
 ExprNode* MakeBoundedExpr (ExprNode* Expr, unsigned Size)
 // Force the given expression into a specific size of ForceRange is true
 {
@@ -2133,8 +1981,6 @@ ExprNode* MakeBoundedExpr (ExprNode* Expr, unsigned Size)
     }
     return Expr;
 }
-
-
 
 ExprNode* BoundedExpr (ExprNode* (*ExprFunc) (void), unsigned Size)
 // Parse an expression and force it within a given size if ForceRange is true

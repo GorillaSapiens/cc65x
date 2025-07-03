@@ -31,25 +31,17 @@
 //
 //***************************************************************************
 
-
-
 #ifndef REGINFO_H
 #define REGINFO_H
-
-
 
 #include <stdio.h>      // ###
 
 // common
 #include "inline.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Encoding for an unknown register value
 #define UNKNOWN_REGVAL  -1
@@ -115,8 +107,6 @@
 #define ZNREG_AY        (REG_A | REG_Y)
 #define ZNREG_AXY       (REG_A | REG_X | REG_Y)
 
-
-
 // Register contents
 typedef struct RegContents RegContents;
 struct RegContents {
@@ -140,13 +130,9 @@ struct RegInfo {
     RegContents Out2;           // Alternative outgoing reg values for branches
 };
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 void RC_Invalidate (RegContents* C);
 // Invalidate all registers
@@ -241,8 +227,6 @@ void FreeRegInfo (RegInfo* RI);
 
 void DumpRegInfo (const char* Desc, const RegInfo* RI);
 // Dump the register info for debugging
-
-
 
 // End of reginfo.h
 

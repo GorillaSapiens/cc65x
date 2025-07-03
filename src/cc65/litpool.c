@@ -31,8 +31,6 @@
 //
 //***************************************************************************
 
-
-
 #include <stdio.h>
 #include <string.h>
 
@@ -50,13 +48,9 @@
 #include "global.h"
 #include "litpool.h"
 
-
-
 //***************************************************************************
 //                                   Data
 //***************************************************************************
-
-
 
 // Definition of a literal
 struct Literal {
@@ -84,13 +78,9 @@ static LiteralPool*     LP         = 0;
 */
 static Collection       LPStack  = STATIC_COLLECTION_INITIALIZER;
 
-
-
 //***************************************************************************
 //                              struct Literal
 //***************************************************************************
-
-
 
 static Literal* NewLiteral (const StrBuf* S)
 // Create a new literal and return it
@@ -109,8 +99,6 @@ static Literal* NewLiteral (const StrBuf* S)
     return L;
 }
 
-
-
 static void FreeLiteral (Literal* L)
 // Free a literal
 {
@@ -120,8 +108,6 @@ static void FreeLiteral (Literal* L)
     // Free the structure itself
     xfree (L);
 }
-
-
 
 static void OutputLiteral (Literal* L)
 // Output one literal to the currently active data segment
@@ -136,8 +122,6 @@ static void OutputLiteral (Literal* L)
     L->Output = 1;
 }
 
-
-
 Literal* UseLiteral (Literal* L)
 // Increase the reference counter for the literal and return it
 {
@@ -148,8 +132,6 @@ Literal* UseLiteral (Literal* L)
     return L;
 }
 
-
-
 void ReleaseLiteral (Literal* L)
 // Decrement the reference counter for the literal
 {
@@ -157,15 +139,11 @@ void ReleaseLiteral (Literal* L)
     CHECK (L->RefCount >= 0);
 }
 
-
-
 void TranslateLiteral (Literal* L)
 // Translate a literal into the target charset
 {
     TgtTranslateStrBuf (&L->Data);
 }
-
-
 
 void ConcatLiteral (Literal* L, const Literal* Appended)
 // Concatenate string literals
@@ -176,15 +154,11 @@ void ConcatLiteral (Literal* L, const Literal* Appended)
     SB_Append (&L->Data, &Appended->Data);
 }
 
-
-
 unsigned GetLiteralLabel (const Literal* L)
 // Return the asm label for a literal
 {
     return L->Label;
 }
-
-
 
 const char* GetLiteralStr (const Literal* L)
 // Return the data for a literal as pointer to char
@@ -192,15 +166,11 @@ const char* GetLiteralStr (const Literal* L)
     return SB_GetConstBuf (&L->Data);
 }
 
-
-
 const StrBuf* GetLiteralStrBuf (const Literal* L)
 // Return the data for a literal as pointer to the string buffer
 {
     return &L->Data;
 }
-
-
 
 unsigned GetLiteralSize (const Literal* L)
 // Get the size of a literal string
@@ -208,13 +178,9 @@ unsigned GetLiteralSize (const Literal* L)
     return SB_GetLen (&L->Data);
 }
 
-
-
 //***************************************************************************
 //                                   Code
 //***************************************************************************
-
-
 
 static LiteralPool* NewLiteralPool (struct SymEntry* Func)
 // Create a new literal pool and return it
@@ -231,8 +197,6 @@ static LiteralPool* NewLiteralPool (struct SymEntry* Func)
     return LP;
 }
 
-
-
 static void FreeLiteralPool (LiteralPool* LP)
 // Free a LiteralPool structure
 {
@@ -244,8 +208,6 @@ static void FreeLiteralPool (LiteralPool* LP)
     xfree (LP);
 }
 
-
-
 static int Compare (void* Data attribute ((unused)),
                     const void* Left, const void* Right)
 // Compare function used when sorting the literal pool
@@ -254,16 +216,12 @@ static int Compare (void* Data attribute ((unused)),
     return (int) GetLiteralSize (Right) - (int) GetLiteralSize (Left);
 }
 
-
-
 void InitLiteralPool (void)
 // Initialize the literal pool
 {
     // Create the global literal pool
     GlobalPool = LP = NewLiteralPool (0);
 }
-
-
 
 void PushLiteralPool (struct SymEntry* Func)
 // Push the current literal pool onto the stack and create a new one
@@ -277,8 +235,6 @@ void PushLiteralPool (struct SymEntry* Func)
     // Create a new one
     LP = NewLiteralPool (Func);
 }
-
-
 
 LiteralPool* PopLiteralPool (void)
 /* Pop the last literal pool from TOS and activate it. Return the old
@@ -294,8 +250,6 @@ LiteralPool* PopLiteralPool (void)
     // Return the old one
     return Old;
 }
-
-
 
 static void MoveLiterals (Collection* Source, Collection* Target)
 // Move referenced literals from Source to Target, delete unreferenced ones
@@ -319,8 +273,6 @@ static void MoveLiterals (Collection* Source, Collection* Target)
     }
 }
 
-
-
 void MoveLiteralPool (LiteralPool* LocalPool)
 /* Move all referenced literals in LocalPool to the global literal pool. This
 ** function will free LocalPool after moving the used string literals.
@@ -333,8 +285,6 @@ void MoveLiteralPool (LiteralPool* LocalPool)
     // Free the local literal pool
     FreeLiteralPool (LocalPool);
 }
-
-
 
 static void OutputWritableLiterals (Collection* Literals)
 // Output the given writable literals
@@ -362,8 +312,6 @@ static void OutputWritableLiterals (Collection* Literals)
 
     }
 }
-
-
 
 static void OutputReadOnlyLiterals (Collection* Literals)
 // Output the given readonly literals merging (even partial) duplicates
@@ -445,8 +393,6 @@ static void OutputReadOnlyLiterals (Collection* Literals)
     }
 }
 
-
-
 void OutputLocalLiteralPool (LiteralPool* Pool)
 // Output the local literal pool
 {
@@ -455,15 +401,11 @@ void OutputLocalLiteralPool (LiteralPool* Pool)
     OutputReadOnlyLiterals (&Pool->ReadOnlyLiterals);
 }
 
-
-
 void OutputGlobalLiteralPool (void)
 // Output the global literal pool
 {
     OutputLocalLiteralPool (GlobalPool);
 }
-
-
 
 Literal* AddLiteral (const char* S)
 // Add a literal string to the literal pool. Return the literal.
@@ -472,8 +414,6 @@ Literal* AddLiteral (const char* S)
     SB_InitFromString(&SB, S);
     return AddLiteralStr(&SB);
 }
-
-
 
 Literal* AddLiteralStr (const StrBuf* S)
 // Add a literal string to the literal pool. Return the literal.
