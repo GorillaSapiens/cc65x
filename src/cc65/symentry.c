@@ -1,68 +1,62 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                symentry.c                                 */
-/*                                                                           */
-/*               Symbol table entries for the cc65 C compiler                */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2013, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//                                symentry.c
+//
+//               Symbol table entries for the cc65 C compiler
+//
+//
+//
+// (C) 2000-2013, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 #include <string.h>
 
-/* common */
+// common
 #include "xmalloc.h"
 
-/* cc65 */
+// cc65
 #include "anonname.h"
 #include "asmlabel.h"
 #include "declare.h"
 #include "error.h"
 #include "symentry.h"
 
-
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                                   Code
+////////////////////////////////////////////////////////////////////////////////
 
 SymEntry* NewSymEntry (const char* Name, unsigned Flags)
-/* Create a new symbol table with the given name */
+// Create a new symbol table with the given name
 {
-    /* Get the length of the name */
+    // Get the length of the name
     unsigned Len = strlen (Name);
 
-    /* Allocate memory for the symbol entry */
+    // Allocate memory for the symbol entry
     SymEntry* E = xmalloc (sizeof (SymEntry) + Len);
 
-    /* Initialize the entry */
+    // Initialize the entry
     E->NextHash = 0;
     E->PrevSym  = 0;
     E->NextSym  = 0;
@@ -74,14 +68,12 @@ SymEntry* NewSymEntry (const char* Name, unsigned Flags)
     memset (&E->V, 0, sizeof (E->V));
     memcpy (E->Name, Name, Len+1);
 
-    /* Return the new entry */
+    // Return the new entry
     return E;
 }
 
-
-
 void FreeSymEntry (SymEntry* E)
-/* Free a symbol entry */
+// Free a symbol entry
 {
     unsigned i;
 
@@ -99,10 +91,8 @@ void FreeSymEntry (SymEntry* E)
     xfree (E);
 }
 
-
-
 void DumpSymEntry (FILE* F, const SymEntry* E)
-/* Dump the given symbol table entry to the file in readable form */
+// Dump the given symbol table entry to the file in readable form
 {
     typedef const struct {
         const char*         Name;
@@ -157,18 +147,18 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
     unsigned I;
     unsigned SymFlags;
 
-    /* Print the name */
+    // Print the name
     fprintf (F, "%s:\n", E->Name);
 
-    /* Print the assembler name if we have one */
+    // Print the assembler name if we have one
     if (E->AsmName) {
         fprintf (F, "    AsmName: %s\n", E->AsmName);
     }
 
-    /* Print the flags */
+    // Print the flags
     SymFlags = E->Flags;
     fprintf (F, "    Flags:");
-    /* Symbol types */
+    // Symbol types
     if ((SymFlags & SC_TYPEMASK) != 0) {
         for (I = 0; I < sizeof (Types) / sizeof (Types[0]); ++I) {
             if ((SymFlags & SC_TYPEMASK) == Types[I].Val) {
@@ -178,7 +168,7 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
             }
         }
     }
-    /* Storage classes */
+    // Storage classes
     if ((SymFlags & SC_STORAGEMASK) != 0) {
         for (I = 0; I < sizeof (Storages) / sizeof (Storages[0]); ++I) {
             if ((SymFlags & SC_STORAGEMASK) == Storages[I].Val) {
@@ -188,14 +178,14 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
             }
         }
     }
-    /* Special property flags */
+    // Special property flags
     for (I = 0; I < sizeof (Properties) / sizeof (Properties[0]) && SymFlags != 0; ++I) {
         if ((SymFlags & Properties[I].Val) == Properties[I].Val) {
             SymFlags &= ~Properties[I].Val;
             fprintf (F, " %s", Properties[I].Name);
         }
     }
-    /* Status flags */
+    // Status flags
     for (I = 0; I < sizeof (Status) / sizeof (Status[0]) && SymFlags != 0; ++I) {
         if ((SymFlags & Status[I].Val) == Status[I].Val) {
             SymFlags &= ~Status[I].Val;
@@ -207,7 +197,7 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
     }
     fprintf (F, "\n");
 
-    /* Print the type */
+    // Print the type
     fprintf (F, "    Type:  ");
     if (E->Type) {
         PrintType (F, E->Type);
@@ -217,50 +207,43 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
     fprintf (F, "\n");
 }
 
-
-
 int SymIsOutputFunc (const SymEntry* Sym)
-/* Return true if this is a function that must be output */
+// Return true if this is a function that must be output
 {
-    /* Symbol must be a function which is defined and either extern or
-    ** static and referenced.
-    */
+    // Symbol must be a function which is defined and either extern or
+    // static and referenced.
     return IsTypeFunc (Sym->Type)                       &&
            SymIsDef (Sym)                               &&
            ((Sym->Flags & SC_REF) ||
             (Sym->Flags & SC_STORAGEMASK) != SC_STATIC);
 }
 
-
-
 const DeclAttr* SymGetAttr (const SymEntry* Sym, DeclAttrType AttrType)
-/* Return an attribute for this symbol or NULL if the attribute does not exist */
+// Return an attribute for this symbol or NULL if the attribute does not exist
 {
-    /* Beware: We may not even have a collection */
+    // Beware: We may not even have a collection
     if (Sym->Attr) {
         unsigned I;
         for (I = 0; I < CollCount (Sym->Attr); ++I) {
 
-            /* Get the next attribute */
+            // Get the next attribute
             const DeclAttr* A = CollConstAt (Sym->Attr, I);
 
-            /* If this is the one we're searching for, return it */
+            // If this is the one we're searching for, return it
             if (A->AttrType == AttrType) {
                 return A;
             }
         }
     }
 
-    /* Not found */
+    // Not found
     return 0;
 }
 
-
-
 void SymUseAttr (SymEntry* Sym, struct Declarator* D)
-/* Use the attributes from the declarator for this symbol */
+// Use the attributes from the declarator for this symbol
 {
-    /* We cannot specify attributes twice */
+    // We cannot specify attributes twice
     if ((Sym->Flags & SC_HAVEATTR) != 0) {
         if (D->Attributes != 0) {
             Error ("Attributes must be specified in the first declaration");
@@ -268,65 +251,54 @@ void SymUseAttr (SymEntry* Sym, struct Declarator* D)
         return;
     }
 
-    /* Move the attributes */
+    // Move the attributes
     Sym->Attr = D->Attributes;
     D->Attributes = 0;
     Sym->Flags |= SC_HAVEATTR;
 }
 
-
-
 void SymSetAsmName (SymEntry* Sym)
-/* Set the assembler name for an external symbol from the name of the symbol.
-** The symbol must have no assembler name set yet.
-*/
+// Set the assembler name for an external symbol from the name of the symbol.
+// The symbol must have no assembler name set yet.
 {
     unsigned Len;
 
-    /* Cannot be used to change the name */
+    // Cannot be used to change the name
     PRECONDITION (Sym->AsmName == 0);
 
-    /* The assembler name starts with an underline */
+    // The assembler name starts with an underline
     Len = strlen (Sym->Name);
     Sym->AsmName = xmalloc (Len + 2);
     Sym->AsmName[0] = '_';
     memcpy (Sym->AsmName+1, Sym->Name, Len+1);
 }
 
-
-
 void SymCvtRegVarToAuto (SymEntry* Sym)
-/* Convert a register variable to an auto variable */
+// Convert a register variable to an auto variable
 {
-    /* Change the storage class */
+    // Change the storage class
     Sym->Flags = (Sym->Flags & ~SC_STORAGEMASK) | SC_AUTO;
 
-    /* Transfer the stack offset from register save area to actual offset */
+    // Transfer the stack offset from register save area to actual offset
     Sym->V.Offs = Sym->V.R.SaveOffs;
 }
 
-
-
 void SymChangeType (SymEntry* Sym, const Type* T)
-/* Change the type of the given symbol */
+// Change the type of the given symbol
 {
     TypeFree (Sym->Type);
     Sym->Type = TypeDup (T);
 }
 
-
-
 void SymChangeAsmName (SymEntry* Sym, const char* NewAsmName)
-/* Change the assembler name of the symbol */
+// Change the assembler name of the symbol
 {
     xfree (Sym->AsmName);
     Sym->AsmName = xstrdup (NewAsmName);
 }
 
-
-
 int SymHasAnonName (const SymEntry* Sym)
-/* Return true if the symbol entry has an anonymous name */
+// Return true if the symbol entry has an anonymous name
 {
     return IsAnonName (Sym->Name);
 }

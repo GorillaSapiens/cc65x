@@ -1,84 +1,77 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 coptsize.c                                */
-/*                                                                           */
-/*                              Size optimizations                           */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2002-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//                                 coptsize.c
+//
+//                              Size optimizations
+//
+//
+//
+// (C) 2002-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 #include <stdlib.h>
 
-/* common */
+// common
 #include "cpu.h"
 
-/* cc65 */
+// cc65
 #include "codeent.h"
 #include "codeinfo.h"
 #include "coptsize.h"
 #include "reginfo.h"
 
+////////////////////////////////////////////////////////////////////////////////
+//                                   Data
+////////////////////////////////////////////////////////////////////////////////
 
-
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* Flags for CallDesc */
-#define F_NONE          0x0000U /* No extra flags */
-#define F_SLOWER        0x0001U /* Function call is slower */
+// Flags for CallDesc
+#define F_NONE          0x0000U // No extra flags
+#define F_SLOWER        0x0001U // Function call is slower
 
 typedef struct CallDesc CallDesc;
 struct CallDesc {
-    const char* LongFunc;       /* Long function name */
-    RegContents Regs;           /* Register contents */
-    unsigned    Flags;          /* Flags from above */
-    const char* ShortFunc;      /* Short function name */
+    const char* LongFunc;       // Long function name
+    RegContents Regs;           // Register contents
+    unsigned    Flags;          // Flags from above
+    const char* ShortFunc;      // Short function name
 };
 
-/* Note: The table is sorted. If there is more than one entry with the same
-** name, entries are sorted best match first, so when searching linear for
-** a match, the first one can be used because it is also the best one (or
-** at least none of the following ones are better).
-** Note^2: Ptr1 and Tmp1 aren't evaluated, because runtime routines don't
-** expect parameters here.
-*/
+// Note: The table is sorted. If there is more than one entry with the same
+// name, entries are sorted best match first, so when searching linear for
+// a match, the first one can be used because it is also the best one (or
+// at least none of the following ones are better).
+// Note^2: Ptr1 and Tmp1 aren't evaluated, because runtime routines don't
+// expect parameters here.
 static const CallDesc CallTable [] = {
-    /* Name          A register      X register     Y register     flags     replacement */
+    // Name          A register      X register     Y register     flags     replacement
     {
         "addeqysp",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -86,9 +79,9 @@ static const CallDesc CallTable [] = {
     },{
         "laddeq",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          1,              0, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -96,9 +89,9 @@ static const CallDesc CallTable [] = {
     },{
         "laddeq",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -106,9 +99,9 @@ static const CallDesc CallTable [] = {
     },{
         "laddeqysp",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -116,9 +109,9 @@ static const CallDesc CallTable [] = {
     },{
         "ldaxidx",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -126,9 +119,9 @@ static const CallDesc CallTable [] = {
     },{
         "ldaxysp",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -136,9 +129,9 @@ static const CallDesc CallTable [] = {
     },{
         "ldeaxidx",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -146,9 +139,9 @@ static const CallDesc CallTable [] = {
     },{
         "ldeaxysp",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -156,9 +149,9 @@ static const CallDesc CallTable [] = {
     },{
         "leaaxsp",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -166,9 +159,9 @@ static const CallDesc CallTable [] = {
     },{
         "lsubeq",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          1,              0, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -176,9 +169,9 @@ static const CallDesc CallTable [] = {
     },{
         "lsubeq",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -186,9 +179,9 @@ static const CallDesc CallTable [] = {
     },{
         "lsubeqysp",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -196,9 +189,9 @@ static const CallDesc CallTable [] = {
     },{
         "pusha",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
@@ -206,9 +199,9 @@ static const CallDesc CallTable [] = {
     },{
         "pusha",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          1, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
@@ -216,9 +209,9 @@ static const CallDesc CallTable [] = {
     },{
         "pusha",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          2, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
@@ -226,9 +219,9 @@ static const CallDesc CallTable [] = {
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -236,9 +229,9 @@ static const CallDesc CallTable [] = {
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          1,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
@@ -246,9 +239,9 @@ static const CallDesc CallTable [] = {
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          2,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
@@ -256,9 +249,9 @@ static const CallDesc CallTable [] = {
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          3,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
@@ -266,9 +259,9 @@ static const CallDesc CallTable [] = {
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          4,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
@@ -276,9 +269,9 @@ static const CallDesc CallTable [] = {
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          5,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
@@ -286,9 +279,9 @@ static const CallDesc CallTable [] = {
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          6,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
@@ -296,9 +289,9 @@ static const CallDesc CallTable [] = {
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          7,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
@@ -306,9 +299,9 @@ static const CallDesc CallTable [] = {
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -316,9 +309,9 @@ static const CallDesc CallTable [] = {
     },{
         "pushax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,           0xFF, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_SLOWER,
@@ -326,9 +319,9 @@ static const CallDesc CallTable [] = {
     },{
         "pushaysp",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -336,9 +329,9 @@ static const CallDesc CallTable [] = {
     },{
         "pusheax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          0,              0, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -346,9 +339,9 @@ static const CallDesc CallTable [] = {
     },{
         "pusheax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -356,9 +349,9 @@ static const CallDesc CallTable [] = {
     },{
         "pushwidx",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -366,9 +359,9 @@ static const CallDesc CallTable [] = {
     },{
         "pushwysp",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -376,9 +369,9 @@ static const CallDesc CallTable [] = {
     },{
         "staxysp",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -386,9 +379,9 @@ static const CallDesc CallTable [] = {
     },{
         "steaxysp",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -396,9 +389,9 @@ static const CallDesc CallTable [] = {
     },{
         "subeqysp",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -406,9 +399,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosaddax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -416,9 +409,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosaddeax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -426,9 +419,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosandax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -436,9 +429,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosandeax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -446,9 +439,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosdivax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -456,9 +449,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosdiveax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -466,9 +459,9 @@ static const CallDesc CallTable [] = {
     },{
         "toseqax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -476,9 +469,9 @@ static const CallDesc CallTable [] = {
     },{
         "toseqax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -486,9 +479,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosgeax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -496,9 +489,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosgeax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -506,9 +499,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosgtax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -516,9 +509,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosgtax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -526,9 +519,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosicmp",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -536,9 +529,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosleax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -546,9 +539,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosleax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -556,9 +549,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosltax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
                          0,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -566,9 +559,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosltax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -576,9 +569,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosmodax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -586,9 +579,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosmodeax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -596,9 +589,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosmulax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -606,9 +599,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosmuleax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -616,9 +609,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosneax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -626,9 +619,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosorax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -636,9 +629,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosoreax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -646,9 +639,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosrsubax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -656,9 +649,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosrsubeax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -666,9 +659,9 @@ static const CallDesc CallTable [] = {
     },{
         "tossubax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -676,9 +669,9 @@ static const CallDesc CallTable [] = {
     },{
         "tossubeax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -686,9 +679,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosudivax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -696,9 +689,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosudiveax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -706,9 +699,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosugeax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -716,9 +709,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosugtax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -726,9 +719,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosuleax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -736,9 +729,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosultax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -746,9 +739,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosumodax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -756,9 +749,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosumodeax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -766,9 +759,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosumulax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -776,9 +769,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosumuleax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -786,9 +779,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosxorax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -796,9 +789,9 @@ static const CallDesc CallTable [] = {
     },{
         "tosxoreax",
         {
-            /*     A               X               Y             SRegLo         SRegHi   */
+            //     A               X               Y             SRegLo         SRegHi
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,              0,
-            /*   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs   */
+            //   Ptr1Lo          Ptr1Hi           Tmp1           PFlags         ZNRegs
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_PFVAL_ALL, ZNREG_NONE
         },
         F_NONE,
@@ -808,103 +801,87 @@ static const CallDesc CallTable [] = {
 };
 #define CALL_COUNT (sizeof(CallTable) / sizeof(CallTable[0]))
 
-
-
-/*****************************************************************************/
-/*                                  Helpers                                  */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                                  Helpers
+////////////////////////////////////////////////////////////////////////////////
 
 static const CallDesc* FindCall (const char* Name)
-/* Find the function with the given name. Return a pointer to the table entry
-** or NULL if the function was not found.
-*/
+// Find the function with the given name. Return a pointer to the table entry
+// or NULL if the function was not found.
 {
-    /* Do a binary search */
+    // Do a binary search
     int First = 0;
     int Last = CALL_COUNT - 1;
     int Found = 0;
 
     while (First <= Last) {
 
-        /* Set current to mid of range */
+        // Set current to mid of range
         int Current = (Last + First) / 2;
 
-        /* Do a compare */
+        // Do a compare
         int Result = strcmp (CallTable[Current].LongFunc, Name);
         if (Result < 0) {
             First = Current + 1;
         } else {
             Last = Current - 1;
             if (Result == 0) {
-                /* Found. Repeat the procedure until the first of all entries
-                ** with the same name is found.
-                */
+                // Found. Repeat the procedure until the first of all entries
+                // with the same name is found.
                 Found = 1;
             }
         }
     }
 
-    /* Return the first entry if found, or NULL otherwise */
+    // Return the first entry if found, or NULL otherwise
     return Found? &CallTable[First] : 0;
 }
 
-
-
 static int RegMatch (short Expected, short Actual)
-/* Check for a register match. If Expected has a value, it must be identical
-** to Actual.
-*/
+// Check for a register match. If Expected has a value, it must be identical
+// to Actual.
 {
     return RegValIsUnknown (Expected) || (Expected == Actual);
 }
 
-
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                                   Code
+////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptSize1 (CodeSeg* S)
-/* Do size optimization by calling special subroutines that preload registers.
-** This routine does not work standalone, it needs a following register load
-** removal pass.
-*/
+// Do size optimization by calling special subroutines that preload registers.
+// This routine does not work standalone, it needs a following register load
+// removal pass.
 {
     CodeEntry* E;
     unsigned Changes = 0;
     unsigned I;
 
-    /* Are we optimizing for size */
+    // Are we optimizing for size
     int OptForSize = (S->CodeSizeFactor < 100);
 
-    /* Walk over the entries */
+    // Walk over the entries
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
         const CallDesc* D;
 
-        /* Get next entry */
+        // Get next entry
         E = CS_GetEntry (S, I);
 
-        /* Check if it's a subroutine call */
+        // Check if it's a subroutine call
         if (E->OPC == OP65_JSR && (D = FindCall (E->Arg)) != 0) {
 
-            /* Get input register info for this insn */
+            // Get input register info for this insn
             const RegContents* In = &E->RI->In;
 
-            /* FindCall finds the first entry that matches our function name.
-            ** The names are listed in "best match" order, so search for the
-            ** first one, that fulfills our conditions.
-            */
+            // FindCall finds the first entry that matches our function name.
+            // The names are listed in "best match" order, so search for the
+            // first one, that fulfills our conditions.
             while (1) {
 
-                /* Check the registers and allow slower code only if
-                ** optimizing for size.
-                */
+                // Check the registers and allow slower code only if
+                // optimizing for size.
                 if ((OptForSize || (D->Flags & F_SLOWER) == 0)          &&
                     RegMatch (D->Regs.RegA,    In->RegA)                &&
                     RegMatch (D->Regs.RegX,    In->RegX)                &&
@@ -912,62 +889,59 @@ unsigned OptSize1 (CodeSeg* S)
                     RegMatch (D->Regs.SRegLo,  In->SRegLo)              &&
                     RegMatch (D->Regs.SRegHi,  In->SRegHi)) {
 
-                    /* Ok, match for all conditions */
+                    // Ok, match for all conditions
                     CodeEntry* X;
                     X = NewCodeEntry (E->OPC, E->AM, D->ShortFunc, 0, E->LI);
                     CS_InsertEntry (S, X, I+1);
                     CS_DelEntry (S, I);
 
-                    /* Remember that we had changes */
+                    // Remember that we had changes
                     ++Changes;
 
-                    /* Done */
+                    // Done
                     break;
                 }
 
-                /* Next table entry, bail out if next entry not valid */
+                // Next table entry, bail out if next entry not valid
                 if (++D >= CallTable + CALL_COUNT ||
                     strcmp (D->LongFunc, E->Arg) != 0) {
-                    /* End of table or entries reached */
+                    // End of table or entries reached
                     break;
                 }
             }
         }
 
-        /* Next entry */
+        // Next entry
         ++I;
 
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }
 
-
-
 unsigned OptSize2 (CodeSeg* S)
-/* Do size optimization by using shorter code sequences, even if this
-** introduces relations between instructions. This step must be one of the
-** last steps, because it makes further work much more difficult.
-*/
+// Do size optimization by using shorter code sequences, even if this
+// introduces relations between instructions. This step must be one of the
+// last steps, because it makes further work much more difficult.
 {
     unsigned Changes = 0;
     unsigned I;
 
-    /* Walk over the entries */
+    // Walk over the entries
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-        /* Get next entry */
+        // Get next entry
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Get the input registers */
+        // Get the input registers
         const RegContents* In = &E->RI->In;
 
-        /* Assume we have no replacement */
+        // Assume we have no replacement
         CodeEntry* X = 0;
 
-        /* Check the instruction */
+        // Check the instruction
         switch (E->OPC) {
 
             case OP65_LDA:
@@ -1014,23 +988,23 @@ unsigned OptSize2 (CodeSeg* S)
                 break;
 
             default:
-                /* Avoid gcc warnings */
+                // Avoid gcc warnings
                 break;
 
         }
 
-        /* Insert the replacement if we have one */
+        // Insert the replacement if we have one
         if (X) {
             CS_InsertEntry (S, X, I+1);
             CS_DelEntry (S, I);
             ++Changes;
         }
 
-        /* Next entry */
+        // Next entry
         ++I;
 
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }

@@ -1,55 +1,49 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 target.c                                  */
-/*                                                                           */
-/*                           Target specification                            */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2015, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//                                 target.c
+//
+//                           Target specification
+//
+//
+//
+// (C) 2000-2015, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 #include <stdlib.h>
 #include <string.h>
 
-/* common */
+// common
 #include "chartype.h"
 #include "check.h"
 #include "target.h"
 
+////////////////////////////////////////////////////////////////////////////////
+//                                   Data
+////////////////////////////////////////////////////////////////////////////////
 
-
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* Translation table with direct (no) translation */
+// Translation table with direct (no) translation
 static const unsigned char CTNone[256] = {
     0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F,
     0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,
@@ -69,7 +63,7 @@ static const unsigned char CTNone[256] = {
     0xF0,0xF1,0xF2,0xF3,0xF4,0xF5,0xF6,0xF7,0xF8,0xF9,0xFA,0xFB,0xFC,0xFD,0xFE,0xFF,
 };
 
-/* Translation table ISO-8859-1 -> AtASCII */
+// Translation table ISO-8859-1 -> AtASCII
 static const unsigned char CTAtari[256] = {
     0x00,0x01,0x02,0x03,0x04,0x05,0x06,0xFD,0x08,0x7F,0x9B,0x0B,0x7D,0x0D,0x0E,0x0F,
     0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,
@@ -89,7 +83,7 @@ static const unsigned char CTAtari[256] = {
     0xF0,0xF1,0xF2,0xF3,0xF4,0xF5,0xF6,0xF7,0xF8,0xF9,0xFA,0xFB,0xFC,0xFD,0xFE,0xFF,
 };
 
-/* Translation table ISO-8859-1 -> OSASCII */
+// Translation table ISO-8859-1 -> OSASCII
 static const unsigned char CTOSI[256] = {
     0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F,
     0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,
@@ -109,7 +103,7 @@ static const unsigned char CTOSI[256] = {
     0xF0,0xF1,0xF2,0xF3,0xF4,0xF5,0xF6,0xF7,0xF8,0xF9,0xFA,0xFB,0xFC,0xFD,0xFE,0xFF,
 };
 
-/* Translation table ISO-8859-1 -> PetSCII */
+// Translation table ISO-8859-1 -> PetSCII
 static const unsigned char CTPET[256] = {
     0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x14,0x09,0x0D,0x11,0x93,0x0A,0x0E,0x0F,
     0x10,0x0B,0x12,0x13,0x08,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,
@@ -129,7 +123,7 @@ static const unsigned char CTPET[256] = {
     0xF0,0xF1,0xF2,0xF3,0xF4,0xF5,0xF6,0xF7,0xF8,0xF9,0xFA,0xFB,0xFC,0xFD,0xFE,0xFF,
 };
 
-/* Translation table KOI8-R -> Agat-9 */
+// Translation table KOI8-R -> Agat-9
 static unsigned char CTAgat[256] = {
     0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F,
     0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,
@@ -149,19 +143,18 @@ static unsigned char CTAgat[256] = {
     0xF0,0xF1,0xF2,0xF3,0xF4,0xF5,0xF6,0xF7,0xF8,0xF9,0xFA,0xFB,0xFC,0xFD,0xFE,0xFF,
 };
 
-/* One entry in the target map */
+// One entry in the target map
 typedef struct TargetEntry TargetEntry;
 struct TargetEntry {
-    char        Name[13];               /* Target name */
-    target_t    Id;                     /* Target ID */
+    char        Name[13];               // Target name
+    target_t    Id;                     // Target ID
 };
 
-/* Table that maps target names to IDs.
-** Allows multiple entries for one target ID (target name aliases).
-** CAUTION: must be alphabetically for bsearch().
-*/
+// Table that maps target names to IDs.
+// Allows multiple entries for one target ID (target name aliases).
+// CAUTION: must be alphabetically for bsearch().
 static const TargetEntry TargetMap[] = {
-/* BEGIN SORTED.SH */
+// BEGIN SORTED.SH
     {   "agat",         TGT_AGAT         },
     {   "apple2",       TGT_APPLE2       },
     {   "apple2enh",    TGT_APPLE2ENH    },
@@ -202,12 +195,11 @@ static const TargetEntry TargetMap[] = {
     {   "sym1",         TGT_SYM1         },
     {   "telestrat",    TGT_TELESTRAT    },
     {   "vic20",        TGT_VIC20        },
-/* END SORTED.SH */
+// END SORTED.SH
 };
 #define MAP_ENTRY_COUNT         (sizeof (TargetMap) / sizeof (TargetMap[0]))
 
-
-/* Table with target properties by target ID */
+// Table with target properties by target ID
 static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "none",           CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "module",         CPU_6502,       BINFMT_O65,         CTNone  },
@@ -250,55 +242,44 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "agat",           CPU_6502,       BINFMT_BINARY,      CTAgat  },
 };
 
-/* Target system */
+// Target system
 target_t Target = TGT_NONE;
 
-
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                                   Code
+////////////////////////////////////////////////////////////////////////////////
 
 static int Compare (const void* Key, const void* Entry)
-/* Compare function for bsearch */
+// Compare function for bsearch
 {
     return strcmp ((const char*) Key, ((const TargetEntry*)Entry)->Name);
 }
 
-
-
 target_t FindTarget (const char* Name)
-/* Find a target by name and return the target ID. TGT_UNKNOWN is returned if
-** the given name is no valid target.
-*/
+// Find a target by name and return the target ID. TGT_UNKNOWN is returned if
+// the given name is no valid target.
 {
-    /* Search for the name in the map */
+    // Search for the name in the map
     const TargetEntry* T;
     T = bsearch (Name, TargetMap, MAP_ENTRY_COUNT, sizeof (TargetMap[0]), Compare);
 
-    /* Return the target ID */
+    // Return the target ID
     return (T == 0)? TGT_UNKNOWN : T->Id;
 }
 
-
-
 const TargetProperties* GetTargetProperties (target_t Target)
-/* Return the properties for a target */
+// Return the properties for a target
 {
-    /* Must have a valid target ID */
+    // Must have a valid target ID
     PRECONDITION (Target >= 0 && Target < TGT_COUNT);
 
-    /* Return the array entry */
+    // Return the array entry
     return &PropertyTable[Target];
 }
 
-
-
 const char* GetTargetName (target_t Target)
-/* Return the name of a target */
+// Return the name of a target
 {
-    /* Return the array entry */
+    // Return the array entry
     return GetTargetProperties (Target)->Name;
 }

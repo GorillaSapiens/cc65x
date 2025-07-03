@@ -1,56 +1,50 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                tgttrans.c                                 */
-/*                                                                           */
-/*                         Character set translation                         */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//                                tgttrans.c
+//
+//                         Character set translation
+//
+//
+//
+// (C) 2000-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 #include <string.h>
 
-/* common */
+// common
 #include "check.h"
 #include "target.h"
 #include "tgttrans.h"
 #include "coll.h"
 #include "xmalloc.h"
 
+////////////////////////////////////////////////////////////////////////////////
+//                                   Data
+////////////////////////////////////////////////////////////////////////////////
 
-
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* Translation table actually used. Default is no translation */
+// Translation table actually used. Default is no translation
 static unsigned char Tab[256] = {
     0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F,
     0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,
@@ -73,40 +67,30 @@ static unsigned char Tab[256] = {
 #define MAX_CHARMAP_STACK   16
 static Collection CharmapStack = STATIC_COLLECTION_INITIALIZER;
 
-
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                                   Code
+////////////////////////////////////////////////////////////////////////////////
 
 void TgtTranslateInit (void)
-/* Initialize the translation tables */
+// Initialize the translation tables
 {
-    /* Copy the translation for the selected target */
+    // Copy the translation for the selected target
     memcpy (Tab, GetTargetProperties (Target)->CharMap, sizeof (Tab));
 }
 
-
-
 int TgtTranslateChar (int C)
-/* Translate one character from the source character set into the target
-** system character set.
-*/
+// Translate one character from the source character set into the target
+// system character set.
 {
-    /* Translate */
+    // Translate
     return Tab[C & 0xFF];
 }
 
-
-
 void TgtTranslateBuf (void* Buf, unsigned Len)
-/* Translate a buffer of the given length from the source character set into
-** the target system character set.
-*/
+// Translate a buffer of the given length from the source character set into
+// the target system character set.
 {
-    /* Translate */
+    // Translate
     unsigned char* B = (unsigned char*)Buf;
     while (Len--) {
         *B = Tab[*B];
@@ -114,43 +98,35 @@ void TgtTranslateBuf (void* Buf, unsigned Len)
     }
 }
 
-
-
 void TgtTranslateStrBuf (StrBuf* Buf)
-/* Translate a string buffer from the source character set into the target
-** system character set.
-*/
+// Translate a string buffer from the source character set into the target
+// system character set.
 {
     unsigned char* B = (unsigned char*)SB_GetBuf(Buf);
     unsigned char* Cooked = (unsigned char*)SB_GetCooked(Buf);
     unsigned Len = SB_GetLen(Buf);
 
-    /* Translate */
+    // Translate
     while (Len--) {
         if (*Cooked) {
             *B = Tab[*B];
         }
-        /* else { *B = *B; } */
+        // else { *B = *B; }
         ++B;
         ++Cooked;
     }
 }
 
-
-
 void TgtTranslateSet (unsigned Index, unsigned char C)
-/* Set the translation code for the given character */
+// Set the translation code for the given character
 {
     CHECK (Index < (sizeof (Tab) / sizeof(Tab[0])));
     Tab[Index] = C;
 }
 
-
-
 int TgtTranslatePush (void)
-/* Pushes the current translation table to the internal stack
-** Returns 1 on success, 0 on stack full
-*/
+// Pushes the current translation table to the internal stack
+// Returns 1 on success, 0 on stack full
 {
     unsigned char* TempTab;
 
@@ -165,12 +141,9 @@ int TgtTranslatePush (void)
     return 1;
 }
 
-
-
 int TgtTranslatePop (void)
-/* Pops a translation table from the internal stack into the current table
-** Returns 1 on success, 0 on stack empty
-*/
+// Pops a translation table from the internal stack into the current table
+// Returns 1 on success, 0 on stack empty
 {
     unsigned char* TempTab;
 
@@ -186,10 +159,8 @@ int TgtTranslatePop (void)
     return 1;
 }
 
-
-
 int TgtTranslateStackIsEmpty (void)
-/* Returns 1 if the internal stack is empty */
+// Returns 1 if the internal stack is empty
 {
     return CollCount (&CharmapStack) == 0;
 }

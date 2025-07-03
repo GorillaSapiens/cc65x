@@ -1,55 +1,53 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                infofile.h                                 */
-/*                                                                           */
-/*                      Disassembler info file handling                      */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2014, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//                                infofile.h
+//
+//                      Disassembler info file handling
+//
+//
+//
+// (C) 2000-2014, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <limits.h>
 #if defined(_MSC_VER)
-/* Microsoft compiler */
+// Microsoft compiler
 #  include <io.h>
 #else
-/* Anyone else */
+// Anyone else
 #  include <unistd.h>
 #endif
 
-/* common */
+// common
 #include "cpu.h"
 #include "xmalloc.h"
 
-/* da65 */
+// da65
 #include "asminc.h"
 #include "attrtab.h"
 #include "comments.h"
@@ -62,28 +60,22 @@
 #include "segment.h"
 #include "handler.h"
 
-
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                                   Code
+////////////////////////////////////////////////////////////////////////////////
 
 static void AddAttr (const char* Name, unsigned* Set, unsigned Attr)
-/* Add an attribute to the set and check that it is not given twice */
+// Add an attribute to the set and check that it is not given twice
 {
     if (*Set & Attr) {
-        /* Attribute is already in the set */
+        // Attribute is already in the set
         InfoError ("%s given twice", Name);
     }
     *Set |= Attr;
 }
 
-
-
 static void AsmIncSection (void)
-/* Parse a asminc section */
+// Parse a asminc section
 {
     static const IdentTok LabelDefs[] = {
         {   "COMMENTSTART",     INFOTOK_COMMENTSTART    },
@@ -91,24 +83,24 @@ static void AsmIncSection (void)
         {   "IGNOREUNKNOWN",    INFOTOK_IGNOREUNKNOWN   },
     };
 
-    /* Locals - initialize to avoid gcc warnings */
+    // Locals - initialize to avoid gcc warnings
     char* Name = 0;
     int CommentStart = EOF;
     int IgnoreUnknown = -1;
 
-    /* Skip the token */
+    // Skip the token
     InfoNextTok ();
 
-    /* Expect the opening curly brace */
+    // Expect the opening curly brace
     InfoConsumeLCurly ();
 
-    /* Look for section tokens */
+    // Look for section tokens
     while (InfoTok != INFOTOK_RCURLY) {
 
-        /* Convert to special token */
+        // Convert to special token
         InfoSpecialToken (LabelDefs, ENTRY_COUNT (LabelDefs), "Asminc directive");
 
-        /* Look at the token */
+        // Look at the token
         switch (InfoTok) {
 
             case INFOTOK_COMMENTSTART:
@@ -148,11 +140,11 @@ static void AsmIncSection (void)
                 Internal ("Unexpected token: %u", InfoTok);
         }
 
-        /* Directive is followed by a semicolon */
+        // Directive is followed by a semicolon
         InfoConsumeSemi ();
     }
 
-    /* Check for the necessary data and assume defaults */
+    // Check for the necessary data and assume defaults
     if (Name == 0) {
         InfoError ("File name is missing");
     }
@@ -163,20 +155,18 @@ static void AsmIncSection (void)
         IgnoreUnknown = 0;
     }
 
-    /* Open the file and read the symbol definitions */
+    // Open the file and read the symbol definitions
     AsmInc (Name, CommentStart, IgnoreUnknown);
 
-    /* Delete the dynamically allocated memory for Name */
+    // Delete the dynamically allocated memory for Name
     xfree (Name);
 
-    /* Consume the closing brace */
+    // Consume the closing brace
     InfoConsumeRCurly ();
 }
 
-
-
 static void GlobalSection (void)
-/* Parse a global section */
+// Parse a global section
 {
     static const IdentTok GlobalDefs[] = {
         {   "ARGUMENTCOL",      INFOTOK_ARGUMENT_COLUMN },
@@ -201,19 +191,19 @@ static void GlobalSection (void)
         {   "TEXTCOLUMN",       INFOTOK_TEXT_COLUMN     },
     };
 
-    /* Skip the token */
+    // Skip the token
     InfoNextTok ();
 
-    /* Expect the opening curly brace */
+    // Expect the opening curly brace
     InfoConsumeLCurly ();
 
-    /* Look for section tokens */
+    // Look for section tokens
     while (InfoTok != INFOTOK_RCURLY) {
 
-        /* Convert to special token */
+        // Convert to special token
         InfoSpecialToken (GlobalDefs, ENTRY_COUNT (GlobalDefs), "Global directive");
 
-        /* Look at the token */
+        // Look at the token
         switch (InfoTok) {
 
             case INFOTOK_ARGUMENT_COLUMN:
@@ -364,19 +354,17 @@ static void GlobalSection (void)
 
         }
 
-        /* Directive is followed by a semicolon */
+        // Directive is followed by a semicolon
         InfoConsumeSemi ();
 
     }
 
-    /* Consume the closing brace */
+    // Consume the closing brace
     InfoConsumeRCurly ();
 }
 
-
-
 static void LabelSection (void)
-/* Parse a label section */
+// Parse a label section
 {
     static const IdentTok LabelDefs[] = {
         {   "COMMENT",      INFOTOK_COMMENT     },
@@ -386,26 +374,26 @@ static void LabelSection (void)
         {   "PARAMSIZE",    INFOTOK_PARAMSIZE   },
     };
 
-    /* Locals - initialize to avoid gcc warnings */
+    // Locals - initialize to avoid gcc warnings
     char* Name      = 0;
     char* Comment   = 0;
     long Value      = -1;
     long Size       = -1;
     long ParamSize  = -1;
 
-    /* Skip the token */
+    // Skip the token
     InfoNextTok ();
 
-    /* Expect the opening curly brace */
+    // Expect the opening curly brace
     InfoConsumeLCurly ();
 
-    /* Look for section tokens */
+    // Look for section tokens
     while (InfoTok != INFOTOK_RCURLY) {
 
-        /* Convert to special token */
+        // Convert to special token
         InfoSpecialToken (LabelDefs, ENTRY_COUNT (LabelDefs), "Label attribute");
 
-        /* Look at the token */
+        // Look at the token
         switch (InfoTok) {
 
             case INFOTOK_ADDR:
@@ -468,11 +456,11 @@ static void LabelSection (void)
                 Internal ("Unexpected token: %u", InfoTok);
         }
 
-        /* Directive is followed by a semicolon */
+        // Directive is followed by a semicolon
         InfoConsumeSemi ();
     }
 
-    /* Did we get the necessary data */
+    // Did we get the necessary data
     if (Name == 0) {
         InfoError ("Label name is missing");
     }
@@ -483,7 +471,7 @@ static void LabelSection (void)
         InfoError ("Label value is missing");
     }
     if (Size < 0) {
-        /* Use default */
+        // Use default
         Size = 1;
     }
     if (Value + Size > 0x10000) {
@@ -493,9 +481,9 @@ static void LabelSection (void)
         InfoError ("Label for address $%04lX already defined", Value);
     }
 
-    /* Define the label(s) */
+    // Define the label(s)
     if (Name[0] == '\0') {
-        /* Size has already beed checked */
+        // Size has already beed checked
         AddUnnamedLabel (Value);
     } else {
         AddExtLabelRange ((unsigned) Value, Name, Size);
@@ -504,23 +492,21 @@ static void LabelSection (void)
         SetSubroutineParamSize ((unsigned) Value, (unsigned) ParamSize);
     }
 
-    /* Define the comment */
+    // Define the comment
     if (Comment) {
         SetComment (Value, Comment);
     }
 
-    /* Delete the dynamically allocated memory for Name and Comment */
+    // Delete the dynamically allocated memory for Name and Comment
     xfree (Name);
     xfree (Comment);
 
-    /* Consume the closing brace */
+    // Consume the closing brace
     InfoConsumeRCurly ();
 }
 
-
-
 static void RangeSection (void)
-/* Parse a range section */
+// Parse a range section
 {
     static const IdentTok RangeDefs[] = {
         {   "COMMENT",          INFOTOK_COMMENT  },
@@ -544,8 +530,7 @@ static void RangeSection (void)
         {   "WORDTABLE",        INFOTOK_WORDTAB  },
     };
 
-
-    /* Which values did we get? */
+    // Which values did we get?
     enum {
         tNone     = 0x00,
         tStart    = 0x01,
@@ -559,7 +544,7 @@ static void RangeSection (void)
     };
     unsigned Attributes = tNone;
 
-    /* Locals - initialize to avoid gcc warnings */
+    // Locals - initialize to avoid gcc warnings
     uint32_t Start      = 0;
     uint32_t End        = 0;
     unsigned char Type  = 0;
@@ -569,20 +554,19 @@ static void RangeSection (void)
     unsigned MemberSize = 0;
     unsigned Unit       = 0;
 
-
-    /* Skip the token */
+    // Skip the token
     InfoNextTok ();
 
-    /* Expect the opening curly brace */
+    // Expect the opening curly brace
     InfoConsumeLCurly ();
 
-    /* Look for section tokens */
+    // Look for section tokens
     while (InfoTok != INFOTOK_RCURLY) {
 
-        /* Convert to special token */
+        // Convert to special token
         InfoSpecialToken (RangeDefs, ENTRY_COUNT (RangeDefs), "Range attribute");
 
-        /* Look at the token */
+        // Look at the token
         switch (InfoTok) {
 
             case INFOTOK_COMMENT:
@@ -700,12 +684,12 @@ static void RangeSection (void)
                 Internal ("Unexpected token: %u", InfoTok);
         }
 
-        /* Directive is followed by a semicolon */
+        // Directive is followed by a semicolon
         InfoConsumeSemi ();
 
     }
 
-    /* Did we get all required values? */
+    // Did we get all required values?
     if ((Attributes & tNeeded) != tNeeded) {
         InfoError ("Required values missing from this section");
     }
@@ -719,7 +703,7 @@ static void RangeSection (void)
         }
     }
 
-    /* Only tables support unit sizes */
+    // Only tables support unit sizes
     if ((Attributes & tUnit) &&
         Type != atAddrTab &&
         Type != atByteTab &&
@@ -731,7 +715,7 @@ static void RangeSection (void)
         InfoError ("Only table types support unit size");
     }
 
-    /* Mark each unit separator */
+    // Mark each unit separator
     if (Attributes & tUnit) {
         unsigned i;
         for (i = Start; i < End; i += Unit) {
@@ -739,43 +723,41 @@ static void RangeSection (void)
         }
     }
 
-    /* Start must be less than end */
+    // Start must be less than end
     if (Start > End) {
         InfoError ("Start value must not be greater than end value");
     }
 
-    /* Check the granularity */
+    // Check the granularity
     if (((End - Start + 1) % MemberSize) != 0) {
         InfoError ("Type of range needs a granularity of %u", MemberSize);
     }
 
-    /* Set the range */
+    // Set the range
     MarkRange (Start, End, Type | AddrMode);
 
-    /* Do we have a label? */
+    // Do we have a label?
     if (Attributes & tName) {
 
-        /* Define a label for the table */
+        // Define a label for the table
         AddExtLabel (Start, Name);
 
-        /* Set the comment if we have one */
+        // Set the comment if we have one
         if (Comment) {
             SetComment (Start, Comment);
         }
 
-        /* Delete name and comment */
+        // Delete name and comment
         xfree (Name);
         xfree (Comment);
     }
 
-    /* Consume the closing brace */
+    // Consume the closing brace
     InfoConsumeRCurly ();
 }
 
-
-
 static void SegmentSection (void)
-/* Parse a segment section */
+// Parse a segment section
 {
     static const IdentTok LabelDefs[] = {
         {   "END",      INFOTOK_END     },
@@ -783,24 +765,24 @@ static void SegmentSection (void)
         {   "START",    INFOTOK_START   },
     };
 
-    /* Locals - initialize to avoid gcc warnings */
+    // Locals - initialize to avoid gcc warnings
     long End    = -1;
     long Start  = -1;
     char* Name  = 0;
 
-    /* Skip the token */
+    // Skip the token
     InfoNextTok ();
 
-    /* Expect the opening curly brace */
+    // Expect the opening curly brace
     InfoConsumeLCurly ();
 
-    /* Look for section tokens */
+    // Look for section tokens
     while (InfoTok != INFOTOK_RCURLY) {
 
-        /* Convert to special token */
+        // Convert to special token
         InfoSpecialToken (LabelDefs, ENTRY_COUNT (LabelDefs), "Segment attribute");
 
-        /* Look at the token */
+        // Look at the token
         switch (InfoTok) {
 
             case INFOTOK_END:
@@ -839,11 +821,11 @@ static void SegmentSection (void)
                 Internal ("Unexpected token: %u", InfoTok);
         }
 
-        /* Directive is followed by a semicolon */
+        // Directive is followed by a semicolon
         InfoConsumeSemi ();
     }
 
-    /* Did we get the necessary data, and is it correct? */
+    // Did we get the necessary data, and is it correct?
     if (Name == 0 || Name[0] == '\0') {
         InfoError ("Segment name is missing");
     }
@@ -857,25 +839,23 @@ static void SegmentSection (void)
         InfoError ("Start address of segment is greater than end address");
     }
 
-    /* Check that segments do not overlap */
+    // Check that segments do not overlap
     if (SegmentDefined ((unsigned) Start, (unsigned) End)) {
         InfoError ("Segments must not overlap");
     }
 
-    /* Remember the segment data */
+    // Remember the segment data
     AddAbsSegment ((unsigned) Start, (unsigned) End, Name);
 
-    /* Delete the dynamically allocated memory for Name */
+    // Delete the dynamically allocated memory for Name
     xfree (Name);
 
-    /* Consume the closing brace */
+    // Consume the closing brace
     InfoConsumeRCurly ();
 }
 
-
-
 static void InfoParse (void)
-/* Parse the config file */
+// Parse the config file
 {
     static const IdentTok Globals[] = {
         {   "ASMINC",   INFOTOK_ASMINC  },
@@ -887,10 +867,10 @@ static void InfoParse (void)
 
     while (InfoTok != INFOTOK_EOF) {
 
-        /* Convert an identifier into a token */
+        // Convert an identifier into a token
         InfoSpecialToken (Globals, ENTRY_COUNT (Globals), "Config directive");
 
-        /* Check the token */
+        // Check the token
         switch (InfoTok) {
 
             case INFOTOK_ASMINC:
@@ -917,25 +897,23 @@ static void InfoParse (void)
                 Internal ("Unexpected token: %u", InfoTok);
         }
 
-        /* Semicolon expected */
+        // Semicolon expected
         InfoConsumeSemi ();
     }
 }
 
-
-
 void ReadInfoFile (void)
-/* Read the info file */
+// Read the info file
 {
-    /* Check if we have a info file given */
+    // Check if we have a info file given
     if (InfoAvail ()) {
-        /* Open the config file */
+        // Open the config file
         InfoOpenInput ();
 
-        /* Parse the config file */
+        // Parse the config file
         InfoParse ();
 
-        /* Close the file */
+        // Close the file
         InfoCloseInput ();
     }
 }

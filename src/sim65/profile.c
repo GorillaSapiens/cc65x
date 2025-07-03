@@ -1,32 +1,32 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 profile.c                                 */
-/*                                                                           */
-/*           Function profiling functionality sim65 6502 simulator           */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2025, Gorilla Sapiens                                                 */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+////////////////////////////////////////////////////////////////////////////////
+//
+//                                 profile.c
+//
+//           Function profiling functionality sim65 6502 simulator
+//
+//
+//
+// (C) 2025, Gorilla Sapiens
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
 #include <string.h>
@@ -45,7 +45,7 @@
 bool enableProfiling = false;
 
 const char *symInfoFile = NULL;
-/* file containing symbol infor used by profiler */
+// file containing symbol infor used by profiler
 
 static uint16_t resetVector = 0xFFFF;
 
@@ -137,7 +137,7 @@ static void ProfileLogCall(uint16_t caller, uint16_t callee) {
 }
 
 static void ProfileLogReturn(uint16_t caller, uint16_t callee, uint64_t ticks) {
-    ProfileTimeEntry *calleeEntry = EnsureTimeEntry(callee); /* must be first !!! */
+    ProfileTimeEntry *calleeEntry = EnsureTimeEntry(callee); // must be first !!!
     ProfileTimeEntry *callerEntry = EnsureTimeEntry(caller);
     callerEntry->childTicks += ticks;
     calleeEntry->totalTicks += ticks;
@@ -318,7 +318,7 @@ static void ProfileDump(void) {
     int i, j, k;
     int gap = 0;
 
-    /* the startup function isn't called by a JSR, so we need to update it here. */
+    // the startup function isn't called by a JSR, so we need to update it here.
     ProfileTimeEntry *startup = EnsureTimeEntry(resetVector);
     grandTotal = startup->totalTicks = Peripherals.Counter.ClockCycles;
 

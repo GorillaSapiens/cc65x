@@ -1,18 +1,15 @@
-/* GEOS resource compiler
+// GEOS resource compiler
+// 
+// by Maciej 'YTM/Elysium' Witkowiak
+// 
+// see GEOSLib documentation for license info
 
-   by Maciej 'YTM/Elysium' Witkowiak
+// - make it work, then do it better
+// - more or less comments? it was hard to code, should be even harder to
+// understand =D
+// - add loadable icons feature (binary - 63 bytes)
 
-   see GEOSLib documentation for license info
-*/
-
-/* - make it work, then do it better
-   - more or less comments? it was hard to code, should be even harder to
-     understand =D
-   - add loadable icons feature (binary - 63 bytes)
-*/
-
-/* - err, maybe free allocated memory, huh? (who cares, it's just a little prog...)
-*/
+// - err, maybe free allocated memory, huh? (who cares, it's just a little prog...)
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,7 +18,7 @@
 #include <errno.h>
 #include <time.h>
 
-/* common stuff */
+// common stuff
 #include "abend.h"
 #include "cmdline.h"
 #include "fname.h"
@@ -30,10 +27,8 @@
 #include "version.h"
 #include "xmalloc.h"
 
-/* I hope that no one will be able to create a .grc bigger than this... */
+// I hope that no one will be able to create a .grc bigger than this...
 #define BLOODY_BIG_BUFFER 65000
-
-
 
 struct menuitem {
     char *name;
@@ -108,7 +103,6 @@ int apple = 0;
 char outputCMode[2] = "w";
 char outputSMode[2] = "w";
 
-
 static void Usage (void)
 {
     printf (
@@ -127,18 +121,16 @@ static void Usage (void)
         ProgName);
 }
 
-
 static void OptHelp (const char* Opt attribute ((unused)),
                      const char* Arg attribute ((unused)))
-/* Print usage information and exit */
+// Print usage information and exit
 {
     Usage ();
     exit (EXIT_SUCCESS);
 }
 
-
 static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
-/* Set the target system */
+// Set the target system
 {
     switch (FindTarget (Arg)) {
 
@@ -155,22 +147,19 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
             break;
 
         default:
-            /* Target is known but unsupported */
+            // Target is known but unsupported
             AbEnd ("Unsupported target system '%s'", Arg);
             break;
     }
 }
 
-
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
-/* Print the program version */
+// Print the program version
 {
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
     exit(EXIT_SUCCESS);
 }
-
-
 
 static void printCHeader (void)
 {
@@ -184,7 +173,6 @@ static void printCHeader (void)
         "//\n\n");
 }
 
-
 static void printSHeader (void)
 {
     fprintf (outputSFile,
@@ -196,7 +184,6 @@ static void printSHeader (void)
         ";\tEdit proper resource file instead.\n"
         ";\n\n");
 }
-
 
 static void openCFile (void)
 {
@@ -211,7 +198,6 @@ static void openCFile (void)
     }
 }
 
-
 static void openSFile (void)
 {
     if ((outputSFile = fopen (outputSName, outputSMode)) == 0) {
@@ -225,10 +211,9 @@ static void openSFile (void)
     }
 }
 
-
 static int findToken (const char * const *tokenTbl, const char *token)
 {
-    /* takes as input table of tokens and token, returns position in table or -1 if not found */
+    // takes as input table of tokens and token, returns position in table or -1 if not found
     int i;
 
     if (token != NULL) {
@@ -242,18 +227,15 @@ static int findToken (const char * const *tokenTbl, const char *token)
     return -1;
 }
 
-
 static char *nextPhrase (void)
 {
     return strtok (NULL, "\"");
 }
 
-
 static char *nextWord (void)
 {
     return strtok (NULL, " ");
 }
-
 
 static void setLen (char *name, unsigned len)
 {
@@ -261,7 +243,6 @@ static void setLen (char *name, unsigned len)
         name[len] = '\0';
     }
 }
-
 
 static void fillOut (char *name, int len, char *filler)
 {
@@ -276,7 +257,6 @@ static void fillOut (char *name, int len, char *filler)
     }
 }
 
-
 static char *bintos (unsigned char a, char out[7])
 {
     int i=0;
@@ -290,10 +270,9 @@ static char *bintos (unsigned char a, char out[7])
     return out;
 }
 
-
 static int getNameSize (const char *word)
 {
-    /* count length of a word using BSW 9 font table */
+    // count length of a word using BSW 9 font table
     int a = 0, i = 0;
 
     while (word[i] != '\0') {
@@ -303,7 +282,6 @@ static int getNameSize (const char *word)
 
     return a;
 }
-
 
 static void DoMenu (void)
 {
@@ -353,18 +331,18 @@ static void DoMenu (void)
 
     curItem->next = NULL;
 
-    /* count menu sizes */
+    // count menu sizes
     size = 0;
     curItem = myMenu.item;
     if (strstr (myMenu.type, "HORIZONTAL") != NULL) {
-        /* menu is HORIZONTAL, ysize=15, sum xsize of all items +~8?*/
+        // menu is HORIZONTAL, ysize=15, sum xsize of all items +~8?
         myMenu.bot = myMenu.top + 15;
         for (a = 0; a != item; a++) {
             size += getNameSize (curItem->name);
             curItem = curItem->next;
         }
     } else {
-        /* menu is VERTICAL, ysize=item*15, count largest xsize of all items +~8? */
+        // menu is VERTICAL, ysize=item*15, count largest xsize of all items +~8?
         myMenu.bot = myMenu.top + (14 * item);
         for (a = 0; a != item; a++) {
             tmpsize = getNameSize (curItem->name);
@@ -376,7 +354,7 @@ static void DoMenu (void)
 
     curItem = myMenu.item;
     for (a = 0; a != item; a++) {
-        /* print prototype only if MENU_ACTION or DYN_SUB_MENU are present in type */
+        // print prototype only if MENU_ACTION or DYN_SUB_MENU are present in type
         if ((strstr (curItem->type, "MENU_ACTION") != NULL) || (strstr (curItem->type, "DYN_SUB_MENU") != NULL)) {
             fprintf (outputCFile,
                 "void %s (void);\n",
@@ -415,7 +393,6 @@ static void DoMenu (void)
         AbEnd ("Error closing %s: %s", outputCName, strerror (errno));
     }
 }
-
 
 static void DoHeader (void)
 {
@@ -460,7 +437,7 @@ static void DoHeader (void)
     nextPhrase ();
     myHead.version = nextPhrase ();
 
-    /* put default values into myHead here */
+    // put default values into myHead here
     myHead.author = "cc65";
     myHead.info = "Program compiled with cc65 and GEOSLib.";
     myHead.dostype = 128;
@@ -490,15 +467,15 @@ static void DoHeader (void)
                 AbEnd ("Unknown field '%s' in header '%s'", token, myHead.dosname);
                 break;
 
-            case 0: /* author */
+            case 0: // author
                 myHead.author = nextPhrase ();
                 break;
 
-            case 1: /* info */
+            case 1: // info
                 myHead.info = nextPhrase ();
                 break;
 
-            case 2: /* date */
+            case 2: // date
                 myHead.year = atoi (nextWord ());
                 myHead.month = atoi (nextWord ());
                 myHead.day = atoi (nextWord ());
@@ -506,7 +483,7 @@ static void DoHeader (void)
                 myHead.min = atoi (nextWord ());
                 break;
 
-            case 3: /* dostype */
+            case 3: // dostype
                 switch (i = findToken (hdrDOSTp, nextWord ())) {
                     case -1:
                         AbEnd ("Unknown dostype in header '%s'", myHead.dosname);
@@ -517,7 +494,7 @@ static void DoHeader (void)
                 }
                 break;
 
-            case 4: /* mode */
+            case 4: // mode
                 switch (findToken (hdrModes, nextWord ())) {
                     case -1:
                         AbEnd ("Unknown mode in header '%s'", myHead.dosname);
@@ -536,7 +513,7 @@ static void DoHeader (void)
                 }
                 break;
 
-            case 5: /* structure */
+            case 5: // structure
                 switch (findToken (hdrStructTp, nextWord ())) {
                     case -1:
                         AbEnd ("unknown structure type in header '%s'", myHead.dosname);
@@ -551,13 +528,13 @@ static void DoHeader (void)
                 }
                 break;
 
-            case 6: /* icon */
+            case 6: // icon
                 myHead.icon = nextPhrase ();
                 break;
         }
     }
 
-    /* OK, all information is gathered, do flushout */
+    // OK, all information is gathered, do flushout
 
     fprintf (outputSFile,
         "\t\t.segment \"DIRENTRY\"\n\n");
@@ -662,7 +639,6 @@ static void DoHeader (void)
     }
 }
 
-
 static void DoMemory (void)
 {
     char *token;
@@ -692,17 +668,17 @@ static void DoMemory (void)
                 AbEnd ("Unknown field '%s' in MEMORY description", token);
                 break;
 
-            case 0: /* stacksize */
+            case 0: // stacksize
                 stacksize = strtol (nextWord (), NULL, 0);
                 token = NULL;
                 break;
 
-            case 1: /* overlaysize */
+            case 1: // overlaysize
                 overlaysize = strtol (nextWord (), NULL, 0);
                 token = NULL;
                 break;
 
-            case 2: /* overlaynums */
+            case 2: // overlaynums
                 do {
                     token = nextWord ();
                     if (IsDigit (token[0]) == 0) break;
@@ -724,11 +700,11 @@ static void DoMemory (void)
                     AbEnd ("There must be at least one overlay number");
                 }
 
-                /* always include number 0 */
+                // always include number 0
                 overlaytable[0] = 1;
                 break;
 
-            case 3: /* backbuffer */
+            case 3: // backbuffer
                 switch (findToken (toggle, nextWord ())) {
                     case -1:
                         AbEnd ("Unknown value for 'backbuffer'");
@@ -747,7 +723,7 @@ static void DoMemory (void)
         }
     }
 
-    /* OK, all information is gathered, do flushout */
+    // OK, all information is gathered, do flushout
 
     if (lastnumber != -1) {
         fprintf (outputSFile,
@@ -846,10 +822,9 @@ static void DoMemory (void)
     }
 }
 
-
 static char *filterInput (FILE *F, char *tbl)
 {
-    /* loads file into buffer filtering it out */
+    // loads file into buffer filtering it out
     int a, prevchar = -1, i = 0, bracket = 0, quote = 1;
 
     a = getc(F);
@@ -887,10 +862,9 @@ static char *filterInput (FILE *F, char *tbl)
                 do {
                     a = getc (F);
                 } while (a != '\n' && a != EOF);
-                /* Don't discard this newline/EOF, continue to next loop.
-                ** A previous implementation used fseek(F,-1,SEEK_CUR),
-                ** which is invalid for text mode files, and was unreliable across platforms.
-                */
+                // Don't discard this newline/EOF, continue to next loop.
+                // A previous implementation used fseek(F,-1,SEEK_CUR),
+                // which is invalid for text mode files, and was unreliable across platforms.
                 continue;
             } else {
                 tbl[i++] = a;
@@ -905,7 +879,6 @@ static char *filterInput (FILE *F, char *tbl)
     return tbl;
 }
 
-
 static void processFile (const char *filename)
 {
     FILE *F;
@@ -913,8 +886,8 @@ static void processFile (const char *filename)
     char *str;
     char *token;
 
-    int head = 0;   /* number of processed HEADER sections */
-    int memory = 0; /* number of processed MEMORY sections */
+    int head = 0;   // number of processed HEADER sections
+    int memory = 0; // number of processed MEMORY sections
 
     if ((F = fopen (filename, "r")) == 0) {
         AbEnd ("Can't open file %s for reading: %s", filename, strerror (errno));
@@ -937,8 +910,8 @@ static void processFile (const char *filename)
                         DoHeader ();
                     }
                     break;
-                case 2: break; /* icon not implemented yet */
-                case 3: break; /* dialog not implemented yet */
+                case 2: break; // icon not implemented yet
+                case 3: break; // dialog not implemented yet
                 case 4:
                     if (++memory != 1) {
                         AbEnd ("More than one MEMORY section, aborting");
@@ -955,10 +928,9 @@ static void processFile (const char *filename)
     } while (token != NULL);
 }
 
-
 int main (int argc, char *argv[])
 {
-    /* Program long options */
+    // Program long options
     static const LongOpt OptTab[] = {
         { "--help",    0, OptHelp},
         { "--target",  1, OptTarget},
@@ -968,17 +940,17 @@ int main (int argc, char *argv[])
     unsigned ffile = 0;
     unsigned I;
 
-    /* Initialize the cmdline module */
+    // Initialize the cmdline module
     InitCmdLine (&argc, &argv, "grc65");
 
-    /* Check the parameters */
+    // Check the parameters
     I = 1;
     while (I < ArgCount) {
 
-        /* Get the argument */
+        // Get the argument
         const char* Arg = ArgVec [I];
 
-        /* Check for an option */
+        // Check for an option
         if (Arg[0] == '-') {
             switch (Arg[1]) {
 
@@ -1020,7 +992,7 @@ int main (int argc, char *argv[])
             processFile (Arg);
         }
 
-        /* Next argument */
+        // Next argument
         ++I;
     }
 

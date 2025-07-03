@@ -1,49 +1,47 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                  error.c                                  */
-/*                                                                           */
-/*                  Error handling for the cc65 C compiler                   */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//                                  error.c
+//
+//                  Error handling for the cc65 C compiler
+//
+//
+//
+// (C) 1998-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 
-/* common */
+// common
 #include "coll.h"
 #include "debugflag.h"
 #include "print.h"
 #include "strbuf.h"
 
-/* cc65 */
+// cc65
 #include "global.h"
 #include "input.h"
 #include "lineinfo.h"
@@ -51,49 +49,45 @@
 #include "stmt.h"
 #include "error.h"
 
+////////////////////////////////////////////////////////////////////////////////
+//                                   Data
+////////////////////////////////////////////////////////////////////////////////
 
-
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* Count of errors/warnings */
-unsigned PPErrorCount     = 0;  /* Pre-parser errors */
-unsigned PPWarningCount   = 0;  /* Pre-parser warnings */
-unsigned ErrorCount       = 0;  /* Errors occurred in parser and later translation phases */
-unsigned WarningCount     = 0;  /* Warnings occurred in parser and later translation phases */
+// Count of errors/warnings
+unsigned PPErrorCount     = 0;  // Pre-parser errors
+unsigned PPWarningCount   = 0;  // Pre-parser warnings
+unsigned ErrorCount       = 0;  // Errors occurred in parser and later translation phases
+unsigned WarningCount     = 0;  // Warnings occurred in parser and later translation phases
 unsigned RecentLineNo     = 0;
 unsigned RecentErrorCount = 0;
 
-/* Warning and error options */
-IntStack WarnEnable         = INTSTACK(1);  /* Enable warnings */
-IntStack WarningsAreErrors  = INTSTACK(0);  /* Treat warnings as errors */
-                                            /* Warn about: */
-IntStack WarnConstComparison= INTSTACK(1);  /* - constant comparison results */
-IntStack WarnNoEffect       = INTSTACK(1);  /* - statements without an effect */
-IntStack WarnPointerSign    = INTSTACK(1);  /* - pointer conversion to pointer differing in signedness */
-IntStack WarnPointerTypes   = INTSTACK(1);  /* - pointer conversion to incompatible pointer type */
-IntStack WarnRemapZero      = INTSTACK(1);  /* - remapping character code zero */
-IntStack WarnReturnType     = INTSTACK(1);  /* - control reaches end of non-void function */
-IntStack WarnStructParam    = INTSTACK(0);  /* - structs passed by val */
-IntStack WarnUnknownPragma  = INTSTACK(1);  /* - unknown #pragmas */
-IntStack WarnUnreachableCode= INTSTACK(1);  /* - unreachable code */
-IntStack WarnUnusedLabel    = INTSTACK(1);  /* - unused labels */
-IntStack WarnUnusedParam    = INTSTACK(1);  /* - unused parameters */
-IntStack WarnUnusedVar      = INTSTACK(1);  /* - unused variables */
-IntStack WarnUnusedFunc     = INTSTACK(1);  /* - unused functions */
-IntStack WarnConstOverflow  = INTSTACK(0);  /* - overflow conversion of numerical constants */
+// Warning and error options
+IntStack WarnEnable         = INTSTACK(1);  // Enable warnings
+IntStack WarningsAreErrors  = INTSTACK(0);  // Treat warnings as errors
+                                            // Warn about:
+IntStack WarnConstComparison= INTSTACK(1);  // - constant comparison results
+IntStack WarnNoEffect       = INTSTACK(1);  // - statements without an effect
+IntStack WarnPointerSign    = INTSTACK(1);  // - pointer conversion to pointer differing in signedness
+IntStack WarnPointerTypes   = INTSTACK(1);  // - pointer conversion to incompatible pointer type
+IntStack WarnRemapZero      = INTSTACK(1);  // - remapping character code zero
+IntStack WarnReturnType     = INTSTACK(1);  // - control reaches end of non-void function
+IntStack WarnStructParam    = INTSTACK(0);  // - structs passed by val
+IntStack WarnUnknownPragma  = INTSTACK(1);  // - unknown #pragmas
+IntStack WarnUnreachableCode= INTSTACK(1);  // - unreachable code
+IntStack WarnUnusedLabel    = INTSTACK(1);  // - unused labels
+IntStack WarnUnusedParam    = INTSTACK(1);  // - unused parameters
+IntStack WarnUnusedVar      = INTSTACK(1);  // - unused variables
+IntStack WarnUnusedFunc     = INTSTACK(1);  // - unused functions
+IntStack WarnConstOverflow  = INTSTACK(0);  // - overflow conversion of numerical constants
 
-/* Map the name of a warning to the intstack that holds its state */
+// Map the name of a warning to the intstack that holds its state
 typedef struct WarnMapEntry WarnMapEntry;
 struct WarnMapEntry {
     IntStack*   Stack;
     const char* Name;
 };
 static WarnMapEntry WarnMap[] = {
-    /* Keep names sorted, even if it isn't used for now */
+    // Keep names sorted, even if it isn't used for now
     { &WarnConstComparison,     "const-comparison"      },
     { &WarningsAreErrors,       "error"                 },
     { &WarnNoEffect,            "no-effect"             },
@@ -113,16 +107,12 @@ static WarnMapEntry WarnMap[] = {
 
 Collection DiagnosticStrBufs;
 
-
-
-/*****************************************************************************/
-/*                                  Helpers                                  */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                                  Helpers
+////////////////////////////////////////////////////////////////////////////////
 
 void PrintFileInclusionInfo (const LineInfo* LI)
-/* Print hierarchy of file inclusion */
+// Print hierarchy of file inclusion
 {
     if (LI->IncFiles != 0) {
         unsigned FileCount = CollCount (LI->IncFiles);
@@ -140,10 +130,8 @@ void PrintFileInclusionInfo (const LineInfo* LI)
     }
 }
 
-
-
 static LineInfo* GetDiagnosticLI (void)
-/* Get the line info where the diagnostic info refers to */
+// Get the line info where the diagnostic info refers to
 {
     if (CurTok.LI) {
         return CurTok.LI;
@@ -152,10 +140,8 @@ static LineInfo* GetDiagnosticLI (void)
     }
 }
 
-
-
 static const char* GetDiagnosticFileName (void)
-/* Get the source file name where the diagnostic info refers to */
+// Get the source file name where the diagnostic info refers to
 {
     if (CurTok.LI) {
         return GetPresumedFileName (CurTok.LI);
@@ -164,10 +150,8 @@ static const char* GetDiagnosticFileName (void)
     }
 }
 
-
-
 static unsigned GetDiagnosticLineNum (void)
-/* Get the source line number where the diagnostic info refers to */
+// Get the source line number where the diagnostic info refers to
 {
     if (CurTok.LI) {
         return GetPresumedLineNum (CurTok.LI);
@@ -176,16 +160,12 @@ static unsigned GetDiagnosticLineNum (void)
     }
 }
 
-
-
-/*****************************************************************************/
-/*                         Handling of fatal errors                          */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                         Handling of fatal errors
+////////////////////////////////////////////////////////////////////////////////
 
 void Fatal_ (const char *file, int line, const char* Format, ...)
-/* Print a message about a fatal error and die */
+// Print a message about a fatal error and die
 {
     va_list ap;
 
@@ -206,10 +186,8 @@ void Fatal_ (const char *file, int line, const char* Format, ...)
     exit (EXIT_FAILURE);
 }
 
-
-
 void Internal_ (const char *file, int line, const char* Format, ...)
-/* Print a message about an internal compiler error and die */
+// Print a message about an internal compiler error and die
 {
     va_list ap;
 
@@ -229,24 +207,20 @@ void Internal_ (const char *file, int line, const char* Format, ...)
         fprintf (stderr, "\nInput: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
 
-    /* Use abort to create a core dump */
+    // Use abort to create a core dump
     abort ();
 }
 
-
-
-/*****************************************************************************/
-/*                            Handling of errors                             */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                            Handling of errors
+////////////////////////////////////////////////////////////////////////////////
 
 static void IntError (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
-/* Print an error message - internal function */
+// Print an error message - internal function
 {
     unsigned LineNo = GetPresumedLineNum (LI);
 
-    /* Print file inclusion if appropriate */
+    // Print file inclusion if appropriate
     if (HasFileInclusionChanged (LI)) {
         PrintFileInclusionInfo (LI);
     }
@@ -277,10 +251,8 @@ static void IntError (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
     }
 }
 
-
-
 void LIError_ (const char *file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...)
-/* Print an error message with the line info given explicitly */
+// Print an error message with the line info given explicitly
 {
     va_list ap;
 
@@ -293,10 +265,8 @@ void LIError_ (const char *file, int line, errcat_t EC, LineInfo* LI, const char
     va_end (ap);
 }
 
-
-
 void Error_ (const char *file, int line, const char* Format, ...)
-/* Print an error message */
+// Print an error message
 {
     va_list ap;
 
@@ -309,10 +279,8 @@ void Error_ (const char *file, int line, const char* Format, ...)
     va_end (ap);
 }
 
-
-
 void PPError_ (const char *file, int line, const char* Format, ...)
-/* Print an error message. For use within the preprocessor */
+// Print an error message. For use within the preprocessor
 {
     va_list ap;
 
@@ -325,27 +293,23 @@ void PPError_ (const char *file, int line, const char* Format, ...)
     va_end (ap);
 }
 
-
-
-/*****************************************************************************/
-/*                           Handling of warnings                            */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                           Handling of warnings
+////////////////////////////////////////////////////////////////////////////////
 
 static void IntWarning (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
-/* Print a warning message - internal function */
+// Print a warning message - internal function
 {
     if (IS_Get (&WarningsAreErrors)) {
 
-        /* Treat the warning as an error */
+        // Treat the warning as an error
         IntError (EC, LI, Msg, ap);
 
     } else if (IS_Get (&WarnEnable)) {
 
         unsigned LineNo = GetPresumedLineNum (LI);
 
-        /* Print file inclusion if appropriate */
+        // Print file inclusion if appropriate
         if (HasFileInclusionChanged (LI)) {
             PrintFileInclusionInfo (LI);
         }
@@ -368,10 +332,8 @@ static void IntWarning (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
     }
 }
 
-
-
 void LIWarning_ (const char *file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...)
-/* Print a warning message with the line info given explicitly */
+// Print a warning message with the line info given explicitly
 {
     va_list ap;
 
@@ -384,10 +346,8 @@ void LIWarning_ (const char *file, int line, errcat_t EC, LineInfo* LI, const ch
     va_end (ap);
 }
 
-
-
 void Warning_ (const char *file, int line, const char* Format, ...)
-/* Print a warning message */
+// Print a warning message
 {
     va_list ap;
 
@@ -400,10 +360,8 @@ void Warning_ (const char *file, int line, const char* Format, ...)
     va_end (ap);
 }
 
-
-
 void PPWarning_ (const char *file, int line, const char* Format, ...)
-/* Print a warning message. For use within the preprocessor */
+// Print a warning message. For use within the preprocessor
 {
     va_list ap;
 
@@ -416,28 +374,22 @@ void PPWarning_ (const char *file, int line, const char* Format, ...)
     va_end (ap);
 }
 
-
-
 void UnreachableCodeWarning (void)
-/* Print a warning about unreachable code at the current location if these
-** warnings are enabled.
-*/
+// Print a warning about unreachable code at the current location if these
+// warnings are enabled.
 {
     if (IS_Get (&WarnUnreachableCode)) {
         Warning ("Unreachable code");
     }
 }
 
-
-
 IntStack* FindWarning (const char* Name)
-/* Search for a warning in the WarnMap table and return a pointer to the
-** intstack that holds its state. Return NULL if there is no such warning.
-*/
+// Search for a warning in the WarnMap table and return a pointer to the
+// intstack that holds its state. Return NULL if there is no such warning.
 {
     unsigned I;
 
-    /* For now, do a linear search */
+    // For now, do a linear search
     for (I = 0; I < sizeof(WarnMap) / sizeof (WarnMap[0]); ++I) {
         if (strcmp (WarnMap[I].Name, Name) == 0) {
             return WarnMap[I].Stack;
@@ -446,10 +398,8 @@ IntStack* FindWarning (const char* Name)
     return 0;
 }
 
-
-
 void ListWarnings (FILE* F)
-/* Print a list of warning types/names to the given file */
+// Print a list of warning types/names to the given file
 {
     unsigned I;
     for (I = 0; I < sizeof(WarnMap) / sizeof (WarnMap[0]); ++I) {
@@ -457,26 +407,20 @@ void ListWarnings (FILE* F)
     }
 }
 
-
-
-/*****************************************************************************/
-/*                          Handling of other infos                          */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                          Handling of other infos
+////////////////////////////////////////////////////////////////////////////////
 
 static void IntNote (const LineInfo* LI, const char* Msg, va_list ap)
-/* Print a note message - internal function */
+// Print a note message - internal function
 {
     fprintf (stderr, "%s:%u: Note: ", GetPresumedFileName (LI), GetPresumedLineNum (LI));
     vfprintf (stderr, Msg, ap);
     fprintf (stderr, "\n");
 }
 
-
-
 void LINote_ (const char *file, int line, const LineInfo* LI, const char* Format, ...)
-/* Print a note message with the line info given explicitly */
+// Print a note message with the line info given explicitly
 {
     va_list ap;
 
@@ -489,10 +433,8 @@ void LINote_ (const char *file, int line, const LineInfo* LI, const char* Format
     va_end (ap);
 }
 
-
-
 void Note_ (const char *file, int line, const char* Format, ...)
-/* Print a note message */
+// Print a note message
 {
     va_list ap;
 
@@ -504,11 +446,9 @@ void Note_ (const char *file, int line, const char* Format, ...)
     IntNote (GetDiagnosticLI (), Format, ap);
     va_end (ap);
 }
-
-
 
 void PPNote_ (const char *file, int line, const char* Format, ...)
-/* Print a note message. For use within the preprocessor */
+// Print a note message. For use within the preprocessor
 {
     va_list ap;
 
@@ -521,32 +461,24 @@ void PPNote_ (const char *file, int line, const char* Format, ...)
     va_end (ap);
 }
 
-
-
-/*****************************************************************************/
-/*                               Error summary                               */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                               Error summary
+////////////////////////////////////////////////////////////////////////////////
 
 unsigned GetTotalErrors (void)
-/* Get total count of errors of all categories */
+// Get total count of errors of all categories
 {
     return PPErrorCount + ErrorCount;
 }
 
-
-
 unsigned GetTotalWarnings (void)
-/* Get total count of warnings of all categories */
+// Get total count of warnings of all categories
 {
     return PPWarningCount + WarningCount;
 }
 
-
-
 void ErrorReport (void)
-/* Report errors (called at end of compile) */
+// Report errors (called at end of compile)
 {
     unsigned TotalErrors = GetTotalErrors ();
     unsigned TotalWarnings = GetTotalWarnings ();
@@ -554,24 +486,18 @@ void ErrorReport (void)
     Print (stdout, V, "%u errors and %u warnings generated.\n", TotalErrors, TotalWarnings);
 }
 
-
-
-/*****************************************************************************/
-/*                              Tracked StrBufs                              */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                              Tracked StrBufs
+////////////////////////////////////////////////////////////////////////////////
 
 void InitDiagnosticStrBufs (void)
-/* Init tracking string buffers used for diagnostics */
+// Init tracking string buffers used for diagnostics
 {
     InitCollection (&DiagnosticStrBufs);
 }
 
-
-
 void DoneDiagnosticStrBufs (void)
-/* Done with tracked string buffers used for diagnostics */
+// Done with tracked string buffers used for diagnostics
 {
     unsigned I;
     for (I = 0; I < CollCount (&DiagnosticStrBufs); ++I) {
@@ -580,10 +506,8 @@ void DoneDiagnosticStrBufs (void)
     DoneCollection (&DiagnosticStrBufs);
 }
 
-
-
 struct StrBuf* NewDiagnosticStrBuf (void)
-/* Get a new tracked string buffer */
+// Get a new tracked string buffer
 {
     StrBuf *Buf = NewStrBuf ();
     CollAppend (&DiagnosticStrBufs, Buf);

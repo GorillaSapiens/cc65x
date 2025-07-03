@@ -1,37 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                  main.c                                   */
-/*                                                                           */
-/*                  Main program for the da65 disassembler                   */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2014, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//                                  main.c
+//
+//                  Main program for the da65 disassembler
+//
+//
+//
+// (C) 1998-2014, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,7 +38,7 @@
 #include <limits.h>
 #include <time.h>
 
-/* common */
+// common
 #include "abend.h"
 #include "check.h"
 #include "cmdline.h"
@@ -50,7 +48,7 @@
 #include "print.h"
 #include "version.h"
 
-/* da65 */
+// da65
 #include "attrtab.h"
 #include "code.h"
 #include "comments.h"
@@ -66,18 +64,14 @@
 #include "scanner.h"
 #include "segment.h"
 
-
 static unsigned PrevAddrMode;
 
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                                   Code
+////////////////////////////////////////////////////////////////////////////////
 
 static void Usage (void)
-/* Print usage information and exit */
+// Print usage information and exit
 {
     printf ("Usage: %s [options] [inputfile]\n"
             "Short options:\n"
@@ -116,31 +110,25 @@ static void Usage (void)
             ProgName);
 }
 
-
-
 static void RangeCheck (const char* Opt, unsigned long Val,
                         unsigned long Min, unsigned long Max)
-/* Do a range check for the given option and abort if there's a range
-** error.
-*/
+// Do a range check for the given option and abort if there's a range
+// error.
 {
     if (Val < Min || Val > Max) {
         Error ("Argument for %s outside valid range (%ld-%ld)", Opt, Min, Max);
     }
 }
 
-
-
 static unsigned long CvtNumber (const char* Arg, const char* Number)
-/* Convert a number from a string. Allow '$' and '0x' prefixes for hex
-** numbers.
-*/
+// Convert a number from a string. Allow '$' and '0x' prefixes for hex
+// numbers.
 {
     unsigned long Val;
     int           Converted;
     char          BoundsCheck;
 
-    /* Convert */
+    // Convert
     if (*Number == '$') {
         ++Number;
         Converted = sscanf (Number, "%lx%c", &Val, &BoundsCheck);
@@ -148,182 +136,152 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
         Converted = sscanf (Number, "%li%c", (long*)&Val, &BoundsCheck);
     }
 
-    /* Check if we do really have a number */
+    // Check if we do really have a number
     if (Converted != 1) {
         Error ("Invalid number given in argument: %s\n", Arg);
     }
 
-    /* Return the result */
+    // Return the result
     return Val;
 }
 
-
-
 static void OptArgumentColumn (const char* Opt, const char* Arg)
-/* Handle the --argument-column option */
+// Handle the --argument-column option
 {
-    /* Convert the argument to a number */
+    // Convert the argument to a number
     unsigned long Val = CvtNumber (Opt, Arg);
 
-    /* Check for a valid range */
+    // Check for a valid range
     RangeCheck (Opt, Val, MIN_ACOL, MAX_ACOL);
 
-    /* Use the value */
+    // Use the value
     ACol = (unsigned char) Val;
 }
 
-
-
 static void OptBytesPerLine (const char* Opt, const char* Arg)
-/* Handle the --bytes-per-line option */
+// Handle the --bytes-per-line option
 {
-    /* Convert the argument to a number */
+    // Convert the argument to a number
     unsigned long Val = CvtNumber (Opt, Arg);
 
-    /* Check for a valid range */
+    // Check for a valid range
     RangeCheck (Opt, Val, MIN_BYTESPERLINE, MAX_BYTESPERLINE);
 
-    /* Use the value */
+    // Use the value
     BytesPerLine = (unsigned char) Val;
 }
 
-
-
 static void OptCommentColumn (const char* Opt, const char* Arg)
-/* Handle the --comment-column option */
+// Handle the --comment-column option
 {
-    /* Convert the argument to a number */
+    // Convert the argument to a number
     unsigned long Val = CvtNumber (Opt, Arg);
 
-    /* Check for a valid range */
+    // Check for a valid range
     RangeCheck (Opt, Val, MIN_CCOL, MAX_CCOL);
 
-    /* Use the value */
+    // Use the value
     CCol = (unsigned char) Val;
 }
 
-
-
 static void OptComments (const char* Opt, const char* Arg)
-/* Handle the --comments option */
+// Handle the --comments option
 {
-    /* Convert the argument to a number */
+    // Convert the argument to a number
     unsigned long Val = CvtNumber (Opt, Arg);
 
-    /* Check for a valid range */
+    // Check for a valid range
     RangeCheck (Opt, Val, MIN_COMMENTS, MAX_COMMENTS);
 
-    /* Use the value */
+    // Use the value
     Comments = (unsigned char) Val;
 }
 
-
-
 static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
-/* Handle the --cpu option */
+// Handle the --cpu option
 {
-    /* Find the CPU from the given name */
+    // Find the CPU from the given name
     CPU = FindCPU (Arg);
     SetOpcTable (CPU);
 }
 
-
-
 static void OptDebug (const char* Opt attribute ((unused)),
                       const char* Arg attribute ((unused)))
-/* Disassembler debug mode */
+// Disassembler debug mode
 {
     ++Debug;
 }
 
-
-
 static void OptDebugInfo (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
-/* Add debug info to the object file */
+// Add debug info to the object file
 {
     DebugInfo = 1;
 }
 
-
-
 static void OptFormFeeds (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
-/* Add form feeds to the output */
+// Add form feeds to the output
 {
     FormFeeds = 1;
 }
 
-
-
 static void OptHelp (const char* Opt attribute ((unused)),
                      const char* Arg attribute ((unused)))
-/* Print usage information and exit */
+// Print usage information and exit
 {
     Usage ();
     exit (EXIT_SUCCESS);
 }
 
-
-
 static void OptHexOffs (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
-/* Handle the --hexoffs option */
+// Handle the --hexoffs option
 {
     UseHexOffs = 1;
 }
 
-
-
 static void OptInfo (const char* Opt attribute ((unused)), const char* Arg)
-/* Handle the --info option */
+// Handle the --info option
 {
     InfoSetName (Arg);
 }
 
-
-
 static void OptLabelBreak (const char* Opt, const char* Arg)
-/* Handle the --label-break option */
+// Handle the --label-break option
 {
-    /* Convert the argument to a number */
+    // Convert the argument to a number
     unsigned long Val = CvtNumber (Opt, Arg);
 
-    /* Check for a valid range */
+    // Check for a valid range
     RangeCheck (Opt, Val, MIN_LABELBREAK, MAX_LABELBREAK);
 
-    /* Use the value */
+    // Use the value
     LBreak = (unsigned char) Val;
 }
 
-
-
 static void OptMnemonicColumn (const char* Opt, const char* Arg)
-/* Handle the --mnemonic-column option */
+// Handle the --mnemonic-column option
 {
-    /* Convert the argument to a number */
+    // Convert the argument to a number
     unsigned long Val = CvtNumber (Opt, Arg);
 
-    /* Check for a valid range */
+    // Check for a valid range
     RangeCheck (Opt, Val, MIN_MCOL, MAX_MCOL);
 
-    /* Use the value */
+    // Use the value
     MCol = (unsigned char) Val;
 }
 
-
-
 static void OptMultiPass (const char* Opt attribute ((unused)),
                          const char* Arg attribute ((unused)))
-/* Handle the --multi-pass option */
+// Handle the --multi-pass option
 {
     MultiPass = 1;
 }
 
-
-
 static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg)
-/* Handle the --pagelength option */
+// Handle the --pagelength option
 {
     int Len = atoi (Arg);
     if (Len != 0) {
@@ -332,79 +290,66 @@ static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg
     PageLength = Len;
 }
 
-
-
 static void OptStartAddr (const char* Opt, const char* Arg)
-/* Set the default start address */
+// Set the default start address
 {
     StartAddr = (uint32_t) CvtNumber (Opt, Arg);
     HaveStartAddr = 1;
 }
 
-
-
 static void OptSyncLines (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
-/* Handle the --sync-lines option */
+// Handle the --sync-lines option
 {
     SyncLines = 1;
 }
 
-
-
 static void OptTextColumn (const char* Opt, const char* Arg)
-/* Handle the --text-column option */
+// Handle the --text-column option
 {
-    /* Convert the argument to a number */
+    // Convert the argument to a number
     unsigned long Val = CvtNumber (Opt, Arg);
 
-    /* Check for a valid range */
+    // Check for a valid range
     RangeCheck (Opt, Val, MIN_TCOL, MAX_TCOL);
 
-    /* Use the value */
+    // Use the value
     TCol = (unsigned char) Val;
 }
 
-
-
 static void OptVerbose (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
-/* Increase verbosity */
+// Increase verbosity
 {
     ++Verbosity;
 }
 
-
-
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
-/* Print the disassembler version */
+// Print the disassembler version
 {
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
     exit (EXIT_SUCCESS);
 }
 
-
-
 static unsigned HandleChangedLength(const OpcDesc* D, unsigned PC)
-/* Instructions that have flSizeChanges set may use a different size than what
-** the table says. This function adjusts the PC accordingly, so after this only
-** the size from the table needs to be added to make up for the correct value
-*/
+// Instructions that have flSizeChanges set may use a different size than what
+// the table says. This function adjusts the PC accordingly, so after this only
+// the size from the table needs to be added to make up for the correct value
 {
     if (D->Flags & flSizeChanges) {
         if (CPU == CPU_45GS02) {
             if (D->Handler == OH_Implicit_42_45GS02) {
                 if (GetCodeByte (PC+1) == 0x42) {
-                    /* NEG:NEG prefix (0x42 0x42) */
+                    // NEG:NEG prefix (0x42 0x42)
                     unsigned opc = GetCodeByte (PC+2);
                     if (opc == 0xea) {
-                        /* 42 42 ea */
+                        // 42 42 ea
                         if ((GetCodeByte (PC+3) & 0x1f) == 0x12) {
                             PC += 4;
                         }
                     } else {
-                        /* 42 42 xx */
+                        // 42 42 xx
                         const OpcDesc* ED = &OpcTable_45GS02_extended[opc];
                         if (ED->Handler != OH_Illegal) {
                             PC += (ED->Size - 1);
@@ -412,7 +357,7 @@ static unsigned HandleChangedLength(const OpcDesc* D, unsigned PC)
                     }
                 }
             } else if (D->Handler == OH_Implicit_ea_45GS02) {
-                /* NOP prefix (0xea) */
+                // NOP prefix (0xea)
                 if ((GetCodeByte (PC+1) & 0x1f) == 0x12) {
                     PC += 2;
                 }
@@ -429,34 +374,30 @@ static unsigned HandleChangedLength(const OpcDesc* D, unsigned PC)
     return PC;
 }
 
-
-
 static void OneOpcode (unsigned RemainingBytes)
-/* Disassemble one opcode */
+// Disassemble one opcode
 {
     uint32_t I;
     uint32_t OldPC = PC;
 
-    /* Get the opcode from the current address */
+    // Get the opcode from the current address
     uint8_t OPC = GetCodeByte (PC);
 
-    /* Get the opcode description for the opcode byte */
+    // Get the opcode description for the opcode byte
     const OpcDesc* D = &OpcTable[OPC];
 
-    /* Get the output style for the current PC */
+    // Get the output style for the current PC
     attr_t Style = GetStyleAttr (PC);
 
-    /* If a segment begins here, then name that segment.
-    ** Note that the segment is named even if its code is being skipped,
-    ** because some of its later code might not be skipped.
-    */
+    // If a segment begins here, then name that segment.
+    // Note that the segment is named even if its code is being skipped,
+    // because some of its later code might not be skipped.
     if (IsSegmentStart (PC)) {
         StartSegment (GetSegmentStartName (PC), GetSegmentAddrSize (PC));
     }
 
-    /* If we have a label at this address, output the label and an attached
-    ** comment, provided that we aren't in a skip area.
-    */
+    // If we have a label at this address, output the label and an attached
+    // comment, provided that we aren't in a skip area.
     if (Style != atSkip && MustDefLabel (PC)) {
         const char* Comment = GetComment (PC);
         if (Comment) {
@@ -465,13 +406,12 @@ static void OneOpcode (unsigned RemainingBytes)
         DefLabel (GetLabelName (PC));
     }
 
-    /* Check...
-    **   - ...if we have enough bytes remaining for the code at this address.
-    **   - ...if the current instruction is valid for the given CPU.
-    **   - ...if there is no label somewhere between the instruction bytes.
-    **   - ...if there is no segment change between the instruction bytes.
-    ** If any one of those conditions is false, switch to data mode.
-    */
+    // Check...
+    // - ...if we have enough bytes remaining for the code at this address.
+    // - ...if the current instruction is valid for the given CPU.
+    // - ...if there is no label somewhere between the instruction bytes.
+    // - ...if there is no segment change between the instruction bytes.
+    // If any one of those conditions is false, switch to data mode.
     if (Style == atDefault) {
         if (D->Size > RemainingBytes) {
             Style = atIllegal;
@@ -497,7 +437,7 @@ static void OneOpcode (unsigned RemainingBytes)
         }
     }
 
-    /* Disassemble the line */
+    // Disassemble the line
     switch (Style) {
 
         case atDefault:
@@ -512,9 +452,8 @@ static void OneOpcode (unsigned RemainingBytes)
             break;
 
         case atCode:
-            /* Beware: If we don't have enough bytes left to disassemble the
-            ** following insn, fall through to byte mode.
-            */
+            // Beware: If we don't have enough bytes left to disassemble the
+            // following insn, fall through to byte mode.
             if (D->Size <= RemainingBytes) {
                 if (CPU == CPU_65816) {
                     const unsigned AddrMode = GetAttr (PC) & at65816Mask;
@@ -532,18 +471,18 @@ static void OneOpcode (unsigned RemainingBytes)
                     }
                 }
 
-                /* Output labels within the next insn */
+                // Output labels within the next insn
                 for (I = 1; I < D->Size; ++I) {
                     ForwardLabel (I);
                 }
-                /* Output the insn */
+                // Output the insn
                 D->Handler (D);
 
                 PC = HandleChangedLength (D, PC);
                 PC += D->Size;
                 break;
             }
-            /* FALLTHROUGH */
+            // FALLTHROUGH
 
         case atByteTab:
             ByteTable ();
@@ -583,9 +522,8 @@ static void OneOpcode (unsigned RemainingBytes)
             break;
     }
 
-    /* Change back to the default CODE segment if
-    ** a named segment stops at the current address.
-    */
+    // Change back to the default CODE segment if
+    // a named segment stops at the current address.
     for (I = PC - OldPC; I > 0; --I) {
         if (IsSegmentEnd (PC - I)) {
             EndSegment ();
@@ -594,33 +532,28 @@ static void OneOpcode (unsigned RemainingBytes)
     }
 }
 
-
-
 static void OnePass (void)
-/* Make one pass through the code */
+// Make one pass through the code
 {
     uint32_t Count;
 
     PrevAddrMode = 0;
 
-    /* Disassemble until nothing left */
+    // Disassemble until nothing left
     while ((Count = GetRemainingBytes ()) > 0) {
         OneOpcode (Count);
     }
 }
 
-
-
 static void Disassemble (void)
-/* Disassemble the code */
+// Disassemble the code
 {
-    /* Preparation pass */
+    // Preparation pass
     Pass = PASS_PREP;
     OnePass ();
 
-    /* If the --multi-pass option is given, repeat this pass until we have no
-    ** new labels.
-    */
+    // If the --multi-pass option is given, repeat this pass until we have no
+    // new labels.
     if (MultiPass) {
         unsigned long LabelCount = GetLabelCount ();
         unsigned Passes = 1;
@@ -628,7 +561,7 @@ static void Disassemble (void)
             unsigned long NewLabelCount;
             ResetCode ();
             OnePass ();
-            CHECK(++Passes <= 4096);            /* Safety measure */
+            CHECK(++Passes <= 4096);            // Safety measure
             NewLabelCount = GetLabelCount ();
             if (NewLabelCount <= LabelCount) {
                 break;
@@ -643,7 +576,7 @@ static void Disassemble (void)
     Output ("---------------------------");
     LineFeed ();
 
-    /* Final pass */
+    // Final pass
     Pass = PASS_FINAL;
     ResetCode ();
     OutputSettings ();
@@ -651,12 +584,10 @@ static void Disassemble (void)
     OnePass ();
 }
 
-
-
 int main (int argc, char* argv [])
-/* Assembler main program */
+// Assembler main program
 {
-    /* Program long options */
+    // Program long options
     static const LongOpt OptTab[] = {
         { "--argument-column",  1,      OptArgumentColumn       },
         { "--bytes-per-line",   1,      OptBytesPerLine         },
@@ -683,17 +614,17 @@ int main (int argc, char* argv [])
     unsigned I;
     time_t T;
 
-    /* Initialize the cmdline module */
+    // Initialize the cmdline module
     InitCmdLine (&argc, &argv, "da65");
 
-    /* Check the parameters */
+    // Check the parameters
     I = 1;
     while (I < ArgCount) {
 
-        /* Get the argument */
+        // Get the argument
         const char* Arg = ArgVec[I];
 
-        /* Check for an option */
+        // Check for an option
         if (Arg [0] == '-') {
             switch (Arg [1]) {
 
@@ -751,7 +682,7 @@ int main (int argc, char* argv [])
 
             }
         } else {
-            /* Filename. Check if we already had one */
+            // Filename. Check if we already had one
             if (InFile) {
                 fprintf (stderr, "%s: Don't know what to do with '%s'\n",
                          ProgName, Arg);
@@ -761,22 +692,21 @@ int main (int argc, char* argv [])
             }
         }
 
-        /* Next argument */
+        // Next argument
         ++I;
     }
 
-    /* Try to read the info file */
+    // Try to read the info file
     ReadInfoFile ();
 
-    /* Must have an input file */
+    // Must have an input file
     if (InFile == 0) {
         AbEnd ("No input file");
     }
 
-    /* Check the formatting options for reasonable values. Note: We will not
-    ** really check that they make sense, just that they aren't complete
-    ** garbage.
-    */
+    // Check the formatting options for reasonable values. Note: We will not
+    // really check that they make sense, just that they aren't complete
+    // garbage.
     if (MCol >= ACol) {
         AbEnd ("mnemonic-column value must be smaller than argument-column value");
     }
@@ -787,29 +717,28 @@ int main (int argc, char* argv [])
         AbEnd ("comment-column value must be smaller than text-column value");
     }
 
-    /* If no CPU given, use the default CPU */
+    // If no CPU given, use the default CPU
     if (CPU == CPU_UNKNOWN) {
         CPU = CPU_6502;
     }
 
-    /* Get the current time and convert it to string so it can be used in
-    ** the output page headers.
-    */
+    // Get the current time and convert it to string so it can be used in
+    // the output page headers.
     T = time (0);
     strftime (Now, sizeof (Now), "%Y-%m-%d %H:%M:%S", localtime (&T));
 
-    /* Load the input file */
+    // Load the input file
     LoadCode ();
 
-    /* Open the output file */
+    // Open the output file
     OpenOutput (OutFile);
 
-    /* Disassemble the code */
+    // Disassemble the code
     Disassemble ();
 
-    /* Close the output file */
+    // Close the output file
     CloseOutput ();
 
-    /* Done */
+    // Done
     return EXIT_SUCCESS;
 }

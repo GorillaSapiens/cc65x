@@ -1,37 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 output.c                                  */
-/*                                                                           */
-/*                       Disassembler output routines                        */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2014, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//                                 output.c
+//
+//                       Disassembler output routines
+//
+//
+//
+// (C) 2000-2014, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 #include <inttypes.h>
 #include <stdio.h>
@@ -40,42 +38,34 @@
 #include <ctype.h>
 #include <errno.h>
 
-/* common */
+// common
 #include "addrsize.h"
 #include "cpu.h"
 #include "version.h"
 
-/* da65 */
+// da65
 #include "code.h"
 #include "error.h"
 #include "global.h"
 #include "output.h"
 
+////////////////////////////////////////////////////////////////////////////////
+//                                   Data
+////////////////////////////////////////////////////////////////////////////////
 
+static FILE*    F       = 0;            // Output stream
+static unsigned Col     = 1;            // Current column
+static unsigned Line    = 0;            // Current line on page
+static unsigned Page    = 1;            // Current output page
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+static const char* SegmentName = 0;     // Name of current segment
 
-
-
-static FILE*    F       = 0;            /* Output stream */
-static unsigned Col     = 1;            /* Current column */
-static unsigned Line    = 0;            /* Current line on page */
-static unsigned Page    = 1;            /* Current output page */
-
-static const char* SegmentName = 0;     /* Name of current segment */
-
-
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                                   Code
+////////////////////////////////////////////////////////////////////////////////
 
 static void PageHeader (void)
-/* Print a page header */
+// Print a page header
 {
     fprintf (F,
              "; da65 V%s\n"
@@ -88,12 +78,10 @@ static void PageHeader (void)
              Page);
 }
 
-
-
 void OpenOutput (const char* Name)
-/* Open the given file for output */
+// Open the given file for output
 {
-    /* If we have a name given, open the output file, otherwise use stdout */
+    // If we have a name given, open the output file, otherwise use stdout
     if (Name != 0) {
         F = fopen (Name, "w");
         if (F == 0) {
@@ -103,26 +91,22 @@ void OpenOutput (const char* Name)
         F = stdout;
     }
 
-    /* Output the header and initialize stuff */
+    // Output the header and initialize stuff
     PageHeader ();
     Line = 5;
     Col  = 1;
 }
 
-
-
 void CloseOutput (void)
-/* Close the output file */
+// Close the output file
 {
     if (F != stdout && fclose (F) != 0) {
         Error ("Error closing output file: %s", strerror (errno));
     }
 }
 
-
-
 void Output (const char* Format, ...)
-/* Write to the output file */
+// Write to the output file
 {
     if (Pass == PASS_FINAL) {
         va_list ap;
@@ -132,10 +116,8 @@ void Output (const char* Format, ...)
     }
 }
 
-
-
 void Indent (unsigned N)
-/* Make sure the current line column is at position N (zero based) */
+// Make sure the current line column is at position N (zero based)
 {
     if (Pass == PASS_FINAL) {
         while (Col < N) {
@@ -145,10 +127,8 @@ void Indent (unsigned N)
     }
 }
 
-
-
 void LineFeed (void)
-/* Add a linefeed to the output file */
+// Add a linefeed to the output file
 {
     if (Pass == PASS_FINAL) {
         fputc ('\n', F);
@@ -164,34 +144,28 @@ void LineFeed (void)
     }
 }
 
-
-
 void DefLabel (const char* Name)
-/* Define a label with the given name */
+// Define a label with the given name
 {
     Output ("%s:", Name);
-    /* If the label is longer than the configured maximum, or if it runs into
-    ** the opcode column, start a new line.
-    */
+    // If the label is longer than the configured maximum, or if it runs into
+    // the opcode column, start a new line.
     if (Col > LBreak+2 || Col > MCol) {
         LineFeed ();
     }
 }
 
-
-
 void DefForward (const char* Name, const char* Comment, unsigned Offs)
-/* Define a label as "* + x", where x is the offset relative to the
-** current PC.
-*/
+// Define a label as "* + x", where x is the offset relative to the
+// current PC.
 {
     if (Pass == PASS_FINAL) {
-        /* Flush existing output if necessary */
+        // Flush existing output if necessary
         if (Col > 1) {
             LineFeed ();
         }
 
-        /* Output the forward definition */
+        // Output the forward definition
         Output ("%s", Name);
         Indent (ACol);
         if (UseHexOffs) {
@@ -207,10 +181,8 @@ void DefForward (const char* Name, const char* Comment, unsigned Offs)
     }
 }
 
-
-
 void DefConst (const char* Name, const char* Comment, uint32_t Addr)
-/* Define an address constant */
+// Define an address constant
 {
     if (Pass == PASS_FINAL) {
         Output ("%s", Name);
@@ -224,10 +196,8 @@ void DefConst (const char* Name, const char* Comment, uint32_t Addr)
     }
 }
 
-
-
 void DataByteLine (uint32_t ByteCount)
-/* Output a line with bytes */
+// Output a line with bytes
 {
     uint32_t I;
 
@@ -245,10 +215,8 @@ void DataByteLine (uint32_t ByteCount)
     LineFeed ();
 }
 
-
-
 void DataDByteLine (uint32_t ByteCount)
-/* Output a line with dbytes */
+// Output a line with dbytes
 {
     uint32_t I;
 
@@ -266,10 +234,8 @@ void DataDByteLine (uint32_t ByteCount)
     LineFeed ();
 }
 
-
-
 void DataWordLine (uint32_t ByteCount)
-/* Output a line with words */
+// Output a line with words
 {
     uint32_t I;
 
@@ -287,10 +253,8 @@ void DataWordLine (uint32_t ByteCount)
     LineFeed ();
 }
 
-
-
 void DataDWordLine (uint32_t ByteCount)
-/* Output a line with dwords */
+// Output a line with dwords
 {
     uint32_t I;
 
@@ -308,10 +272,8 @@ void DataDWordLine (uint32_t ByteCount)
     LineFeed ();
 }
 
-
-
 void SeparatorLine (void)
-/* Print a separator line */
+// Print a separator line
 {
     if (Pass == PASS_FINAL && Comments >= 1) {
         Output ("; ----------------------------------------------------------------------------");
@@ -319,10 +281,8 @@ void SeparatorLine (void)
     }
 }
 
-
-
 void StartSegment (const char* Name, unsigned AddrSize)
-/* Start a segment */
+// Start a segment
 {
     if (Pass == PASS_FINAL) {
         LineFeed ();
@@ -338,10 +298,8 @@ void StartSegment (const char* Name, unsigned AddrSize)
     }
 }
 
-
-
 void EndSegment (void)
-/* End a segment */
+// End a segment
 {
     LineFeed ();
     Output ("; End of \"%s\" segment", SegmentName);
@@ -352,19 +310,15 @@ void EndSegment (void)
     LineFeed ();
 }
 
-
-
 void UserComment (const char* Comment)
-/* Output a comment line */
+// Output a comment line
 {
     Output ("; %s", Comment);
     LineFeed ();
 }
 
-
-
 void LineComment (unsigned PC, unsigned Count)
-/* Add a line comment with the PC and data bytes */
+// Add a line comment with the PC and data bytes
 {
     unsigned I;
 
@@ -389,10 +343,8 @@ void LineComment (unsigned PC, unsigned Count)
     }
 }
 
-
-
 void OutputSettings (void)
-/* Output CPU and other settings */
+// Output CPU and other settings
 {
     LineFeed ();
     Indent (MCol);
@@ -403,20 +355,16 @@ void OutputSettings (void)
     LineFeed ();
 }
 
-
-
 void OutputMFlag (unsigned char enabled)
-/* Output the 65816 M-flag state */
+// Output the 65816 M-flag state
 {
     Indent (MCol);
     Output (enabled ? ".a8" : ".a16");
     LineFeed ();
 }
 
-
-
 void OutputXFlag (unsigned char enabled)
-/* Output the 65816 X-flag state */
+// Output the 65816 X-flag state
 {
     Indent (MCol);
     Output (enabled ? ".i8" : ".i16");

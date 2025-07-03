@@ -1,72 +1,58 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 ppexpr.h                                  */
-/*                                                                           */
-/*                      Expressions for C preprocessor                       */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2022  The cc65 Authors                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+////////////////////////////////////////////////////////////////////////////////
+//
+//                                 ppexpr.h
+//
+//                      Expressions for C preprocessor
+//
+//
+//
+// (C) 2022  The cc65 Authors
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+////////////////////////////////////////////////////////////////////////////////
 
-
-
-/* cc65 */
+// cc65
 #include "error.h"
 #include "scanner.h"
 #include "ppexpr.h"
 
+////////////////////////////////////////////////////////////////////////////////
+//                                   Data
+////////////////////////////////////////////////////////////////////////////////
 
-
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* PP expression parser status */
+// PP expression parser status
 static int PPEvaluationEnabled = 0;
 static int PPEvaluationFailed  = 0;
 
-
-
-/*****************************************************************************/
-/*                                 Forwards                                  */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                                 Forwards
+////////////////////////////////////////////////////////////////////////////////
 
 static void PPhie1 (PPExpr* Expr);
 
-
-
-/*****************************************************************************/
-/*                             Helper functions                              */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                             Helper functions
+////////////////////////////////////////////////////////////////////////////////
 
 static token_t PPFindTok (token_t Tok, const token_t* Table)
-/* Find a token in a generator table */
+// Find a token in a generator table
 {
     while (*Table != TOK_INVALID) {
         if (*Table == Tok) {
@@ -77,21 +63,16 @@ static token_t PPFindTok (token_t Tok, const token_t* Table)
     return TOK_INVALID;
 }
 
-
-
 static void PPExprInit (PPExpr* Expr)
-/* Initialize the expression */
+// Initialize the expression
 {
     Expr->IVal  = 0;
     Expr->Flags = PPEXPR_NONE;
 }
 
-
-
 static void PPErrorSkipLine (void)
-/* Set the expression parser error flag, skip the remain tokens till the end
-** of the line, clear the current and the next tokens.
-*/
+// Set the expression parser error flag, skip the remain tokens till the end
+// of the line, clear the current and the next tokens.
 {
     PPEvaluationFailed = 1;
     SkipTokens (0, 0);
@@ -99,26 +80,21 @@ static void PPErrorSkipLine (void)
     NextTok.Tok = TOK_CEOF;
 }
 
-
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                                   Code
+////////////////////////////////////////////////////////////////////////////////
 
 static void PPhiePrimary (PPExpr* Expr)
-/* This is the lowest level of the PP expression parser */
+// This is the lowest level of the PP expression parser
 {
     switch (CurTok.Tok) {
         case TOK_ICONST:
         case TOK_CCONST:
         case TOK_WCCONST:
-            /* Character and integer constants */
+            // Character and integer constants
             Expr->IVal = CurTok.IVal;
-            /* According to the C standard, all signed types act as intmax_t
-            ** and all unsigned types act as uintmax_t.
-            */
+            // According to the C standard, all signed types act as intmax_t
+            // and all unsigned types act as uintmax_t.
             if (IsSignUnsigned (CurTok.Type)) {
                 Expr->Flags |= PPEXPR_UNSIGNED;
             }
@@ -126,51 +102,47 @@ static void PPhiePrimary (PPExpr* Expr)
             break;
 
         case TOK_FCONST:
-            /* Floating point constant */
+            // Floating point constant
             PPError ("Floating constant in preprocessor expression");
             Expr->IVal = 0;
             NextToken ();
             break;
 
         case TOK_LPAREN:
-            /* Parse parenthesized subexpression by calling the whole parser
-            ** recursively.
-            */
+            // Parse parenthesized subexpression by calling the whole parser
+            // recursively.
             NextToken ();
             PPhie1 (Expr);
             ConsumeRParen ();
             break;
 
         case TOK_IDENT:
-            /* Assume that this identifier is an undefined macro and replace
-            ** it by a constant value of zero.
-            */
+            // Assume that this identifier is an undefined macro and replace
+            // it by a constant value of zero.
             NextToken ();
             Expr->Flags |= PPEXPR_UNDEFINED;
             Expr->IVal = 0;
             break;
 
         case TOK_CEOF:
-            /* Error recovery */
+            // Error recovery
             break;
 
         default:
-            /* Illegal expression in PP mode */
+            // Illegal expression in PP mode
             PPError ("Preprocessor expression expected");
             PPErrorSkipLine ();
             break;
     }
 }
 
-
-
 static void PPhie11 (PPExpr* Expr)
-/* Handle compound types (structs and arrays) etc which are invalid in PP */
+// Handle compound types (structs and arrays) etc which are invalid in PP
 {
-    /* Evaluate the lhs */
+    // Evaluate the lhs
     PPhiePrimary (Expr);
 
-    /* Check for a rhs */
+    // Check for a rhs
     while (CurTok.Tok == TOK_INC    || CurTok.Tok == TOK_DEC    ||
            CurTok.Tok == TOK_LBRACK || CurTok.Tok == TOK_LPAREN ||
            CurTok.Tok == TOK_DOT    || CurTok.Tok == TOK_PTR_REF) {
@@ -183,9 +155,8 @@ static void PPhie11 (PPExpr* Expr)
                 break;
 
             case TOK_LPAREN:
-                /* Function call syntax is not recognized in preprocessor
-                ** expressions.
-                */
+                // Function call syntax is not recognized in preprocessor
+                // expressions.
                 PPError ("Missing binary operator before token \"(\"");
                 PPErrorSkipLine ();
                 break;
@@ -216,17 +187,15 @@ static void PPhie11 (PPExpr* Expr)
         }
     }
 
-    /* Check for excessive expressions */
+    // Check for excessive expressions
     if (!TokIsPunc (&CurTok)) {
         PPError ("Missing binary operator");
         PPErrorSkipLine ();
     }
 }
 
-
-
 void PPhie10 (PPExpr* Expr)
-/* Handle prefixing unary operators */
+// Handle prefixing unary operators
 {
     switch (CurTok.Tok) {
 
@@ -262,31 +231,28 @@ void PPhie10 (PPExpr* Expr)
             NextToken ();
             PPhie10 (Expr);
             Expr->IVal = !Expr->IVal;
-            Expr->Flags &= ~PPEXPR_UNSIGNED;    /* Result is signed */
+            Expr->Flags &= ~PPEXPR_UNSIGNED;    // Result is signed
             break;
 
         case TOK_CEOF:
-            /* Error recovery */
+            // Error recovery
             break;
 
         case TOK_STAR:
         case TOK_AND:
         case TOK_SIZEOF:
         default:
-            /* Type cast, sizeof, *, &, are not recognized in preprocessor
-            ** expressions. So everything is treated as as expression here.
-            */
+            // Type cast, sizeof, *, &, are not recognized in preprocessor
+            // expressions. So everything is treated as as expression here.
             PPhie11 (Expr);
             break;
     }
 }
 
-
-
-static void PPhie_internal (const token_t* Ops,   /* List of generators */
+static void PPhie_internal (const token_t* Ops,   // List of generators
                             PPExpr* Expr,
                             void (*hienext) (PPExpr*))
-/* Helper function */
+// Helper function
 {
     token_t Tok;
 
@@ -297,19 +263,19 @@ static void PPhie_internal (const token_t* Ops,   /* List of generators */
         PPExpr Rhs;
         PPExprInit (&Rhs);
 
-        /* Remember the operator token, then skip it */
+        // Remember the operator token, then skip it
         NextToken ();
 
-        /* Get the right hand side */
+        // Get the right hand side
         hienext (&Rhs);
 
         if (PPEvaluationEnabled && !PPEvaluationFailed) {
 
-            /* Evaluate the result for operands */
+            // Evaluate the result for operands
             unsigned long Val1 = Expr->IVal;
             unsigned long Val2 = Rhs.IVal;
 
-            /* If either side is unsigned, the result is unsigned */
+            // If either side is unsigned, the result is unsigned
             Expr->Flags |= Rhs.Flags & PPEXPR_UNSIGNED;
 
             switch (Tok) {
@@ -336,7 +302,7 @@ static void PPhie_internal (const token_t* Ops,   /* List of generators */
                         PPError ("Division by zero");
                         Expr->IVal = 0;
                     } else {
-                        /* Handle signed and unsigned operands differently */
+                        // Handle signed and unsigned operands differently
                         if ((Expr->Flags & PPEXPR_UNSIGNED) == 0) {
                             Expr->IVal = ((long)Val1 / (long)Val2);
                         } else {
@@ -349,7 +315,7 @@ static void PPhie_internal (const token_t* Ops,   /* List of generators */
                         PPError ("Modulo operation with zero");
                         Expr->IVal = 0;
                     } else {
-                        /* Handle signed and unsigned operands differently */
+                        // Handle signed and unsigned operands differently
                         if ((Expr->Flags & PPEXPR_UNSIGNED) == 0) {
                             Expr->IVal = ((long)Val1 % (long)Val2);
                         } else {
@@ -364,12 +330,10 @@ static void PPhie_internal (const token_t* Ops,   /* List of generators */
     }
 }
 
-
-
-static void PPhie_compare (const token_t* Ops,    /* List of generators */
+static void PPhie_compare (const token_t* Ops,    // List of generators
                            PPExpr* Expr,
                            void (*hienext) (PPExpr*))
-/* Helper function for the compare operators */
+// Helper function for the compare operators
 {
     token_t Tok;
 
@@ -381,21 +345,21 @@ static void PPhie_compare (const token_t* Ops,    /* List of generators */
 
         PPExprInit (&Rhs);
 
-        /* Skip the operator token */
+        // Skip the operator token
         NextToken ();
 
-        /* Get the right hand side */
+        // Get the right hand side
         hienext (&Rhs);
 
         if (PPEvaluationEnabled && !PPEvaluationFailed) {
 
-            /* If either side is unsigned, the comparison is unsigned */
+            // If either side is unsigned, the comparison is unsigned
             Expr->Flags |= Rhs.Flags & PPEXPR_UNSIGNED;
 
-            /* Determine if this is a signed or unsigned compare */
+            // Determine if this is a signed or unsigned compare
             if ((Expr->Flags & PPEXPR_UNSIGNED) == 0) {
 
-                /* Evaluate the result for signed operands */
+                // Evaluate the result for signed operands
                 signed long Val1 = Expr->IVal;
                 signed long Val2 = Rhs.IVal;
                 switch (Tok) {
@@ -410,7 +374,7 @@ static void PPhie_compare (const token_t* Ops,    /* List of generators */
 
             } else {
 
-                /* Evaluate the result for unsigned operands */
+                // Evaluate the result for unsigned operands
                 unsigned long Val1 = Expr->IVal;
                 unsigned long Val2 = Rhs.IVal;
                 switch (Tok) {
@@ -425,15 +389,13 @@ static void PPhie_compare (const token_t* Ops,    /* List of generators */
             }
         }
 
-        /* The result is signed */
+        // The result is signed
         Expr->Flags &= ~PPEXPR_UNSIGNED;
     }
 }
 
-
-
 static void PPhie9 (PPExpr* Expr)
-/* Handle "*", "/" and "%" operators */
+// Handle "*", "/" and "%" operators
 {
     static const token_t PPhie9_ops[] = {
         TOK_STAR,
@@ -445,10 +407,8 @@ static void PPhie9 (PPExpr* Expr)
     PPhie_internal (PPhie9_ops, Expr, PPhie10);
 }
 
-
-
 static void PPhie8 (PPExpr* Expr)
-/* Handle "+" and "-" binary operators */
+// Handle "+" and "-" binary operators
 {
     static const token_t PPhie8_ops[] = {
         TOK_PLUS,
@@ -459,30 +419,28 @@ static void PPhie8 (PPExpr* Expr)
     PPhie_internal (PPhie8_ops, Expr, PPhie9);
 }
 
-
-
 static void PPhie7 (PPExpr* Expr)
-/* Handle the "<<" and ">>" shift operators */
+// Handle the "<<" and ">>" shift operators
 {
-    /* Evaluate the lhs */
+    // Evaluate the lhs
     PPhie8 (Expr);
 
     while (CurTok.Tok == TOK_SHL || CurTok.Tok == TOK_SHR) {
 
-        token_t Op;             /* The operator token */
+        token_t Op;             // The operator token
         PPExpr Rhs;
         PPExprInit (&Rhs);
 
-        /* Remember the operator, then skip its token */
+        // Remember the operator, then skip its token
         Op = CurTok.Tok;
         NextToken ();
 
-        /* Get the right hand side */
+        // Get the right hand side
         PPhie8 (&Rhs);
 
-        /* Evaluate */
+        // Evaluate
         if (PPEvaluationEnabled && !PPEvaluationFailed) {
-            /* For now we use 32-bit integer types for PP integer constants */
+            // For now we use 32-bit integer types for PP integer constants
             if ((Rhs.Flags & PPEXPR_UNSIGNED) != 0) {
                 if ((unsigned long)Rhs.IVal > LONG_BITS) {
                     Rhs.IVal = (long)LONG_BITS;
@@ -493,15 +451,14 @@ static void PPhie7 (PPExpr* Expr)
                 Rhs.IVal = -(long)LONG_BITS;
             }
 
-            /* Positive count for left-shift and negative for right-shift. So
-            ** to shift by a count is equivalent to shift to the opposite
-            ** direction by the negated count.
-            */
+            // Positive count for left-shift and negative for right-shift. So
+            // to shift by a count is equivalent to shift to the opposite
+            // direction by the negated count.
             if (Op == TOK_SHR) {
                 Rhs.IVal = -Rhs.IVal;
             }
 
-            /* Evaluate the result */
+            // Evaluate the result
             if ((Expr->Flags & PPEXPR_UNSIGNED) != 0) {
                 if (Rhs.IVal >= (long)LONG_BITS) {
                     PPWarning ("Integer overflow in preprocessor expression");
@@ -514,7 +471,7 @@ static void PPhie7 (PPExpr* Expr)
                     Expr->IVal = (unsigned long)Expr->IVal >> -Rhs.IVal;
                 }
             } else {
-                /* -1 for sign bit */
+                // -1 for sign bit
                 if (Rhs.IVal >= (long)(LONG_BITS - 1)) {
                     PPWarning ("Integer overflow in preprocessor expression");
                     Expr->IVal = 0;
@@ -530,10 +487,8 @@ static void PPhie7 (PPExpr* Expr)
     }
 }
 
-
-
 static void PPhie6 (PPExpr* Expr)
-/* Handle greater-than type relational operators */
+// Handle greater-than type relational operators
 {
     static const token_t PPhie6_ops [] = {
         TOK_LT,
@@ -546,10 +501,8 @@ static void PPhie6 (PPExpr* Expr)
     PPhie_compare (PPhie6_ops, Expr, PPhie7);
 }
 
-
-
 static void PPhie5 (PPExpr* Expr)
-/* Handle "==" and "!=" relational operators */
+// Handle "==" and "!=" relational operators
 {
     static const token_t PPhie5_ops[] = {
         TOK_EQ,
@@ -560,10 +513,8 @@ static void PPhie5 (PPExpr* Expr)
     PPhie_compare (PPhie5_ops, Expr, PPhie6);
 }
 
-
-
 static void PPhie4 (PPExpr* Expr)
-/* Handle the bitwise AND "&" operator */
+// Handle the bitwise AND "&" operator
 {
     static const token_t PPhie4_ops[] = {
         TOK_AND,
@@ -573,10 +524,8 @@ static void PPhie4 (PPExpr* Expr)
     PPhie_internal (PPhie4_ops, Expr, PPhie5);
 }
 
-
-
 static void PPhie3 (PPExpr* Expr)
-/* Handle the bitwise exclusive OR "^" operator */
+// Handle the bitwise exclusive OR "^" operator
 {
     static const token_t PPhie3_ops[] = {
         TOK_XOR,
@@ -586,10 +535,8 @@ static void PPhie3 (PPExpr* Expr)
     PPhie_internal (PPhie3_ops, Expr, PPhie4);
 }
 
-
-
 static void PPhie2 (PPExpr* Expr)
-/* Handle the bitwise OR "|" operator */
+// Handle the bitwise OR "|" operator
 {
     static const token_t PPhie2_ops[] = {
         TOK_OR,
@@ -599,12 +546,10 @@ static void PPhie2 (PPExpr* Expr)
     PPhie_internal (PPhie2_ops, Expr, PPhie3);
 }
 
-
-
 static void PPhieAnd (PPExpr* Expr)
-/* Handle the logical AND "expr1 && expr2" operator */
+// Handle the logical AND "expr1 && expr2" operator
 {
-    /* Get one operand */
+    // Get one operand
     PPhie2 (Expr);
 
     if (CurTok.Tok == TOK_BOOL_AND) {
@@ -612,43 +557,41 @@ static void PPhieAnd (PPExpr* Expr)
         int PPEvaluationEnabledPrev = PPEvaluationEnabled;
         PPExpr One;
 
-        /* Do logical and */
+        // Do logical and
         Expr->IVal = (Expr->IVal != 0);
         if (Expr->IVal == 0) {
             PPEvaluationEnabled = 0;
         }
 
-        /* While there are more expressions */
+        // While there are more expressions
         while (CurTok.Tok == TOK_BOOL_AND) {
-            /* Skip the && */
+            // Skip the &&
             NextToken ();
 
-            /* Get one operand */
+            // Get one operand
             PPExprInit (&One);
             PPhie2 (&One);
 
-            /* Evaluate */
+            // Evaluate
             if (PPEvaluationEnabled) {
                 if (One.IVal == 0) {
-                    /* Skip evaluating remaining */
+                    // Skip evaluating remaining
                     PPEvaluationEnabled = 0;
-                    /* The value of the result will be false */
+                    // The value of the result will be false
                     Expr->IVal = 0;
                 }
             }
         }
 
-        /* Restore evaluation as before */
+        // Restore evaluation as before
         PPEvaluationEnabled = PPEvaluationEnabledPrev;
     }
 }
 
-
-
 static void PPhieOr (PPExpr* Expr)
-/* Handle the logical OR "||" operator */
+// Handle the logical OR "||" operator
 {
-    /* Call the next level parser */
+    // Call the next level parser
     PPhieAnd (Expr);
 
     if (CurTok.Tok == TOK_BOOL_OR) {
@@ -656,92 +599,88 @@ static void PPhieOr (PPExpr* Expr)
         int PPEvaluationEnabledPrev = PPEvaluationEnabled;
         PPExpr One;
 
-        /* Do logical or */
+        // Do logical or
         Expr->IVal = (Expr->IVal != 0);
         if (Expr->IVal != 0) {
             PPEvaluationEnabled = 0;
         }
 
-        /* While there are more expressions */
+        // While there are more expressions
         while (CurTok.Tok == TOK_BOOL_OR) {
-            /* Skip the || */
+            // Skip the ||
             NextToken ();
 
-            /* Get rhs subexpression */
+            // Get rhs subexpression
             PPExprInit (&One);
             PPhieAnd (&One);
 
-            /* Evaluate */
+            // Evaluate
             if (PPEvaluationEnabled) {
                 if (One.IVal != 0) {
-                    /* Skip evaluating remaining */
+                    // Skip evaluating remaining
                     PPEvaluationEnabled = 0;
-                    /* The value of the result will be true */
+                    // The value of the result will be true
                     Expr->IVal = 1;
                 }
             }
         }
 
-        /* Restore evaluation as before */
+        // Restore evaluation as before
         PPEvaluationEnabled = PPEvaluationEnabledPrev;
     }
 }
 
-
-
 static void PPhieQuest (PPExpr* Expr)
-/* Handle the ternary "expr1 ? expr2 : expr3 " operator */
+// Handle the ternary "expr1 ? expr2 : expr3 " operator
 {
-    /* Call the lower level eval routine */
+    // Call the lower level eval routine
     PPhieOr (Expr);
 
-    /* Check if it's a ternary expression */
+    // Check if it's a ternary expression
     if (CurTok.Tok == TOK_QUEST) {
         int PPEvaluationEnabledPrev = PPEvaluationEnabled;
-        PPExpr Expr2;       /* Expression 2 */
-        PPExpr Expr3;       /* Expression 3 */
+        PPExpr Expr2;       // Expression 2
+        PPExpr Expr3;       // Expression 3
 
-        /* Skip the question mark */
+        // Skip the question mark
         NextToken ();
 
-        /* Disable evaluation for Expr2 if the condition is false */
+        // Disable evaluation for Expr2 if the condition is false
         if (Expr->IVal == 0) {
             PPEvaluationEnabled = 0;
         }
 
-        /* Parse second expression */
+        // Parse second expression
         PPExprInit (&Expr2);
         PPhie1 (&Expr2);
 
-        /* Skip the colon */
+        // Skip the colon
         ConsumeColon ();
 
-        /* Disable evaluation for Expr3 if the condition is true */
+        // Disable evaluation for Expr3 if the condition is true
         if (Expr->IVal != 0) {
             PPEvaluationEnabled = 0;
         }
 
-        /* Parse third expression */
+        // Parse third expression
         PPExprInit (&Expr3);
         PPhieQuest (&Expr3);
 
-        /* Set the result */
+        // Set the result
         Expr->IVal = Expr->IVal ? Expr2.IVal : Expr3.IVal;
 
-        /* Restore evaluation as before */
+        // Restore evaluation as before
         PPEvaluationEnabled = PPEvaluationEnabledPrev;
     }
 }
 
-
-
 static void PPhie1 (PPExpr* Expr)
-/* Handle first level of expression hierarchy */
+// Handle first level of expression hierarchy
 {
     PPhieQuest (Expr);
 
     if (!PPEvaluationEnabled) {
-        /* Skip evaluation */
+        // Skip evaluation
         return;
     }
 
@@ -807,26 +746,24 @@ static void PPhie1 (PPExpr* Expr)
     }
 }
 
-
-
 void ParsePPExprInLine (PPExpr* Expr)
-/* Parse a line for PP expression */
+// Parse a line for PP expression
 {
-    /* Initialize the parser status */
+    // Initialize the parser status
     PPEvaluationFailed = 0;
     PPEvaluationEnabled = 1;
     PPParserRunning = 1;
 
-    /* Parse */
+    // Parse
     PPExprInit (Expr);
     PPhie1 (Expr);
 
-    /* If the evaluation fails, the result is always zero */
+    // If the evaluation fails, the result is always zero
     if (PPEvaluationFailed) {
         Expr->IVal = 0;
         PPEvaluationFailed = 0;
     }
 
-    /* Restore parser status */
+    // Restore parser status
     PPParserRunning = 0;
 }

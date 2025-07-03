@@ -1,111 +1,99 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                  code.c                                   */
-/*                                                                           */
-/*                          Binary code management                           */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//                                  code.c
+//
+//                          Binary code management
+//
+//
+//
+// (C) 2000-2003 Ullrich von Bassewitz
+//               Roemerstrasse 52
+//               D-70794 Filderstadt
+// EMail:        uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
 
-/* common */
+// common
 #include "check.h"
 
-/* da65 */
+// da65
 #include "code.h"
 #include "error.h"
 #include "global.h"
 
+////////////////////////////////////////////////////////////////////////////////
+//                                   Data
+////////////////////////////////////////////////////////////////////////////////
 
+uint8_t CodeBuf[0x10000];               // Code buffer
+uint32_t CodeStart;                     // Start address
+uint32_t CodeEnd;                       // End address
+uint32_t PC;                            // Current PC
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-uint8_t CodeBuf[0x10000];               /* Code buffer */
-uint32_t CodeStart;                     /* Start address */
-uint32_t CodeEnd;                       /* End address */
-uint32_t PC;                            /* Current PC */
-
-
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                                   Code
+////////////////////////////////////////////////////////////////////////////////
 
 void LoadCode (void)
-/* Load the code from the given file */
+// Load the code from the given file
 {
     long Count, MaxCount, Size;
     FILE* F;
 
-
     PRECONDITION (StartAddr < 0x10000);
 
-    /* Open the file */
+    // Open the file
     F = fopen (InFile, "rb");
     if (F == 0) {
         Error ("Cannot open '%s': %s", InFile, strerror (errno));
     }
 
-    /* Seek to the end to get the size of the file */
+    // Seek to the end to get the size of the file
     if (fseek (F, 0, SEEK_END) != 0) {
         Error ("Cannot seek on file '%s': %s", InFile, strerror (errno));
     }
     Size = ftell (F);
 
-    /* The input offset must be smaller than the size */
+    // The input offset must be smaller than the size
     if (InputOffs >= 0) {
         if (InputOffs >= Size) {
             Error ("Input offset is greater than file size");
         }
     } else {
-        /* Use a zero offset */
+        // Use a zero offset
         InputOffs = 0;
     }
 
-    /* Seek to the input offset and correct size to contain the remainder of
-    ** the file.
-    */
+    // Seek to the input offset and correct size to contain the remainder of
+    // the file.
     if (fseek (F, InputOffs, SEEK_SET) != 0) {
         Error ("Cannot seek on file '%s': %s", InFile, strerror (errno));
     }
     Size -= InputOffs;
 
-    /* Limit the size to the maximum input size if one is given */
+    // Limit the size to the maximum input size if one is given
     if (InputSize >= 0) {
         if (InputSize > Size) {
             Error ("Input size is greater than what is available");
@@ -113,10 +101,9 @@ void LoadCode (void)
         Size = InputSize;
     }
 
-    /* If the start address was not given, set it so that the code loads to
-    ** 0x10000 - Size. This is a reasonable default assuming that the file
-    ** is a ROM that contains the hardware vectors at $FFFA.
-    */
+    // If the start address was not given, set it so that the code loads to
+    // 0x10000 - Size. This is a reasonable default assuming that the file
+    // is a ROM that contains the hardware vectors at $FFFA.
     if (!HaveStartAddr) {
         if (Size > 0x10000) {
             StartAddr = 0;
@@ -126,10 +113,10 @@ void LoadCode (void)
         HaveStartAddr = 1;
     }
 
-    /* Calculate the maximum code size */
+    // Calculate the maximum code size
     MaxCount = 0x10000 - StartAddr;
 
-    /* Check if the size is larger than what we can read */
+    // Check if the size is larger than what we can read
     if (Size == 0) {
         Error ("Nothing to read from input file '%s'", InFile);
     }
@@ -140,63 +127,53 @@ void LoadCode (void)
         MaxCount = (unsigned) Size;
     }
 
-    /* Read from the file and remember the number of bytes read */
+    // Read from the file and remember the number of bytes read
     Count = fread (CodeBuf + StartAddr, 1, MaxCount, F);
     if (ferror (F) || Count != MaxCount) {
         Error ("Error reading from '%s': %s", InFile, strerror (errno));
     }
 
-    /* Close the file */
+    // Close the file
     fclose (F);
 
-    /* Set the buffer variables */
+    // Set the buffer variables
     CodeStart = PC = StartAddr;
-    CodeEnd = CodeStart + Count - 1;    /* CodeEnd is inclusive */
+    CodeEnd = CodeStart + Count - 1;    // CodeEnd is inclusive
 }
 
-
-
 uint8_t GetCodeByte (uint32_t Addr)
-/* Get a byte from the given address */
+// Get a byte from the given address
 {
     PRECONDITION (Addr <= CodeEnd);
     return CodeBuf [Addr];
 }
 
-
-
 uint16_t GetCodeDByte (uint32_t Addr)
-/* Get a dbyte from the given address */
+// Get a dbyte from the given address
 {
     uint16_t Lo = GetCodeByte (Addr);
     uint16_t Hi = GetCodeByte (Addr+1);
     return (Lo <<8) | Hi;
 }
 
-
-
 uint16_t GetCodeWord (uint32_t Addr)
-/* Get a word from the given address */
+// Get a word from the given address
 {
     uint16_t Lo = GetCodeByte (Addr);
     uint16_t Hi = GetCodeByte (Addr+1);
     return Lo | (Hi << 8);
 }
 
-
-
 uint32_t GetCodeDWord (uint32_t Addr)
-/* Get a dword from the given address */
+// Get a dword from the given address
 {
     uint32_t Lo = GetCodeWord (Addr);
     uint32_t Hi = GetCodeWord (Addr+2);
     return Lo | (Hi << 16);
 }
 
-
-
 uint32_t GetCodeLongAddr (uint32_t Addr)
-/* Get a word from the given address */
+// Get a word from the given address
 {
     uint32_t Lo = GetCodeByte (Addr);
     uint32_t Mid = GetCodeByte (Addr+1);
@@ -204,10 +181,8 @@ uint32_t GetCodeLongAddr (uint32_t Addr)
     return Lo | (Mid << 8) | (Hi << 16);
 }
 
-
-
 uint32_t GetRemainingBytes (void)
-/* Return the number of remaining code bytes */
+// Return the number of remaining code bytes
 {
     if (CodeEnd >= PC) {
         return (CodeEnd - PC + 1);
@@ -216,18 +191,14 @@ uint32_t GetRemainingBytes (void)
     }
 }
 
-
-
 int CodeLeft (void)
-/* Return true if there are code bytes left */
+// Return true if there are code bytes left
 {
     return (PC <= CodeEnd);
 }
 
-
-
 void ResetCode (void)
-/* Reset the code input to start over for the next pass */
+// Reset the code input to start over for the next pass
 {
     PC = CodeStart;
 }

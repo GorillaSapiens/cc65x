@@ -1,45 +1,43 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 objdata.c                                 */
-/*                                                                           */
-/*               Handling object file data for the ld65 linker               */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//                                 objdata.c
+//
+//               Handling object file data for the ld65 linker
+//
+//
+//
+// (C) 1998-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 #include <string.h>
 
-/* common */
+// common
 #include "check.h"
 #include "xmalloc.h"
 
-/* ld65 */
+// ld65
 #include "error.h"
 #include "exports.h"
 #include "fileinfo.h"
@@ -47,32 +45,24 @@
 #include "objdata.h"
 #include "spool.h"
 
+////////////////////////////////////////////////////////////////////////////////
+//                                   Data
+////////////////////////////////////////////////////////////////////////////////
 
-
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* Collection containing used ObjData objects */
+// Collection containing used ObjData objects
 Collection       ObjDataList = STATIC_COLLECTION_INITIALIZER;
 
-
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                                   Code
+////////////////////////////////////////////////////////////////////////////////
 
 ObjData* NewObjData (void)
-/* Allocate a new structure on the heap, insert it into the list, return it */
+// Allocate a new structure on the heap, insert it into the list, return it
 {
-    /* Allocate memory */
+    // Allocate memory
     ObjData* O = xmalloc (sizeof (ObjData));
 
-    /* Initialize the data */
+    // Initialize the data
     O->Next             = 0;
     O->Name             = INVALID_STRING_ID;
     O->Lib              = 0;
@@ -96,17 +86,14 @@ ObjData* NewObjData (void)
     O->Scopes           = EmptyCollection;
     O->Spans            = EmptyCollection;
 
-    /* Return the new entry */
+    // Return the new entry
     return O;
 }
 
-
-
 void FreeObjData (ObjData* O)
-/* Free an ObjData object. NOTE: This function works only for unused object
-** data, that is, ObjData objects that aren't used because they aren't
-** referenced.
-*/
+// Free an ObjData object. NOTE: This function works only for unused object
+// data, that is, ObjData objects that aren't used because they aren't
+// referenced.
 {
     unsigned I;
 
@@ -141,35 +128,27 @@ void FreeObjData (ObjData* O)
     xfree (O);
 }
 
-
-
 void FreeObjStrings (ObjData* O)
-/* Free the module string data. Used once the object file is loaded completely
-** when all strings are converted to global strings.
-*/
+// Free the module string data. Used once the object file is loaded completely
+// when all strings are converted to global strings.
 {
     xfree (O->Strings);
     O->Strings = 0;
 }
 
-
-
 void InsertObjData (ObjData* O)
-/* Insert the ObjData object into the collection of used ObjData objects. */
+// Insert the ObjData object into the collection of used ObjData objects.
 {
     CollAppend (&ObjDataList, O);
 }
 
-
-
 void InsertObjGlobals (ObjData* O)
-/* Insert imports and exports from the object file into the global import and
-** export lists.
-*/
+// Insert imports and exports from the object file into the global import and
+// export lists.
 {
     unsigned I;
 
-    /* Insert exports and imports */
+    // Insert exports and imports
     for (I = 0; I < CollCount (&O->Exports); ++I) {
         InsertExport (CollAt (&O->Exports, I));
     }
@@ -178,10 +157,8 @@ void InsertObjGlobals (ObjData* O)
     }
 }
 
-
-
 unsigned MakeGlobalStringId (const ObjData* O, unsigned Index)
-/* Convert a local string id into a global one and return it. */
+// Convert a local string id into a global one and return it.
 {
     if (Index >= O->StringCount) {
         Error ("Invalid string index (%u) in module '%s'",
@@ -190,28 +167,21 @@ unsigned MakeGlobalStringId (const ObjData* O, unsigned Index)
     return O->Strings[Index];
 }
 
-
-
 const char* GetObjFileName (const ObjData* O)
-/* Get the name of the object file. Return "[linker generated]" if the object
-** file is NULL.
-*/
+// Get the name of the object file. Return "[linker generated]" if the object
+// file is NULL.
 {
     return O? GetString (O->Name) : "[linker generated]";
 }
 
-
-
 const struct StrBuf* GetObjString (const ObjData* Obj, unsigned Id)
-/* Get a string from an object file checking for an invalid index */
+// Get a string from an object file checking for an invalid index
 {
     return GetStrBuf (MakeGlobalStringId (Obj, Id));
 }
 
-
-
 struct Section* GetObjSection (const ObjData* O, unsigned Id)
-/* Get a section from an object file checking for a valid index */
+// Get a section from an object file checking for a valid index
 {
     if (Id >= CollCount (&O->Sections)) {
         Error ("Invalid section index (%u) in module '%s'",
@@ -220,10 +190,8 @@ struct Section* GetObjSection (const ObjData* O, unsigned Id)
     return CollAtUnchecked (&O->Sections, Id);
 }
 
-
-
 struct Import* GetObjImport (const ObjData* O, unsigned Id)
-/* Get an import from an object file checking for a valid index */
+// Get an import from an object file checking for a valid index
 {
     if (Id >= CollCount (&O->Imports)) {
         Error ("Invalid import index (%u) in module '%s'",
@@ -232,10 +200,8 @@ struct Import* GetObjImport (const ObjData* O, unsigned Id)
     return CollAtUnchecked (&O->Imports, Id);
 }
 
-
-
 struct Export* GetObjExport (const ObjData* O, unsigned Id)
-/* Get an export from an object file checking for a valid index */
+// Get an export from an object file checking for a valid index
 {
     if (Id >= CollCount (&O->Exports)) {
         Error ("Invalid export index (%u) in module '%s'",
@@ -244,10 +210,8 @@ struct Export* GetObjExport (const ObjData* O, unsigned Id)
     return CollAtUnchecked (&O->Exports, Id);
 }
 
-
-
 struct DbgSym* GetObjDbgSym (const ObjData* O, unsigned Id)
-/* Get a debug symbol from an object file checking for a valid index */
+// Get a debug symbol from an object file checking for a valid index
 {
     if (Id >= CollCount (&O->DbgSyms)) {
         Error ("Invalid debug symbol index (%u) in module '%s'",
@@ -256,10 +220,8 @@ struct DbgSym* GetObjDbgSym (const ObjData* O, unsigned Id)
     return CollAtUnchecked (&O->DbgSyms, Id);
 }
 
-
-
 struct Scope* GetObjScope (const ObjData* O, unsigned Id)
-/* Get a scope from an object file checking for a valid index */
+// Get a scope from an object file checking for a valid index
 {
     if (Id >= CollCount (&O->Scopes)) {
         Error ("Invalid scope index (%u) in module '%s'",
@@ -268,43 +230,39 @@ struct Scope* GetObjScope (const ObjData* O, unsigned Id)
     return CollAtUnchecked (&O->Scopes, Id);
 }
 
-
-
 unsigned ObjDataCount (void)
-/* Return the total number of modules */
+// Return the total number of modules
 {
     return CollCount (&ObjDataList);
 }
 
-
-
 void PrintDbgModules (FILE* F)
-/* Output the modules to a debug info file */
+// Output the modules to a debug info file
 {
     unsigned I;
 
-    /* Output modules */
+    // Output modules
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
-        /* Get this object file */
+        // Get this object file
         const ObjData* O = CollConstAt (&ObjDataList, I);
 
-        /* The main source file is the one at index zero */
+        // The main source file is the one at index zero
         const FileInfo* Source = CollConstAt (&O->Files, 0);
 
-        /* Output the module line */
+        // Output the module line
         fprintf (F,
                  "mod\tid=%u,name=\"%s\",file=%u",
                  I,
                  GetObjFileName (O),
                  Source->Id);
 
-        /* Add library if any */
+        // Add library if any
         if (O->Lib != 0) {
             fprintf (F, ",lib=%u", GetLibId (O->Lib));
         }
 
-        /* Terminate the output line */
+        // Terminate the output line
         fputc ('\n', F);
     }
 

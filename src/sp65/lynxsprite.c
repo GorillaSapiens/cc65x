@@ -1,58 +1,52 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                               lynxsprite.c                                */
-/*                                                                           */
-/*    Lynx sprite format backend for the sp65 sprite and bitmap utility      */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2012,      Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//                               lynxsprite.c
+//
+//    Lynx sprite format backend for the sp65 sprite and bitmap utility
+//
+//
+//
+// (C) 2012,      Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 #include <stdlib.h>
 
-/* common */
+// common
 #include "attrib.h"
 #include "print.h"
 
-/* sp65 */
+// sp65
 #include "attr.h"
 #include "error.h"
 #include "lynxsprite.h"
 
+////////////////////////////////////////////////////////////////////////////////
+//                                   Data
+////////////////////////////////////////////////////////////////////////////////
 
-
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* Sprite mode */
+// Sprite mode
 enum Mode {
     smAuto,
     smLiteral,
@@ -60,17 +54,14 @@ enum Mode {
     smShaped
 };
 
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//                                   Code
+////////////////////////////////////////////////////////////////////////////////
 
 static enum Mode GetMode (const Collection* A)
-/* Return the sprite mode from the attribute collection A */
+// Return the sprite mode from the attribute collection A
 {
-    /* Check for a mode attribute */
+    // Check for a mode attribute
     const char* Mode = GetAttrVal (A, "mode");
     if (Mode) {
         if (strcmp (Mode, "literal") == 0) {
@@ -87,11 +78,10 @@ static enum Mode GetMode (const Collection* A)
     return smAuto;
 }
 
-
 static unsigned GetActionPointX (const Bitmap* B, const Collection* A)
-/* Return the sprite mode from the attribute collection A */
+// Return the sprite mode from the attribute collection A
 {
-    /* Check for a action point x attribute */
+    // Check for a action point x attribute
     const char* ActionPointX = GetAttrVal (A, "ax");
     if (ActionPointX) {
         if (strcmp (ActionPointX, "mid") == 0) {
@@ -106,11 +96,10 @@ static unsigned GetActionPointX (const Bitmap* B, const Collection* A)
     }
 }
 
-
 static unsigned GetActionPointY (const Bitmap* B, const Collection* A)
-/* Return the sprite mode from the attribute collection A */
+// Return the sprite mode from the attribute collection A
 {
-    /* Check for a action point y attribute */
+    // Check for a action point y attribute
     const char* ActionPointY = GetAttrVal (A, "ay");
     if (ActionPointY) {
         if (strcmp (ActionPointY, "mid") == 0) {
@@ -126,9 +115,9 @@ static unsigned GetActionPointY (const Bitmap* B, const Collection* A)
 }
 
 static unsigned GetEdgeIndex (const Collection* A)
-/* Return the sprite mode from the attribute collection A */
+// Return the sprite mode from the attribute collection A
 {
-    /* Get index for edge color in shaped mode */
+    // Get index for edge color in shaped mode
     const char* EdgeIndex = GetAttrVal (A, "edge");
     if (EdgeIndex) {
         return atoi(EdgeIndex);
@@ -138,9 +127,9 @@ static unsigned GetEdgeIndex (const Collection* A)
 }
 
 static unsigned GetQuadrant (const Collection* A)
-/* Return the sprite mode from the attribute collection A */
+// Return the sprite mode from the attribute collection A
 {
-    /* Get index for edge color in shaped mode */
+    // Get index for edge color in shaped mode
     const char* Quadrant = GetAttrVal (A, "quadrant");
     if (Quadrant) {
         return atoi(Quadrant);
@@ -150,7 +139,7 @@ static unsigned GetQuadrant (const Collection* A)
 }
 
 static void OptimizePenpal (const Bitmap* B, char *PenPal)
-/* Create an optimal Penpal */
+// Create an optimal Penpal
 {
     char usage[16];
     unsigned I, J, Val;
@@ -224,16 +213,16 @@ static void OptimizePenpal (const Bitmap* B, char *PenPal)
         PenPal[J] = 0;
         J++;
     }
-    /* printf("Penpal %s\n", PenPal); */
+    // printf("Penpal %s\n", PenPal);
 }
 
 static unsigned GetPenpal (const Bitmap* B, const Collection* A, char *PenPal)
-/* Return the penpal from the attribute collection A */
+// Return the penpal from the attribute collection A
 {
     const char* Pen = GetAttrVal (A, "pen");
     if (Pen) {
         if (strcmp (Pen, "opt") == 0) {
-            /* So we need to optimize the penpal and colour depth */
+            // So we need to optimize the penpal and colour depth
             OptimizePenpal (B, PenPal);
         } else {
             strncpy(PenPal, Pen, 17);
@@ -244,9 +233,9 @@ static unsigned GetPenpal (const Bitmap* B, const Collection* A, char *PenPal)
 }
 
 static unsigned GetBPP (const Collection* A)
-/* Return the sprite depth from the attribute collection A */
+// Return the sprite depth from the attribute collection A
 {
-    /* Get index for edge color in shaped mode */
+    // Get index for edge color in shaped mode
     const char* BPP = GetAttrVal (A, "bpp");
     if (BPP) {
         return atoi(BPP);
@@ -255,21 +244,21 @@ static unsigned GetBPP (const Collection* A)
     }
 }
 
-static char OutBuffer[512]; /* The maximum size is 508 pixels */
+static char OutBuffer[512]; // The maximum size is 508 pixels
 static unsigned char OutIndex;
 
 static void AssembleByte(unsigned bits, char val)
 {
     static char bit_counter = 8, byte = 0;
 
-    /* initialize */
+    // initialize
     if (!bits) {
         OutIndex = 0;
         bit_counter = 8;
         byte = 0;
         return;
     }
-    /* handle end of line */
+    // handle end of line
     if (bits == 7) {
         if (bit_counter != 8) {
             byte <<= bit_counter;
@@ -278,7 +267,7 @@ static void AssembleByte(unsigned bits, char val)
                 Error ("Sprite is too large for the Lynx");
             }
         } else {
-            /* Add pad byte */
+            // Add pad byte
             byte = 0;
             OutBuffer[OutIndex++] = byte;
             if (!OutIndex) {
@@ -342,16 +331,16 @@ static unsigned char AnalyseNextChunks(signed *newlen, signed len, char data[32]
         return 'L';
     }
     if ((lindex > 0) && (lindex + longest > 15)) {
-        /* We cannot pack the stride in this packet */
+        // We cannot pack the stride in this packet
         *newlen = lindex;
         return 'A';
     }
-    /* Cost till end of area */
+    // Cost till end of area
     literal_cost = 5 + lindex * ColorBits + longest * ColorBits;
     packed_cost = 5 + lindex * ColorBits + 5 + ColorBits;
     if (packed_cost < literal_cost) {
         if (lindex == 0) {
-            /* Use packed data */
+            // Use packed data
             if (longest > 16) {
                 *newlen = 16;
             } else {
@@ -359,11 +348,11 @@ static unsigned char AnalyseNextChunks(signed *newlen, signed len, char data[32]
             }
             return 'P';
         }
-        /* We had a good find, but it was not at the start of the line */
+        // We had a good find, but it was not at the start of the line
         *newlen = lindex;
         return 'A';
     }
-    /* There is no point in packing - use literal */
+    // There is no point in packing - use literal
     if (len > 16) {
         *newlen = 16;
     } else {
@@ -380,23 +369,23 @@ static unsigned char GetNextChunk(signed *newlen, signed len, char data[32], cha
         oper = AnalyseNextChunks(newlen, len, data, ColorBits);
         len = *newlen;
     }
-    return oper; /* The packet type is now P or L and the length is in newlen */
+    return oper; // The packet type is now P or L and the length is in newlen
 }
 
 static void WriteOutBuffer(StrBuf *D)
 {
     signed i;
 
-    /* Fix bug in Lynx where the count cannot be 1 */
+    // Fix bug in Lynx where the count cannot be 1
     if (OutIndex == 1) {
         OutBuffer[OutIndex++] = 0;
     }
-    /* Write the byte count to the end of the scanline */
+    // Write the byte count to the end of the scanline
     if (OutIndex == 255) {
         Error ("Sprite is too large for the Lynx");
     }
     SB_AppendChar (D, OutIndex+1);
-    /* Write scanline data */
+    // Write scanline data
     for (i = 0; i < OutIndex; i++) {
         SB_AppendChar (D, OutBuffer[i]);
     }
@@ -404,23 +393,22 @@ static void WriteOutBuffer(StrBuf *D)
 
 static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask, char LineBuffer[512],
     int len, int LastOpaquePixel) {
-/*
- * The data starts with a byte count. It tells the number of bytes on this
- * line + 1.
- * Special case is a count of 1. It will change to next quadrant.
- * Other special case is 0. It will end the sprite.
- *
- * Ordinary data packet. These are bits in a stream.
- * 1=literal 0=packed
- * 4 bit count (+1)
- * for literal you put "count" values
- * for packed you repeat the value "count" times
- * Never use packed mode for one pixel
- * If the last bit on a line is in use you need to add a byte of zeroes
- * A sequence 00000 ends a scan line
- *
- * All data is high nybble first
- */
+// 
+// The data starts with a byte count. It tells the number of bytes on this
+// line + 1.
+// Special case is a count of 1. It will change to next quadrant.
+// Other special case is 0. It will end the sprite.
+// 
+// Ordinary data packet. These are bits in a stream.
+// 1=literal 0=packed
+// 4 bit count (+1)
+// for literal you put "count" values
+// for packed you repeat the value "count" times
+// Never use packed mode for one pixel
+// If the last bit on a line is in use you need to add a byte of zeroes
+// A sequence 00000 ends a scan line
+// 
+// All data is high nybble first
     unsigned char V = 0;
     signed i;
     signed count;
@@ -430,11 +418,11 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
     case smAuto:
     case smLiteral:
         for (i = 0; i < len; i++) {
-            /* Fetch next pixel index into pixel buffer */
+            // Fetch next pixel index into pixel buffer
             AssembleByte(ColorBits, LineBuffer[i] & ColorMask);
         }
         AssembleByte(7, 0);
-        /* Write the buffer to file */
+        // Write the buffer to file
         WriteOutBuffer(D);
         break;
     case smPacked:
@@ -456,7 +444,7 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
                 analyselen = 32;
             }
             if (GetNextChunk(&count, analyselen, LineBuffer + i, ColorBits) == 'P') {
-                /* Make runlength packet */
+                // Make runlength packet
                 V = LineBuffer[i];
                 i += count;
                 len -= count;
@@ -464,7 +452,7 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
                 AssembleByte(ColorBits, V & ColorMask);
 
             } else {
-                /* Make packed literal packet */
+                // Make packed literal packet
                 AssembleByte(5, (count-1) | 0x10);
                 do {
                     AssembleByte(ColorBits, LineBuffer[i]);
@@ -473,27 +461,26 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
                 } while (--count > 0);
             }
         }
-        /* Force EOL for shaped? AssembleByte(5, 0); */
+        // Force EOL for shaped? AssembleByte(5, 0);
         AssembleByte(7, 0);
-        /* Write the buffer to file */
+        // Write the buffer to file
         WriteOutBuffer(D);
         break;
     }
 }
 
 StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
-/* Generate binary output in Lynx sprite format for the bitmap B. The output
-** is stored in a string buffer (which is actually a dynamic char array) and
-** returned.
-**
-** The Lynx will draw 4 quadrants:
-** 0 - Down right
-** 1 - Up right
-** 2 - Up left
-** 3 - Down left
-**
-** The sprite will end with a byte 0.
-*/
+// Generate binary output in Lynx sprite format for the bitmap B. The output
+// is stored in a string buffer (which is actually a dynamic char array) and
+// returned.
+// 
+// The Lynx will draw 4 quadrants:
+// 0 - Down right
+// 1 - Up right
+// 2 - Up left
+// 3 - Down left
+// 
+// The sprite will end with a byte 0.
 {
     enum Mode M;
     StrBuf* D;
@@ -505,19 +492,19 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
     char Quadrant;
     char quad;
     char BPP;
-    /* The default mapping is 1:1 plus extra colours become 0 */
+    // The default mapping is 1:1 plus extra colours become 0
     char Map[17] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0};
     signed PenColors;
     char PenPal[18];
     signed Val;
 
-    /* Get EdgeIndex */
+    // Get EdgeIndex
     EdgeIndex = GetEdgeIndex (A);
 
-    /* Get Quadrant for starting the draw process */
+    // Get Quadrant for starting the draw process
     Quadrant = GetQuadrant (A) & 3;
 
-    /* Action point of the sprite */
+    // Action point of the sprite
     OX = GetActionPointX (B, A);
     OY = GetActionPointY (B, A);
     if (OX >= GetBitmapWidth (B)) {
@@ -527,19 +514,19 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
         Error ("Action point Y cannot be larger than bitmap height");
     }
 
-    /* Output the image properties */
+    // Output the image properties
     Print (stdout, 1, "Image is %ux%u with %u colors%s\n",
            GetBitmapWidth (B), GetBitmapHeight (B), GetBitmapColors (B),
            BitmapIsIndexed (B)? " (indexed)" : "");
 
-    /* Get the sprite mode */
+    // Get the sprite mode
     M = GetMode (A);
 
-    /* Now check how to do the mapping */
+    // Now check how to do the mapping
     if (GetPenpal (B, A, &PenPal[0])) {
             signed I;
 
-            /* Modify the map by content of PenPal */
+            // Modify the map by content of PenPal
             PenColors = strlen(PenPal);
             for (I = 0; I < PenColors; I++) {
                 switch (PenPal[I]) {
@@ -597,7 +584,7 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
             case 'F':
                     Map[15] = I;
                         break;
-                /* The X is reserved as transparency. This allows for shaped sprites */
+                // The X is reserved as transparency. This allows for shaped sprites
             case 'x':
             case 'X':
                     Map[16] = I;
@@ -637,23 +624,23 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
         ColorMask = 0x0f;
         break;
     }
-    /* B->BPP = ColorBits; */
-    /* Create the output buffer and resize it to the required size. */
+    // B->BPP = ColorBits;
+    // Create the output buffer and resize it to the required size.
     D = NewStrBuf ();
     SB_Realloc (D, 63);
 
     for (quad = 0; quad < 4; quad++) {
         switch ((Quadrant + quad) & 3) {
         case 0:
-            /* Convert the image for quadrant bottom right */
+            // Convert the image for quadrant bottom right
             for (Y = OY; Y < (signed)GetBitmapHeight (B); ++Y) {
                 signed i = 0;
                 signed LastOpaquePixel = -1;
-                char LineBuffer[512]; /* The maximum size is 508 pixels */
+                char LineBuffer[512]; // The maximum size is 508 pixels
 
-                /* Fill the LineBuffer for easier optimisation */
+                // Fill the LineBuffer for easier optimisation
                 for (X = OX; X < (signed)GetBitmapWidth (B); ++X) {
-                    /* Fetch next bit into byte buffer */
+                    // Fetch next bit into byte buffer
                     Val = GetPixel (B, X, Y).Index;
                     if (Val > 16) Val = 16;
                     LineBuffer[i] = Map[Val] & ColorMask;
@@ -667,34 +654,34 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
                 encodeSprite(D, M, ColorBits, ColorMask, LineBuffer, i, LastOpaquePixel);
             }
             if ((OY == 0) && (OX == 0)) {
-                /* Trivial case only one quadrant */
+                // Trivial case only one quadrant
 
-                /* Mark end of sprite */
+                // Mark end of sprite
                 SB_AppendChar (D, 0);
 
-                /* Return the converted bitmap */
+                // Return the converted bitmap
                 return D;
             }
             if ((quad == 1) && (OY == 0)) {
-                /* Special case only two quadrants */
+                // Special case only two quadrants
 
-                /* Mark end of sprite */
+                // Mark end of sprite
                 SB_AppendChar (D, 0);
 
-                /* Return the converted bitmap */
+                // Return the converted bitmap
                 return D;
             }
             break;
         case 1:
-            /* Convert the image for quadrant top right */
+            // Convert the image for quadrant top right
             for (Y = OY - 1; Y >= 0; --Y) {
                 signed i = 0;
                 signed LastOpaquePixel = -1;
-                char LineBuffer[512]; /* The maximum size is 508 pixels */
+                char LineBuffer[512]; // The maximum size is 508 pixels
 
-                /* Fill the LineBuffer for easier optimisation */
+                // Fill the LineBuffer for easier optimisation
                 for (X = OX; X < (signed)GetBitmapWidth (B); ++X) {
-                    /* Fetch next bit into byte buffer */
+                    // Fetch next bit into byte buffer
                     Val = GetPixel (B, X, Y).Index;
                     if (Val > 16) Val = 16;
 
@@ -710,34 +697,34 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
             }
 
             if ((OY == GetBitmapHeight (B) - 1) && (OX == 0)) {
-                /* Trivial case only one quadrant */
+                // Trivial case only one quadrant
 
-                /* Mark end of sprite */
+                // Mark end of sprite
                 SB_AppendChar (D, 0);
 
-                /* Return the converted bitmap */
+                // Return the converted bitmap
                 return D;
             }
             if ((quad == 1) && (OX == 0)) {
-                /* Special case only two quadrants */
+                // Special case only two quadrants
 
-                /* Mark end of sprite */
+                // Mark end of sprite
                 SB_AppendChar (D, 0);
 
-                /* Return the converted bitmap */
+                // Return the converted bitmap
                 return D;
             }
             break;
         case 2:
-            /* Convert the image for quadrant top left */
+            // Convert the image for quadrant top left
             for (Y = OY - 1; Y >= 0; --Y) {
                 signed i = 0;
                 signed LastOpaquePixel = -1;
-                char LineBuffer[512]; /* The maximum size is 508 pixels */
+                char LineBuffer[512]; // The maximum size is 508 pixels
 
-                /* Fill the LineBuffer for easier optimisation */
+                // Fill the LineBuffer for easier optimisation
                 for (X = OX - 1; X >= 0; --X) {
-                    /* Fetch next bit into byte buffer */
+                    // Fetch next bit into byte buffer
                     Val = GetPixel (B, X, Y).Index;
                     if (Val > 16) Val = 16;
 
@@ -752,34 +739,34 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
                 encodeSprite(D, M, ColorBits, ColorMask, LineBuffer, i, LastOpaquePixel);
             }
             if ((OY == GetBitmapHeight (B) - 1) && (OX == GetBitmapWidth (B) - 1)) {
-                /* Trivial case only one quadrant */
+                // Trivial case only one quadrant
 
-                /* Mark end of sprite */
+                // Mark end of sprite
                 SB_AppendChar (D, 0);
 
-                /* Return the converted bitmap */
+                // Return the converted bitmap
                 return D;
             }
             if ((quad == 1) && (OY == GetBitmapHeight (B) - 1)) {
-                /* Special case only two quadrants */
+                // Special case only two quadrants
 
-                /* Mark end of sprite */
+                // Mark end of sprite
                 SB_AppendChar (D, 0);
 
-                /* Return the converted bitmap */
+                // Return the converted bitmap
                 return D;
             }
             break;
         case 3:
-            /* Convert the image for quadrant bottom left */
+            // Convert the image for quadrant bottom left
             for (Y = OY; Y < (signed)GetBitmapHeight (B); ++Y) {
                 signed i = 0;
                 signed LastOpaquePixel = -1;
-                char LineBuffer[512]; /* The maximum size is 508 pixels */
+                char LineBuffer[512]; // The maximum size is 508 pixels
 
-                /* Fill the LineBuffer for easier optimisation */
+                // Fill the LineBuffer for easier optimisation
                 for (X = OX - 1; X >= 0; --X) {
-                    /* Fetch next bit into byte buffer */
+                    // Fetch next bit into byte buffer
                     Val = GetPixel (B, X, Y).Index;
                     if (Val > 16) Val = 16;
 
@@ -794,34 +781,34 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
                 encodeSprite(D, M, ColorBits, ColorMask, LineBuffer, i, LastOpaquePixel);
             }
             if ((OY == 0) && (OX == GetBitmapWidth (B) - 1)) {
-                /* Trivial case only one quadrant */
+                // Trivial case only one quadrant
 
-                /* Mark end of sprite */
+                // Mark end of sprite
                 SB_AppendChar (D, 0);
 
-                /* Return the converted bitmap */
+                // Return the converted bitmap
                 return D;
             }
             if ((quad == 1) && (OX == GetBitmapWidth (B) - 1)) {
-                /* Special case only two quadrants */
+                // Special case only two quadrants
 
-                /* Mark end of sprite */
+                // Mark end of sprite
                 SB_AppendChar (D, 0);
 
-                /* Return the converted bitmap */
+                // Return the converted bitmap
                 return D;
             }
             break;
         }
         if (quad < 3) {
-            /* Next quadrant */
+            // Next quadrant
             SB_AppendChar (D, 1);
         } else {
-            /* End sprite */
+            // End sprite
             SB_AppendChar (D, 0);
         }
     }
 
-    /* Return the converted bitmap */
+    // Return the converted bitmap
     return D;
 }

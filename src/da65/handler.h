@@ -1,60 +1,52 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 handler.h                                 */
-/*                                                                           */
-/*               Opcode handler functions for the disassembler               */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
-
-
+////////////////////////////////////////////////////////////////////////////////
+//
+//                                 handler.h
+//
+//               Opcode handler functions for the disassembler
+//
+//
+//
+// (C) 2000-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef HANDLER_H
 #define HANDLER_H
 
-
-
 #include <stdint.h>
 
-/* common */
+// common
 #include "attrib.h"
 
-/* da65 */
+// da65
 #include "opctable.h"
 
+////////////////////////////////////////////////////////////////////////////////
+//                                   Code
+////////////////////////////////////////////////////////////////////////////////
 
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
-
-/* Generic handlers */
+// Generic handlers
 void OH_Illegal (const OpcDesc* D attribute ((unused)));
 void OH_Accumulator (const OpcDesc*);
 void OH_Implicit (const OpcDesc*);
@@ -97,7 +89,7 @@ void OH_BlockMove (const OpcDesc*);
 void OH_BlockMove65816 (const OpcDesc*);
 void OH_AbsoluteXIndirect (const OpcDesc*);
 
-/* Mitsubishi 740 */
+// Mitsubishi 740
 void OH_DirectImmediate (const OpcDesc*);
 void OH_ZeroPageBit (const OpcDesc*);
 void OH_AccumulatorBit (const OpcDesc*);
@@ -105,7 +97,7 @@ void OH_AccumulatorBitBranch (const OpcDesc*);
 void OH_JmpDirectIndirect (const OpcDesc* D);
 void OH_SpecialPage (const OpcDesc*);
 
-/* 45GS02 */
+// 45GS02
 void OH_Direct_Q (const OpcDesc*);
 void OH_DirectIndirectZ_Q (const OpcDesc* D);
 void OH_Absolute_Q (const OpcDesc* D);
@@ -114,7 +106,7 @@ void OH_DirectX_Q (const OpcDesc* D);
 void OH_Implicit_ea_45GS02 (const OpcDesc* D);
 void OH_Implicit_42_45GS02 (const OpcDesc* D);
 
-/* Handlers for special instructions */
+// Handlers for special instructions
 void OH_Rts (const OpcDesc*);
 void OH_JmpAbsolute (const OpcDesc*);
 void OH_JmpAbsoluteIndirect (const OpcDesc* D);
@@ -123,7 +115,6 @@ void OH_JsrAbsolute (const OpcDesc*);
 
 void SetSubroutineParamSize (uint32_t Addr, unsigned Size);
 
-
-/* End of handler.h */
+// End of handler.h
 
 #endif
