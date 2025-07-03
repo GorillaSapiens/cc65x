@@ -41,9 +41,8 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* An enum that describes different types of input files. The members are
-** choosen so that it is possible to combine them to bitsets
-*/
+// An enum that describes different types of input files. The members are
+// choosen so that it is possible to combine them to bitsets
 typedef enum {
     FT_MAIN     = 0x01,         // Main input file
     FT_INCLUDE  = 0x02,         // Normal include file
@@ -63,9 +62,8 @@ unsigned GetFileIndex (const StrBuf* Name);
 
 unsigned AddFile (const StrBuf* Name, FileType Type,
                   unsigned long Size, unsigned long MTime);
-/* Add a new file to the list of input files. Return the index of the file in
-** the table.
-*/
+// Add a new file to the list of input files. Return the index of the file in
+// the table.
 
 void WriteFiles (void);
 // Write the list of input files to the object file

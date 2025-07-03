@@ -44,10 +44,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 static int IsImmCmp16 (CodeEntry** L)
-/* Check if the instructions at L are an immediate compare of a/x:
-**
-**
-*/
+// Check if the instructions at L are an immediate compare of a/x:
+// 
+// 
 {
     return (L[0]->OPC == OP65_CPX                              &&
             L[0]->AM == AM65_IMM                               &&
@@ -81,16 +80,15 @@ static int GetCmpRegVal (const CodeEntry* E)
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptCmp1 (CodeSeg* S)
-/* Search for the sequence
-**
-**      ldx     xx
-**      stx     tmp1
-**      ora     tmp1
-**
-** and replace it by
-**
-**      ora     xx
-*/
+// Search for the sequence
+// 
+// ldx     xx
+// stx     tmp1
+// ora     tmp1
+// 
+// and replace it by
+// 
+// ora     xx
 {
     unsigned Changes = 0;
 
@@ -136,17 +134,16 @@ unsigned OptCmp1 (CodeSeg* S)
 }
 
 unsigned OptCmp2 (CodeSeg* S)
-/* Search for the sequence
-**
-**      stx     xx
-**      stx     tmp1
-**      ora     tmp1
-**
-** and replace it by
-**
-**      stx     xx
-**      ora     xx
-*/
+// Search for the sequence
+// 
+// stx     xx
+// stx     tmp1
+// ora     tmp1
+// 
+// and replace it by
+// 
+// stx     xx
+// ora     xx
 {
     unsigned Changes = 0;
 
@@ -189,18 +186,17 @@ unsigned OptCmp2 (CodeSeg* S)
 }
 
 unsigned OptCmp3 (CodeSeg* S)
-/* Search for
-**
-**      lda/and/ora/eor ...
-**      cmp #$00
-**      jeq/jne
-** or
-**      lda/and/ora/eor ...
-**      cmp #$00
-**      jsr boolxx
-**
-** and remove the cmp.
-*/
+// Search for
+// 
+// lda/and/ora/eor ...
+// cmp #$00
+// jeq/jne
+// or
+// lda/and/ora/eor ...
+// cmp #$00
+// jsr boolxx
+// 
+// and remove the cmp.
 {
     unsigned Changes = 0;
 
@@ -234,10 +230,9 @@ unsigned OptCmp3 (CodeSeg* S)
 
             int Delete = 0;
 
-            /* Check for the call to boolxx. We only remove the compare if
-            ** the carry flag is not evaluated later, because the load will
-            ** not set the carry flag.
-            */
+            // Check for the call to boolxx. We only remove the compare if
+            // the carry flag is not evaluated later, because the load will
+            // not set the carry flag.
             if (L[2]->OPC == OP65_JSR) {
                 switch (FindBoolCmpCond (L[2]->Arg)) {
 
@@ -257,11 +252,10 @@ unsigned OptCmp3 (CodeSeg* S)
                 }
 
             } else if ((L[2]->Info & OF_FBRA) != 0) {
-                /* The following insn branches on the condition of the load,
-                ** so the compare instruction might be removed. For safety,
-                ** do some more checks if the carry isn't used later, since
-                ** the compare does set the carry, but the load does not.
-                */
+                // The following insn branches on the condition of the load,
+                // so the compare instruction might be removed. For safety,
+                // do some more checks if the carry isn't used later, since
+                // the compare does set the carry, but the load does not.
                 CodeEntry* E;
                 CodeEntry* N;
                 if ((E = CS_GetNextEntry (S, I+2)) != 0         &&
@@ -274,10 +268,9 @@ unsigned OptCmp3 (CodeSeg* S)
                     (N->OPC != OP65_JSR                 ||
                     FindBoolCmpCond (N->Arg) == CMP_INV)) {
 
-                    /* The following insn branches on the condition of a load,
-                    ** and there's no use of the carry flag in sight, so the
-                    ** compare instruction can be removed.
-                    */
+                    // The following insn branches on the condition of a load,
+                    // and there's no use of the carry flag in sight, so the
+                    // compare instruction can be removed.
                     Delete = 1;
                 }
             }
@@ -299,25 +292,24 @@ unsigned OptCmp3 (CodeSeg* S)
 }
 
 unsigned OptCmp4 (CodeSeg* S)
-/* Search for
-**
-**      lda     x
-**      ldx     y
-**      cpx     #a
-**      bne     L1
-**      cmp     #b
-** L1:  jne/jeq L2
-**
-** If a is zero, we may remove the compare. If a and b are both zero, we may
-** replace it by the sequence
-**
-**      lda     x
-**      ora     x+1
-**      jne/jeq ...
-**
-** L1 may be either the label at the branch instruction, or the target label
-** of this instruction.
-*/
+// Search for
+// 
+// lda     x
+// ldx     y
+// cpx     #a
+// bne     L1
+// cmp     #b
+// L1:  jne/jeq L2
+// 
+// If a is zero, we may remove the compare. If a and b are both zero, we may
+// replace it by the sequence
+// 
+// lda     x
+// ora     x+1
+// jne/jeq ...
+// 
+// L1 may be either the label at the branch instruction, or the target label
+// of this instruction.
 {
     unsigned Changes = 0;
 
@@ -343,19 +335,17 @@ unsigned OptCmp4 (CodeSeg* S)
                 CE_ReplaceOPC (L[0], OP65_ORA);
                 CS_DelEntries (S, I+2, 3);
             } else {
-                /* Move the lda instruction after the first branch. This will
-                ** improve speed, since the load is delayed after the first
-                ** test.
-                */
+                // Move the lda instruction after the first branch. This will
+                // improve speed, since the load is delayed after the first
+                // test.
                 CS_MoveEntry (S, I, I+4);
 
                 // We will replace the ldx/cpx by lda/cmp
                 CE_ReplaceOPC (L[0], OP65_LDA);
                 CE_ReplaceOPC (L[1], OP65_CMP);
 
-                /* Beware: If the first LDA instruction had a label, we have
-                ** to move this label to the top of the sequence again.
-                */
+                // Beware: If the first LDA instruction had a label, we have
+                // to move this label to the top of the sequence again.
                 if (CE_HasLabel (E)) {
                     CS_MoveLabels (S, E, L[0]);
                 }
@@ -375,15 +365,14 @@ unsigned OptCmp4 (CodeSeg* S)
 }
 
 unsigned OptCmp5 (CodeSeg* S)
-/* Optimize compares of local variables:
-**
-**      ldy     #o
-**      jsr     ldaxysp
-**      cpx     #a
-**      bne     L1
-**      cmp     #b
-**      jne/jeq L2
-*/
+// Optimize compares of local variables:
+// 
+// ldy     #o
+// jsr     ldaxysp
+// cpx     #a
+// bne     L1
+// cmp     #b
+// jne/jeq L2
 {
     unsigned Changes = 0;
 
@@ -409,13 +398,12 @@ unsigned OptCmp5 (CodeSeg* S)
                 CodeEntry* X;
                 char Buf[20];
 
-                /* The value is zero, we may use the simple code version:
-                **      ldy     #o-1
-                **      lda     (c_sp),y
-                **      ldy     #o
-                **      ora     (c_sp),y
-                **      jne/jeq ...
-                */
+                // The value is zero, we may use the simple code version:
+                // ldy     #o-1
+                // lda     (c_sp),y
+                // ldy     #o
+                // ora     (c_sp),y
+                // jne/jeq ...
                 sprintf (Buf, "$%02X", (int)(L[0]->Num-1));
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+1);
@@ -437,18 +425,17 @@ unsigned OptCmp5 (CodeSeg* S)
                 CodeEntry* X;
                 char Buf[20];
 
-                /* Change the code to just use the A register. Move the load
-                ** of the low byte after the first branch if possible:
-                **
-                **      ldy     #o
-                **      lda     (c_sp),y
-                **      cmp     #a
-                **      bne     L1
-                **      ldy     #o-1
-                **      lda     (c_sp),y
-                **      cmp     #b
-                **      jne/jeq ...
-                */
+                // Change the code to just use the A register. Move the load
+                // of the low byte after the first branch if possible:
+                // 
+                // ldy     #o
+                // lda     (c_sp),y
+                // cmp     #a
+                // bne     L1
+                // ldy     #o-1
+                // lda     (c_sp),y
+                // cmp     #b
+                // jne/jeq ...
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, L[0]->Arg, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+3);
 
@@ -482,9 +469,8 @@ unsigned OptCmp5 (CodeSeg* S)
 }
 
 unsigned OptCmp6 (CodeSeg* S)
-/* Remove compare instructions before an RTS or an subroutine call that doesn't
-** use the flags.
-*/
+// Remove compare instructions before an RTS or an subroutine call that doesn't
+// use the flags.
 {
     unsigned Changes = 0;
     unsigned I;
@@ -498,11 +484,10 @@ unsigned OptCmp6 (CodeSeg* S)
         // Get next entry
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check for a compare followed by something else.
-        ** Note: The test could be improved by checking the flag usage of the
-        ** function explicitly against the flags set by the compare instruction.
-        ** For current code generation this makes no difference, however.
-        */
+        // Check for a compare followed by something else.
+        // Note: The test could be improved by checking the flag usage of the
+        // function explicitly against the flags set by the compare instruction.
+        // For current code generation this makes no difference, however.
         if ((E->Info & OF_CMP) != 0                     &&
             (N = CS_GetNextEntry (S, I)) != 0           &&
             (N->OPC == OP65_RTS                 ||  // Either RTS, or ...
@@ -525,9 +510,8 @@ unsigned OptCmp6 (CodeSeg* S)
 }
 
 unsigned OptCmp7 (CodeSeg* S)
-/* Search for a sequence ldx/txa/branch and remove the txa if A is not
-** used later.
-*/
+// Search for a sequence ldx/txa/branch and remove the txa if A is not
+// used later.
 {
     unsigned Changes = 0;
 
@@ -567,9 +551,8 @@ unsigned OptCmp7 (CodeSeg* S)
 }
 
 unsigned OptCmp8 (CodeSeg* S)
-/* Check for register compares where the contents of the register and therefore
-** the result of the compare is known.
-*/
+// Check for register compares where the contents of the register and therefore
+// the result of the compare is known.
 {
     unsigned Changes = 0;
     unsigned I;
@@ -588,9 +571,8 @@ unsigned OptCmp8 (CodeSeg* S)
             (RegVal = GetCmpRegVal (E)) >= 0  &&
             CE_IsConstImm (E)) {
 
-            /* We are able to evaluate the compare at compile time. Check if
-            ** one or more branches are ahead.
-            */
+            // We are able to evaluate the compare at compile time. Check if
+            // one or more branches are ahead.
             unsigned ProtectCompare = 0;
             unsigned JumpsChanged = 0;
             CodeEntry* N;
@@ -627,11 +609,10 @@ unsigned OptCmp8 (CodeSeg* S)
 
                     case BC_VC:
                     case BC_VS:
-                        /* Not set by the compare operation, bail out (Note:
-                        ** Just skipping anything here is rather stupid, but
-                        ** the sequence is never generated by the compiler,
-                        ** so it's quite safe to skip).
-                        */
+                        // Not set by the compare operation, bail out (Note:
+                        // Just skipping anything here is rather stupid, but
+                        // the sequence is never generated by the compiler,
+                        // so it's quite safe to skip).
                         goto NextEntry;
 
                     default:
@@ -639,10 +620,9 @@ unsigned OptCmp8 (CodeSeg* S)
 
                 }
 
-                /* If the condition is false, we may remove the jump. Otherwise
-                ** the branch will always be taken, so we may replace it by a
-                ** jump (and bail out).
-                */
+                // If the condition is false, we may remove the jump. Otherwise
+                // the branch will always be taken, so we may replace it by a
+                // jump (and bail out).
                 if (!Cond) {
                     CS_DelEntry (S, I+1);
                 } else {
@@ -651,11 +631,10 @@ unsigned OptCmp8 (CodeSeg* S)
                     CodeEntry* X = NewCodeEntry (OP65_JMP, AM65_BRA, LabelName, L, N->LI);
                     CS_InsertEntry (S, X, I+2);
                     CS_DelEntry (S, I+1);
-                    /* Normally we can remove the compare as well,
-                    ** but some comparisons generate code with a
-                    ** shared branch operation. This prevents the unsafe
-                    ** removal of the compare for known problem cases.
-                    */
+                    // Normally we can remove the compare as well,
+                    // but some comparisons generate code with a
+                    // shared branch operation. This prevents the unsafe
+                    // removal of the compare for known problem cases.
                     if (
                         // Jump to branch that relies on the comparison.
                         (L->Owner->Info & (OF_CBRA | OF_ZBRA)) ||
@@ -690,17 +669,16 @@ NextEntry:
 }
 
 unsigned OptCmp9 (CodeSeg* S)
-/* Search for the sequence
-**
-**    sbc       xx
-**    bvs/bvc   L
-**    eor       #$80
-** L: asl       a
-**    bcc/bcs   somewhere
-**
-** If A is not used later (which should be the case), we can branch on the N
-** flag instead of the carry flag and remove the asl.
-*/
+// Search for the sequence
+// 
+// sbc       xx
+// bvs/bvc   L
+// eor       #$80
+// L: asl       a
+// bcc/bcs   somewhere
+// 
+// If A is not used later (which should be the case), we can branch on the N
+// flag instead of the carry flag and remove the asl.
 {
     unsigned Changes = 0;
     unsigned I;

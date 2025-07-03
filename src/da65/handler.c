@@ -87,9 +87,8 @@ static void OneLine (const OpcDesc* D, const char* Arg, ...)
 }
 
 static const char* GetAbsOverride (unsigned Flags, uint32_t Addr)
-/* If the instruction requires an abs override modifier, return the necessary
-** string, otherwise return the empty string.
-*/
+// If the instruction requires an abs override modifier, return the necessary
+// string, otherwise return the empty string.
 {
     if ((Flags & flFarOverride) != 0 && Addr < 0x10000) {
         return "f:";
@@ -129,11 +128,10 @@ static void GenerateLabel (unsigned Flags, uint32_t Addr)
         ((Flags & flGenLabel) != 0 ||
          ((Flags & flUseLabel) != 0 && Addr >= CodeStart && Addr <= CodeEnd))) {
 
-        /* As a special case, handle ranges with tables or similar. Within
-        ** such a range with a granularity > 1, do only generate dependent
-        ** labels for all addresses but the first one. Be sure to generate
-        ** a label for the start of the range, however.
-        */
+        // As a special case, handle ranges with tables or similar. Within
+        // such a range with a granularity > 1, do only generate dependent
+        // labels for all addresses but the first one. Be sure to generate
+        // a label for the start of the range, however.
         attr_t Style         = GetStyleAttr (Addr);
         unsigned Granularity = GetGranularity (Style);
 
@@ -144,9 +142,8 @@ static void GenerateLabel (unsigned Flags, uint32_t Addr)
 
             // THIS CODE IS A MESS AND WILL FAIL ON SEVERAL CONDITIONS! ###
 
-            /* Search for the start of the range or the last non dependent
-            ** label in the range.
-            */
+            // Search for the start of the range or the last non dependent
+            // label in the range.
             unsigned Offs;
             attr_t LabelAttr;
             unsigned LabelAddr = Addr;
@@ -578,18 +575,16 @@ void OH_BitBranch (const OpcDesc* D)
     // Calculate the target address for the branch
     uint32_t BranchAddr = (((int) PC+3) + BranchOffs) & 0xFFFF;
 
-    /* Generate labels in pass 1. The bit branch codes are special in that
-    ** they don't really match the remainder of the 6502 instruction set (they
-    ** are a Rockwell addon), so we must pass additional flags as direct
-    ** value to the second GenerateLabel call.
-    */
+    // Generate labels in pass 1. The bit branch codes are special in that
+    // they don't really match the remainder of the 6502 instruction set (they
+    // are a Rockwell addon), so we must pass additional flags as direct
+    // value to the second GenerateLabel call.
     GenerateLabel (D->Flags, TestAddr);
     GenerateLabel (flLabel, BranchAddr);
 
-    /* Make a copy of an operand, so that
-    ** the other operand can't overwrite it.
-    ** [GetAddrArg() uses a statically-stored buffer.]
-    */
+    // Make a copy of an operand, so that
+    // the other operand can't overwrite it.
+    // [GetAddrArg() uses a statically-stored buffer.]
     BranchLabel = xstrdup (GetAddrArg (flLabel, BranchAddr));
 
     // Output the line
@@ -599,9 +594,8 @@ void OH_BitBranch (const OpcDesc* D)
 }
 
 void OH_BitBranch_m740 (const OpcDesc* D)
-/* <bit> zp, rel
-** NOTE: currently <bit> is part of the instruction
-*/
+// <bit> zp, rel
+// NOTE: currently <bit> is part of the instruction
 {
     // unsigned Bit = GetCodeByte (PC) >> 5;
     uint32_t Addr     = GetCodeByte (PC+1);
@@ -726,10 +720,9 @@ void OH_BlockMove (const OpcDesc* D)
     GenerateLabel (D->Flags, Src);
     GenerateLabel (D->Flags, Dst);
 
-    /* Make a copy of an operand, so that
-    ** the other operand can't overwrite it.
-    ** [GetAddrArg() uses a statically-stored buffer.]
-    */
+    // Make a copy of an operand, so that
+    // the other operand can't overwrite it.
+    // [GetAddrArg() uses a statically-stored buffer.]
     DstLabel = xstrdup (GetAddrArg (D->Flags, Dst));
 
     // Output the line
@@ -777,9 +770,8 @@ void OH_DirectImmediate (const OpcDesc* D)
 }
 
 void OH_ZeroPageBit (const OpcDesc* D)
-/* <bit> zp
-** NOTE: currently <bit> is part of the instruction
-*/
+// <bit> zp
+// NOTE: currently <bit> is part of the instruction
 {
     uint32_t Addr = GetCodeByte (PC+1);
 
@@ -791,18 +783,16 @@ void OH_ZeroPageBit (const OpcDesc* D)
 }
 
 void OH_AccumulatorBit (const OpcDesc* D)
-/* <bit> A
-** NOTE: currently <bit> is part of the instruction
-*/
+// <bit> A
+// NOTE: currently <bit> is part of the instruction
 {
     // Output the line
     OneLine (D, "a");
 }
 
 void OH_AccumulatorBitBranch (const OpcDesc* D)
-/* <bit> A, rel
-** NOTE: currently <bit> is part of the instruction
-*/
+// <bit> A, rel
+// NOTE: currently <bit> is part of the instruction
 {
     int8_t BranchOffs = GetCodeByte (PC+1);
 

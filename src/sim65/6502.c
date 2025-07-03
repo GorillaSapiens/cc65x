@@ -38,9 +38,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Known bugs and limitations of the 65C02 simulation:
- * the WAI ($CB) and STP ($DB) instructions are unsupported.
- */
+// Known bugs and limitations of the 65C02 simulation:
+// the WAI ($CB) and STP ($DB) instructions are unsupported.
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -54,315 +53,313 @@
 
 #include "6502.h"
 
-/*
-
- 6502 opcode map:
-
-    x0   x1   x2   x3   x4   x5   x6   x7   x8   x9   xA   xB   xC   xD   xE   xF
-0x  BRK  ORA  ---  SLO  NOP  ORA  ASL  SLO  PHP  ORA  ASL  ANC  NOP  ORA  ASL  SLO
-         inx       inx  zp   zp   zp   zp        imm  acc  imm  abs  abs  abs  abs
-
-1x  BPL  ORA  ---  SLO  NOP  ORA  ASL  SLO  CLC  ORA  NOP  SLO  NOP  ORA  ASL  SLO
-    rel  iny       iny  zpx  zpx  zpx  zpy       aby       aby  abx  abx  abx  abx
-
-2x  JSR  AND  ---  RLA  BIT  AND  ROL  RLA  PLP  AND  ROL  ANC  BIT  AND  ROL  RLA
-    abs  inx       inx  zp   zp   zp   zp        imm  acc  imm  abs  abs  abs  abs
-
-3x  BMI  AND  ---  RLA  NOP  AND  ROL  RLA  SEC  AND  NOP  RLA  NOP  AND  ROL  RLA
-    rel  iny       iny  zpx  zpx  zpx  zpy       aby       aby  abx  abx  abx  abx
-
-4x  RTI  EOR  ---  SRE  NOP  EOR  LSR  SRE  PHA  EOR  LSR  ASR  JMP  EOR  LSR  SRE
-         inx       inx  zp   zp   zp   zp        imm  acc  imm  abs  abs  abs  abs
-
-5x  BVC  EOR  ---  SRE  NOP  EOR  LSR  SRE  CLI  EOR  NOP  SRE  NOP  EOR  LSR  SRE
-    rel  iny       iny  zpx  zpx  zpx  zpx       aby       aby  abx  abx  abx  abx
-
-6x  RTS  ADC  ---  RRA  NOP  ADC  ROR  RRA  PLA  ADC  ROR  ARR  JMP  ADC  ROR  RRA
-         inx       inx  zp   zp   zp   zp        imm  acc  imm  ind  abs  abs  abs
-
-7x  BVS  ADC  ---  RRA  NOP  ADC  ROR  RRA  SEI  ADC  NOP  RRA  NOP  ADC  ROR  RRA
-    rel  iny       iny  zpx  zpx  zpx  zpx       aby       aby  abx  abx  abx  abx
-
-8x  NOP  STA  NOP  SAX  STY  STA  STX  SAX  DEY  NOP  TXA  ANE  STY  STA  STX  SAX
-    imm  inx  imm  inx  zp   zp   zp   zp        imm       imm  abs  abs  abs  abs
-
-9x  BCC  STA  ---  SHA  STY  STA  STX  SAX  TYA  STA  TXS  TAS  SHY  STA  SHX  SHA
-    rel  iny       iny  zpx  zpx  zpy  zpy       aby       aby  abx  abx  aby  aby
-
-Ax  LDY  LDA  LDX  LAX  LDY  LDA  LDX  LAX  TAY  LDA  TAX  LXA  LDY  LDA  LDX  LAX
-    imm  inx  imm  inx  zp   zp   zp   zp        imm       imm  abs  abs  abs  abs
-
-Bx  BCS  LDA  ---  LAX  LDY  LDA  LDX  LAX  CLV  LDA  TSX  LAS  LDY  LDA  LDX  LAX
-    rel  iny       iny  zpx  zpx  zpy  zpy       aby       aby  abx  abx  aby  aby
-
-Cx  CPY  CMP  NOP  DCP  CPY  CMP  DEC  DCP  INY  CMP  DEX  SBX  CPY  CMP  DEC  DCP
-    imm  inx  imm  inx  zp   zp   zp   zp        imm       imm  abs  abs  abs  abs
-
-Dx  BNE  CMP  ---  DCP  NOP  CMP  DEC  DCP  CLD  CMP  NOP  DCP  NOP  CMP  DEC  DCP
-    rel  iny       iny  zpx  zpx  zpx  zpx       aby  zpx  aby  abx  abx  abx  abx
-
-Ex  CPX  SBC  NOP  ISC  CPX  SBC  INC  ISC  INX  SBC  NOP  SBC  CPX  SBC  INC  ISC
-    imm  inx  imm  inx  zp   zp   zp   zp        imm       imm  abs  abs  abs  abs
-
-Fx  BEQ  SBC  ---  ISC  NOP  SBC  INC  ISC  SED  SBC  NOP  ISC  NOP  SBC  INC  ISC
-    rel  iny       iny  zpx  zpx  zpx  zpx       aby  zpx  aby  abx  abx  abx  abx
-
---- = CPU JAM/HALT
-
-*/
-
-/*
-
-65xx ILLEGAL INSTRUCTIONS
-
-* SLO: shift left the contents of a memory location and then OR the result with
-       the accumulator.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  X . . . . X X
-SLO abs      |   0Fh  |  6     |
-SLO abs,X    |   1Fh  |  7     |
-SLO abs,Y    |   1Bh  |  7     |
-SLO zp       |   07h  |  5     |
-SLO zp,X     |   17h  |  6     |
-SLO (zp,X)   |   03h  |  8     |
-SLO (zp),Y   |   13h  |  8     |
--------------+--------+--------+
-
-* RLA: rotate left the contents of a memory location and then AND the result with
-       the accumulator.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  X . . . . X X
-RLA abs      |   2Fh  |  6     |
-RLA abs,X    |   3Fh  |  7     |
-RLA abs,Y    |   3Bh  |  7     |
-RLA zp       |   27h  |  5     |
-RLA zp,X     |   37h  |  6     |
-RLA (zp,X)   |   23h  |  8     |
-RLA (zp),Y   |   33h  |  8     |
--------------+--------+--------+
-
-* SRE: shift right the contents of a memory location and then X-OR the result
-       with the accumulator.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  X . . . . X X
-SRE abs      |   4Fh  |  6     |
-SRE abs,X    |   5Fh  |  7     |
-SRE abs,Y    |   5Bh  |  7     |
-SRE zp       |   47h  |  5     |
-SRE zp,X     |   57h  |  6     |
-SRE (zp,X)   |   43h  |  8     |
-SRE (zp),Y   |   53h  |  8     |
--------------+--------+--------+
-
-* RRA: rotate right the contents of a memory location and then adds with carry
-       the result with the accumulator.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  X X . . . X X
-RRA abs      |   6Fh  |  6     |
-RRA abs,X    |   7Fh  |  7     |
-RRA abs,Y    |   7Bh  |  7     |
-RRA zp       |   67h  |  5     |
-RRA zp,X     |   77h  |  6     |
-RRA (zp,X)   |   63h  |  8     |
-RRA (zp),Y   |   73h  |  8     |
--------------+--------+--------+
-
-* SAX: calculate AND between the A and X registers (without changing the
-       contents of the registers) and stores the result in memory.
-       Flags into P register are not modified.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  . . . . . . .
-SAX abs      |   8Fh  |  4     |
-SAX zp       |   87h  |  3     |
-SAX zp,Y     |   97h  |  4     |
-SAX (zp,X)   |   83h  |  6     |
--------------+--------+--------+
-
-* LAX: loads both the accumulator and the X register with the content of a memory
-       location.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  X . . . . X .
-LAX abs      |   AFh  |  4     |
-LAX abs,Y    |   BFh  |  4*    |    * = adds +1 if page cross is detected.
-LAX zp       |   A7h  |  3     |
-LAX zp,Y     |   B7h  |  4     |
-LAX (zp,X)   |   A3h  |  6     |
-LAX (zp),Y   |   B3h  |  5*    |
--------------+--------+--------+
-
-* DCP: decrements the contents of a memory location and then compares the result
-       with the accumulator.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  X . . . . X X
-DCP abs      |   CFh  |  6     |
-DCP abs,X    |   DFh  |  7     |
-DCP abs,Y    |   DBh  |  7     |
-DCP zp       |   C7h  |  5     |
-DCP zp,X     |   D7h  |  6     |
-DCP (zp,X)   |   C3h  |  8     |
-DCP (zp),Y   |   D3h  |  8     |
--------------+--------+--------+
-
-* ISC: increments the contents of a memory location and then subtract with carry
-       the result from the accumulator.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  X X . . . X X
-ISC abs      |   EFh  |  6     |
-ISC abs,X    |   FFh  |  7     |
-ISC abs,Y    |   FBh  |  7     |
-ISC zp       |   E7h  |  5     |
-ISC zp,X     |   F7h  |  6     |
-ISC (zp,X)   |   E3h  |  8     |
-ISC (zp),Y   |   F3h  |  8     |
--------------+--------+--------+
-
-* ASR: calculates the AND between the accumulator and an immediate value and then
-       shift right the result.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  X . . . . X X
-ASR #imm     |   4Bh  |  2     |
--------------+--------+--------+
-
-* ARR: calculates the AND between the accumulator and an immediate value and then
-       rotate right the result.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  X . . . . X X
-ARR #imm     |   6Bh  |  2     |
--------------+--------+--------+
-
-* ANE: calculates the OR of the accumulator with an unstable constant, then it does
-       an AND with the X register and an immediate value.
-       The unstable constant varies with temperature, the production batch and
-       maybe other factors. Experimental measures assume its value to 0xEF.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  X . . . . X .
-ANE #imm     |   8Bh  |  2     |
--------------+--------+--------+
-
-* LXA: calculates the OR of the accumulator with an unstable constant, then it does
-       an AND with an immediate value. The result is copied into the X register and
-       the accumulator.
-       The unstable constant varies with temperature, the production batch and
-       maybe other factors. Experimental measures assume its value to 0xEE.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  X . . . . X .
-LXA #imm     |   ABh  |  2     |
--------------+--------+--------+
-
-* SBX: calculates the AND of the accumulator with the X register and the subtracts
-       an immediate value.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  X . . . . X X
-SBX #imm     |   CBh  |  2     |
--------------+--------+--------+
-
-* NOP: No-Operation.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  . . . . . . .
-NOP          |   1Ah  |  2     |
-NOP          |   3Ah  |  2     |    * = adds +1 if page cross is detected.
-NOP          |   5Ah  |  2     |
-NOP          |   7Ah  |  2     |
-NOP          |   DAh  |  2     |
-NOP          |   FAh  |  2     |
-NOP #imm     |   80h  |  2     |
-NOP #imm     |   82h  |  2     |
-NOP #imm     |   89h  |  2     |
-NOP #imm     |   C2h  |  2     |
-NOP #imm     |   E2h  |  2     |
-NOP zp       |   04h  |  3     |
-NOP zp,x     |   14h  |  4     |
-NOP zp,x     |   34h  |  4     |
-NOP zp       |   44h  |  3     |
-NOP zp,x     |   54h  |  4     |
-NOP zp       |   64h  |  3     |
-NOP zp,x     |   74h  |  4     |
-NOP zp,x     |   D4h  |  4     |
-NOP zp,x     |   F4h  |  4     |
-NOP abs      |   0Ch  |  4     |
-NOP abs,x    |   1Ch  |  4*    |
-NOP abs,x    |   3Ch  |  4*    |
-NOP abs,x    |   5Ch  |  4*    |
-NOP abs,x    |   7Ch  |  4*    |
-NOP abs,x    |   DCh  |  4*    |
-NOP abs,x    |   FCh  |  4*    |
--------------+--------+--------+
-
-* TAS: calculates the AND of the accumulator with the X register and stores the result
-       into the stack pointer. Then, it calculates the AND of the result with the
-       high byte of the memory pointer plus 1 and it stores the final result in memory.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  . . . . . . .
-TAS abs,y    |   9Bh  |  5     |
--------------+--------+--------+
-
-* SHY: calculates the AND of the Y register with the high byte of the memory pointer
-       plus 1 and it stores the final result in memory.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  . . . . . . .
-SHY abs,x    |   9Ch  |  5     |
--------------+--------+--------+
-
-* SHX: calculates the AND of the X register with the high byte of the memory pointer
-       plus 1 and it stores the final result in memory.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  . . . . . . .
-SHX abs,y    |   9Eh  |  5     |
--------------+--------+--------+
-
-* SHA: calculates the AND of the accumulator with the X register with the high byte
-       of the memory pointer plus 1 and it stores the final result in memory.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  . . . . . . .
-SHX abs,y    |   9Fh  |  5     |
-SHX (zp),y   |   93h  |  6     |
--------------+--------+--------+
-
-* ANC: calculates the AND of the accumulator with an immediate value and then
-       updates the status of N and Z bits of the status register.
-       The N flag is also copied into the Carry flag.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  X . . . . X X
-ANC #imm     |   0Bh  |  2     |
-ANC #imm     |   2Bh  |  2     |
--------------+--------+--------+
-
-* LAS: calculates the AND of a memory location with the contents of the
-stack pointer register and it stores the result in the accumulator, the X
-register, and the stack pointer.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  X . . . . X .
-LAS abs,y    |   BBh  |  4*    |
--------------+--------+--------+    * = adds +1 if page cross is detected.
-
-* SBC: alias of the official SBC opcode.
-
-Address mode | opcode | cycles |            N V B D I Z C
--------------+--------+--------+    FLAGS:  X X . . . X X
-SBC #imm     |   EBh  |  2     |
--------------+--------+--------+
-
-*/
+// 
+// 
+// 6502 opcode map:
+// 
+// x0   x1   x2   x3   x4   x5   x6   x7   x8   x9   xA   xB   xC   xD   xE   xF
+// 0x  BRK  ORA  ---  SLO  NOP  ORA  ASL  SLO  PHP  ORA  ASL  ANC  NOP  ORA  ASL  SLO
+// inx       inx  zp   zp   zp   zp        imm  acc  imm  abs  abs  abs  abs
+// 
+// 1x  BPL  ORA  ---  SLO  NOP  ORA  ASL  SLO  CLC  ORA  NOP  SLO  NOP  ORA  ASL  SLO
+// rel  iny       iny  zpx  zpx  zpx  zpy       aby       aby  abx  abx  abx  abx
+// 
+// 2x  JSR  AND  ---  RLA  BIT  AND  ROL  RLA  PLP  AND  ROL  ANC  BIT  AND  ROL  RLA
+// abs  inx       inx  zp   zp   zp   zp        imm  acc  imm  abs  abs  abs  abs
+// 
+// 3x  BMI  AND  ---  RLA  NOP  AND  ROL  RLA  SEC  AND  NOP  RLA  NOP  AND  ROL  RLA
+// rel  iny       iny  zpx  zpx  zpx  zpy       aby       aby  abx  abx  abx  abx
+// 
+// 4x  RTI  EOR  ---  SRE  NOP  EOR  LSR  SRE  PHA  EOR  LSR  ASR  JMP  EOR  LSR  SRE
+// inx       inx  zp   zp   zp   zp        imm  acc  imm  abs  abs  abs  abs
+// 
+// 5x  BVC  EOR  ---  SRE  NOP  EOR  LSR  SRE  CLI  EOR  NOP  SRE  NOP  EOR  LSR  SRE
+// rel  iny       iny  zpx  zpx  zpx  zpx       aby       aby  abx  abx  abx  abx
+// 
+// 6x  RTS  ADC  ---  RRA  NOP  ADC  ROR  RRA  PLA  ADC  ROR  ARR  JMP  ADC  ROR  RRA
+// inx       inx  zp   zp   zp   zp        imm  acc  imm  ind  abs  abs  abs
+// 
+// 7x  BVS  ADC  ---  RRA  NOP  ADC  ROR  RRA  SEI  ADC  NOP  RRA  NOP  ADC  ROR  RRA
+// rel  iny       iny  zpx  zpx  zpx  zpx       aby       aby  abx  abx  abx  abx
+// 
+// 8x  NOP  STA  NOP  SAX  STY  STA  STX  SAX  DEY  NOP  TXA  ANE  STY  STA  STX  SAX
+// imm  inx  imm  inx  zp   zp   zp   zp        imm       imm  abs  abs  abs  abs
+// 
+// 9x  BCC  STA  ---  SHA  STY  STA  STX  SAX  TYA  STA  TXS  TAS  SHY  STA  SHX  SHA
+// rel  iny       iny  zpx  zpx  zpy  zpy       aby       aby  abx  abx  aby  aby
+// 
+// Ax  LDY  LDA  LDX  LAX  LDY  LDA  LDX  LAX  TAY  LDA  TAX  LXA  LDY  LDA  LDX  LAX
+// imm  inx  imm  inx  zp   zp   zp   zp        imm       imm  abs  abs  abs  abs
+// 
+// Bx  BCS  LDA  ---  LAX  LDY  LDA  LDX  LAX  CLV  LDA  TSX  LAS  LDY  LDA  LDX  LAX
+// rel  iny       iny  zpx  zpx  zpy  zpy       aby       aby  abx  abx  aby  aby
+// 
+// Cx  CPY  CMP  NOP  DCP  CPY  CMP  DEC  DCP  INY  CMP  DEX  SBX  CPY  CMP  DEC  DCP
+// imm  inx  imm  inx  zp   zp   zp   zp        imm       imm  abs  abs  abs  abs
+// 
+// Dx  BNE  CMP  ---  DCP  NOP  CMP  DEC  DCP  CLD  CMP  NOP  DCP  NOP  CMP  DEC  DCP
+// rel  iny       iny  zpx  zpx  zpx  zpx       aby  zpx  aby  abx  abx  abx  abx
+// 
+// Ex  CPX  SBC  NOP  ISC  CPX  SBC  INC  ISC  INX  SBC  NOP  SBC  CPX  SBC  INC  ISC
+// imm  inx  imm  inx  zp   zp   zp   zp        imm       imm  abs  abs  abs  abs
+// 
+// Fx  BEQ  SBC  ---  ISC  NOP  SBC  INC  ISC  SED  SBC  NOP  ISC  NOP  SBC  INC  ISC
+// rel  iny       iny  zpx  zpx  zpx  zpx       aby  zpx  aby  abx  abx  abx  abx
+// 
+// --- = CPU JAM/HALT
+// 
+
+// 
+// 
+// 65xx ILLEGAL INSTRUCTIONS
+// 
+// SLO: shift left the contents of a memory location and then OR the result with
+// the accumulator.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  X . . . . X X
+// SLO abs      |   0Fh  |  6     |
+// SLO abs,X    |   1Fh  |  7     |
+// SLO abs,Y    |   1Bh  |  7     |
+// SLO zp       |   07h  |  5     |
+// SLO zp,X     |   17h  |  6     |
+// SLO (zp,X)   |   03h  |  8     |
+// SLO (zp),Y   |   13h  |  8     |
+// -------------+--------+--------+
+// 
+// RLA: rotate left the contents of a memory location and then AND the result with
+// the accumulator.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  X . . . . X X
+// RLA abs      |   2Fh  |  6     |
+// RLA abs,X    |   3Fh  |  7     |
+// RLA abs,Y    |   3Bh  |  7     |
+// RLA zp       |   27h  |  5     |
+// RLA zp,X     |   37h  |  6     |
+// RLA (zp,X)   |   23h  |  8     |
+// RLA (zp),Y   |   33h  |  8     |
+// -------------+--------+--------+
+// 
+// SRE: shift right the contents of a memory location and then X-OR the result
+// with the accumulator.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  X . . . . X X
+// SRE abs      |   4Fh  |  6     |
+// SRE abs,X    |   5Fh  |  7     |
+// SRE abs,Y    |   5Bh  |  7     |
+// SRE zp       |   47h  |  5     |
+// SRE zp,X     |   57h  |  6     |
+// SRE (zp,X)   |   43h  |  8     |
+// SRE (zp),Y   |   53h  |  8     |
+// -------------+--------+--------+
+// 
+// RRA: rotate right the contents of a memory location and then adds with carry
+// the result with the accumulator.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  X X . . . X X
+// RRA abs      |   6Fh  |  6     |
+// RRA abs,X    |   7Fh  |  7     |
+// RRA abs,Y    |   7Bh  |  7     |
+// RRA zp       |   67h  |  5     |
+// RRA zp,X     |   77h  |  6     |
+// RRA (zp,X)   |   63h  |  8     |
+// RRA (zp),Y   |   73h  |  8     |
+// -------------+--------+--------+
+// 
+// SAX: calculate AND between the A and X registers (without changing the
+// contents of the registers) and stores the result in memory.
+// Flags into P register are not modified.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  . . . . . . .
+// SAX abs      |   8Fh  |  4     |
+// SAX zp       |   87h  |  3     |
+// SAX zp,Y     |   97h  |  4     |
+// SAX (zp,X)   |   83h  |  6     |
+// -------------+--------+--------+
+// 
+// LAX: loads both the accumulator and the X register with the content of a memory
+// location.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  X . . . . X .
+// LAX abs      |   AFh  |  4     |
+// LAX abs,Y    |   BFh  |  4*    |    * = adds +1 if page cross is detected.
+// LAX zp       |   A7h  |  3     |
+// LAX zp,Y     |   B7h  |  4     |
+// LAX (zp,X)   |   A3h  |  6     |
+// LAX (zp),Y   |   B3h  |  5*    |
+// -------------+--------+--------+
+// 
+// DCP: decrements the contents of a memory location and then compares the result
+// with the accumulator.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  X . . . . X X
+// DCP abs      |   CFh  |  6     |
+// DCP abs,X    |   DFh  |  7     |
+// DCP abs,Y    |   DBh  |  7     |
+// DCP zp       |   C7h  |  5     |
+// DCP zp,X     |   D7h  |  6     |
+// DCP (zp,X)   |   C3h  |  8     |
+// DCP (zp),Y   |   D3h  |  8     |
+// -------------+--------+--------+
+// 
+// ISC: increments the contents of a memory location and then subtract with carry
+// the result from the accumulator.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  X X . . . X X
+// ISC abs      |   EFh  |  6     |
+// ISC abs,X    |   FFh  |  7     |
+// ISC abs,Y    |   FBh  |  7     |
+// ISC zp       |   E7h  |  5     |
+// ISC zp,X     |   F7h  |  6     |
+// ISC (zp,X)   |   E3h  |  8     |
+// ISC (zp),Y   |   F3h  |  8     |
+// -------------+--------+--------+
+// 
+// ASR: calculates the AND between the accumulator and an immediate value and then
+// shift right the result.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  X . . . . X X
+// ASR #imm     |   4Bh  |  2     |
+// -------------+--------+--------+
+// 
+// ARR: calculates the AND between the accumulator and an immediate value and then
+// rotate right the result.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  X . . . . X X
+// ARR #imm     |   6Bh  |  2     |
+// -------------+--------+--------+
+// 
+// ANE: calculates the OR of the accumulator with an unstable constant, then it does
+// an AND with the X register and an immediate value.
+// The unstable constant varies with temperature, the production batch and
+// maybe other factors. Experimental measures assume its value to 0xEF.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  X . . . . X .
+// ANE #imm     |   8Bh  |  2     |
+// -------------+--------+--------+
+// 
+// LXA: calculates the OR of the accumulator with an unstable constant, then it does
+// an AND with an immediate value. The result is copied into the X register and
+// the accumulator.
+// The unstable constant varies with temperature, the production batch and
+// maybe other factors. Experimental measures assume its value to 0xEE.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  X . . . . X .
+// LXA #imm     |   ABh  |  2     |
+// -------------+--------+--------+
+// 
+// SBX: calculates the AND of the accumulator with the X register and the subtracts
+// an immediate value.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  X . . . . X X
+// SBX #imm     |   CBh  |  2     |
+// -------------+--------+--------+
+// 
+// NOP: No-Operation.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  . . . . . . .
+// NOP          |   1Ah  |  2     |
+// NOP          |   3Ah  |  2     |    * = adds +1 if page cross is detected.
+// NOP          |   5Ah  |  2     |
+// NOP          |   7Ah  |  2     |
+// NOP          |   DAh  |  2     |
+// NOP          |   FAh  |  2     |
+// NOP #imm     |   80h  |  2     |
+// NOP #imm     |   82h  |  2     |
+// NOP #imm     |   89h  |  2     |
+// NOP #imm     |   C2h  |  2     |
+// NOP #imm     |   E2h  |  2     |
+// NOP zp       |   04h  |  3     |
+// NOP zp,x     |   14h  |  4     |
+// NOP zp,x     |   34h  |  4     |
+// NOP zp       |   44h  |  3     |
+// NOP zp,x     |   54h  |  4     |
+// NOP zp       |   64h  |  3     |
+// NOP zp,x     |   74h  |  4     |
+// NOP zp,x     |   D4h  |  4     |
+// NOP zp,x     |   F4h  |  4     |
+// NOP abs      |   0Ch  |  4     |
+// NOP abs,x    |   1Ch  |  4*    |
+// NOP abs,x    |   3Ch  |  4*    |
+// NOP abs,x    |   5Ch  |  4*    |
+// NOP abs,x    |   7Ch  |  4*    |
+// NOP abs,x    |   DCh  |  4*    |
+// NOP abs,x    |   FCh  |  4*    |
+// -------------+--------+--------+
+// 
+// TAS: calculates the AND of the accumulator with the X register and stores the result
+// into the stack pointer. Then, it calculates the AND of the result with the
+// high byte of the memory pointer plus 1 and it stores the final result in memory.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  . . . . . . .
+// TAS abs,y    |   9Bh  |  5     |
+// -------------+--------+--------+
+// 
+// SHY: calculates the AND of the Y register with the high byte of the memory pointer
+// plus 1 and it stores the final result in memory.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  . . . . . . .
+// SHY abs,x    |   9Ch  |  5     |
+// -------------+--------+--------+
+// 
+// SHX: calculates the AND of the X register with the high byte of the memory pointer
+// plus 1 and it stores the final result in memory.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  . . . . . . .
+// SHX abs,y    |   9Eh  |  5     |
+// -------------+--------+--------+
+// 
+// SHA: calculates the AND of the accumulator with the X register with the high byte
+// of the memory pointer plus 1 and it stores the final result in memory.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  . . . . . . .
+// SHX abs,y    |   9Fh  |  5     |
+// SHX (zp),y   |   93h  |  6     |
+// -------------+--------+--------+
+// 
+// ANC: calculates the AND of the accumulator with an immediate value and then
+// updates the status of N and Z bits of the status register.
+// The N flag is also copied into the Carry flag.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  X . . . . X X
+// ANC #imm     |   0Bh  |  2     |
+// ANC #imm     |   2Bh  |  2     |
+// -------------+--------+--------+
+// 
+// LAS: calculates the AND of a memory location with the contents of the
+// stack pointer register and it stores the result in the accumulator, the X
+// register, and the stack pointer.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  X . . . . X .
+// LAS abs,y    |   BBh  |  4*    |
+// -------------+--------+--------+    * = adds +1 if page cross is detected.
+// 
+// SBC: alias of the official SBC opcode.
+// 
+// Address mode | opcode | cycles |            N V B D I Z C
+// -------------+--------+--------+    FLAGS:  X X . . . X X
+// SBC #imm     |   EBh  |  2     |
+// -------------+--------+--------+
+// 
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Data
@@ -398,9 +395,8 @@ static bool HaveIRQRequest;
 #define GET_OF()        ((Regs.SR & OF) != 0)
 #define GET_SF()        ((Regs.SR & SF) != 0)
 
-/* Set the flags. The parameter is a boolean flag that says if the flag should be
-** set or reset.
-*/
+// Set the flags. The parameter is a boolean flag that says if the flag should be
+// set or reset.
 #define SET_CF(f)       do { if (f) { Regs.SR |= CF; } else { Regs.SR &= ~CF; } } while (0)
 #define SET_ZF(f)       do { if (f) { Regs.SR |= ZF; } else { Regs.SR &= ~ZF; } } while (0)
 #define SET_IF(f)       do { if (f) { Regs.SR |= IF; } else { Regs.SR &= ~IF; } } while (0)
@@ -408,9 +404,8 @@ static bool HaveIRQRequest;
 #define SET_OF(f)       do { if (f) { Regs.SR |= OF; } else { Regs.SR &= ~OF; } } while (0)
 #define SET_SF(f)       do { if (f) { Regs.SR |= SF; } else { Regs.SR &= ~SF; } } while (0)
 
-/* Special test and set macros. The meaning of the parameter depends on the
-** actual flag that should be set or reset.
-*/
+// Special test and set macros. The meaning of the parameter depends on the
+// actual flag that should be set or reset.
 #define TEST_ZF(v)      SET_ZF (((v) & 0xFF) == 0)
 #define TEST_SF(v)      SET_SF (((v) & 0x80) != 0)
 
@@ -852,8 +847,8 @@ static bool HaveIRQRequest;
     SET_ZF ((Val & Regs.AC) == 0)
 
 // BITIMM
-/* The BIT instruction with immediate mode addressing only sets
-   the zero flag; the sign and overflow flags are not changed. */
+// The BIT instruction with immediate mode addressing only sets
+// the zero flag; the sign and overflow flags are not changed. 
 #define BITIMM(Val)                                             \
     SET_ZF ((Val & Regs.AC) == 0)
 
@@ -941,12 +936,11 @@ static bool HaveIRQRequest;
     } while (0)
 
 // ANE
-/* An "unstable" illegal opcode that depends on a "constant" value that isn't
- * really constant. It varies between machines, with temperature, and so on.
- * Original sim65 behavior was to use the constant 0xEF here. To get behavior
- * in line with the 65x02 testsuite, we now use the value 0xEE instead,
- * which is also a reasonable choice that can be observed in practice.
- */
+// An "unstable" illegal opcode that depends on a "constant" value that isn't
+// really constant. It varies between machines, with temperature, and so on.
+// Original sim65 behavior was to use the constant 0xEF here. To get behavior
+// in line with the 65x02 testsuite, we now use the value 0xEE instead,
+// which is also a reasonable choice that can be observed in practice.
 #define ANE(Val)                                                \
     Val = (Regs.AC | 0xEE) & Regs.XR & Val;                     \
     Regs.AC = Val;                                              \
@@ -1084,9 +1078,8 @@ static bool HaveIRQRequest;
         }                                                       \
     } while (0)
 
-/* Set/reset a specific bit in a zero-page byte. This macro
- * macro is used to implement the 65C02 RMBx and SMBx instructions.
- */
+// Set/reset a specific bit in a zero-page byte. This macro
+// macro is used to implement the 65C02 RMBx and SMBx instructions.
 #define ZP_BITOP(bitnr, bitval)                                 \
     do {                                                        \
         const uint8_t zp_address = MemReadByte (Regs.PC + 1);   \
@@ -1101,10 +1094,9 @@ static bool HaveIRQRequest;
         Cycles = 5;                                             \
     } while (0)
 
-/* Branch depending on the state of a specific bit of a zero page
- * address. This macro is used to implement the 65C02 BBRx and
- * BBSx instructions.
- */
+// Branch depending on the state of a specific bit of a zero page
+// address. This macro is used to implement the 65C02 BBRx and
+// BBSx instructions.
 #define ZP_BIT_BRANCH(bitnr, bitval)                            \
     do {                                                        \
         const uint8_t zp_address = MemReadByte (Regs.PC + 1);   \
@@ -1417,25 +1409,24 @@ static void OPC_65C02_1F (void)
 static void OPC_6502_20 (void)
 // Opcode $20: JSR
 {
-    /* The obvious way to implement JSR for the 6502 is to (a) read the target address,
-     * and then (b) push the return address minus one. Or do (b) first, then (a).
-     *
-     * However, there is a non-obvious case where this conflicts with the actual order
-     * of operations that the 6502 does, which is:
-     *
-     * (a) Load the LSB of the target address.
-     * (b) Push the MSB of the return address, minus one.
-     * (c) Push the LSB of the return address, minus one.
-     * (d) Load the MSB of the target address.
-     *
-     * This can make a difference in a pretty esoteric case, if the JSR target is located,
-     * wholly or in part, inside the stack page (!). This won't happen in normal code
-     * but it can happen in specifically constructed examples.
-     *
-     * To deal with this, we load the LSB and MSB of the target address separately,
-     * with the pushing of the return address sandwiched in between, to mimic
-     * the order of the bus operations on a real 6502.
-     */
+    // The obvious way to implement JSR for the 6502 is to (a) read the target address,
+    // and then (b) push the return address minus one. Or do (b) first, then (a).
+    // 
+    // However, there is a non-obvious case where this conflicts with the actual order
+    // of operations that the 6502 does, which is:
+    // 
+    // (a) Load the LSB of the target address.
+    // (b) Push the MSB of the return address, minus one.
+    // (c) Push the LSB of the return address, minus one.
+    // (d) Load the MSB of the target address.
+    // 
+    // This can make a difference in a pretty esoteric case, if the JSR target is located,
+    // wholly or in part, inside the stack page (!). This won't happen in normal code
+    // but it can happen in specifically constructed examples.
+    // 
+    // To deal with this, we load the LSB and MSB of the target address separately,
+    // with the pushing of the return address sandwiched in between, to mimic
+    // the order of the bus operations on a real 6502.
 
     Cycles = 6;
     Regs.PC += 1;
@@ -1857,14 +1848,13 @@ static void OPC_6502X_5B (void)
 static void OPC_65C02_5C (void)
 // Opcode $5C: 'Absolute' 8 cycle NOP
 {
-    /* This instruction takes 8 cycles, as per the following sources:
-     *
-     * - http://www.6502.org/tutorials/65c02opcodes.html
-     * - Tests on a WDC 65C02 in hardware.
-     *
-     * The 65x02 testsuite however claims that this instruction takes 4 cycles.
-     * See issue: https://github.com/SingleStepTests/65x02/issues/12
-     */
+    // This instruction takes 8 cycles, as per the following sources:
+    // 
+    // - http://www.6502.org/tutorials/65c02opcodes.html
+    // - Tests on a WDC 65C02 in hardware.
+    // 
+    // The 65x02 testsuite however claims that this instruction takes 4 cycles.
+    // See issue: https://github.com/SingleStepTests/65x02/issues/12
     Cycles = 8;
     Regs.PC += 3;
 }
@@ -2288,8 +2278,8 @@ static void OPC_6502_88 (void)
 static void OPC_65C02_89 (void)
 // Opcode $89: BIT #imm
 {
-    /* Note: BIT #imm behaves differently from BIT with other addressing modes,
-     * hence the different 'op' argument to the macro. */
+    // Note: BIT #imm behaves differently from BIT with other addressing modes,
+    // hence the different 'op' argument to the macro. 
     ALU_OP_IMM (BITIMM);
 }
 

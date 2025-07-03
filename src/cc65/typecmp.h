@@ -89,10 +89,9 @@ typecmp_t TypeCmp (const Type* lhs, const Type* rhs);
 // Compare two types and return the result
 
 void TypeCompatibilityDiagnostic (const Type* NewType, const Type* OldType, int IsError, const char* Msg);
-/* Print error or warning message about type compatibility with proper type
-** names. The format string shall contain two '%s' specifiers for the names of
-** the two types.
-*/
+// Print error or warning message about type compatibility with proper type
+// names. The format string shall contain two '%s' specifiers for the names of
+// the two types.
 
 // End of typecmp.h
 

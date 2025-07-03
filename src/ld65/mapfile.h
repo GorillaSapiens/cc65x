@@ -49,9 +49,8 @@ enum {
 ////////////////////////////////////////////////////////////////////////////////
 
 void CreateMapFile (int ShortMap);
-/* Create a map file. If ShortMap is true, only the segment lists are
-** generated, not the import/export lists.
-*/
+// Create a map file. If ShortMap is true, only the segment lists are
+// generated, not the import/export lists.
 
 void CreateLabelFile (void);
 // Create a label file

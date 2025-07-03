@@ -46,12 +46,11 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Code generator flags.
-** Note: The type flags are designed so that a smaller type may override a
-** larger one by or'ing it into the existing one.
-** Note^2: The actual type including the sign flag is in the lower bits, so
-** we can mask the information and use them as a table index.
-*/
+// Code generator flags.
+// Note: The type flags are designed so that a smaller type may override a
+// larger one by or'ing it into the existing one.
+// Note^2: The actual type including the sign flag is in the lower bits, so
+// we can mask the information and use them as a table index.
 #define CF_NONE         0x0000  // No special flags
 
 // Values for the actual type
@@ -176,36 +175,30 @@ void g_tosint (unsigned flags);
 // Make sure, the value on TOS is an int. Convert if necessary
 
 void g_regint (unsigned from);
-/* Convert the value in the primary register to an int (whose representation
-** is irrelevent of signedness).
-*/
+// Convert the value in the primary register to an int (whose representation
+// is irrelevent of signedness).
 
 void g_reglong (unsigned from);
-/* Convert the value in the primary register to a long (whose representation
-** is irrelevent of signedness).
-*/
+// Convert the value in the primary register to a long (whose representation
+// is irrelevent of signedness).
 
 void g_regfloat (unsigned from);
-/* Convert the value in the primary register to a float
-*/
+// Convert the value in the primary register to a float
 
 unsigned g_typeadjust (unsigned lhs, unsigned rhs);
-/* Adjust the integer operands before doing a binary operation. lhs is a flags
-** value, that corresponds to the value on TOS, rhs corresponds to the value
-**  in (e)ax. The return value is the flags value for the resulting type.
-*/
+// Adjust the integer operands before doing a binary operation. lhs is a flags
+// value, that corresponds to the value on TOS, rhs corresponds to the value
+// in (e)ax. The return value is the flags value for the resulting type.
 
 unsigned g_typecast (unsigned to, unsigned from);
-/* Cast the value in the primary register to the specified operand size and
-** signedness. Return the result flags.
-*/
+// Cast the value in the primary register to the specified operand size and
+// signedness. Return the result flags.
 
 void g_scale (unsigned flags, long val);
-/* Scale the value in the primary register by the given value. If val is positive,
-** scale up, is val is negative, scale down. This function is used to scale
-** the operands or results of pointer arithmetic by the size of the type, the
-** pointer points to.
-*/
+// Scale the value in the primary register by the given value. If val is positive,
+// scale up, is val is negative, scale down. This function is used to scale
+// the operands or results of pointer arithmetic by the size of the type, the
+// pointer points to.
 
 ////////////////////////////////////////////////////////////////////////////////
 //                          Function entry and exit
@@ -245,17 +238,15 @@ void g_getlocal (unsigned Flags, int Offs);
 // Fetch specified local object (local var).
 
 void g_getind (unsigned Flags, unsigned Offs);
-/* Fetch the specified object type indirect through the primary register
-** into the primary register
-*/
+// Fetch the specified object type indirect through the primary register
+// into the primary register
 
 void g_leasp (int Offs);
 // Fetch the address of the specified symbol into the primary register
 
 void g_leavariadic (int Offs);
-/* Fetch the address of a parameter in a variadic function into the primary
-** register
-*/
+// Fetch the address of a parameter in a variadic function into the primary
+// register
 
 ////////////////////////////////////////////////////////////////////////////////
 //                             Store into memory
@@ -268,9 +259,8 @@ void g_putlocal (unsigned Flags, int Offs, long Val);
 // Put data into local object.
 
 void g_putind (unsigned flags, unsigned offs);
-/* Store the specified object type in the primary register at the address
-** on the top of the stack
-*/
+// Store the specified object type in the primary register at the address
+// on the top of the stack
 
 ////////////////////////////////////////////////////////////////////////////////
 //              Adds and subs of variables fix a fixed address
@@ -327,9 +317,8 @@ void g_restore (unsigned flags);
 // Copy hold register to primary.
 
 void g_cmp (unsigned flags, unsigned long val);
-/* Immediate compare. The primary register will not be changed, Z flag
-** will be set.
-*/
+// Immediate compare. The primary register will not be changed, Z flag
+// will be set.
 
 void g_test (unsigned flags);
 // Test the value in the primary and set the condition codes
@@ -340,9 +329,8 @@ void g_push_float (unsigned flags, double val);
 // Push the primary register or a constant value onto the stack
 
 void g_swap (unsigned flags);
-/* Swap the primary register and the top of the stack. flags give the type
-** of *both* values (must have same size).
-*/
+// Swap the primary register and the top of the stack. flags give the type
+// of *both* values (must have same size).
 
 void g_call (unsigned Flags, const char* Label, unsigned ArgSize);
 // Call the specified subroutine name
@@ -360,11 +348,10 @@ void g_falsejump (unsigned flags, unsigned label);
 // Jump to label if zero flag set
 
 void g_branch (unsigned Label);
-/* Branch unconditionally to Label if the CPU has the BRA instruction.
-** Otherwise, jump to Label.
-** Use this function, instead of g_jump(), only where it is certain that
-** the label cannot be farther away from the branch than -128/+127 bytes.
-*/
+// Branch unconditionally to Label if the CPU has the BRA instruction.
+// Otherwise, jump to Label.
+// Use this function, instead of g_jump(), only where it is certain that
+// the label cannot be farther away from the branch than -128/+127 bytes.
 
 void g_lateadjustSP (unsigned label);
 // Adjust stack based on non-immediate data

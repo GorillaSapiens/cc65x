@@ -80,16 +80,14 @@ Span* OpenSpan (void);
 // Open a span for the active segment and return it.
 
 Span* CloseSpan (Span* S);
-/* Close the given span. Be sure to replace the passed span by the one
-** returned, since the span will get deleted if it is empty or may be
-** replaced if a duplicate exists.
-*/
+// Close the given span. Be sure to replace the passed span by the one
+// returned, since the span will get deleted if it is empty or may be
+// replaced if a duplicate exists.
 
 void OpenSpanList (Collection* Spans);
-/* Open a list of spans for all existing segments to the given collection of
-** spans. The currently active segment will be inserted first with all others
-** following.
-*/
+// Open a list of spans for all existing segments to the given collection of
+// spans. The currently active segment will be inserted first with all others
+// following.
 
 void CloseSpanList (Collection* Spans);
 // Close all open spans by setting PC to the current PC for the segment.

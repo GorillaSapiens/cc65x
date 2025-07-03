@@ -265,75 +265,67 @@ int TokIsFuncSpec (const Token* T);
 // Return true if the token is a function specifier
 
 void SymName (char* S);
-/* Read a symbol from the input stream. The first character must have been
-** checked before calling this function. The buffer is expected to be at
-** least of size MAX_IDENTLEN+1.
-*/
+// Read a symbol from the input stream. The first character must have been
+// checked before calling this function. The buffer is expected to be at
+// least of size MAX_IDENTLEN+1.
 
 int IsWideQuoted (char First, char Second);
-/* Return 1 if the two successive characters indicate a wide string literal or
-** a wide char constant, otherwise return 0.
-*/
+// Return 1 if the two successive characters indicate a wide string literal or
+// a wide char constant, otherwise return 0.
 
 int IsSym (char* S);
 // If a symbol follows, read it and return 1, otherwise return 0
 
 int IsPPNumber (int Cur, int Next);
-/* Return 1 if the two successive characters indicate a pp-number, otherwise
-** return 0.
-*/
+// Return 1 if the two successive characters indicate a pp-number, otherwise
+// return 0.
 
 void CopyPPNumber (StrBuf* Target);
 // Copy a pp-number from the input to Target
 
 void NextToken (void);
-/* Get next non-pragma token from input stream consuming any pragmas
-** encountered. Adjacent string literal tokens will be concatenated.
-*/
+// Get next non-pragma token from input stream consuming any pragmas
+// encountered. Adjacent string literal tokens will be concatenated.
 
 void SkipTokens (const token_t* TokenList, unsigned TokenCount);
-/* Skip tokens until we reach TOK_CEOF or a token in the given token list.
-** This routine is used for error recovery.
-*/
+// Skip tokens until we reach TOK_CEOF or a token in the given token list.
+// This routine is used for error recovery.
 
 int SmartErrorSkip (int TillEnd);
-/* Try some smart error recovery.
-**
-** - If TillEnd == 0:
-**   Skip tokens until a comma or closing curly brace that is not enclosed in
-**   an open parenthesis/bracket/curly brace, or until a semicolon, EOF or
-**   unpaired right parenthesis/bracket/curly brace is reached. The closing
-**   curly brace is consumed in the former case.
-**
-** - If TillEnd != 0:
-**   Skip tokens until a right curly brace or semicolon is reached and consumed
-**   while there are no open parentheses/brackets/curly braces, or until an EOF
-**   is reached anytime. Any open parenthesis/bracket/curly brace is considered
-**   to be closed by consuming a right parenthesis/bracket/curly brace even if
-**   they didn't match.
-**
-** - Return -1:
-**   If this exits at a semicolon or unpaired right parenthesis/bracket/curly
-**   brace while there are still open parentheses/brackets/curly braces.
-**
-** - Return 0:
-**   If this exits as soon as it reaches an EOF;
-**   Or if this exits right after consuming a semicolon or right curly brace
-**   while there are no open parentheses/brackets/curly braces.
-**
-** - Return 1:
-**   If this exits at a non-EOF without consuming it.
-*/
+// Try some smart error recovery.
+// 
+// - If TillEnd == 0:
+// Skip tokens until a comma or closing curly brace that is not enclosed in
+// an open parenthesis/bracket/curly brace, or until a semicolon, EOF or
+// unpaired right parenthesis/bracket/curly brace is reached. The closing
+// curly brace is consumed in the former case.
+// 
+// - If TillEnd != 0:
+// Skip tokens until a right curly brace or semicolon is reached and consumed
+// while there are no open parentheses/brackets/curly braces, or until an EOF
+// is reached anytime. Any open parenthesis/bracket/curly brace is considered
+// to be closed by consuming a right parenthesis/bracket/curly brace even if
+// they didn't match.
+// 
+// - Return -1:
+// If this exits at a semicolon or unpaired right parenthesis/bracket/curly
+// brace while there are still open parentheses/brackets/curly braces.
+// 
+// - Return 0:
+// If this exits as soon as it reaches an EOF;
+// Or if this exits right after consuming a semicolon or right curly brace
+// while there are no open parentheses/brackets/curly braces.
+// 
+// - Return 1:
+// If this exits at a non-EOF without consuming it.
 
 int SimpleErrorSkip (void);
-/* Skip tokens until an EOF or unpaired right parenthesis/bracket/curly brace
-** is reached. Return 0 If this exits at an EOF. Otherwise return -1.
-*/
+// Skip tokens until an EOF or unpaired right parenthesis/bracket/curly brace
+// is reached. Return 0 If this exits at an EOF. Otherwise return -1.
 
 int Consume (token_t Token, const char* ErrorMsg);
-/* Eat token if it is the next in the input stream, otherwise print an error
-** message. Returns true if the token was found and false otherwise.
-*/
+// Eat token if it is the next in the input stream, otherwise print an error
+// message. Returns true if the token was found and false otherwise.
 
 int ConsumeColon (void);
 // Check for a colon and skip it.

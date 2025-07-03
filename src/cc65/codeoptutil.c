@@ -109,9 +109,8 @@ void FinalizeLoadRegInfo (LoadRegInfo* LRI, CodeSeg* S)
 }
 
 void AdjustLoadRegInfo (LoadRegInfo* LRI, int Index, int Change)
-/* Adjust a load register info struct after deleting or inserting an entry
-** with a given index
-*/
+// Adjust a load register info struct after deleting or inserting an entry
+// with a given index
 {
     CHECK (abs (Change) == 1);
     if (Change < 0) {
@@ -197,10 +196,9 @@ RegInfo* GetLastChangedRegInfo (StackOpData* D, LoadRegInfo* Reg)
 }
 
 static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
-/* Check if the result of the same loading code as in LRI may be changed by E.
-** If any part of the arg is used, it could be unsafe to add such a store before E.
-** If any part of the arg is changed, it could be unsafe to add such a load after E.
-*/
+// Check if the result of the same loading code as in LRI may be changed by E.
+// If any part of the arg is used, it could be unsafe to add such a store before E.
+// If any part of the arg is changed, it could be unsafe to add such a load after E.
 {
     fncls_t         fncls;
     unsigned int    Use;
@@ -226,9 +224,8 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
     if ((LRI->Flags & LI_CHECK_ARG) != 0) {
         AE = LRI->LoadEntry;
         if (AE != 0) {
-            /* We ignore processor flags for loading args.
-            ** Further more, Reg A can't be used as the index.
-            */
+            // We ignore processor flags for loading args.
+            // Further more, Reg A can't be used as the index.
             UseToCheck |= AE->Use & ~REG_A & REG_ALL;
             ChgToCheck |= AE->Chg & ~REG_A & REG_ALL;
 
@@ -244,9 +241,8 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
                 ChgToCheck |= ZI->ByteUse;
             }
         } else {
-            /* We don't know what regs could have been used for the src.
-            ** So we just assume all.
-            */
+            // We don't know what regs could have been used for the src.
+            // So we just assume all.
             UseToCheck |= ~REG_A & REG_ALL;
             ChgToCheck |= ~REG_A & REG_ALL;
         }
@@ -269,9 +265,8 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
                 ChgToCheck |= ZI->ByteUse;
             }
         } else {
-            /* We don't know what regs could have been used by Y.
-            ** So we just assume all.
-            */
+            // We don't know what regs could have been used by Y.
+            // So we just assume all.
             UseToCheck |= ~REG_A & REG_ALL;
             ChgToCheck |= ~REG_A & REG_ALL;
         }
@@ -302,11 +297,10 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
                 goto L_Affected;
             }
 
-            /* These opc may operate on memory locations. In some cases we can
-            ** be sure that the src is unaffected as E doesn't overlap with it.
-            ** However, if we don't know what memory locations could have been
-            ** used for the src, we just assume all.
-            */
+            // These opc may operate on memory locations. In some cases we can
+            // be sure that the src is unaffected as E doesn't overlap with it.
+            // However, if we don't know what memory locations could have been
+            // used for the src, we just assume all.
             if (E->AM == AM65_ABS       ||
                 E->AM == AM65_ZP        ||
                 (E->AM == AM65_ZP_INDY && strcmp (E->ArgBase, "c_sp") == 0)
@@ -332,9 +326,8 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
                 }
 
                 if ((LRI->Flags & LI_CHECK_Y) != 0) {
-                    /* If we don't know what memory location could have been
-                    ** used by Y, we just assume all.
-                    */
+                    // If we don't know what memory location could have been
+                    // used by Y, we just assume all.
                     if (YE == 0 ||
                         (YE->ArgOff == E->ArgOff && strcmp (YE->ArgBase, E->ArgBase) == 0)) {
 
@@ -352,10 +345,9 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
                 // Otherwise unaffected
                 goto L_Result;
             }
-            /* We could've check further for more cases where the load target
-            ** isn't modified, but for now let's save the trouble and just play
-            ** it safe.
-            */
+            // We could've check further for more cases where the load target
+            // isn't modified, but for now let's save the trouble and just play
+            // it safe.
             goto L_Affected;
         }
     }
@@ -403,9 +395,8 @@ static void HonourUseAndChg (LoadRegInfo* LRI, unsigned Reg, const CodeEntry* E,
 }
 
 void PrepairLoadRegInfoForArgCheck (CodeSeg* S, LoadRegInfo* LRI, CodeEntry* E)
-/* Set the load src flags and remember to check for load src change if necessary.
-** Note: this doesn't assume reloading Y.
-*/
+// Set the load src flags and remember to check for load src change if necessary.
+// Note: this doesn't assume reloading Y.
 {
     if (E->AM == AM65_IMM) {
         // These insns are all ok and replaceable
@@ -418,18 +409,16 @@ void PrepairLoadRegInfoForArgCheck (CodeSeg* S, LoadRegInfo* LRI, CodeEntry* E)
         LRI->Flags |= LI_CHECK_ARG | LI_CHECK_Y;
     } else if ((E->AM == AM65_ZP_INDY) &&
                 strcmp (E->Arg, "c_sp") == 0) {
-        /* A load from the stack with known offset is also ok, but in this
-        ** case we must reload the index register later. Please note that
-        ** a load indirect via other zero page locations is not ok, since
-        ** these locations may change between the push and the actual
-        ** operation.
-        */
+        // A load from the stack with known offset is also ok, but in this
+        // case we must reload the index register later. Please note that
+        // a load indirect via other zero page locations is not ok, since
+        // these locations may change between the push and the actual
+        // operation.
         LRI->Flags |= LI_CHECK_ARG | LI_CHECK_Y;
     }
 
-    /* If the load offset has a known value, we can just remember and reload
-    ** it into the index register later.
-    */
+    // If the load offset has a known value, we can just remember and reload
+    // it into the index register later.
     if ((LRI->Flags & LI_CHECK_Y) != 0) {
         if (RegValIsKnown (E->RI->In.RegY)) {
             LRI->Offs = (unsigned char)E->RI->In.RegY;
@@ -476,9 +465,8 @@ void SetIfOperandLoadUnremovable (LoadInfo* LI, unsigned Used)
 }
 
 unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
-/* Track loads for a code entry.
-** Return used registers.
-*/
+// Track loads for a code entry.
+// Return used registers.
 {
     unsigned Used;
     CodeEntry* E = CS_GetEntry (S, I);
@@ -487,10 +475,9 @@ unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
     // By default
     Used = E->Use;
 
-    /* Whether we had a load or xfer op before or not, the newly loaded value
-    ** will be the real one used for the pushax/op unless it's overwritten,
-    ** so we can just reset the flags about it in such cases.
-    */
+    // Whether we had a load or xfer op before or not, the newly loaded value
+    // will be the real one used for the pushax/op unless it's overwritten,
+    // so we can just reset the flags about it in such cases.
     if (E->Info & OF_LOAD) {
 
         LoadRegInfo* LRI = 0;
@@ -523,12 +510,11 @@ unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
             LRI->Flags |= LI_CHECK_ARG | LI_CHECK_Y;
         } else if (E->AM == AM65_ZP_INDY &&
                    strcmp (E->Arg, "c_sp") == 0) {
-            /* A load from the stack with known offset is also ok, but in this
-            ** case we must reload the index register later. Please note that
-            ** a load indirect via other zero page locations is not ok, since
-            ** these locations may change between the push and the actual
-            ** operation.
-            */
+            // A load from the stack with known offset is also ok, but in this
+            // case we must reload the index register later. Please note that
+            // a load indirect via other zero page locations is not ok, since
+            // these locations may change between the push and the actual
+            // operation.
             LRI->Flags |= LI_CHECK_ARG | LI_CHECK_Y | LI_SP;
 
             // Reg Y can be regarded as unused if this load is removed
@@ -540,9 +526,8 @@ unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
             }
         }
 
-        /* If the load offset has a known value, we can just remember and reload
-        ** it into the index register later.
-        */
+        // If the load offset has a known value, we can just remember and reload
+        // it into the index register later.
         if ((LRI->Flags & LI_CHECK_Y) != 0) {
             if (RegValIsKnown (E->RI->In.RegY)) {
                 LRI->Offs = (unsigned char)E->RI->In.RegY;
@@ -719,9 +704,8 @@ void ResetStackOpData (StackOpData* Data)
 ////////////////////////////////////////////////////////////////////////////////
 
 void InsertEntry (StackOpData* D, CodeEntry* E, int Index)
-/* Insert a new entry. Depending on Index, D->PushIndex and D->OpIndex will
-** be adjusted by this function.
-*/
+// Insert a new entry. Depending on Index, D->PushIndex and D->OpIndex will
+// be adjusted by this function.
 {
     // Insert the entry into the code segment
     CS_InsertEntry (D->Code, E, Index);
@@ -740,9 +724,8 @@ void InsertEntry (StackOpData* D, CodeEntry* E, int Index)
 }
 
 void DelEntry (StackOpData* D, int Index)
-/* Delete an entry. Depending on Index, D->PushIndex and D->OpIndex will be
-** adjusted by this function, and PushEntry/OpEntry may get invalidated.
-*/
+// Delete an entry. Depending on Index, D->PushIndex and D->OpIndex will be
+// adjusted by this function, and PushEntry/OpEntry may get invalidated.
 {
     // Delete the entry from the code segment
     CS_DelEntry (D->Code, Index);
@@ -765,9 +748,8 @@ void DelEntry (StackOpData* D, int Index)
 }
 
 void AdjustStackOffset (StackOpData* D, unsigned Offs)
-/* Adjust the offset for all stack accesses in the range PushIndex to OpIndex.
-** OpIndex is adjusted according to the insertions.
-*/
+// Adjust the offset for all stack accesses in the range PushIndex to OpIndex.
+// OpIndex is adjusted according to the insertions.
 {
     // Walk over all entries
     int I = D->PushIndex + 1;
@@ -778,9 +760,8 @@ void AdjustStackOffset (StackOpData* D, unsigned Offs)
         // Check against some things that should not happen
         CHECK ((E->Use & SLV_TOP) != SLV_TOP);
 
-        /* Check if this entry does a stack access, and if so, if it's a plain
-        ** load from stack, since this is needed later.
-        */
+        // Check if this entry does a stack access, and if so, if it's a plain
+        // load from stack, since this is needed later.
         int Correction = 0;
         if ((E->Use & SLV_IND) == SLV_IND) {
 
@@ -800,9 +781,8 @@ void AdjustStackOffset (StackOpData* D, unsigned Offs)
         }
 
         if (Correction) {
-            /* Get the code entry before this one. If it's a LDY, adjust the
-            ** value.
-            */
+            // Get the code entry before this one. If it's a LDY, adjust the
+            // value.
             CodeEntry* P = CS_GetPrevEntry (D->Code, I);
             if (P && P->OPC == OP65_LDY && CE_IsConstImm (P) && !CE_HasLabel (E)) {
                 // The Y load is just before the stack access, adjust it
@@ -823,23 +803,22 @@ void AdjustStackOffset (StackOpData* D, unsigned Offs)
                     CodeEntry* N;
                     if ((N = CS_GetNextEntry (D->Code, I)) != 0 &&
                         ((N->Info & OF_ZBRA) != 0) && N->JumpTo != 0) {
-                        /* The Y register is used but the load instruction loads A
-                        ** and is followed by a branch that evaluates the zero flag.
-                        ** This means that we cannot just insert the load insn
-                        ** for the Y register at this place, because it would
-                        ** destroy the Z flag. Instead place load insns at the
-                        ** target of the branch and after it.
-                        ** Note: There is a chance that this code won't work. The
-                        ** jump may be a backwards jump (in which case the stack
-                        ** offset has already been adjusted) or there may be other
-                        ** instructions between the load and the conditional jump.
-                        ** Currently the compiler does not generate such code, but
-                        ** it is possible to force the optimizer into something
-                        ** invalid by use of inline assembler.
-                        ** Note: In reality, this route is never taken as all
-                        ** callers of this function will just give up with
-                        ** optimization whenever they detect a branch.
-                        */
+                        // The Y register is used but the load instruction loads A
+                        // and is followed by a branch that evaluates the zero flag.
+                        // This means that we cannot just insert the load insn
+                        // for the Y register at this place, because it would
+                        // destroy the Z flag. Instead place load insns at the
+                        // target of the branch and after it.
+                        // Note: There is a chance that this code won't work. The
+                        // jump may be a backwards jump (in which case the stack
+                        // offset has already been adjusted) or there may be other
+                        // instructions between the load and the conditional jump.
+                        // Currently the compiler does not generate such code, but
+                        // it is possible to force the optimizer into something
+                        // invalid by use of inline assembler.
+                        // Note: In reality, this route is never taken as all
+                        // callers of this function will just give up with
+                        // optimization whenever they detect a branch.
 
                         // Add load insn after the branch
                         CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
@@ -881,9 +860,8 @@ void AdjustStackOffset (StackOpData* D, unsigned Offs)
         ++I;
     }
 
-    /* If we have rhs load insns that load from stack, we'll have to adjust
-    ** the offsets for these also.
-    */
+    // If we have rhs load insns that load from stack, we'll have to adjust
+    // the offsets for these also.
     if ((D->Rhs.A.Flags & (LI_RELOAD_Y | LI_SP | LI_CHECK_Y)) == (LI_RELOAD_Y | LI_SP)) {
         D->Rhs.A.Offs -= Offs;
     }
@@ -893,10 +871,9 @@ void AdjustStackOffset (StackOpData* D, unsigned Offs)
 }
 
 int IsRegVar (StackOpData* D)
-/* If the value pushed is that of a zeropage variable that is unchanged until Op,
-** replace ZPLo and ZPHi in the given StackOpData struct by the variable and return true.
-** Otherwise leave D untouched and return false.
-*/
+// If the value pushed is that of a zeropage variable that is unchanged until Op,
+// replace ZPLo and ZPHi in the given StackOpData struct by the variable and return true.
+// Otherwise leave D untouched and return false.
 {
     CodeEntry*  LoadA = D->Lhs.A.LoadEntry;
     CodeEntry*  LoadX = D->Lhs.X.LoadEntry;
@@ -946,15 +923,13 @@ void AddStoreLhsX (StackOpData* D)
 }
 
 void ReplacePushByStore (StackOpData* D)
-/* Replace the call to the push subroutine by a store into the zero page
-** location (actually, the push is not replaced, because we need it for
-** later, but the name is still ok since the push will get removed at the
-** end of each routine).
-*/
+// Replace the call to the push subroutine by a store into the zero page
+// location (actually, the push is not replaced, because we need it for
+// later, but the name is still ok since the push will get removed at the
+// end of each routine).
 {
-    /* Store the value into the zeropage instead of pushing it. Check high
-    ** byte first so that the store is later in A/X order.
-    */
+    // Store the value into the zeropage instead of pushing it. Check high
+    // byte first so that the store is later in A/X order.
     if ((D->Lhs.X.Flags & LI_DIRECT) == 0) {
         AddStoreLhsX (D);
     }
@@ -964,17 +939,15 @@ void ReplacePushByStore (StackOpData* D)
 }
 
 void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
-/* Add an op for the low byte of an operator. This function honours the
-** OP_DIRECT and OP_RELOAD_Y flags and generates the necessary instructions.
-** All code is inserted at the current insertion point.
-*/
+// Add an op for the low byte of an operator. This function honours the
+// OP_DIRECT and OP_RELOAD_Y flags and generates the necessary instructions.
+// All code is inserted at the current insertion point.
 {
     CodeEntry* X;
 
     if ((LI->A.Flags & LI_DIRECT) != 0) {
-        /* Op with a variable location. If the location is on the stack, we
-        ** need to reload the Y register.
-        */
+        // Op with a variable location. If the location is on the stack, we
+        // need to reload the Y register.
         if ((LI->A.Flags & LI_RELOAD_Y) == 0) {
 
             // opc ...
@@ -1017,10 +990,9 @@ void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
 }
 
 void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
-/* Add an op for the high byte of an operator. Special cases (constant values
-** or similar) have to be checked separately, the function covers only the
-** generic case. Code is inserted at the insertion point.
-*/
+// Add an op for the high byte of an operator. Special cases (constant values
+// or similar) have to be checked separately, the function covers only the
+// generic case. Code is inserted at the insertion point.
 {
     CodeEntry* X;
 
@@ -1162,9 +1134,8 @@ static const char* const Tab[] = {
 };
 
 int HarmlessCall (const CodeEntry* E, int PushedBytes)
-/* Check if this is a call to a harmless subroutine that will not interrupt
-** the pushax/op sequence when encountered.
-*/
+// Check if this is a call to a harmless subroutine that will not interrupt
+// the pushax/op sequence when encountered.
 {
     unsigned Use = 0, Chg = 0;
     if (GetFuncInfo (E->Arg, &Use, &Chg) == FNCLS_BUILTIN) {
@@ -1175,14 +1146,13 @@ int HarmlessCall (const CodeEntry* E, int PushedBytes)
             ((Use & (SLV_IND | SLV_TOP)) != SLV_IND ||
              RegValIsUnknown (E->RI->In.RegY)       ||
              E->RI->In.RegY < PushedBytes)) {
-            /* If we are using the stack, and we don't have "indirect"
-            ** addressing mode, or the value of Y is unknown, or less
-            ** than two, we cannot cope with this piece of code. Having
-            ** an unknown value of Y means that we cannot correct the
-            ** stack offset, while having an offset less than PushedBytes
-            ** means that the code works with the value on stack which
-            ** is to be removed.
-            */
+            // If we are using the stack, and we don't have "indirect"
+            // addressing mode, or the value of Y is unknown, or less
+            // than two, we cannot cope with this piece of code. Having
+            // an unknown value of Y means that we cannot correct the
+            // stack offset, while having an offset less than PushedBytes
+            // means that the code works with the value on stack which
+            // is to be removed.
             return 0;
         }
         return 1;
@@ -1245,11 +1215,10 @@ const char* GetZPName (unsigned ZPLoc)
 }
 
 unsigned FindAvailableBackupLoc (BackupInfo* B, unsigned Type)
-/* Find a ZP loc for storing the backup and fill in the info.
-** The allowed types are specified with the Type parameter.
-** For convenience, all types are aloowed if none is specified.
-** Return the type of the found loc.
-*/
+// Find a ZP loc for storing the backup and fill in the info.
+// The allowed types are specified with the Type parameter.
+// For convenience, all types are aloowed if none is specified.
+// Return the type of the found loc.
 {
     unsigned SizeType = Type & BU_SIZE_MASK;
     Type &= BU_TYPE_MASK;
@@ -1310,9 +1279,8 @@ unsigned FindAvailableBackupLoc (BackupInfo* B, unsigned Type)
     }
 
     if (SizeType == BU_B24 && (Type & BU_ZP) != 0) {
-        /* For now we only check for certain combinations of
-        ** tmp1 + (ptr1, sreg or ptr2).
-        */
+        // For now we only check for certain combinations of
+        // tmp1 + (ptr1, sreg or ptr2).
         if ((B->ZPUsage & (REG_TMP1 | REG_PTR1)) == 0) {
             B->Type = BU_ZP | BU_B24;
             B->Where = REG_TMP1 | REG_PTR1;
@@ -1352,9 +1320,8 @@ unsigned FindAvailableBackupLoc (BackupInfo* B, unsigned Type)
 }
 
 void AdjustEntryIndices (Collection* Indices, int Index, int Change)
-/* Adjust a load register info struct after deleting or inserting successive
-** entries with a given index.
-*/
+// Adjust a load register info struct after deleting or inserting successive
+// entries with a given index.
 {
     int I;
     int* IndexPtr;
@@ -1752,9 +1719,8 @@ static int BackupAXAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, 
 }
 
 static int BackupAXYAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, int After)
-/* Backup the content of AXY before or after the specified index Idx depending on the param After.
-** This doesn't allow separating the backup of Y from that of AX for now.
-*/
+// Backup the content of AXY before or after the specified index Idx depending on the param After.
+// This doesn't allow separating the backup of Y from that of AX for now.
 {
     CodeEntry* E;
     CodeEntry* X;
@@ -1880,9 +1846,8 @@ int BackupAXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 }
 
 int BackupAXYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
-/* Backup the content of AXY before the specified index Idx.
-** This doesn't allow separating the backup of Y from that of AX for now.
-*/
+// Backup the content of AXY before the specified index Idx.
+// This doesn't allow separating the backup of Y from that of AX for now.
 {
     return BackupAXYAt (S, B, Idx, Indices, 0);
 }
@@ -1912,9 +1877,8 @@ int BackupAXAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 }
 
 int BackupAXYAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
-/* Backup the content of AXY after the specified index Idx.
-** This doesn't allow separating the backup of Y from that of AX for now.
-*/
+// Backup the content of AXY after the specified index Idx.
+// This doesn't allow separating the backup of Y from that of AX for now.
 {
     return BackupAXYAt (S, B, Idx, Indices, 1);
 }
@@ -2205,9 +2169,8 @@ int RestoreAXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 }
 
 int RestoreAXYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
-/* Restore the content of AXY before the specified index Idx.
-** This only allows restore from compacted AXY backup for now.
-*/
+// Restore the content of AXY before the specified index Idx.
+// This only allows restore from compacted AXY backup for now.
 {
     CodeEntry* E;
     CodeEntry* X;
@@ -2281,10 +2244,9 @@ int RestoreAXYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 }
 
 int BackupArgAfter (CodeSeg* S, BackupInfo* B, int Idx, const CodeEntry* E, Collection* Indices)
-/* Backup the content of the opc arg of the entry E after the specified index Idx.
-** Reg A/Y will be used to transfer the content from a memory location to another
-** regardless of whether it is in use.
-*/
+// Backup the content of the opc arg of the entry E after the specified index Idx.
+// Reg A/Y will be used to transfer the content from a memory location to another
+// regardless of whether it is in use.
 {
     CodeEntry* X;
     int OldIdx = Idx;
@@ -2443,9 +2405,8 @@ int BackupArgAfter (CodeSeg* S, BackupInfo* B, int Idx, const CodeEntry* E, Coll
 }
 
 static int LoadAAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices, int After)
-/* Reload into A the same arg according to LoadRegInfo before or after Idx
-** depending on the After param.
-*/
+// Reload into A the same arg according to LoadRegInfo before or after Idx
+// depending on the After param.
 {
     CodeEntry* E;
     CodeEntry* O;       // Old entry at Idx
@@ -2524,9 +2485,8 @@ static int LoadAAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
 }
 
 static int LoadXAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices, int After)
-/* Reload into X the same arg according to LoadRegInfo before or after Idx
-** depending on the After param.
-*/
+// Reload into X the same arg according to LoadRegInfo before or after Idx
+// depending on the After param.
 {
     CodeEntry* E;
     CodeEntry* O;       // Old entry at Idx
@@ -2621,9 +2581,8 @@ static int LoadXAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
 }
 
 static int LoadYAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices, int After)
-/* Reload into Y the same arg according to LoadRegInfo before or after Idx
-** depending on the After param.
-*/
+// Reload into Y the same arg according to LoadRegInfo before or after Idx
+// depending on the After param.
 {
     CodeEntry* E;
     CodeEntry* O;       // Old entry at Idx
@@ -2748,10 +2707,9 @@ int LoadYAfter (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices
 }
 
 unsigned GetRegAccessedInOpenRange (CodeSeg* S, int First, int Last)
-/* Get what ZPs, registers or processor states are used or changed in the range
-** (First, Last).
-** The code block must be basic without any jump backwards.
-*/
+// Get what ZPs, registers or processor states are used or changed in the range
+// (First, Last).
+// The code block must be basic without any jump backwards.
 {
     CodeEntry* X;
     unsigned ZPAccessed = 0;
@@ -2767,11 +2725,10 @@ unsigned GetRegAccessedInOpenRange (CodeSeg* S, int First, int Last)
 }
 
 unsigned GetRegUsageInOpenRange (CodeSeg* S, int First, int Last, unsigned* Use, unsigned* Chg)
-/* Get what ZPs, registers or processor states are used or changed in the range
-** (First, Last) in output parameters Use and Chg.
-** Return what ZP regs are used before changed in this range.
-** The code block must be basic without any jump backwards.
-*/
+// Get what ZPs, registers or processor states are used or changed in the range
+// (First, Last) in output parameters Use and Chg.
+// Return what ZP regs are used before changed in this range.
+// The code block must be basic without any jump backwards.
 {
     CodeEntry* X;
     unsigned U = 0;
@@ -2804,10 +2761,9 @@ unsigned GetRegUsageInOpenRange (CodeSeg* S, int First, int Last, unsigned* Use,
 }
 
 int IsArgSameInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E)
-/* Check if the loading the opc arg gives the same result everywhere between (First, Last).
-** The code block in the range must be basic without any jump backwards.
-** Note: this always checks Y if any of the LI_CHECK_Y / LI_RELOAD_Y flags is set.
-*/
+// Check if the loading the opc arg gives the same result everywhere between (First, Last).
+// The code block in the range must be basic without any jump backwards.
+// Note: this always checks Y if any of the LI_CHECK_Y / LI_RELOAD_Y flags is set.
 {
     LoadRegInfo LRI;
     CodeEntry*  X;
@@ -2849,12 +2805,11 @@ int IsArgSameInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E)
 }
 
 int FindArgFirstChangeInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E)
-/* Find the first possible spot where the loaded arg of E might be changed in
-** the range (First, Last). The code block in the range must be basic without
-** any jump backwards.
-** Return the index of the found entry, or Last if not found.
-** Note: changes of Y are always ignored even if the LI_RELOAD_Y flag is not set.
-*/
+// Find the first possible spot where the loaded arg of E might be changed in
+// the range (First, Last). The code block in the range must be basic without
+// any jump backwards.
+// Return the index of the found entry, or Last if not found.
+// Note: changes of Y are always ignored even if the LI_RELOAD_Y flag is not set.
 {
     LoadRegInfo LRI;
     CodeEntry* X;
@@ -2889,11 +2844,10 @@ int FindArgFirstChangeInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E
 }
 
 int FindArgLastUsageInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E, int ReloadY)
-/* Find the last index where the arg of E might be used or changed in the range (First, Last).
-** ReloadY indicates whether Y is supposed to be reloaded.
-** The code block in the range must be basic without any jump backwards.
-** Return the index of the found entry, or First if not found.
-*/
+// Find the last index where the arg of E might be used or changed in the range (First, Last).
+// ReloadY indicates whether Y is supposed to be reloaded.
+// The code block in the range must be basic without any jump backwards.
+// Return the index of the found entry, or First if not found.
 {
     LoadRegInfo LRI;
     CodeEntry* X;
@@ -2946,11 +2900,10 @@ int FindArgLastUsageInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E, 
 }
 
 int FindRegFirstChangeInOpenRange (CodeSeg* S, int First, int Last, unsigned what)
-/* Find the first possible spot where the queried ZPs, registers and/or processor
-** states might be changed in the range (First, Last). The code block in the
-** range must be basic without any jump backwards.
-** Return the index of the found entry, or Last if not found.
-*/
+// Find the first possible spot where the queried ZPs, registers and/or processor
+// states might be changed in the range (First, Last). The code block in the
+// range must be basic without any jump backwards.
+// Return the index of the found entry, or Last if not found.
 {
     CodeEntry* X;
 
@@ -2968,11 +2921,10 @@ int FindRegFirstChangeInOpenRange (CodeSeg* S, int First, int Last, unsigned wha
 }
 
 int FindRegFirstUseInOpenRange (CodeSeg* S, int First, int Last, unsigned what)
-/* Find the first possible spot where the queried ZPs, registers and/or processor
-** states might be used in the range (First, Last). The code block in the range
-** must be basic without any jump backwards.
-** Return the index of the found entry, or Last if not found.
-*/
+// Find the first possible spot where the queried ZPs, registers and/or processor
+// states might be used in the range (First, Last). The code block in the range
+// must be basic without any jump backwards.
+// Return the index of the found entry, or Last if not found.
 {
     CodeEntry* X;
 
@@ -2990,11 +2942,10 @@ int FindRegFirstUseInOpenRange (CodeSeg* S, int First, int Last, unsigned what)
 }
 
 int FindRegLastChangeInOpenRange (CodeSeg* S, int First, int Last, unsigned what)
-/* Find the last possible spot where the queried ZPs, registers and/or processor
-** states might be changed in the range (First, Last). The code block in the
-** range must be basic without any jump backwards.
-** Return the index of the found entry, or First if not found.
-*/
+// Find the last possible spot where the queried ZPs, registers and/or processor
+// states might be changed in the range (First, Last). The code block in the
+// range must be basic without any jump backwards.
+// Return the index of the found entry, or First if not found.
 {
     CodeEntry* X;
     int Found = First;
@@ -3012,11 +2963,10 @@ int FindRegLastChangeInOpenRange (CodeSeg* S, int First, int Last, unsigned what
 }
 
 int FindRegLastUseInOpenRange (CodeSeg* S, int First, int Last, unsigned what)
-/* Find the last possible spot where the queried ZPs, registers and/or processor
-** states might be used in the range (First, Last). The code block in the range
-** must be basic without any jump backwards.
-** Return the index of the found entry, or First if not found.
-*/
+// Find the last possible spot where the queried ZPs, registers and/or processor
+// states might be used in the range (First, Last). The code block in the range
+// must be basic without any jump backwards.
+// Return the index of the found entry, or First if not found.
 {
     CodeEntry* X;
     int Found = First;

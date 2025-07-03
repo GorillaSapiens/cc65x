@@ -87,9 +87,8 @@ void NMIRequest (void);
 // Generate an NMI
 
 unsigned ExecuteInsn (void);
-/* Execute one CPU instruction. Return the number of clock cycles for the
-** executed instruction.
-*/
+// Execute one CPU instruction. Return the number of clock cycles for the
+// executed instruction.
 
 // End of 6502.h
 

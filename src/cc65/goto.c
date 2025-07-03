@@ -137,10 +137,9 @@ void GotoStatement (void)
 
             ConsumeRBrack ();
 
-            /* Loop over all target labels, specifying this as a jump point.
-            ** It's not exact -- if there's multiple gotos, the last will be used;
-            ** but, it's needed only so the optimizer does not remove the labels.
-            */
+            // Loop over all target labels, specifying this as a jump point.
+            // It's not exact -- if there's multiple gotos, the last will be used;
+            // but, it's needed only so the optimizer does not remove the labels.
             E = CS_GetEntry (CS->Code, CS_GetEntryCount (CS->Code) - 1);
             tab = GetLabelSymTab ();
             if (tab) {

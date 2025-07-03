@@ -118,10 +118,9 @@ INLINE unsigned char GetCurrentSegAddrSize (void)
 #endif
 
 void SegAlign (unsigned long Alignment, int FillVal);
-/* Align the PC segment to Alignment. If FillVal is -1, emit fill fragments
-** (the actual fill value will be determined by the linker), otherwise use
-** the given value.
-*/
+// Align the PC segment to Alignment. If FillVal is -1, emit fill fragments
+// (the actual fill value will be determined by the linker), otherwise use
+// the given value.
 
 unsigned char GetSegAddrSize (unsigned SegNum);
 // Return the address size of the segment with the given number
@@ -133,14 +132,12 @@ int GetRelocMode (void);
 // Return true if we're currently in relocatable mode
 
 void EnterAbsoluteMode (unsigned long AbsPC);
-/* Enter absolute (non relocatable mode). Depending on the OrgPerSeg flag,
-** this will either switch the mode globally or for the current segment.
-*/
+// Enter absolute (non relocatable mode). Depending on the OrgPerSeg flag,
+// this will either switch the mode globally or for the current segment.
 
 void EnterRelocMode (void);
-/* Enter relocatable mode. Depending on the OrgPerSeg flag, this will either
-** switch the mode globally or for the current segment.
-*/
+// Enter relocatable mode. Depending on the OrgPerSeg flag, this will either
+// switch the mode globally or for the current segment.
 
 void SegDone (void);
 // Check the segments for range and other errors. Do cleanup.

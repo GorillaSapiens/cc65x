@@ -58,11 +58,10 @@ static bool GetWallclockTime (struct timespec * ts)
     bool time_valid;
 
 #if defined(__MINGW64__)
-    /* When using the MinGW64 compiler, neither timespec_get() nor clock_gettime()
-     * are available; using either of them makes the Linux PR build workflow build fail.
-     * The gettimeofday() function does work, so use that; its microsecond resolution
-     * is fine for most applications.
-     */
+    // When using the MinGW64 compiler, neither timespec_get() nor clock_gettime()
+    // are available; using either of them makes the Linux PR build workflow build fail.
+    // The gettimeofday() function does work, so use that; its microsecond resolution
+    // is fine for most applications.
     struct timeval tv;
     time_valid = (gettimeofday(&tv, NULL) == 0);
     if (time_valid) {
@@ -70,14 +69,13 @@ static bool GetWallclockTime (struct timespec * ts)
         ts->tv_nsec = tv.tv_usec * 1000;
     }
 #elif defined(__MINGW32__)
-    /* Note: we test for MinGW32 after the test for MinGW64, as the __MINGW32__ symbol is also
-     * defined in MinGW64. This allows us to distinguish MinGW32 and MinGW64 build.
-     *
-     * When using the MinGW32 compiler, neither timespec_get() nor clock_gettime()
-     * are available; using either of them makes the Linux snapshot workflow build fail.
-     * The gettimeofday() function does work, so use that; its microsecond resolution
-     * is fine for most applications.
-     */
+    // Note: we test for MinGW32 after the test for MinGW64, as the __MINGW32__ symbol is also
+    // defined in MinGW64. This allows us to distinguish MinGW32 and MinGW64 build.
+    // 
+    // When using the MinGW32 compiler, neither timespec_get() nor clock_gettime()
+    // are available; using either of them makes the Linux snapshot workflow build fail.
+    // The gettimeofday() function does work, so use that; its microsecond resolution
+    // is fine for most applications.
     struct timeval tv;
     time_valid = (gettimeofday(&tv, NULL) == 0);
     if (time_valid) {
@@ -85,14 +83,12 @@ static bool GetWallclockTime (struct timespec * ts)
         ts->tv_nsec = tv.tv_usec * 1000;
     }
 #elif defined(_MSC_VER)
-    /* Using the Microsoft C++ compiler.
-     * clock_gettime() is not available; use timespec_get() instead.
-     */
+    // Using the Microsoft C++ compiler.
+    // clock_gettime() is not available; use timespec_get() instead.
     time_valid = timespec_get(ts, TIME_UTC) == TIME_UTC;
 #else
-    /* On all other compilers, assume that clock_gettime() is available.
-     * This is true on Linux and MacOS, at least.
-     */
+    // On all other compilers, assume that clock_gettime() is available.
+    // This is true on Linux and MacOS, at least.
     time_valid = clock_gettime(CLOCK_REALTIME, ts) == 0;
 #endif
 
@@ -118,8 +114,8 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
             if (time_valid) {
                 // Wallclock time: number of nanoseconds since 1-1-1970.
                 Peripherals.Counter.LatchedWallclockTime = 1000000000 * (uint64_t)ts.tv_sec + ts.tv_nsec;
-                /* Wallclock time, split: high word is number of seconds since 1-1-1970,
-                 * low word is number of nanoseconds since the start of that second. */
+                // Wallclock time, split: high word is number of seconds since 1-1-1970,
+                // low word is number of nanoseconds since the start of that second. 
                 Peripherals.Counter.LatchedWallclockTimeSplit = (uint64_t)ts.tv_sec << 32 | ts.tv_nsec;
             } else {
                 // Unable to get time. Report max uint64 value for both fields.
@@ -180,9 +176,8 @@ uint8_t PeripheralsReadByte (uint8_t Addr)
         case PERIPHERALS_COUNTER_ADDRESS_OFFSET_VALUE + 5:
         case PERIPHERALS_COUNTER_ADDRESS_OFFSET_VALUE + 6:
         case PERIPHERALS_COUNTER_ADDRESS_OFFSET_VALUE + 7: {
-            /* Read from any of the eight counter bytes.
-             * The first byte is the 64 bit value's LSB, the seventh byte is its MSB.
-             */
+            // Read from any of the eight counter bytes.
+            // The first byte is the 64 bit value's LSB, the seventh byte is its MSB.
             unsigned SelectedByteIndex = Addr - PERIPHERALS_COUNTER_ADDRESS_OFFSET_VALUE; // 0 .. 7
             uint64_t Value;
             switch (Peripherals.Counter.LatchedValueSelected) {

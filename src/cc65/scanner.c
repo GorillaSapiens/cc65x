@@ -149,9 +149,8 @@ static const struct Keyword {
 #define IT_LONG         0x04
 #define IT_ULONG        0x08
 
-/* Internal type for numeric constant scanning.
-** Size must be explicit for cross-platform uniformity.
-*/
+// Internal type for numeric constant scanning.
+// Size must be explicit for cross-platform uniformity.
 typedef uint32_t scan_t;
 
 // ParseChar return values
@@ -171,9 +170,8 @@ static int CmpKey (const void* Key, const void* Elem)
 }
 
 static token_t FindKey (const char* Key)
-/* Find a keyword and return the token. Return IDENT if the token is not a
-** keyword.
-*/
+// Find a keyword and return the token. Return IDENT if the token is not a
+// keyword.
 {
     struct Keyword* K;
     K = bsearch (Key, Keywords, KEY_COUNT, sizeof (Keywords [0]), CmpKey);
@@ -185,15 +183,13 @@ static token_t FindKey (const char* Key)
 }
 
 static int SkipWhite (void)
-/* Skip white space in the input stream, reading and preprocessing new lines
-** if necessary. Return 0 if end of file is reached, return 1 otherwise.
-*/
+// Skip white space in the input stream, reading and preprocessing new lines
+// if necessary. Return 0 if end of file is reached, return 1 otherwise.
 {
     while (1) {
         while (CurC == '\0') {
-            /* If reading next line fails or is disabled with directives, bail
-            ** out.
-            */
+            // If reading next line fails or is disabled with directives, bail
+            // out.
             if (PPParserRunning || PreprocessNextLine () == 0) {
                 return 0;
             }
@@ -215,10 +211,9 @@ int TokIsFuncSpec (const Token* T)
 }
 
 void SymName (char* S)
-/* Read a symbol from the input stream. The first character must have been
-** checked before calling this function. The buffer is expected to be at
-** least of size MAX_IDENTLEN+1.
-*/
+// Read a symbol from the input stream. The first character must have been
+// checked before calling this function. The buffer is expected to be at
+// least of size MAX_IDENTLEN+1.
 {
     unsigned Len = 0;
     do {
@@ -232,9 +227,8 @@ void SymName (char* S)
 }
 
 int IsWideQuoted (char First, char Second)
-/* Return 1 if the two successive characters indicate a wide string literal or
-** a wide char constant, otherwise return 0.
-*/
+// Return 1 if the two successive characters indicate a wide string literal or
+// a wide char constant, otherwise return 0.
 {
     return First == 'L' && IsQuote(Second);
 }
@@ -251,9 +245,8 @@ int IsSym (char* S)
 }
 
 int IsPPNumber (int Cur, int Next)
-/* Return 1 if the two successive characters indicate a pp-number, otherwise
-** return 0.
-*/
+// Return 1 if the two successive characters indicate a pp-number, otherwise
+// return 0.
 {
     return Cur != '.' ? IsDigit (Cur) : IsDigit (Next);
 }
@@ -522,9 +515,8 @@ static void NumericConst (void)
     SB_Terminate (&Src);
     SB_Reset (&Src);
 
-    /* Check for a leading hex, octal or binary prefix and determine the
-    ** possible integer types.
-    */
+    // Check for a leading hex, octal or binary prefix and determine the
+    // possible integer types.
     if (SB_Peek (&Src) == '0') {
         // Gobble 0 and examine next char
         SB_Skip (&Src);
@@ -544,19 +536,17 @@ static void NumericConst (void)
         Base = 10;
     }
 
-    /* Because floating point numbers don't have octal prefixes (a number with
-    ** a leading zero is decimal), we first have to read the number before
-    ** converting it, so we can determine if it's a float or an integer.
-    */
+    // Because floating point numbers don't have octal prefixes (a number with
+    // a leading zero is decimal), we first have to read the number before
+    // converting it, so we can determine if it's a float or an integer.
     Index = SB_GetIndex (&Src);
     while ((C = SB_Peek (&Src)) != '\0' && (Base <= 10 ? IsDigit (C) : IsXDigit (C))) {
         SB_Skip (&Src);
     }
 
-    /* The following character tells us if we have an integer or floating
-    ** point constant. Note: Hexadecimal floating point constants aren't
-    ** supported in C89.
-    */
+    // The following character tells us if we have an integer or floating
+    // point constant. Note: Hexadecimal floating point constants aren't
+    // supported in C89.
     IsFloat = (C == '.' ||
                (Base == 10 && toupper (C) == 'E') ||
                (Base == 16 && toupper (C) == 'P' && IS_Get (&Standard) >= STD_C99));
@@ -595,10 +585,9 @@ static void NumericConst (void)
         unsigned Types;
         unsigned WarnTypes = 0;
 
-        /* Check for a suffix and determine the possible types. It is always
-        ** possible to convert the data to unsigned long even if the IT_ULONG
-        ** flag were not set, but we are not doing that.
-        */
+        // Check for a suffix and determine the possible types. It is always
+        // possible to convert the data to unsigned long even if the IT_ULONG
+        // flag were not set, but we are not doing that.
         if (toupper (SB_Peek (&Src)) == 'U') {
             // Unsigned type
             SB_Skip (&Src);
@@ -638,11 +627,10 @@ static void NumericConst (void)
         if (IVal > 0x7FFF) {
             // Out of range for int
             Types &= ~IT_INT;
-            /* If the value is in the range 0x8000..0xFFFF, unsigned int is not
-            ** allowed, and we don't have a long type specifying suffix, emit a
-            ** warning, because the constant is of type long while the user
-            ** might expect an unsigned int.
-            */
+            // If the value is in the range 0x8000..0xFFFF, unsigned int is not
+            // allowed, and we don't have a long type specifying suffix, emit a
+            // warning, because the constant is of type long while the user
+            // might expect an unsigned int.
             if (IVal <= 0xFFFF              &&
                 (Types & IT_UINT) == 0      &&
                 (WarnTypes & IT_LONG) != 0) {
@@ -656,12 +644,11 @@ static void NumericConst (void)
         if (IVal > 0x7FFFFFFF) {
             // Out of range for long int
             Types &= ~IT_LONG;
-            /* If the value is in the range 0x80000000..0xFFFFFFFF, decimal,
-            ** and we have no unsigned type specifying suffix, emit a warning,
-            ** because the constant is of type unsigned long while the user
-            ** might expect a signed integer constant, especially if there is
-            ** a preceding unary op or when it is used in constant calculation.
-            */
+            // If the value is in the range 0x80000000..0xFFFFFFFF, decimal,
+            // and we have no unsigned type specifying suffix, emit a warning,
+            // because the constant is of type unsigned long while the user
+            // might expect a signed integer constant, especially if there is
+            // a preceding unary op or when it is used in constant calculation.
             if (WarnTypes & IT_ULONG) {
                 Warning ("Integer constant implies unsigned long");
             }
@@ -731,12 +718,11 @@ static void NumericConst (void)
                 SB_Skip (&Src);
             }
 
-            /* Read exponent digits. Since we support only 32 bit floats
-            ** with a maximum exponent of +-/127, we read the exponent
-            ** part as integer with up to 3 digits and drop the remainder.
-            ** This avoids an overflow of Exp. The exponent is always
-            ** decimal, even for hex float consts.
-            */
+            // Read exponent digits. Since we support only 32 bit floats
+            // with a maximum exponent of +-/127, we read the exponent
+            // part as integer with up to 3 digits and drop the remainder.
+            // This avoids an overflow of Exp. The exponent is always
+            // decimal, even for hex float consts.
             Digits = 0;
             Exp    = 0;
             while (IsDigit (SB_Peek (&Src))) {
@@ -746,18 +732,16 @@ static void NumericConst (void)
                 SB_Skip (&Src);
             }
 
-            /* Check for errors: We must have exponent digits, and not more
-            ** than three.
-            */
+            // Check for errors: We must have exponent digits, and not more
+            // than three.
             if (Digits == 0) {
                 Error ("Floating constant exponent has no digits");
             } else if (Digits > 3) {
                 Warning ("Floating constant exponent is too large");
             }
 
-            /* Scale the exponent and adjust the value accordingly.
-            ** Decimal exponents are base 10, hexadecimal exponents are base 2 (C99).
-            */
+            // Scale the exponent and adjust the value accordingly.
+            // Decimal exponents are base 10, hexadecimal exponents are base 2 (C99).
             if (Exp) {
                 FVal = FP_D_Mul (FVal, FP_D_Make (pow ((Base == 16) ? 2.0 : 10.0, (Sign ? -1.0 : 1.0) * Exp)));
             }
@@ -815,11 +799,10 @@ static void GetNextInputToken (void)
     CurTok = NextTok;
 
     if (SavedTok.Tok == TOK_INVALID) {
-        /* We have to skip white space here before shifting tokens, since the
-        ** tokens and the current line info is invalid at startup and will get
-        ** initialized by reading the first time from the file. Remember if we
-        ** were at end of input and handle that later.
-        */
+        // We have to skip white space here before shifting tokens, since the
+        // tokens and the current line info is invalid at startup and will get
+        // initialized by reading the first time from the file. Remember if we
+        // were at end of input and handle that later.
         int GotEOF = (SkipWhite () == 0);
 
         // Remember the starting position of the next token
@@ -1123,17 +1106,15 @@ static void GetNextInputToken (void)
 }
 
 void NextToken (void)
-/* Get next non-pragma token from input stream consuming any pragmas
-** encountered. Adjacent string literal tokens will be concatenated.
-*/
+// Get next non-pragma token from input stream consuming any pragmas
+// encountered. Adjacent string literal tokens will be concatenated.
 {
     // Used for string literal concatenation
     Token PrevTok;
 
-    /* When reading the first time from the file, the line info in NextTok,
-    ** which will be copied to CurTok is invalid. Since the information from
-    ** the token is used for error messages, we must make it valid.
-    */
+    // When reading the first time from the file, the line info in NextTok,
+    // which will be copied to CurTok is invalid. Since the information from
+    // the token is used for error messages, we must make it valid.
     if (NextTok.LI == 0) {
         NextTok.LI = UseLineInfo (GetCurLineInfo ());
     }
@@ -1160,10 +1141,9 @@ void NextToken (void)
                 // Concatenate strings
                 ConcatLiteral (PrevTok.SVal, CurTok.SVal);
 
-                /* If at least one of the concatenated strings is a wide
-                ** character literal, the whole string is a wide char
-                ** literal, otherwise it is a normal string literal.
-                */
+                // If at least one of the concatenated strings is a wide
+                // character literal, the whole string is a wide char
+                // literal, otherwise it is a normal string literal.
                 if (CurTok.Tok == TOK_WCSCONST) {
                     PrevTok.Tok = TOK_WCSCONST;
                     PrevTok.Type = CurTok.Type;
@@ -1205,9 +1185,8 @@ void NextToken (void)
 }
 
 void SkipTokens (const token_t* TokenList, unsigned TokenCount)
-/* Skip tokens until we reach TOK_CEOF or a token in the given token list.
-** This routine is used for error recovery.
-*/
+// Skip tokens until we reach TOK_CEOF or a token in the given token list.
+// This routine is used for error recovery.
 {
     while (CurTok.Tok != TOK_CEOF) {
 
@@ -1248,10 +1227,9 @@ static void PopBrace (Collection* C)
 }
 
 static int CloseBrace (Collection* C, token_t Tok)
-/* Consume a closing parenthesis/bracket/curly brace if it is matched with an
-** opening one to close and return 0, or bail out and return -1 if it is not
-** matched.
-*/
+// Consume a closing parenthesis/bracket/curly brace if it is matched with an
+// opening one to close and return 0, or bail out and return -1 if it is not
+// matched.
 {
     if (CollCount (C) > 0) {
         token_t LastTok = (token_t)(intptr_t)CollLast (C);
@@ -1266,33 +1244,32 @@ static int CloseBrace (Collection* C, token_t Tok)
 }
 
 int SmartErrorSkip (int TillEnd)
-/* Try some smart error recovery.
-**
-** - If TillEnd == 0:
-**   Skip tokens until a comma or closing curly brace that is not enclosed in
-**   an open parenthesis/bracket/curly brace, or until a semicolon, EOF or
-**   unpaired right parenthesis/bracket/curly brace is reached. The closing
-**   curly brace is consumed in the former case.
-**
-** - If TillEnd != 0:
-**   Skip tokens until a right curly brace or semicolon is reached and consumed
-**   while there are no open parentheses/brackets/curly braces, or until an EOF
-**   is reached anytime. Any open parenthesis/bracket/curly brace is considered
-**   to be closed by consuming a right parenthesis/bracket/curly brace even if
-**   they didn't match.
-**
-** - Return -1:
-**   If this exits at a semicolon or unpaired right parenthesis/bracket/curly
-**   brace while there are still open parentheses/brackets/curly braces.
-**
-** - Return 0:
-**   If this exits as soon as it reaches an EOF;
-**   Or if this exits right after consuming a semicolon or right curly brace
-**   while there are no open parentheses/brackets/curly braces.
-**
-** - Return 1:
-**   If this exits at a non-EOF without consuming it.
-*/
+// Try some smart error recovery.
+// 
+// - If TillEnd == 0:
+// Skip tokens until a comma or closing curly brace that is not enclosed in
+// an open parenthesis/bracket/curly brace, or until a semicolon, EOF or
+// unpaired right parenthesis/bracket/curly brace is reached. The closing
+// curly brace is consumed in the former case.
+// 
+// - If TillEnd != 0:
+// Skip tokens until a right curly brace or semicolon is reached and consumed
+// while there are no open parentheses/brackets/curly braces, or until an EOF
+// is reached anytime. Any open parenthesis/bracket/curly brace is considered
+// to be closed by consuming a right parenthesis/bracket/curly brace even if
+// they didn't match.
+// 
+// - Return -1:
+// If this exits at a semicolon or unpaired right parenthesis/bracket/curly
+// brace while there are still open parentheses/brackets/curly braces.
+// 
+// - Return 0:
+// If this exits as soon as it reaches an EOF;
+// Or if this exits right after consuming a semicolon or right curly brace
+// while there are no open parentheses/brackets/curly braces.
+// 
+// - Return 1:
+// If this exits at a non-EOF without consuming it.
 {
     Collection C = AUTO_COLLECTION_INITIALIZER;
     int Res = 0;
@@ -1376,9 +1353,8 @@ ExitPoint:
 }
 
 int SimpleErrorSkip (void)
-/* Skip tokens until an EOF or unpaired right parenthesis/bracket/curly brace
-** is reached. Return 0 If this exits at an EOF. Otherwise return -1.
-*/
+// Skip tokens until an EOF or unpaired right parenthesis/bracket/curly brace
+// is reached. Return 0 If this exits at an EOF. Otherwise return -1.
 {
     Collection C = AUTO_COLLECTION_INITIALIZER;
     int Res = 0;
@@ -1423,9 +1399,8 @@ ExitPoint:
 }
 
 int Consume (token_t Token, const char* ErrorMsg)
-/* Eat token if it is the next in the input stream, otherwise print an error
-** message. Returns true if the token was found and false otherwise.
-*/
+// Eat token if it is the next in the input stream, otherwise print an error
+// message. Returns true if the token was found and false otherwise.
 {
     if (CurTok.Tok == Token) {
         NextToken ();

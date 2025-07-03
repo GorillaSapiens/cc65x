@@ -42,9 +42,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #define SIM65_ERROR         -1
-/* An error result for errors that are not part of the simulated test.
-** Note that set simulated test can only return 8-bit errors 0-255.
-*/
+// An error result for errors that are not part of the simulated test.
+// Note that set simulated test can only return 8-bit errors 0-255.
 
 #define SIM65_ERROR_TIMEOUT -2
 // An error result for max CPU instructions exceeded.

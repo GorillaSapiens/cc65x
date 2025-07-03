@@ -31,21 +31,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Check out if we have a spawn() function on the system, or if we must use
-** our own.
-*/
+// Check out if we have a spawn() function on the system, or if we must use
+// our own.
 #if defined(_WIN32)
 #  define HAVE_SPAWN 1
 #else
 #  define NEED_SPAWN 1
 #endif
 
-/* GCC strictly follows http://c-faq.com/ansi/constmismatch.html and issues an
-** 'incompatible pointer type' warning - that can't be suppressed via #pragma.
-** The spawnvp() prototype of MinGW (http://www.mingw.org/) differs from the
-** one of MinGW-w64 (http://mingw-w64.sourceforge.net/) regarding constness.
-** So there's no alternative to actually distinguish these environments :-(
-*/
+// GCC strictly follows http://c-faq.com/ansi/constmismatch.html and issues an
+// 'incompatible pointer type' warning - that can't be suppressed via #pragma.
+// The spawnvp() prototype of MinGW (http://www.mingw.org/) differs from the
+// one of MinGW-w64 (http://mingw-w64.sourceforge.net/) regarding constness.
+// So there's no alternative to actually distinguish these environments :-(
 #define SPAWN_ARGV_CONST_CAST
 #if defined(__MINGW32__)
 #  include <_mingw.h>
@@ -115,17 +113,16 @@ static int DoAssemble   = 1;
 // The name of the output file, NULL if none given
 static const char* OutputName = 0;
 
-/* The path part of the output file, NULL if none given
-** or the OutputName is just a filename with no path
-** information. */
+// The path part of the output file, NULL if none given
+// or the OutputName is just a filename with no path
+// information. 
 static char *OutputDirectory = 0;
 
 // The name of the linker configuration file if given
 static const char* LinkerConfig = 0;
 
-/* The name of the first input file. This will be used to construct the
-** executable file name if no explicit name is given.
-*/
+// The name of the first input file. This will be used to construct the
+// executable file name if no explicit name is given.
 static const char* FirstInput = 0;
 
 // The names of the files for dependency generation
@@ -183,13 +180,12 @@ static char* CmdAllocArg (const char* Arg, unsigned Len)
 {
     char* Alloc;
 
-/* The Microsoft docs say on spawnvp():
-** Spaces embedded in strings may cause unexpected behavior; for example,
-** passing _spawn the string "hi there" will result in the new process getting
-** two arguments, "hi" and "there". If the intent was to have the new process
-** open a file named "hi there", the process would fail. You can avoid this by
-** quoting the string: "\"hi there\"".
-*/
+// The Microsoft docs say on spawnvp():
+// Spaces embedded in strings may cause unexpected behavior; for example,
+// passing _spawn the string "hi there" will result in the new process getting
+// two arguments, "hi" and "there". If the intent was to have the new process
+// open a file named "hi there", the process would fail. You can avoid this by
+// quoting the string: "\"hi there\"".
 #if defined(_WIN32)
     // Quote argument if it contains space(s)
     if (memchr (Arg, ' ', Len)) {
@@ -258,9 +254,8 @@ static void CmdAddArgList (CmdDesc* Cmd, const char* ArgList)
             // Add the new argument
             Cmd->Args[Cmd->ArgCount++] = CmdAllocArg (Arg, Len);
 
-            /* If the argument was terminated by a comma, skip it, otherwise
-            ** we're done.
-            */
+            // If the argument was terminated by a comma, skip it, otherwise
+            // we're done.
             if (*P == ',') {
                 // Start over at next char
                 Arg = ++P;
@@ -294,11 +289,10 @@ static void CmdAddFile (CmdDesc* Cmd, const char* File)
         Cmd->Files    = xrealloc (Cmd->Files, Cmd->FileMax * sizeof (char*));
     }
 
-    /* If the file name is not NULL (which is legal and is used to terminate
-    ** the file list), check if the file name does already exist in the file
-    ** list and print a warning if so. Regardless of the search result, add
-    ** the file.
-    */
+    // If the file name is not NULL (which is legal and is used to terminate
+    // the file list), check if the file name does already exist in the file
+    // list and print a warning if so. Regardless of the search result, add
+    // the file.
     if (File) {
         unsigned I;
         for (I = 0; I < Cmd->FileCount; ++I) {
@@ -426,10 +420,9 @@ static void Link (void)
 {
     unsigned I;
 
-    /* Since linking is always the final step, if we have an output file name
-    ** given, set it here. If we don't have an explicit output name given,
-    ** try to build one from the name of the first input file.
-    */
+    // Since linking is always the final step, if we have an output file name
+    // given, set it here. If we don't have an explicit output name given,
+    // try to build one from the name of the first input file.
     if (OutputName) {
 
         CmdSetOutput (&LD65, OutputName);
@@ -443,9 +436,8 @@ static void Link (void)
 
     }
 
-    /* If we have a linker config file given, add it to the command line.
-    ** Otherwise pass the target to the linker if we have one.
-    */
+    // If we have a linker config file given, add it to the command line.
+    // Otherwise pass the target to the linker if we have one.
     if (LinkerConfig) {
         if (Module) {
             Error ("Cannot use -C and --module together");
@@ -481,10 +473,9 @@ static void Link (void)
 }
 
 static void AssembleFile (const char* File, const char* TmpFile, unsigned ArgCount)
-/* Common routine to assemble a file. Will be called by Assemble() and
-** AssembleIntermediate(). Adds options common for both routines and
-** assembles the file. Will remove excess arguments after assembly.
-*/
+// Common routine to assemble a file. Will be called by Assemble() and
+// AssembleIntermediate(). Adds options common for both routines and
+// assembles the file. Will remove excess arguments after assembly.
 {
     // ObjName may be used for temporary or real filename
     char *ObjName;
@@ -494,10 +485,9 @@ static void AssembleFile (const char* File, const char* TmpFile, unsigned ArgCou
 
     // Check if this is the last processing step
     if (DoLink) {
-        /* We're linking later. Add the output file of the assembly
-        ** to the file list of the linker. The name of the output
-        ** file is that of the input file with ".s" replaced by ".o".
-        */
+        // We're linking later. Add the output file of the assembly
+        // to the file list of the linker. The name of the output
+        // file is that of the input file with ".s" replaced by ".o".
         if (TmpFile) {
             ObjName = MakeFilename (TmpFile, ".o");
         } else {
@@ -533,14 +523,12 @@ static void AssembleFile (const char* File, const char* TmpFile, unsigned ArgCou
 }
 
 static void AssembleIntermediate (const char* SourceFile, const char* TmpFile)
-/* Assemble an intermediate file which was generated by a previous processing
-** step with SourceFile as input. The -dep options won't be added and
-** the intermediate assembler file is removed after assembly.
-*/
+// Assemble an intermediate file which was generated by a previous processing
+// step with SourceFile as input. The -dep options won't be added and
+// the intermediate assembler file is removed after assembly.
 {
-    /* Generate the name of the assembler output file from the source file
-    ** name. It's the same name with the extension replaced by ".s"
-    */
+    // Generate the name of the assembler output file from the source file
+    // name. It's the same name with the extension replaced by ".s"
     char* AsmName = MakeFilename (SourceFile, ".s");
     char* AsmTmpName = TmpFile ? MakeFilename(TmpFile, ".s") : NULL;
 
@@ -564,10 +552,9 @@ static void Assemble (const char* File)
     // Remember the current assembler argument count
     unsigned ArgCount = CA65.ArgCount;
 
-    /* We aren't assembling an intermediate file, but one requested by the
-    ** user. So add a few options here if they were given on the command
-    ** line.
-    */
+    // We aren't assembling an intermediate file, but one requested by the
+    // user. So add a few options here if they were given on the command
+    // line.
     if (DepName && *DepName) {
         CmdAddArg2 (&CA65, "--create-dep", DepName);
     }
@@ -593,11 +580,10 @@ static void Compile (const char* File)
 
     // Check if this is the final step
     if (DoAssemble) {
-        /* We will assemble this file later. If a dependency file is to be
-        ** generated, set the dependency target to be the final object file,
-        ** not the intermediate assembler file. But beware: There may be an
-        ** output name specified for the assembler.
-        */
+        // We will assemble this file later. If a dependency file is to be
+        // generated, set the dependency target to be the final object file,
+        // not the intermediate assembler file. But beware: There may be an
+        // output name specified for the assembler.
         if (DepName || FullDepName) {
             // Was an output name for the assembler specified?
             if (!DoLink && OutputName) {
@@ -611,9 +597,8 @@ static void Compile (const char* File)
             }
         }
     } else {
-        /* If we won't assemble, this is the final step. In this case, set
-        ** the output name if it was given.
-        */
+        // If we won't assemble, this is the final step. In this case, set
+        // the output name if it was given.
         if (OutputName) {
             CmdSetOutput (&CC65, OutputName);
         }
@@ -637,9 +622,8 @@ static void Compile (const char* File)
     // Remove the excess arguments
     CmdDelArgs (&CC65, ArgCount);
 
-    /* If this is not the final step, assemble the generated file, then
-    ** remove it
-    */
+    // If this is not the final step, assemble the generated file, then
+    // remove it
     if (DoAssemble) {
         // Assemble the intermediate file and remove it
         AssembleIntermediate (File, TmpFile);
@@ -658,14 +642,12 @@ static void CompileRes (const char* File)
     // Remember the current assembler argument count
     unsigned ArgCount = GRC.ArgCount;
 
-    /* Resource files need an geos-apple or geos-cbm target but this
-    ** is checked within grc65.
-    */
+    // Resource files need an geos-apple or geos-cbm target but this
+    // is checked within grc65.
     CmdSetTarget (&GRC, Target);
 
-    /* Changes to output file name must come
-    ** BEFORE adding the file
-    */
+    // Changes to output file name must come
+    // BEFORE adding the file
     if (DoAssemble && DoLink) {
         AsmName = MakeTmpFilename(OutputDirectory, File, ".s");
         CmdSetAsmOutput(&GRC, AsmName);
@@ -683,9 +665,8 @@ static void CompileRes (const char* File)
     // Remove the excess arguments
     CmdDelArgs (&GRC, ArgCount);
 
-    /* If this is not the final step, assemble the generated file, then
-    ** remove it
-    */
+    // If this is not the final step, assemble the generated file, then
+    // remove it
     if (DoAssemble) {
         // Assemble the intermediate file and remove it
         AssembleIntermediate (File, AsmName);
@@ -701,9 +682,8 @@ static void ConvertO65 (const char* File)
     // Remember the current converter argument count
     unsigned ArgCount = CO65.ArgCount;
 
-    /* If we won't assemble, this is the final step. In this case, set the
-    ** output name.
-    */
+    // If we won't assemble, this is the final step. In this case, set the
+    // output name.
     if (!DoAssemble && OutputName) {
         CmdSetOutput (&CO65, OutputName);
     }
@@ -720,9 +700,8 @@ static void ConvertO65 (const char* File)
     // Remove the excess arguments
     CmdDelArgs (&CO65, ArgCount);
 
-    /* If this is not the final step, assemble the generated file, then
-    ** remove it
-    */
+    // If this is not the final step, assemble the generated file, then
+    // remove it
     if (DoAssemble) {
         // Assemble the intermediate file and remove it
         AssembleIntermediate (File, NULL);
@@ -1541,10 +1520,9 @@ int main (int argc, char* argv [])
 
     // Link the given files if requested and if we have any
     if (DoLink && LD65.FileCount > 0) {
-        /*
-        ** Link() may not return if there's an error, so we install
-        ** RemoveTempFiles() as an atexit() handler.
-        */
+        // 
+        // Link() may not return if there's an error, so we install
+        // RemoveTempFiles() as an atexit() handler.
         atexit (RemoveTempFiles);
         Link ();
     }

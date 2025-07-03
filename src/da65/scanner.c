@@ -203,11 +203,10 @@ Store:
 }
 
 static void LineMarkerOrComment ()
-/* Handle a line beginning with '#'. Possible interpretations are:
-** - #line <lineno> ["<filename>"]          (C preprocessor input)
-** - # <lineno> "<filename>" [<flag>]...    (gcc preprocessor output)
-** - #<comment>
-*/
+// Handle a line beginning with '#'. Possible interpretations are:
+// - #line <lineno> ["<filename>"]          (C preprocessor input)
+// - # <lineno> "<filename>" [<flag>]...    (gcc preprocessor output)
+// - #<comment>
 {
     unsigned long LineNo = 0;
     int LineDirective = 0;

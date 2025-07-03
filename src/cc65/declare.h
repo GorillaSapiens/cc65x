@@ -96,20 +96,19 @@ struct Declarator {
     unsigned    Index;              // Used to build Type
 };
 
-/* Modes for ParseDecl:
-**  - DM_IDENT_OR_EMPTY means:
-**      we *may* have an identifier, or none. If it is the latter case,
-**      the type specifier must be used for an empty declaration,
-**      or it is an error.
-**  - DM_NO_IDENT means:
-**      we must have a type but no variable identifer
-**      (if there is one, it's not read).
-**      Note: this is used for type names.
-**  - DM_ACCEPT_PARAM_IDENT means:
-**      we *may* have an identifier. If there is an identifier,
-**      it is read, but it is no error, if there is none.
-**      Note: this is used for function parameter type lists.
-*/
+// Modes for ParseDecl:
+// - DM_IDENT_OR_EMPTY means:
+// we *may* have an identifier, or none. If it is the latter case,
+// the type specifier must be used for an empty declaration,
+// or it is an error.
+// - DM_NO_IDENT means:
+// we must have a type but no variable identifer
+// (if there is one, it's not read).
+// Note: this is used for type names.
+// - DM_ACCEPT_PARAM_IDENT means:
+// we *may* have an identifier. If there is an identifier,
+// it is read, but it is no error, if there is none.
+// Note: this is used for function parameter type lists.
 typedef enum {
     DM_IDENT_OR_EMPTY,
     DM_NO_IDENT,
@@ -124,20 +123,18 @@ Type* ParseType (Type* Type);
 // Parse a complete type specification in parentheses
 
 int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode);
-/* Parse a variable, type or function declarator. Return -1 if this stops at
-** an unpaired right parenthesis/bracket/curly brace. Return 0 if this stops
-** after consuming a semicolon or closing curly brace, or reaching an EOF.
-** Return 1 otherwise.
-*/
+// Parse a variable, type or function declarator. Return -1 if this stops at
+// an unpaired right parenthesis/bracket/curly brace. Return 0 if this stops
+// after consuming a semicolon or closing curly brace, or reaching an EOF.
+// Return 1 otherwise.
 
 void ParseDeclSpec (DeclSpec* Spec, typespec_t TSFlags, unsigned DefStorage);
 // Parse a declaration specification
 
 void CheckEmptyDecl (const DeclSpec* Spec);
-/* Called after an empty type declaration (that is, a type declaration without
-** a variable). Checks if the declaration does really make sense and issues a
-** warning if not.
-*/
+// Called after an empty type declaration (that is, a type declaration without
+// a variable). Checks if the declaration does really make sense and issues a
+// warning if not.
 
 // End of declare.h
 

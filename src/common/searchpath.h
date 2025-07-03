@@ -54,38 +54,32 @@ void AddSearchPath (SearchPaths* P, const char* NewPath);
 // Add a new search path to the end of an existing list
 
 void AddSearchPathFromEnv (SearchPaths* P, const char* EnvVar);
-/* Add a search path from an environment variable to the end of an existing
-** list.
-*/
+// Add a search path from an environment variable to the end of an existing
+// list.
 
 void AddSubSearchPathFromEnv (SearchPaths* P, const char* EnvVar, const char* SubDir);
-/* Add a search path from an environment variable, adding a subdirectory to
-** the environment variable value.
-*/
+// Add a search path from an environment variable, adding a subdirectory to
+// the environment variable value.
 
 void AddSubSearchPathFromBin (SearchPaths* P, const char* SubDir);
-/* Add a search path from the running binary, adding a subdirectory to
-** the parent directory of the directory containing the binary.
-*/
+// Add a search path from the running binary, adding a subdirectory to
+// the parent directory of the directory containing the binary.
 
 int PushSearchPath (SearchPaths* P, const char* NewPath);
-/* Add a new search path to the head of an existing search path list, provided
-** that it's not already there. If the path is already at the first position,
-** return zero, otherwise return a non zero value.
-*/
+// Add a new search path to the head of an existing search path list, provided
+// that it's not already there. If the path is already at the first position,
+// return zero, otherwise return a non zero value.
 
 void PopSearchPath (SearchPaths* P);
 // Remove a search path from the head of an existing search path list
 
 char* GetSearchPath (SearchPaths* P, unsigned Index);
-/* Return the search path at the given index, if the index is valid, return an
-** empty string otherwise.
-*/
+// Return the search path at the given index, if the index is valid, return an
+// empty string otherwise.
 
 char* SearchFile (const SearchPaths* P, const char* File);
-/* Search for a file in a list of directories. Return a pointer to a malloced
-** area that contains the complete path, if found, return 0 otherwise.
-*/
+// Search for a file in a list of directories. Return a pointer to a malloced
+// area that contains the complete path, if found, return 0 otherwise.
 
 // End of searchpath.h
 

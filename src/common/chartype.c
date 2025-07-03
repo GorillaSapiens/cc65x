@@ -33,14 +33,13 @@
 
 #include "chartype.h"
 
-/* This module contains replacements for functions in ctype.h besides other
-** functions. There is a problem with using ctype.h directly:
-** The parameter must have a value of "unsigned char" or EOF.
-** So on platforms where a char is signed, this may give problems or at
-** least warnings. The wrapper functions below will have an "char" parameter
-** but handle it correctly. They will NOT work for EOF, but this is not a
-** problem, since EOF is always handled separately.
-*/
+// This module contains replacements for functions in ctype.h besides other
+// functions. There is a problem with using ctype.h directly:
+// The parameter must have a value of "unsigned char" or EOF.
+// So on platforms where a char is signed, this may give problems or at
+// least warnings. The wrapper functions below will have an "char" parameter
+// but handle it correctly. They will NOT work for EOF, but this is not a
+// problem, since EOF is always handled separately.
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Code

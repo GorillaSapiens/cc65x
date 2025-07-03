@@ -53,11 +53,10 @@ static Collection FileInfos = STATIC_COLLECTION_INITIALIZER;
 ////////////////////////////////////////////////////////////////////////////////
 
 static int FindFileInfo (unsigned Name, unsigned* Index)
-/* Find the FileInfo for a given file name. The function returns true if the
-** name was found. In this case, Index contains the index of the first item
-** that matches. If the item wasn't found, the function returns false and
-** Index contains the insert position for FileName.
-*/
+// Find the FileInfo for a given file name. The function returns true if the
+// name was found. In this case, Index contains the index of the first item
+// that matches. If the item wasn't found, the function returns false and
+// Index contains the insert position for FileName.
 {
     // Do a binary search
     int Lo = 0;
@@ -76,9 +75,8 @@ static int FindFileInfo (unsigned Name, unsigned* Index)
             Lo = Cur + 1;
         } else {
             Hi = Cur - 1;
-            /* Since we may have duplicates, repeat the search until we've
-            ** the first item that has a match.
-            */
+            // Since we may have duplicates, repeat the search until we've
+            // the first item that has a match.
             if (CurItem->Name == Name) {
                 Found = 1;
             }
@@ -131,11 +129,10 @@ FileInfo* ReadFileInfo (FILE* F, ObjData* O)
     unsigned Index;
     if (FindFileInfo (Name, &Index)) {
 
-        /* We have at least one such entry. Try all of them and, if size and
-        ** modification time matches, return the first match. When the loop
-        ** is terminated without finding an entry, Index points one behind
-        ** the last entry with the name, which is the perfect insert position.
-        */
+        // We have at least one such entry. Try all of them and, if size and
+        // modification time matches, return the first match. When the loop
+        // is terminated without finding an entry, Index points one behind
+        // the last entry with the name, which is the perfect insert position.
         FI = CollAt (&FileInfos, Index);
         while (1) {
 
@@ -166,9 +163,8 @@ FileInfo* ReadFileInfo (FILE* F, ObjData* O)
     // Remember that this module uses the file info
     CollAppend (&FI->Modules, O);
 
-    /* Insert the file info in our global list. Index points to the insert
-    ** position.
-    */
+    // Insert the file info in our global list. Index points to the insert
+    // position.
     CollInsert (&FileInfos, FI, Index);
 
     // Return the new struct

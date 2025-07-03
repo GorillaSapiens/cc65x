@@ -31,17 +31,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-/* According to the C standard, shifting a data type by the number of bits it
-** has causes undefined behaviour. So
-**
-**      unsigned long l = 1;
-**      unsigned u =32;
-**      l <<= u;
-**
-** may be illegal. The functions in this module behave safely in that respect,
-** and they use proper casting to distinguish signed from unsigned shifts.
-** They are not a general purpose replacement for the shift operator!
-*/
+// According to the C standard, shifting a data type by the number of bits it
+// has causes undefined behaviour. So
+// 
+// unsigned long l = 1;
+// unsigned u =32;
+// l <<= u;
+// 
+// may be illegal. The functions in this module behave safely in that respect,
+// and they use proper casting to distinguish signed from unsigned shifts.
+// They are not a general purpose replacement for the shift operator!
 
 #include <limits.h>
 

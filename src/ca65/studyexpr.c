@@ -95,9 +95,8 @@ int ED_IsConst (const ExprDesc* D)
 }
 
 static int ED_IsValid (const ExprDesc* D)
-/* Return true if the expression is valid, that is, neither the ERROR nor the
-** TOO_COMPLEX flags are set.
-*/
+// Return true if the expression is valid, that is, neither the ERROR nor the
+// TOO_COMPLEX flags are set.
 {
     return ((D->Flags & (ED_ERROR | ED_TOO_COMPLEX)) == 0);
 }
@@ -142,23 +141,20 @@ static void ED_MergeAddrSize (ExprDesc* ED, const ExprDesc* Right)
 // Merge the address sizes of two expressions into ED
 {
     if (ED->AddrSize == ADDR_SIZE_DEFAULT) {
-        /* If ED is valid, ADDR_SIZE_DEFAULT gets always overridden, otherwise
-        ** it takes precedence over anything else.
-        */
+        // If ED is valid, ADDR_SIZE_DEFAULT gets always overridden, otherwise
+        // it takes precedence over anything else.
         if (ED_IsValid (ED)) {
             ED->AddrSize = Right->AddrSize;
         }
     } else if (Right->AddrSize == ADDR_SIZE_DEFAULT) {
-        /* If Right is valid, ADDR_SIZE_DEFAULT gets always overridden,
-        ** otherwise it takes precedence over anything else.
-        */
+        // If Right is valid, ADDR_SIZE_DEFAULT gets always overridden,
+        // otherwise it takes precedence over anything else.
         if (!ED_IsValid (Right)) {
             ED->AddrSize = Right->AddrSize;
         }
     } else {
-        /* Neither ED nor Right has a default address size, use the larger of
-        ** the two.
-        */
+        // Neither ED nor Right has a default address size, use the larger of
+        // the two.
         if (Right->AddrSize > ED->AddrSize) {
             ED->AddrSize = Right->AddrSize;
         }
@@ -173,23 +169,20 @@ static void ED_MergeAddrSizeAND (ExprNode* Expr, ExprDesc* ED, const ExprDesc* R
     long Val, ValR;
 
     if (ED->AddrSize == ADDR_SIZE_DEFAULT) {
-        /* If ED is valid, ADDR_SIZE_DEFAULT gets always overridden, otherwise
-        ** it takes precedence over anything else.
-        */
+        // If ED is valid, ADDR_SIZE_DEFAULT gets always overridden, otherwise
+        // it takes precedence over anything else.
         if (ED_IsValid (ED)) {
             ED->AddrSize = Right->AddrSize;
         }
     } else if (Right->AddrSize == ADDR_SIZE_DEFAULT) {
-        /* If Right is valid, ADDR_SIZE_DEFAULT gets always overridden,
-        ** otherwise it takes precedence over anything else.
-        */
+        // If Right is valid, ADDR_SIZE_DEFAULT gets always overridden,
+        // otherwise it takes precedence over anything else.
         if (!ED_IsValid (Right)) {
             ED->AddrSize = Right->AddrSize;
         }
     } else {
-        /* Neither ED nor Right has a default address size, use the smaller of
-        ** the two.
-        */
+        // Neither ED nor Right has a default address size, use the smaller of
+        // the two.
         if (Right->AddrSize < ED->AddrSize) {
             ED->AddrSize = Right->AddrSize;
         }
@@ -201,11 +194,11 @@ static void ED_MergeAddrSizeAND (ExprNode* Expr, ExprDesc* ED, const ExprDesc* R
         // If neither part of the expression is constant, the above is all we can do
         return;
     }
-    /* We start assuming the left side is constant, left value is in Val, right
-       size in Size */
+    // We start assuming the left side is constant, left value is in Val, right
+    // size in Size 
     Size = Right->AddrSize;
-    /* Now check if the right side is constant, and if so put the right value
-       into Val and the Left size into Size. */
+    // Now check if the right side is constant, and if so put the right value
+    // into Val and the Left size into Size. 
     if (ConstR) {
         Val = ValR;
         Size = ED->AddrSize;
@@ -230,9 +223,8 @@ static void ED_MergeAddrSizeAND (ExprNode* Expr, ExprDesc* ED, const ExprDesc* R
 }
 
 static ED_SymRef* ED_FindSymRef (ExprDesc* ED, SymEntry* Sym)
-/* Find a symbol reference and return it. Return NULL if the reference does
-** not exist.
-*/
+// Find a symbol reference and return it. Return NULL if the reference does
+// not exist.
 {
     unsigned I;
     ED_SymRef* SymRef;
@@ -245,9 +237,8 @@ static ED_SymRef* ED_FindSymRef (ExprDesc* ED, SymEntry* Sym)
 }
 
 static ED_SecRef* ED_FindSecRef (ExprDesc* ED, unsigned Sec)
-/* Find a section reference and return it. Return NULL if the reference does
-** not exist.
-*/
+// Find a section reference and return it. Return NULL if the reference does
+// not exist.
 {
     unsigned I;
     ED_SecRef* SecRef;
@@ -260,9 +251,8 @@ static ED_SecRef* ED_FindSecRef (ExprDesc* ED, unsigned Sec)
 }
 
 static ED_SymRef* ED_AllocSymRef (ExprDesc* ED, SymEntry* Sym)
-/* Allocate a new symbol reference and return it. The count of the new
-** reference will be set to zero, and the reference itself to Sym.
-*/
+// Allocate a new symbol reference and return it. The count of the new
+// reference will be set to zero, and the reference itself to Sym.
 {
     ED_SymRef* SymRef;
 
@@ -285,9 +275,8 @@ static ED_SymRef* ED_AllocSymRef (ExprDesc* ED, SymEntry* Sym)
 }
 
 static ED_SecRef* ED_AllocSecRef (ExprDesc* ED, unsigned Sec)
-/* Allocate a new section reference and return it. The count of the new
-** reference will be set to zero, and the reference itself to Sec.
-*/
+// Allocate a new section reference and return it. The count of the new
+// reference will be set to zero, and the reference itself to Sec.
 {
     ED_SecRef* SecRef;
 
@@ -310,9 +299,8 @@ static ED_SecRef* ED_AllocSecRef (ExprDesc* ED, unsigned Sec)
 }
 
 static ED_SymRef* ED_GetSymRef (ExprDesc* ED, SymEntry* Sym)
-/* Get a symbol reference and return it. If the symbol reference does not
-** exist, a new one is created and returned.
-*/
+// Get a symbol reference and return it. If the symbol reference does not
+// exist, a new one is created and returned.
 {
     ED_SymRef* SymRef = ED_FindSymRef (ED, Sym);
     if (SymRef == 0) {
@@ -322,9 +310,8 @@ static ED_SymRef* ED_GetSymRef (ExprDesc* ED, SymEntry* Sym)
 }
 
 static ED_SecRef* ED_GetSecRef (ExprDesc* ED, unsigned Sec)
-/* Get a section reference and return it. If the section reference does not
-** exist, a new one is created and returned.
-*/
+// Get a section reference and return it. If the section reference does not
+// exist, a new one is created and returned.
 {
     ED_SecRef* SecRef = ED_FindSecRef (ED, Sec);
     if (SecRef == 0) {
@@ -428,9 +415,8 @@ static void ED_Neg (ExprDesc* D)
 }
 
 static void ED_Move (ExprDesc* From, ExprDesc* To)
-/* Move the data from one ExprDesc to another. Old data is freed, and From
-** is prepared to that ED_Done may be called safely.
-*/
+// Move the data from one ExprDesc to another. Old data is freed, and From
+// is prepared to that ED_Done may be called safely.
 {
     // Delete old data
     ED_Done (To);
@@ -464,13 +450,12 @@ static unsigned char GetConstAddrSize (long Val)
 }
 
 static void StudyBinaryExpr (ExprNode* Expr, ExprDesc* D)
-/* Study a binary expression subtree. This is a helper function for StudyExpr
-** used for operations that succeed when both operands are known and constant.
-** It evaluates the two subtrees and checks if they are constant. If they
-** aren't constant, it will set the TOO_COMPLEX flag, and merge references.
-** Otherwise the first value is returned in D->Val, the second one in D->Right,
-** so the actual operation can be done by the caller.
-*/
+// Study a binary expression subtree. This is a helper function for StudyExpr
+// used for operations that succeed when both operands are known and constant.
+// It evaluates the two subtrees and checks if they are constant. If they
+// aren't constant, it will set the TOO_COMPLEX flag, and merge references.
+// Otherwise the first value is returned in D->Val, the second one in D->Right,
+// so the actual operation can be done by the caller.
 {
     ExprDesc Right;
 
@@ -520,11 +505,10 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
     // Get the symbol from the expression
     SymEntry* Sym = Expr->V.Sym;
 
-    /* If the symbol is defined somewhere, it has an expression associated.
-    ** In this case, just study the expression associated with the symbol,
-    ** but mark the symbol so if we encounter it twice, we know that we have
-    ** a circular reference.
-    */
+    // If the symbol is defined somewhere, it has an expression associated.
+    // In this case, just study the expression associated with the symbol,
+    // but mark the symbol so if we encounter it twice, we know that we have
+    // a circular reference.
     if (SymHasExpr (Sym)) {
 
         if (SymHasUserMark (Sym)) {
@@ -546,11 +530,10 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
                 DumpExpr (Expr, SymResolve);
             }
 
-            /* If the symbol has an explicit address size that is smaller than
-            ** the one found, use it. This may lead to range errors later
-            ** (maybe even in the linker stage) if the user lied about the
-            ** address size, but for now we trust him.
-            */
+            // If the symbol has an explicit address size that is smaller than
+            // the one found, use it. This may lead to range errors later
+            // (maybe even in the linker stage) if the user lied about the
+            // address size, but for now we trust him.
             AddrSize = GetSymAddrSize (Sym);
             if (AddrSize != ADDR_SIZE_DEFAULT && AddrSize < D->AddrSize) {
                 D->AddrSize = AddrSize;
@@ -559,9 +542,8 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
 
     } else if (SymIsImport (Sym)) {
 
-        /* The symbol is an import. Track the symbols used and update the
-        ** address size.
-        */
+        // The symbol is an import. Track the symbols used and update the
+        // address size.
         ED_SymRef* SymRef = ED_GetSymRef (D, Sym);
         ++SymRef->Count;
         ED_UpdateAddrSize (D, GetSymAddrSize (Sym));
@@ -571,18 +553,16 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
         unsigned char AddrSize;
         SymTable* Parent;
 
-        /* The symbol is undefined. Track symbol usage but set the "too
-        ** complex" flag, since we cannot evaluate the final result.
-        */
+        // The symbol is undefined. Track symbol usage but set the "too
+        // complex" flag, since we cannot evaluate the final result.
         ED_SymRef* SymRef = ED_GetSymRef (D, Sym);
         ++SymRef->Count;
         ED_Invalidate (D);
 
-        /* Since the symbol may be a forward, and we may need a statement
-        ** about the address size, check higher lexical levels for a symbol
-        ** with the same name and use its address size if we find such a
-        ** symbol which is defined.
-        */
+        // Since the symbol may be a forward, and we may need a statement
+        // about the address size, check higher lexical levels for a symbol
+        // with the same name and use its address size if we find such a
+        // symbol which is defined.
         AddrSize = GetSymAddrSize (Sym);
         Parent = GetSymParentScope (Sym);
         if (AddrSize == ADDR_SIZE_DEFAULT && Parent != 0) {
@@ -613,9 +593,8 @@ static void StudySection (ExprNode* Expr, ExprDesc* D)
 static void StudyULabel (ExprNode* Expr, ExprDesc* D)
 // Study an unnamed label expression node
 {
-    /* If we can resolve the label, study the expression associated with it,
-    ** otherwise mark the expression as too complex to evaluate.
-    */
+    // If we can resolve the label, study the expression associated with it,
+    // otherwise mark the expression as too complex to evaluate.
     if (ULabCanResolve ()) {
         // We can resolve the label
         StudyExprInternal (ULabResolve (Expr->V.IVal), D);
@@ -702,9 +681,8 @@ static void StudyMul (ExprNode* Expr, ExprDesc* D)
     ED_Init (&Right);
     StudyExprInternal (Expr->Right, &Right);
 
-    /* We can handle the operation if at least one of both operands is const
-    ** and the other one is valid.
-    */
+    // We can handle the operation if at least one of both operands is const
+    // and the other one is valid.
     if (ED_IsConst (D) && ED_IsValid (&Right)) {
 
         // Multiply both, result goes into Right
@@ -1431,25 +1409,22 @@ void StudyExpr (ExprNode* Expr, ExprDesc* D)
         }
     }
 
-    /* If we don't have an address size, assign one if the expression is a
-    ** constant.
-    */
+    // If we don't have an address size, assign one if the expression is a
+    // constant.
     if (D->AddrSize == ADDR_SIZE_DEFAULT && ED_IsConst (D)) {
         D->AddrSize = GetConstAddrSize (D->Val);
     }
 
-    /* If the expression is valid, throw away the address size and recalculate
-    ** it using the data we have. This is more exact than the on-the-fly
-    ** calculation done when evaluating the tree, because symbols may have
-    ** been removed from the expression, and the final numeric value is now
-    ** known.
-    */
+    // If the expression is valid, throw away the address size and recalculate
+    // it using the data we have. This is more exact than the on-the-fly
+    // calculation done when evaluating the tree, because symbols may have
+    // been removed from the expression, and the final numeric value is now
+    // known.
     if (ED_IsValid (D)) {
         unsigned char AddrSize;
 
-        /* If there are symbols or sections, use the largest one. If the
-        ** expression resolves to a const, use the address size of the value.
-        */
+        // If there are symbols or sections, use the largest one. If the
+        // expression resolves to a const, use the address size of the value.
         if (D->SymCount > 0 || D->SecCount > 0) {
 
             D->AddrSize = ADDR_SIZE_DEFAULT;

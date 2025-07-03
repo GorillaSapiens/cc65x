@@ -43,10 +43,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 StrBuf* GenLynxPalette (const Bitmap* B, const Collection* A);
-/* Generate binary output in Lynx palette format for the bitmap B. The output
-** is stored in a string buffer (which is actually a dynamic char array) and
-** returned.
-*/
+// Generate binary output in Lynx palette format for the bitmap B. The output
+// is stored in a string buffer (which is actually a dynamic char array) and
+// returned.
 
 // End of lynxpalette.h
 

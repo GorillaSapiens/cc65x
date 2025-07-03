@@ -58,17 +58,15 @@ void FreeExtSymTab (ExtSymTab* Tab);
 // Free an external symbol structure
 
 ExtSym* GetExtSym (const ExtSymTab* Tab, unsigned Name);
-/* Return the entry for the external symbol with the given name. Return NULL
-** if there is no such symbol.
-*/
+// Return the entry for the external symbol with the given name. Return NULL
+// if there is no such symbol.
 
 unsigned ExtSymCount (const ExtSymTab* Tab);
 // Return the number of symbols in the table
 
 const ExtSym* ExtSymList (const ExtSymTab* Tab);
-/* Return the start of the symbol list sorted by symbol number. Call
-** ExtSymNext for the next symbol.
-*/
+// Return the start of the symbol list sorted by symbol number. Call
+// ExtSymNext for the next symbol.
 
 unsigned ExtSymNum (const ExtSym* E);
 // Return the number of an external symbol

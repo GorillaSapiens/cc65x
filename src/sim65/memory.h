@@ -55,10 +55,9 @@ uint16_t MemReadWord (uint16_t Addr);
 // Read a word from a memory location
 
 uint16_t MemReadZPWord (uint8_t Addr);
-/* Read a word from the zero page. This function differs from MemReadWord in that
-** the read will always be in the zero page, even in case of an address
-** overflow.
-*/
+// Read a word from the zero page. This function differs from MemReadWord in that
+// the read will always be in the zero page, even in case of an address
+// overflow.
 
 void MemInit (void);
 // Initialize the memory subsystem

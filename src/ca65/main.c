@@ -529,9 +529,8 @@ static void OptListBytes (const char* Opt, const char* Arg)
 static void OptListing (const char* Opt, const char* Arg)
 // Create a listing file
 {
-    /* Since the meaning of -l and --listing has changed, print an error if
-    ** the filename is empty or begins with the option char.
-    */
+    // Since the meaning of -l and --listing has changed, print an error if
+    // the filename is empty or begins with the option char.
     if (Arg == 0 || *Arg == '\0' || *Arg == '-') {
         Fatal ("The meaning of '%s' has changed. It does now "
                "expect a file name as argument.", Opt);
@@ -635,9 +634,8 @@ static void OneLine (void)
     Macro*        Mac   = 0;
     int           Instr = -1;
 
-    /* Initialize the new listing line if we are actually reading from file
-    ** and not from internally pushed input.
-    */
+    // Initialize the new listing line if we are actually reading from file
+    // and not from internally pushed input.
     if (!HavePushedInput ()) {
         InitListingLine ();
     }
@@ -656,9 +654,8 @@ static void OneLine (void)
         ULabDef ();
         NextTok ();
 
-        /* Skip the colon. If NoColonLabels is enabled, allow labels without
-        ** a colon if there is no whitespace before the identifier.
-        */
+        // Skip the colon. If NoColonLabels is enabled, allow labels without
+        // a colon if there is no whitespace before the identifier.
         if (CurTok.Tok == TOK_COLON) {
             NextTok ();
         } else if (CurTok.WS || !NoColonLabels) {
@@ -666,9 +663,8 @@ static void OneLine (void)
         }
     }
 
-    /* If the first token on the line is an identifier, check for a macro or
-    ** an instruction.
-    */
+    // If the first token on the line is an identifier, check for a macro or
+    // an instruction.
     if (CurTok.Tok == TOK_IDENT) {
         if (UbiquitousIdents) {
             // Macros CAN be instructions, so check for them first
@@ -685,10 +681,9 @@ static void OneLine (void)
         }
     }
 
-    /* Handle an identifier. This may be a cheap local symbol, or a fully
-    ** scoped identifier which may start with a namespace token (for global
-    ** namespace)
-    */
+    // Handle an identifier. This may be a cheap local symbol, or a fully
+    // scoped identifier which may start with a namespace token (for global
+    // namespace)
     if (CurTok.Tok == TOK_LOCAL_IDENT ||
         CurTok.Tok == TOK_NAMESPACE   ||
         (CurTok.Tok == TOK_IDENT && Instr < 0 && Mac == 0)) {
@@ -699,9 +694,8 @@ static void OneLine (void)
         // Generate the symbol table entry, then skip the name
         Sym = ParseAnySymName (SYM_ALLOC_NEW);
 
-        /* If a colon follows, this is a label definition. If there
-        ** is no colon, it's an assignment.
-        */
+        // If a colon follows, this is a label definition. If there
+        // is no colon, it's an assignment.
         if (CurTok.Tok == TOK_EQ || CurTok.Tok == TOK_ASSIGN) {
 
             // Determine the symbol flags from the assignment token
@@ -727,9 +721,8 @@ static void OneLine (void)
             // Read the assignment expression, which must be constant
             Expr = GenLiteralExpr (ConstExpression ());
 
-            /* Define the symbol with the constant expression following
-            ** the '='
-            */
+            // Define the symbol with the constant expression following
+            // the '='
             SymDef (Sym, Expr, ADDR_SIZE_DEFAULT, SF_VAR);
 
             // Don't allow anything after a symbol definition
@@ -738,19 +731,17 @@ static void OneLine (void)
 
         } else {
 
-            /* A label. Remember the current segment, so we can later
-            ** determine the size of the data stored under the label.
-            */
+            // A label. Remember the current segment, so we can later
+            // determine the size of the data stored under the label.
             Seg = ActiveSeg;
             PC  = GetPC ();
 
             // Define the label
             SymDef (Sym, GenCurrentPC (), ADDR_SIZE_DEFAULT, SF_LABEL);
 
-            /* Skip the colon. If NoColonLabels is enabled, allow labels
-            ** without a colon if there is no whitespace before the
-            ** identifier.
-            */
+            // Skip the colon. If NoColonLabels is enabled, allow labels
+            // without a colon if there is no whitespace before the
+            // identifier.
             if (CurTok.Tok != TOK_COLON) {
                 if (HadWS || !NoColonLabels) {
                     Error ("':' expected");
@@ -764,9 +755,8 @@ static void OneLine (void)
                 NextTok ();
             }
 
-            /* If we come here, a new identifier may be waiting, which may
-            ** be a macro or instruction.
-            */
+            // If we come here, a new identifier may be waiting, which may
+            // be a macro or instruction.
             if (CurTok.Tok == TOK_IDENT) {
                 if (UbiquitousIdents) {
                     // Macros CAN be instructions, so check for them first
@@ -808,10 +798,9 @@ static void OneLine (void)
         }
     }
 
-    /* If we have defined a label, remember its size. Sym is also set by
-    ** a symbol assignment, but in this case Done is false, so we don't
-    ** come here.
-    */
+    // If we have defined a label, remember its size. Sym is also set by
+    // a symbol assignment, but in this case Done is false, so we don't
+    // come here.
     if (Sym) {
         unsigned long Size;
         if (Seg == ActiveSeg) {
@@ -821,9 +810,8 @@ static void OneLine (void)
             // The line has switched the segment
             Size = 0;
         }
-        /* Suppress .size Symbol if this Symbol already has a multiply-defined error,
-        ** as it will only create its own additional unnecessary error.
-        */
+        // Suppress .size Symbol if this Symbol already has a multiply-defined error,
+        // as it will only create its own additional unnecessary error.
         if ((Sym->Flags & SF_MULTDEF) == 0) {
             DefSizeOfSymbol (Sym, Size);
         }
@@ -934,14 +922,12 @@ int main (int argc, char* argv [])
     // Create the predefined segments
     SegInit ();
 
-    /* Enter the base lexical level. We must do that here, since we may
-    ** define symbols using -D.
-    */
+    // Enter the base lexical level. We must do that here, since we may
+    // define symbols using -D.
     SymEnterLevel (&GlobalNameSpace, SCOPE_FILE, ADDR_SIZE_DEFAULT, 0);
 
-    /* Initialize the line infos. Must be done here, since we need line infos
-    ** for symbol definitions.
-    */
+    // Initialize the line infos. Must be done here, since we need line infos
+    // for symbol definitions.
     InitLineInfo ();
 
     // Check the parameters
@@ -1126,9 +1112,8 @@ int main (int argc, char* argv [])
     // If we didn't have an errors, finish off the line infos
     DoneLineInfo ();
 
-    /* If we didn't have any errors, create the object, listing and
-    ** dependency files
-    */
+    // If we didn't have any errors, create the object, listing and
+    // dependency files
     if (ErrorCount == 0) {
         CreateObjFile ();
         if (SB_GetLen (&ListingName) > 0) {

@@ -39,9 +39,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 void ConsumePragma (void);
-/* Parse a pragma. The pragma comes always in the form of the new C99 _Pragma()
-** operator.
-*/
+// Parse a pragma. The pragma comes always in the form of the new C99 _Pragma()
+// operator.
 
 // End of pragma.h
 

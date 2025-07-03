@@ -99,9 +99,8 @@ void SetSegAddrSize (const char* Name, unsigned char AddrSize);
 // Set the address size for a segment
 
 unsigned char GetSegAddrSize (const char* Name);
-/* Get the address size of the given segment.
-** Return ADDR_SIZE_INVALID if not found.
-*/
+// Get the address size of the given segment.
+// Return ADDR_SIZE_INVALID if not found.
 
 void InitSegNames (void);
 // Initialize the segment names

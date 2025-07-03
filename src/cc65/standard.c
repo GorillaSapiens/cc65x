@@ -53,9 +53,8 @@ static const char* const StdNames[STD_COUNT] = {
 ////////////////////////////////////////////////////////////////////////////////
 
 standard_t FindStandard (const char* Name)
-/* Find a standard by name. Returns one of the constants defined above.
-** STD_UNKNOWN is returned if Name doesn't match a standard.
-*/
+// Find a standard by name. Returns one of the constants defined above.
+// STD_UNKNOWN is returned if Name doesn't match a standard.
 {
     unsigned I;
 

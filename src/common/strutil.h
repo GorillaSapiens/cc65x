@@ -41,10 +41,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 char* StrCopy (char* Dest, size_t DestSize, const char* Source);
-/* Copy Source to Dest honouring the maximum size of the target buffer. In
-** constrast to strncpy, the resulting string will always be NUL terminated.
-** The function returns the pointer to the destintation buffer.
-*/
+// Copy Source to Dest honouring the maximum size of the target buffer. In
+// constrast to strncpy, the resulting string will always be NUL terminated.
+// The function returns the pointer to the destintation buffer.
 
 int StrCaseCmp (const char* S1, const char* S2);
 // Compare two strings ignoring case

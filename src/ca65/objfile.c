@@ -89,9 +89,8 @@ static ObjHeader Header = {
 ////////////////////////////////////////////////////////////////////////////////
 
 static void ObjWriteError (void)
-/* Called on a write error. Will try to close and remove the file, then
-** print a fatal error.
-*/
+// Called on a write error. Will try to close and remove the file, then
+// print a fatal error.
 {
     // Remember the error
     int Error = errno;
@@ -145,9 +144,8 @@ void ObjOpen (void)
 {
     // Do we have a name for the output file?
     if (OutFile == 0) {
-        /* We don't have an output name explicitly given, construct one from
-        ** the name of the input file.
-        */
+        // We don't have an output name explicitly given, construct one from
+        // the name of the input file.
         OutFile = MakeFilename (InFile, OBJ_EXT);
     }
 
@@ -236,11 +234,10 @@ void ObjWrite32 (unsigned long V)
 void ObjWriteVar (unsigned long V)
 // Write a variable sized value to the file in special encoding
 {
-    /* We will write the value to the file in 7 bit chunks. If the 8th bit
-    ** is clear, we're done, if it is set, another chunk follows. This will
-    ** allow us to encode smaller values with less bytes, at the expense of
-    ** needing 5 bytes if a 32 bit value is written to file.
-    */
+    // We will write the value to the file in 7 bit chunks. If the 8th bit
+    // is clear, we're done, if it is set, another chunk follows. This will
+    // allow us to encode smaller values with less bytes, at the expense of
+    // needing 5 bytes if a 32 bit value is written to file.
     do {
         unsigned char C = (V & 0x7F);
         V >>= 7;
@@ -256,10 +253,9 @@ void ObjWriteStr (const char* S)
 {
     unsigned Len = strlen (S);
 
-    /* Write the string with the length preceeded (this is easier for
-    ** the reading routine than the C format since the length is known in
-    ** advance).
-    */
+    // Write the string with the length preceeded (this is easier for
+    // the reading routine than the C format since the length is known in
+    // advance).
     ObjWriteVar (Len);
     ObjWriteData (S, Len);
 }
@@ -267,10 +263,9 @@ void ObjWriteStr (const char* S)
 void ObjWriteBuf (const StrBuf* S)
 // Write a string to the object file
 {
-    /* Write the string with the length preceeded (this is easier for
-    ** the reading routine than the C format since the length is known in
-    ** advance).
-    */
+    // Write the string with the length preceeded (this is easier for
+    // the reading routine than the C format since the length is known in
+    // advance).
     ObjWriteVar (SB_GetLen (S));
     ObjWriteData (SB_GetConstBuf (S), SB_GetLen (S));
 }

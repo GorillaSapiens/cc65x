@@ -51,9 +51,8 @@ int TokHasIVal (token_t Tok)
 }
 
 void CopyToken (Token* Dst, const Token* Src)
-/* Copy a token from Src to Dst. The current value of Dst.SVal is free'd,
-** so Dst must be initialized.
-*/
+// Copy a token from Src to Dst. The current value of Dst.SVal is free'd,
+// so Dst must be initialized.
 {
     // Copy the fields
     Dst->Tok  = Src->Tok;

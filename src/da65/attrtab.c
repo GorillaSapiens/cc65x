@@ -53,10 +53,9 @@ struct Attribute {
     attr_t              Attr;           // Actual attribute
 };
 
-/* Attributes use a hash table and a linear list for collision resolution. The
-** hash function is easy and effective. It evaluates just the lower bits of
-** the address.
-*/
+// Attributes use a hash table and a linear list for collision resolution. The
+// hash function is easy and effective. It evaluates just the lower bits of
+// the address.
 #define ATTR_HASH_SIZE          8192u   // Must be power of two
 static Attribute* AttributeTab[ATTR_HASH_SIZE];
 
@@ -86,9 +85,8 @@ static uint32_t GetAttributeHash (uint32_t Addr)
 }
 
 static Attribute* FindAttribute (uint32_t Addr)
-/* Search for an attribute for the given address and return it. Returns NULL
-** if no attribute exists for the address.
-*/
+// Search for an attribute for the given address and return it. Returns NULL
+// if no attribute exists for the address.
 {
     Attribute* A = AttributeTab[GetAttributeHash (Addr)];
     while (A) {
@@ -123,10 +121,9 @@ void AddrCheck (uint32_t Addr)
 attr_t GetAttr (uint32_t Addr)
 // Return the attribute for the given address
 {
-    /* As a small optimization we cache the last used attribute so when the
-    ** function is called several times with the same address we do already
-    ** know it.
-    */
+    // As a small optimization we cache the last used attribute so when the
+    // function is called several times with the same address we do already
+    // know it.
     static const Attribute* A = 0;
     if (A != 0 && A->Addr == Addr) {
         return A->Attr;

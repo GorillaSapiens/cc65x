@@ -66,9 +66,8 @@ static const char BoolTransformerTab [][8] = {
     "boolugt", "booluge", "boolult", "boolule"
 };
 
-/* Table listing the function names and code info values for known internally
-** used functions. This table should get auto-generated in the future.
-*/
+// Table listing the function names and code info values for known internally
+// used functions. This table should get auto-generated in the future.
 typedef struct FuncInfo FuncInfo;
 struct FuncInfo {
     const char*     Name;       // Function name
@@ -76,14 +75,14 @@ struct FuncInfo {
     unsigned        Chg;        // Changed/destroyed registers
 };
 
-/* Functions that change the SP are regarded as using the SP as well.
-** The callax/jmpvec functions may call a function that uses/changes more
-** registers, so we should further check the info of the called function
-** or just play it safe.
-** Note for the shift functions: Shifts are done modulo 32, so all shift
-** routines are marked to use only the A register. The remainder is ignored
-** anyway.
-*/
+// Functions that change the SP are regarded as using the SP as well.
+// The callax/jmpvec functions may call a function that uses/changes more
+// registers, so we should further check the info of the called function
+// or just play it safe.
+// Note for the shift functions: Shifts are done modulo 32, so all shift
+// routines are marked to use only the A register. The remainder is ignored
+// anyway.
+// 
 // CAUTION: table must be sorted for bsearch
 static const FuncInfo FuncInfoTable[] = {
 // BEGIN SORTED.SH
@@ -406,9 +405,8 @@ static const ZPInfo ZPInfoTable[] = {
 ////////////////////////////////////////////////////////////////////////////////
 
 static int IsAddrOnZP (long Address)
-/* Return true if the Address is within the ZP range.
-** FIXME: ZP range may vary depending on the CPU settings.
-*/
+// Return true if the Address is within the ZP range.
+// FIXME: ZP range may vary depending on the CPU settings.
 {
     // ZP in range [0x00, 0xFF]
     return Address >= 0 && Address < 0x100;
@@ -459,17 +457,15 @@ int IsZPArg (const char* Name)
         return 0;
     }
 
-    /* Search for the symbol in the global symbol table skipping the underline
-    ** in its name.
-    */
+    // Search for the symbol in the global symbol table skipping the underline
+    // in its name.
     E = FindGlobalSym (SB_GetConstBuf (&NameBuf) + 1);
 
     SB_Done (&NameBuf);
 
-    /* We are checking the offset against the symbol size rather than the actual
-    ** zeropage boundary, since we can't magically ensure that until linking and
-    ** can only trust the user in writing the correct code for now.
-    */
+    // We are checking the offset against the symbol size rather than the actual
+    // zeropage boundary, since we can't magically ensure that until linking and
+    // can only trust the user in writing the correct code for now.
     if (E != 0 && (E->Flags & SC_ZEROPAGE) != 0) {
         return Offset >= 0 && (unsigned)Offset < CheckedSizeOf (E->Type);
     }
@@ -485,16 +481,14 @@ static int CompareFuncInfo (const void* Key, const void* Info)
 }
 
 fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg)
-/* For the given function, lookup register information and store it into
-** the given variables. If the function is unknown, assume it will use and
-** load all registers as well as touching the processor flags.
-*/
+// For the given function, lookup register information and store it into
+// the given variables. If the function is unknown, assume it will use and
+// load all registers as well as touching the processor flags.
 {
-    /* If the function name starts with an underline, it is an external
-    ** function. Search for it in the symbol table. If the function does
-    ** not start with an underline, it may be a runtime support function.
-    ** Search for it in the list of builtin functions.
-    */
+    // If the function name starts with an underline, it is an external
+    // function. Search for it in the symbol table. If the function does
+    // not start with an underline, it may be a runtime support function.
+    // Search for it in the list of builtin functions.
     if (Name[0] == '_') {
         // Search in the symbol table, skip the leading underscore
         SymEntry* E = FindGlobalSym (Name+1);
@@ -504,23 +498,20 @@ fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg)
             FuncDesc* D = GetFuncDesc (E->Type);
             *Use = REG_NONE;
 
-            /* A variadic function will use the Y register (the parameter list
-            ** size is passed there). A fastcall function will use the A or A/X
-            ** registers. In all other cases, no registers are used. However,
-            ** we assume that any function will destroy all registers.
-            */
+            // A variadic function will use the Y register (the parameter list
+            // size is passed there). A fastcall function will use the A or A/X
+            // registers. In all other cases, no registers are used. However,
+            // we assume that any function will destroy all registers.
             if ((D->Flags & FD_VARIADIC) != 0) {
                 *Use = REG_Y | REG_SP | SLV_TOP;
             } else if (D->Flags & FD_CALL_WRAPPER) {
-                /* Wrappers may go to any functions, so mark them as using all
-                ** registers.
-                */
+                // Wrappers may go to any functions, so mark them as using all
+                // registers.
                 *Use = REG_EAXY;
             } else if (D->ParamCount > 0 || (D->Flags & FD_EMPTY) != 0) {
-                /* Will use registers depending on the last param. If the last
-                ** param has incomplete type, or if the function has not been
-                ** prototyped yet, just assume __EAX__.
-                */
+                // Will use registers depending on the last param. If the last
+                // param has incomplete type, or if the function has not been
+                // prototyped yet, just assume __EAX__.
                 if (IsFastcallFunc (E->Type)) {
                     if (D->LastParam != 0) {
                         switch (SizeOf (D->LastParam->Type)) {
@@ -559,10 +550,9 @@ fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg)
 
     } else if (IsDigit (Name[0]) || Name[0] == '$') {
 
-        /* A call to a numeric address. Assume that anything gets used and
-        ** destroyed. This is not a real problem, since numeric addresses
-        ** are used mostly in inline assembly anyway.
-        */
+        // A call to a numeric address. Assume that anything gets used and
+        // destroyed. This is not a real problem, since numeric addresses
+        // are used mostly in inline assembly anyway.
         *Use = REG_ALL;
         *Chg = (REG_ALL | PSTATE_ALL);
         return FNCLS_NUMERIC;
@@ -582,11 +572,10 @@ fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg)
                 *Use |= REG_SP;
             }
         } else {
-            /* It's an internal function we have no information for. If in
-            ** debug mode, output an additional warning, so we have a chance
-            ** to fix it. Otherwise assume that the internal function will
-            ** use and change all registers.
-            */
+            // It's an internal function we have no information for. If in
+            // debug mode, output an additional warning, so we have a chance
+            // to fix it. Otherwise assume that the internal function will
+            // use and change all registers.
             if (Debug) {
                 fprintf (stderr, "No info about internal function '%s'\n", Name);
             }
@@ -596,9 +585,8 @@ fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg)
         return FNCLS_BUILTIN;
     }
 
-    /* Function not found - assume that the primary register is input, and all
-    ** registers and processor flags are changed
-    */
+    // Function not found - assume that the primary register is input, and all
+    // registers and processor flags are changed
     *Use = REG_EAXY;
     *Chg = (REG_ALL | PSTATE_ALL);
 
@@ -612,9 +600,8 @@ static int CompareZPInfo (const void* Name, const void* Info)
     const char* N   = (const char*) Name;
     const ZPInfo* E = (const ZPInfo*) Info;
 
-    /* Do the compare. Be careful because of the length (Info may contain
-    ** more than just the zeropage name).
-    */
+    // Do the compare. Be careful because of the length (Info may contain
+    // more than just the zeropage name).
     if (E->Len == 0) {
         // Do a full compare
         return strcmp (N, E->Name);
@@ -630,9 +617,8 @@ static int CompareZPInfo (const void* Name, const void* Info)
 }
 
 const ZPInfo* GetZPInfo (const char* Name)
-/* If the given name is a zero page symbol, return a pointer to the info
-** struct for this symbol, otherwise return NULL.
-*/
+// If the given name is a zero page symbol, return a pointer to the info
+// struct for this symbol, otherwise return NULL.
 {
     // Search for the zp location in the list
     return bsearch (Name, ZPInfoTable, ZPInfoCount,
@@ -653,9 +639,8 @@ static unsigned GetRegInfo2 (CodeSeg* S,
 
         unsigned R;
 
-        /* Check if we have already visited the current code entry. If so,
-        ** bail out.
-        */
+        // Check if we have already visited the current code entry. If so,
+        // bail out.
         if (CE_HasMark (E)) {
             break;
         }
@@ -672,9 +657,8 @@ static unsigned GetRegInfo2 (CodeSeg* S,
             R |= S->ExitRegs;
         }
         if (R != REG_NONE) {
-            /* We are not interested in the use of any register that has been
-            ** used before.
-            */
+            // We are not interested in the use of any register that has been
+            // used before.
             R &= ~Unused;
             // Remember the remaining registers
             Used |= R;
@@ -682,9 +666,8 @@ static unsigned GetRegInfo2 (CodeSeg* S,
 
         // Evaluate the changed registers
         if ((R = E->Chg) != REG_NONE) {
-            /* We are not interested in the use of any register that has been
-            ** used before.
-            */
+            // We are not interested in the use of any register that has been
+            // used before.
             R &= ~Used;
             // Remember the remaining registers
             Unused |= R;
@@ -700,9 +683,8 @@ static unsigned GetRegInfo2 (CodeSeg* S,
             break;
         }
 
-        /* If we have an unconditional branch, follow this branch if possible,
-        ** otherwise we're done.
-        */
+        // If we have an unconditional branch, follow this branch if possible,
+        // otherwise we're done.
         if ((E->Info & OF_UBRA) != 0) {
 
             // Does this jump have a valid target?
@@ -717,10 +699,9 @@ static unsigned GetRegInfo2 (CodeSeg* S,
                 break;
             }
 
-        /* In case of conditional branches, follow the branch if possible and
-        ** follow the normal flow (branch not taken) afterwards. If we cannot
-        ** follow the branch, we're done.
-        */
+        // In case of conditional branches, follow the branch if possible and
+        // follow the normal flow (branch not taken) afterwards. If we cannot
+        // follow the branch, we're done.
         } else if ((E->Info & OF_CBRA) != 0) {
 
             // Recursively determine register usage at the branch target
@@ -734,9 +715,8 @@ static unsigned GetRegInfo2 (CodeSeg* S,
 
             } else {
 
-                /* Jump to external label. This will effectively exit the
-                ** function, so we use the exitregs information here.
-                */
+                // Jump to external label. This will effectively exit the
+                // function, so we use the exitregs information here.
                 U1 = S->ExitRegs;
 
             }
@@ -803,9 +783,8 @@ static unsigned GetRegInfo1 (CodeSeg* S,
 }
 
 unsigned GetRegInfo (struct CodeSeg* S, unsigned Index, unsigned Wanted)
-/* Determine register usage information for the instructions starting at the
-** given index.
-*/
+// Determine register usage information for the instructions starting at the
+// given index.
 {
     CodeEntry*      E;
     Collection      Visited;    // Visited entries
@@ -868,10 +847,9 @@ int LoadFlagsUsed (struct CodeSeg* S, unsigned Index)
 }
 
 unsigned GetKnownReg (unsigned Use, const RegContents* RC)
-/* Return the register or zero page location from the set in Use, thats
-** contents are known. If Use does not contain any register, or if the
-** register in question does not have a known value, return REG_NONE.
-*/
+// Return the register or zero page location from the set in Use, thats
+// contents are known. If Use does not contain any register, or if the
+// register in question does not have a known value, return REG_NONE.
 {
     if ((Use & REG_A) != 0) {
         return (RC == 0 || RC->RegA >= 0)? REG_A : REG_NONE;
@@ -912,10 +890,9 @@ static cmp_t FindCmpCond (const char* Code, unsigned CodeLen)
 }
 
 cmp_t FindBoolCmpCond (const char* Name)
-/* Check if the given string is the name of one of the boolean transformer
-** subroutine, and if so, return the condition that is evaluated by this
-** routine. Return CMP_INV if the condition is not recognised.
-*/
+// Check if the given string is the name of one of the boolean transformer
+// subroutine, and if so, return the condition that is evaluated by this
+// routine. Return CMP_INV if the condition is not recognised.
 {
     // Check for the correct subroutine name
     if (strncmp (Name, "bool", 4) == 0) {
@@ -928,9 +905,8 @@ cmp_t FindBoolCmpCond (const char* Name)
 }
 
 cmp_t FindTosCmpCond (const char* Name)
-/* Check if this is a call to one of the TOS compare functions (tosgtax).
-** Return the condition code or CMP_INV on failure.
-*/
+// Check if this is a call to one of the TOS compare functions (tosgtax).
+// Return the condition code or CMP_INV on failure.
 {
     unsigned Len = strlen (Name);
 
@@ -959,11 +935,10 @@ const char* GetCmpSuffix (cmp_t Cond)
 }
 
 char* GetBoolCmpSuffix (char* Buf, cmp_t Cond)
-/* Search for a boolean transformer subroutine (eg. booleq) by the given compare
-** condition.
-** Return the output buffer filled with the name of the correct subroutine or 0
-** on failure.
-*/
+// Search for a boolean transformer subroutine (eg. booleq) by the given compare
+// condition.
+// Return the output buffer filled with the name of the correct subroutine or 0
+// on failure.
 {
     // Check for the correct boolean transformer subroutine name
     const char* Suf = GetCmpSuffix (Cond);
@@ -978,10 +953,9 @@ char* GetBoolCmpSuffix (char* Buf, cmp_t Cond)
 }
 
 char* GetTosCmpSuffix (char* Buf, cmp_t Cond)
-/* Search for a TOS compare function (eg. tosgtax) by the given compare condition.
-** Return the output buffer filled with the name of the correct function or 0 on
-** failure.
-*/
+// Search for a TOS compare function (eg. tosgtax) by the given compare condition.
+// Return the output buffer filled with the name of the correct function or 0 on
+// failure.
 {
     // Check for the correct TOS function name
     const char* Suf = GetCmpSuffix (Cond);

@@ -100,9 +100,8 @@ static void Usage (void)
 }
 
 static void SetWorkBitmap (Bitmap* N)
-/* Delete an old working bitmap and set a new one. The new one may be NULL
-** to clear it.
-*/
+// Delete an old working bitmap and set a new one. The new one may be NULL
+// to clear it.
 {
     // If we have a distinct work bitmap, delete it
     if (C != 0 && C != B) {
@@ -114,9 +113,8 @@ static void SetWorkBitmap (Bitmap* N)
 }
 
 static void SetOutputData (StrBuf* N)
-/* Delete the old output data and replace it by the given one. The new one
-** may be NULL to clear it.
-*/
+// Delete the old output data and replace it by the given one. The new one
+// may be NULL to clear it.
 {
     // Delete the old output data
     if (D != 0) {
@@ -128,9 +126,8 @@ static void SetOutputData (StrBuf* N)
 }
 
 static void SetPalOutputData (StrBuf* N)
-/* Delete the old output data and replace it by the given one. The new one
-** may be NULL to clear it.
-*/
+// Delete the old output data and replace it by the given one. The new one
+// may be NULL to clear it.
 {
     // Delete the old output data
     if (E != 0) {

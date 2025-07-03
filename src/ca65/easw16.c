@@ -44,10 +44,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 static long RegNum ()
-/* Try to read a register number specified not as a register (Rx) but as a
-** numeric value between 0 and 15. Return the register number or -1 on
-** failure.
-*/
+// Try to read a register number specified not as a register (Rx) but as a
+// numeric value between 0 and 15. Return the register number or -1 on
+// failure.
 {
     long Val;
     ExprNode* Expr = Expression ();
@@ -117,9 +116,8 @@ void GetSweet16EA (EffAddr* A)
         A->Expr = Expression ();
         A->AddrModeSet = AMSW16_BRA;
 
-        /* If the value is a constant between 0 and 15, it may also be a
-        ** register number.
-        */
+        // If the value is a constant between 0 and 15, it may also be a
+        // register number.
         if (IsConstExpr (A->Expr, &Reg) && Reg >= 0 && Reg <= 15) {
             FreeExpr (A->Expr);
             A->Reg = (unsigned) Reg;

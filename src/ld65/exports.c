@@ -108,10 +108,9 @@ static Import* NewImport (unsigned char AddrSize, ObjData* Obj)
 }
 
 void FreeImport (Import* I)
-/* Free an import. NOTE: This won't remove the import from the exports table,
-** so it may only be called for unused imports (imports from modules that
-** aren't referenced).
-*/
+// Free an import. NOTE: This won't remove the import from the exports table,
+// so it may only be called for unused imports (imports from modules that
+// aren't referenced).
 {
     // Safety
     PRECONDITION ((I->Flags & IMP_INLIST) == 0);
@@ -144,10 +143,9 @@ Import* ReadImport (FILE* F, ObjData* Obj)
 
     // Check the address size
     if (I->AddrSize == ADDR_SIZE_DEFAULT || I->AddrSize > ADDR_SIZE_LONG) {
-        /* Beware: This function may be called in cases where the object file
-        ** is not read completely into memory. In this case, the file list is
-        ** invalid. Be sure not to access it in this case.
-        */
+        // Beware: This function may be called in cases where the object file
+        // is not read completely into memory. In this case, the file list is
+        // invalid. Be sure not to access it in this case.
         if (ObjHasFiles (I->Obj)) {
             const LineInfo* LI = GetImportPos (I);
             Error ("Invalid import size in for '%s', imported from %s:%u: 0x%02X",
@@ -178,9 +176,8 @@ Import* GenImport (unsigned Name, unsigned char AddrSize)
 
     // Check the address size
     if (I->AddrSize == ADDR_SIZE_DEFAULT || I->AddrSize > ADDR_SIZE_LONG) {
-        /* We have no object file information and no line info for a new
-        ** import
-        */
+        // We have no object file information and no line info for a new
+        // import
         Error ("Invalid import size 0x%02X for symbol '%s'",
                I->AddrSize,
                GetString (I->Name));
@@ -225,9 +222,8 @@ Import* InsertImport (Import* I)
         }
     }
 
-    /* Ok, E now points to a valid exports entry for the given import. Insert
-    ** the import into the imports list and update the counters.
-    */
+    // Ok, E now points to a valid exports entry for the given import. Insert
+    // the import into the imports list and update the counters.
     I->Exp     = E;
     I->Next    = E->ImpList;
     E->ImpList = I;
@@ -292,10 +288,9 @@ static Export* NewExport (unsigned Type, unsigned char AddrSize,
 }
 
 void FreeExport (Export* E)
-/* Free an export. NOTE: This won't remove the export from the exports table,
-** so it may only be called for unused exports (exports from modules that
-** aren't referenced).
-*/
+// Free an export. NOTE: This won't remove the export from the exports table,
+// so it may only be called for unused exports (exports from modules that
+// aren't referenced).
 {
     // Safety
     PRECONDITION ((E->Flags & EXP_INLIST) == 0);
@@ -336,10 +331,9 @@ Export* ReadExport (FILE* F, ObjData* O)
         // Read the data into temp storage
         ReadData (F, ConDes, ConDesCount);
 
-        /* Re-order the data. In the file, each decl is encoded into a byte
-        ** which contains the type and the priority. In memory, we will use
-        ** an array of types which contain the priority.
-        */
+        // Re-order the data. In the file, each decl is encoded into a byte
+        // which contains the type and the priority. In memory, we will use
+        // an array of types which contain the priority.
         for (I = 0; I < ConDesCount; ++I) {
             E->ConDes[CD_GET_TYPE (ConDes[I])] = CD_GET_PRIO (ConDes[I]);
         }
@@ -364,9 +358,8 @@ Export* ReadExport (FILE* F, ObjData* O)
     ReadLineInfoList (F, O, &E->DefLines);
     ReadLineInfoList (F, O, &E->RefLines);
 
-    /* If this symbol is exported as a condes, and the condes type declares a
-    ** forced import, add this import to the object module.
-    */
+    // If this symbol is exported as a condes, and the condes type declares a
+    // forced import, add this import to the object module.
     for (I = 0; I < CD_TYPE_COUNT; ++I) {
         const ConDesImport* CDI;
 
@@ -379,11 +372,10 @@ Export* ReadExport (FILE* F, ObjData* O)
             Imp->Obj = O;
             CollAppend (&O->Imports, Imp);
 
-            /* Add line info for the export that is actually the condes that
-            ** forces the import.  Then, add line info for the config. file.
-            ** The export's info is added first because the import pretends
-            ** that it came from the object module instead of the config. file.
-            */
+            // Add line info for the export that is actually the condes that
+            // forces the import.  Then, add line info for the config. file.
+            // The export's info is added first because the import pretends
+            // that it came from the object module instead of the config. file.
             for (J = 0; J < CollCount (&E->DefLines); ++J) {
                 CollAppend (&Imp->RefLines, DupLineInfo (CollAt (&E->DefLines, J)));
             }
@@ -428,9 +420,8 @@ void InsertExport (Export* E)
                 // This may be an unresolved external
                 if (L->Expr == 0) {
 
-                    /* This *is* an unresolved external. Use the actual export
-                    ** in E instead of the dummy one in L.
-                    */
+                    // This *is* an unresolved external. Use the actual export
+                    // in E instead of the dummy one in L.
                     E->Next     = L->Next;
                     E->ImpCount = L->ImpCount;
                     E->ImpList  = L->ImpList;
@@ -441,9 +432,8 @@ void InsertExport (Export* E)
                     }
                     ImpOpen -= E->ImpCount;     // Decrease open imports now
                     xfree (L);
-                    /* We must run through the import list and change the
-                    ** export pointer now.
-                    */
+                    // We must run through the import list and change the
+                    // export pointer now.
                     Imp = E->ImpList;
                     while (Imp) {
                         Imp->Exp = E;
@@ -559,9 +549,8 @@ Export* CreateSectionExport (unsigned Name, Section* Sec, unsigned long Offs)
 }
 
 Export* FindExport (unsigned Name)
-/* Check for an identifier in the list. Return 0 if not found, otherwise
-** return a pointer to the export.
-*/
+// Check for an identifier in the list. Return 0 if not found, otherwise
+// return a pointer to the export.
 {
     // Get a pointer to the list with the symbols hash value
     Export* L = HashTab[Name & HASHTAB_MASK];
@@ -628,10 +617,9 @@ static void CheckSymType (const Export* E)
             const LineInfo* ExportLI = GetExportPos (E);
             const LineInfo* ImportLI = GetImportPos (I);
 
-            /* Generate strings that describe the location of the im- and
-            ** exports. This depends on the place from where they come:
-            ** Object file or linker config.
-            */
+            // Generate strings that describe the location of the im- and
+            // exports. This depends on the place from where they come:
+            // Object file or linker config.
             if (E->Obj) {
                 // The export comes from an object file
                 SB_Printf (&ExportLoc, "%s, %s:%u",
@@ -643,9 +631,8 @@ static void CheckSymType (const Export* E)
                            GetSourceName (ExportLI),
                            GetSourceLine (ExportLI));
             } else {
-                /* The export is linker generated and we don't have line
-                ** information (likely from command line define)
-                */
+                // The export is linker generated and we don't have line
+                // information (likely from command line define)
                 SB_Printf (&ExportLoc, "%s", GetObjFileName (E->Obj));
             }
             if (I->Obj) {
@@ -655,16 +642,14 @@ static void CheckSymType (const Export* E)
                            GetSourceName (ImportLI),
                            GetSourceLine (ImportLI));
             } else if (ImportLI) {
-                /* The import is linker generated and we have line
-                ** information
-                */
+                // The import is linker generated and we have line
+                // information
                 SB_Printf (&ImportLoc, "%s:%u",
                            GetSourceName (ImportLI),
                            GetSourceLine (ImportLI));
             } else {
-                /* The import is linker generated and we don't have line
-                ** information
-                */
+                // The import is linker generated and we don't have line
+                // information
                 SB_Printf (&ImportLoc, "%s", GetObjFileName (I->Obj));
             }
 
@@ -702,9 +687,8 @@ static void CheckSymTypes (void)
 }
 
 static void PrintUnresolved (ExpCheckFunc F, void* Data)
-/* Print a list of unresolved symbols. On unresolved symbols, F is
-** called (see the comments on ExpCheckFunc in the data section).
-*/
+// Print a list of unresolved symbols. On unresolved symbols, F is
+// called (see the comments on ExpCheckFunc in the data section).
 {
     unsigned I;
 
@@ -717,8 +701,8 @@ static void PrintUnresolved (ExpCheckFunc F, void* Data)
             const char* name = GetString (E->Name);
             while (Imp) {
                 unsigned J, count = CollCount (&Imp->RefLines);
-                /* The count is 0 when the import was not added by an input file,
-                   but by the compiler itself. */
+                // The count is 0 when the import was not added by an input file,
+                // but by the compiler itself. 
                 if (count == 0) {
                     fprintf (stderr, "Error: Unresolved external '%s'\n", name);
                 } else {
@@ -777,9 +761,8 @@ static void CreateExportPool (void)
 }
 
 void CheckExports (void)
-/* Setup the list of all exports and check for export/import symbol type
-** mismatches.
-*/
+// Setup the list of all exports and check for export/import symbol type
+// mismatches.
 {
     // Create an export pool
     CreateExportPool ();
@@ -789,9 +772,8 @@ void CheckExports (void)
 }
 
 void CheckUnresolvedImports (ExpCheckFunc F, void* Data)
-/* Check if there are any unresolved imports. On unresolved imports, F is
-** called (see the comments on ExpCheckFunc in the data section).
-*/
+// Check if there are any unresolved imports. On unresolved imports, F is
+// called (see the comments on ExpCheckFunc in the data section).
 {
     // Check for unresolved externals
     if (ImpOpen != 0) {
@@ -825,13 +807,12 @@ static void PrintExportMap (Export** Pool, unsigned Count, FILE* F)
     for (I = 0; I < Count; ++I) {
         const Export* E = Pool [I];
 
-        /* Print unreferenced symbols only if explictly requested. If Expr is
-        ** NULL, the export is undefined. This happens for imports that don't
-        ** have a matching export, but if we have one of those, we don't come
-        ** here. It does also happen for imports that where satisfied from
-        ** elsewhere, like o65 imports defined in the linker config.
-        ** So ignore exports here that have an invalid Expr.
-        */
+        // Print unreferenced symbols only if explictly requested. If Expr is
+        // NULL, the export is undefined. This happens for imports that don't
+        // have a matching export, but if we have one of those, we don't come
+        // here. It does also happen for imports that where satisfied from
+        // elsewhere, like o65 imports defined in the linker config.
+        // So ignore exports here that have an invalid Expr.
         if (E->Expr != 0 &&
             (VerboseMap || E->ImpCount > 0 || SYM_IS_CONDES (E->Type))) {
             fprintf (F,
@@ -884,9 +865,8 @@ void PrintImportMap (FILE* F)
         // Get the export
         const Export* Exp = ExpPool [I];
 
-        /* Print the symbol only if there are imports, or if a verbose map
-        ** file is requested.
-        */
+        // Print the symbol only if there are imports, or if a verbose map
+        // file is requested.
         if (VerboseMap || Exp->ImpCount > 0) {
 
             // Print the export
@@ -899,10 +879,9 @@ void PrintImportMap (FILE* F)
             Imp = Exp->ImpList;
             while (Imp) {
 
-                /* Print the import. Beware: The import might be linker
-                ** generated, in which case there is no object file and
-                ** sometimes no line information.
-                */
+                // Print the import. Beware: The import might be linker
+                // generated, in which case there is no object file and
+                // sometimes no line information.
                 const LineInfo* LI = GetImportPos (Imp);
                 if (LI) {
                     fprintf (F,

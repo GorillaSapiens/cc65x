@@ -95,9 +95,8 @@ unsigned long ReadVar (FILE* F);
 // Read a variable size value from the file
 
 unsigned ReadStr (FILE* F);
-/* Read a string from the file, place it into the global string pool, and
-** return its string id.
-*/
+// Read a string from the file, place it into the global string pool, and
+// return its string id.
 
 FilePos* ReadFilePos (FILE* F, FilePos* Pos);
 // Read a file position from the file

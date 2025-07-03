@@ -109,7 +109,6 @@ typedef enum token_t {
     INFOTOK_COMMENTSTART,
     INFOTOK_IGNOREUNKNOWN,
 
-    //
     INFOTOK_TRUE,
     INFOTOK_FALSE
 } token_t;

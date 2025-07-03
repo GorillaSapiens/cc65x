@@ -112,9 +112,8 @@ static void Usage (void)
 
 static void RangeCheck (const char* Opt, unsigned long Val,
                         unsigned long Min, unsigned long Max)
-/* Do a range check for the given option and abort if there's a range
-** error.
-*/
+// Do a range check for the given option and abort if there's a range
+// error.
 {
     if (Val < Min || Val > Max) {
         Error ("Argument for %s outside valid range (%ld-%ld)", Opt, Min, Max);
@@ -122,9 +121,8 @@ static void RangeCheck (const char* Opt, unsigned long Val,
 }
 
 static unsigned long CvtNumber (const char* Arg, const char* Number)
-/* Convert a number from a string. Allow '$' and '0x' prefixes for hex
-** numbers.
-*/
+// Convert a number from a string. Allow '$' and '0x' prefixes for hex
+// numbers.
 {
     unsigned long Val;
     int           Converted;
@@ -335,10 +333,9 @@ static void OptVersion (const char* Opt attribute ((unused)),
 }
 
 static unsigned HandleChangedLength(const OpcDesc* D, unsigned PC)
-/* Instructions that have flSizeChanges set may use a different size than what
-** the table says. This function adjusts the PC accordingly, so after this only
-** the size from the table needs to be added to make up for the correct value
-*/
+// Instructions that have flSizeChanges set may use a different size than what
+// the table says. This function adjusts the PC accordingly, so after this only
+// the size from the table needs to be added to make up for the correct value
 {
     if (D->Flags & flSizeChanges) {
         if (CPU == CPU_45GS02) {
@@ -392,17 +389,15 @@ static void OneOpcode (unsigned RemainingBytes)
     // Get the output style for the current PC
     attr_t Style = GetStyleAttr (PC);
 
-    /* If a segment begins here, then name that segment.
-    ** Note that the segment is named even if its code is being skipped,
-    ** because some of its later code might not be skipped.
-    */
+    // If a segment begins here, then name that segment.
+    // Note that the segment is named even if its code is being skipped,
+    // because some of its later code might not be skipped.
     if (IsSegmentStart (PC)) {
         StartSegment (GetSegmentStartName (PC), GetSegmentAddrSize (PC));
     }
 
-    /* If we have a label at this address, output the label and an attached
-    ** comment, provided that we aren't in a skip area.
-    */
+    // If we have a label at this address, output the label and an attached
+    // comment, provided that we aren't in a skip area.
     if (Style != atSkip && MustDefLabel (PC)) {
         const char* Comment = GetComment (PC);
         if (Comment) {
@@ -411,13 +406,12 @@ static void OneOpcode (unsigned RemainingBytes)
         DefLabel (GetLabelName (PC));
     }
 
-    /* Check...
-    **   - ...if we have enough bytes remaining for the code at this address.
-    **   - ...if the current instruction is valid for the given CPU.
-    **   - ...if there is no label somewhere between the instruction bytes.
-    **   - ...if there is no segment change between the instruction bytes.
-    ** If any one of those conditions is false, switch to data mode.
-    */
+    // Check...
+    // - ...if we have enough bytes remaining for the code at this address.
+    // - ...if the current instruction is valid for the given CPU.
+    // - ...if there is no label somewhere between the instruction bytes.
+    // - ...if there is no segment change between the instruction bytes.
+    // If any one of those conditions is false, switch to data mode.
     if (Style == atDefault) {
         if (D->Size > RemainingBytes) {
             Style = atIllegal;
@@ -458,9 +452,8 @@ static void OneOpcode (unsigned RemainingBytes)
             break;
 
         case atCode:
-            /* Beware: If we don't have enough bytes left to disassemble the
-            ** following insn, fall through to byte mode.
-            */
+            // Beware: If we don't have enough bytes left to disassemble the
+            // following insn, fall through to byte mode.
             if (D->Size <= RemainingBytes) {
                 if (CPU == CPU_65816) {
                     const unsigned AddrMode = GetAttr (PC) & at65816Mask;
@@ -529,9 +522,8 @@ static void OneOpcode (unsigned RemainingBytes)
             break;
     }
 
-    /* Change back to the default CODE segment if
-    ** a named segment stops at the current address.
-    */
+    // Change back to the default CODE segment if
+    // a named segment stops at the current address.
     for (I = PC - OldPC; I > 0; --I) {
         if (IsSegmentEnd (PC - I)) {
             EndSegment ();
@@ -560,9 +552,8 @@ static void Disassemble (void)
     Pass = PASS_PREP;
     OnePass ();
 
-    /* If the --multi-pass option is given, repeat this pass until we have no
-    ** new labels.
-    */
+    // If the --multi-pass option is given, repeat this pass until we have no
+    // new labels.
     if (MultiPass) {
         unsigned long LabelCount = GetLabelCount ();
         unsigned Passes = 1;
@@ -713,10 +704,9 @@ int main (int argc, char* argv [])
         AbEnd ("No input file");
     }
 
-    /* Check the formatting options for reasonable values. Note: We will not
-    ** really check that they make sense, just that they aren't complete
-    ** garbage.
-    */
+    // Check the formatting options for reasonable values. Note: We will not
+    // really check that they make sense, just that they aren't complete
+    // garbage.
     if (MCol >= ACol) {
         AbEnd ("mnemonic-column value must be smaller than argument-column value");
     }
@@ -732,9 +722,8 @@ int main (int argc, char* argv [])
         CPU = CPU_6502;
     }
 
-    /* Get the current time and convert it to string so it can be used in
-    ** the output page headers.
-    */
+    // Get the current time and convert it to string so it can be used in
+    // the output page headers.
     T = time (0);
     strftime (Now, sizeof (Now), "%Y-%m-%d %H:%M:%S", localtime (&T));
 

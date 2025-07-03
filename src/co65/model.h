@@ -60,9 +60,8 @@ const char* GetModelName (O65Model M);
 // Map the model to its name.
 
 O65Model FindModel (const char* ModelName);
-/* Map a model name to its identifier. Return O65_MODEL_INVALID if the name
-** could not be found. Case is ignored when comparing names.
-*/
+// Map a model name to its identifier. Return O65_MODEL_INVALID if the name
+// could not be found. Case is ignored when comparing names.
 
 // End of model.h
 

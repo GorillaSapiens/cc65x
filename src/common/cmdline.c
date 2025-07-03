@@ -91,9 +91,8 @@ static void AddArg (CmdLine* L, char* Arg)
 }
 
 static void ExpandFile (CmdLine* L, const char* Name)
-/* Add the contents of a file to the command line. Each line is a separate
-** argument with leading and trailing whitespace removed.
-*/
+// Add the contents of a file to the command line. Each line is a separate
+// argument with leading and trailing whitespace removed.
 {
     char Buf [256];
 
@@ -109,9 +108,8 @@ static void ExpandFile (CmdLine* L, const char* Name)
         // Get a pointer to the buffer
         const char* B = Buf;
 
-        /* Skip trailing whitespace (this will also kill the newline that is
-        ** appended by fgets().
-        */
+        // Skip trailing whitespace (this will also kill the newline that is
+        // appended by fgets().
         unsigned Len = strlen (Buf);
         while (Len > 0 && IsSpace (Buf [Len-1])) {
             --Len;
@@ -133,9 +131,8 @@ static void ExpandFile (CmdLine* L, const char* Name)
 
     }
 
-    /* Close the file, ignore errors here since we had the file open for
-    ** reading only.
-    */
+    // Close the file, ignore errors here since we had the file open for
+    // reading only.
     (void) fclose (F);
 }
 
@@ -144,10 +141,9 @@ static void ExpandFile (CmdLine* L, const char* Name)
 ////////////////////////////////////////////////////////////////////////////////
 
 void InitCmdLine (int* aArgCount, char*** aArgVec, const char* aProgName)
-/* Initialize command line parsing. aArgVec is the argument array terminated by
-** a NULL pointer (as usual), ArgCount is the number of valid arguments in the
-** array. Both arguments are remembered in static storage.
-*/
+// Initialize command line parsing. aArgVec is the argument array terminated by
+// a NULL pointer (as usual), ArgCount is the number of valid arguments in the
+// array. Both arguments are remembered in static storage.
 {
     CmdLine     L;
     int         I;
@@ -164,14 +160,13 @@ void InitCmdLine (int* aArgCount, char*** aArgVec, const char* aProgName)
             ProgName = aProgName;
         }
         else {
-            /* remove .exe extension, if there is any
-            **
-            ** Note: This creates a new string that is
-            ** never free()d.
-            ** As this is exactly only string, and it
-            ** lives for the whole lifetime of the tool,
-            ** this is not an issue.
-            */
+            // remove .exe extension, if there is any
+            // 
+            // Note: This creates a new string that is
+            // never free()d.
+            // As this is exactly only string, and it
+            // lives for the whole lifetime of the tool,
+            // this is not an issue.
             ProgName = MakeFilename (ProgName, "");
         }
     }
@@ -179,10 +174,9 @@ void InitCmdLine (int* aArgCount, char*** aArgVec, const char* aProgName)
     // Make a CmdLine struct
     NewCmdLine (&L);
 
-    /* Walk over the parameters and add them to the CmdLine struct. Add a
-    ** special handling for arguments preceeded by the '@' sign - these are
-    ** actually files containing arguments.
-    */
+    // Walk over the parameters and add them to the CmdLine struct. Add a
+    // special handling for arguments preceeded by the '@' sign - these are
+    // actually files containing arguments.
     for (I = 0; I <= *aArgCount; ++I) {
 
         // Get the next argument
@@ -236,9 +230,8 @@ void InvDef (const char* Def)
 }
 
 const char* GetArg (unsigned* ArgNum, unsigned Len)
-/* Get an argument for a short option. The argument may be appended to the
-** option itself or may be separate. Len is the length of the option string.
-*/
+// Get an argument for a short option. The argument may be appended to the
+// option itself or may be separate. Len is the length of the option string.
 {
     const char* Arg = ArgVec[*ArgNum];
     if (Arg[Len] != '\0') {

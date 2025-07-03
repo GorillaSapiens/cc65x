@@ -46,9 +46,8 @@
 // Encoding for an unknown register value
 #define UNKNOWN_REGVAL  -1
 
-/* Encoding for an unknown processor status:
-** For Bit N in the flags, ((flags >> N) & 0x0101) == 0x0101 means 'unknown'
-*/
+// Encoding for an unknown processor status:
+// For Bit N in the flags, ((flags >> N) & 0x0101) == 0x0101 means 'unknown'
 #define UNKNOWN_PFVAL_C     0x0101U     // Carray
 #define UNKNOWN_PFVAL_Z     0x0202U     // Zero
 #define UNKNOWN_PFVAL_I     0x0404U     // Interrupt
@@ -168,9 +167,8 @@ INLINE int RegValIsUnknown (short Val)
 
 #if defined(HAVE_INLINE)
 INLINE int PStatesAreKnown (unsigned short PFlags, unsigned WhatStates)
-/* Return true if all queried processor states are known.
-** Note: WhatStates takes PSTATE_* rather than PFVAL_*.
-*/
+// Return true if all queried processor states are known.
+// Note: WhatStates takes PSTATE_* rather than PFVAL_*.
 {
     return ((PFlags << (PSTATE_BITS_SHIFT - 8)) & WhatStates & PSTATE_BITS_MASK) == 0;
 }
@@ -180,9 +178,8 @@ int PStatesAreKnown (unsigned short PFlags, unsigned WhatStates);
 
 #if defined(HAVE_INLINE)
 INLINE int PStatesAreUnknown (unsigned short PFlags, unsigned WhatStates)
-/* Return true if any queried processor states are unknown.
-** Note: WhatStates takes PSTATE_* rather than PFVAL_*.
-*/
+// Return true if any queried processor states are unknown.
+// Note: WhatStates takes PSTATE_* rather than PFVAL_*.
 {
     return !PStatesAreKnown (PFlags, WhatStates);
 }
@@ -192,9 +189,8 @@ INLINE int PStatesAreUnknown (unsigned short PFlags, unsigned WhatStates)
 
 #if defined(HAVE_INLINE)
 INLINE int PStatesAreSet (unsigned short PFlags, unsigned WhatStates)
-/* Return true if all queried processor states are known to be set.
-** Note: WhatStates takes PSTATE_* rather than PFVAL_*.
-*/
+// Return true if all queried processor states are known to be set.
+// Note: WhatStates takes PSTATE_* rather than PFVAL_*.
 {
     return (PFlags & (WhatStates >> (PSTATE_BITS_SHIFT - 8))) == 0 &&
            (PFlags & (WhatStates >> PSTATE_BITS_SHIFT)) == WhatStates >> PSTATE_BITS_SHIFT;
@@ -205,9 +201,8 @@ int PStatesAreSet (unsigned short PFlags, unsigned WhatStates);
 
 #if defined(HAVE_INLINE)
 INLINE int PStatesAreClear (unsigned short PFlags, unsigned WhatStates)
-/* Return true if the queried processor states are known to be cleared.
-** Note: WhatStates takes PSTATE_* rather than PFVAL_*.
-*/
+// Return true if the queried processor states are known to be cleared.
+// Note: WhatStates takes PSTATE_* rather than PFVAL_*.
 {
     return (PFlags & (WhatStates >> (PSTATE_BITS_SHIFT - 8))) == 0 &&
            (PFlags & (WhatStates >> PSTATE_BITS_SHIFT)) == 0;
@@ -217,10 +212,9 @@ int PStatesAreClear (unsigned short PFlags, unsigned WhatStates);
 #endif
 
 RegInfo* NewRegInfo (const RegContents* RC);
-/* Allocate a new register info, initialize and return it. If RC is not
-** a NULL pointer, it is used to initialize both, the input and output
-** registers. If the pointer is NULL, all registers are set to unknown.
-*/
+// Allocate a new register info, initialize and return it. If RC is not
+// a NULL pointer, it is used to initialize both, the input and output
+// registers. If the pointer is NULL, all registers are set to unknown.
 
 void FreeRegInfo (RegInfo* RI);
 // Free a RegInfo struct

@@ -48,9 +48,8 @@
 struct IFile;
 struct LineInfo;
 
-/* An enum that describes different types of input files. The members are
-** choosen so that it is possible to combine them to bitsets
-*/
+// An enum that describes different types of input files. The members are
+// choosen so that it is possible to combine them to bitsets
 typedef enum {
     IT_MAIN   = 0x01,           // Main input file
     IT_SYSINC = 0x02,           // System include file (using <>)
@@ -97,20 +96,17 @@ void OpenIncludeFile (const char* Name, InputType IT);
 // Open an include file and insert it into the tables.
 
 void CloseIncludeFile (void);
-/* Close an include file and switch to the higher level file. Set Input to
-** NULL if this was the main file.
-*/
+// Close an include file and switch to the higher level file. Set Input to
+// NULL if this was the main file.
 
 void NextChar (void);
-/* Read the next character from the input stream and make CurC and NextC
-** valid. If end of line is reached, both are set to NUL, no more lines
-** are read by this function.
-*/
+// Read the next character from the input stream and make CurC and NextC
+// valid. If end of line is reached, both are set to NUL, no more lines
+// are read by this function.
 
 Collection* UseInputStack (Collection* InputStack);
-/* Use the provided input stack for incoming input. Return the previously used
-** InputStack.
-*/
+// Use the provided input stack for incoming input. Return the previously used
+// InputStack.
 
 void PushLine (StrBuf* L);
 // Save the current input line and use a new one
@@ -122,19 +118,16 @@ void ClearLine (void);
 // Clear the current input line
 
 StrBuf* InitLine (StrBuf* Buf);
-/* Initialize Line from Buf and read CurC and NextC from the new input line.
-** The function returns the old input line.
-*/
+// Initialize Line from Buf and read CurC and NextC from the new input line.
+// The function returns the old input line.
 
 int NextLine (void);
-/* Get a line from the current input. Returns 0 on end of file with no new
-** input bytes.
-*/
+// Get a line from the current input. Returns 0 on end of file with no new
+// input bytes.
 
 int PreprocessNextLine (void);
-/* Get a line from opened input files and do preprocess. Returns 0 on end of
-** main file.
-*/
+// Get a line from opened input files and do preprocess. Returns 0 on end of
+// main file.
 
 void GetFileInclusionInfo (struct LineInfo* LI);
 // Get info about source file inclusion for LineInfo struct

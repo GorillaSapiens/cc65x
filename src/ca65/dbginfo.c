@@ -115,9 +115,8 @@ static unsigned HexValue (char C)
 }
 
 static int ValidateType (StrBuf* Type)
-/* Check if the given type is valid and if so, return a string id for it. If
-** the type isn't valid, return -1. Type is overwritten when checking.
-*/
+// Check if the given type is valid and if so, return a string id for it. If
+// the type isn't valid, return -1. Type is overwritten when checking.
 {
     unsigned        I;
     const char*     A;
@@ -288,9 +287,8 @@ void DbgInfoLine (void)
         CurLineInfo = 0;
     }
 
-    /* If a parameters follow, this is actual line info. If no parameters
-    ** follow, the last line info is terminated.
-    */
+    // If a parameters follow, this is actual line info. If no parameters
+    // follow, the last line info is terminated.
     if (CurTok.Tok == TOK_SEP) {
         return;
     }
@@ -417,20 +415,18 @@ void DbgInfoSym (void)
 void DbgInfoCheck (void)
 // Do checks on all hll debug info symbols when assembly is complete
 {
-    /* When parsing the debug statements for HLL symbols, we have already
-    ** tagged the functions to their asm counterparts. This wasn't done for
-    ** C symbols, since we will allow forward declarations. So we have to
-    ** resolve the normal C symbols now.
-    */
+    // When parsing the debug statements for HLL symbols, we have already
+    // tagged the functions to their asm counterparts. This wasn't done for
+    // C symbols, since we will allow forward declarations. So we have to
+    // resolve the normal C symbols now.
     unsigned I;
     for (I = 0; I < CollCount (&HLLDbgSyms); ++I) {
 
         // Get the next symbol
         HLLDbgSym* S = CollAtUnchecked (&HLLDbgSyms, I);
 
-        /* Ignore functions and auto symbols, because the later live on the
-        ** stack and don't have corresponding asm symbols.
-        */
+        // Ignore functions and auto symbols, because the later live on the
+        // stack and don't have corresponding asm symbols.
         if (HLL_IS_FUNC (S->Flags) || HLL_GET_SC (S->Flags) == HLL_SC_AUTO) {
             continue;
         }
@@ -471,9 +467,8 @@ void WriteHLLDbgSyms (void)
             // Get the type of the symbol
             unsigned SC = HLL_GET_SC (S->Flags);
 
-            /* Remember if the symbol has debug info attached
-            ** ### This should go into DbgInfoCheck
-            */
+            // Remember if the symbol has debug info attached
+            // ### This should go into DbgInfoCheck
             if (S->Sym && S->Sym->DebugSymId != ~0U) {
                 S->Flags |= HLL_DATA_SYM;
             }

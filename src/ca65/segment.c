@@ -61,9 +61,8 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* If OrgPerSeg is false, all segments share the RelocMode flag and a PC
-** used when in absolute mode. OrgPerSeg may be set by .feature org_per_seg
-*/
+// If OrgPerSeg is false, all segments share the RelocMode flag and a PC
+// used when in absolute mode. OrgPerSeg may be set by .feature org_per_seg
 static int              RelocMode = 1;
 static unsigned long    AbsPC     = 0;          // PC if in absolute mode
 
@@ -86,9 +85,8 @@ Segment* ActiveSeg;
 ////////////////////////////////////////////////////////////////////////////////
 
 static Segment* NewSegFromDef (SegDef* Def)
-/* Create a new segment from a segment definition. Used only internally, no
-** checks.
-*/
+// Create a new segment from a segment definition. Used only internally, no
+// checks.
 {
     // Create a new segment
     Segment* S = xmalloc (sizeof (*S));
@@ -212,9 +210,8 @@ unsigned long GetPC (void)
 }
 
 void EnterAbsoluteMode (unsigned long PC)
-/* Enter absolute (non relocatable mode). Depending on the OrgPerSeg flag,
-** this will either switch the mode globally or for the current segment.
-*/
+// Enter absolute (non relocatable mode). Depending on the OrgPerSeg flag,
+// this will either switch the mode globally or for the current segment.
 {
     if (OrgPerSeg) {
         // Relocatable mode is switched per segment
@@ -240,9 +237,8 @@ int GetRelocMode (void)
 }
 
 void EnterRelocMode (void)
-/* Enter relocatable mode. Depending on the OrgPerSeg flag, this will either
-** switch the mode globally or for the current segment.
-*/
+// Enter relocatable mode. Depending on the OrgPerSeg flag, this will either
+// switch the mode globally or for the current segment.
 {
     if (OrgPerSeg) {
         // Relocatable mode is switched per segment
@@ -254,26 +250,23 @@ void EnterRelocMode (void)
 }
 
 void SegAlign (unsigned long Alignment, int FillVal)
-/* Align the PC segment to Alignment. If FillVal is -1, emit fill fragments
-** (the actual fill value will be determined by the linker), otherwise use
-** the given value.
-*/
+// Align the PC segment to Alignment. If FillVal is -1, emit fill fragments
+// (the actual fill value will be determined by the linker), otherwise use
+// the given value.
 {
     unsigned char Data [4];
     unsigned long CombinedAlignment;
     unsigned long Count;
 
-    /* The segment must have the combined alignment of all separate alignments
-    ** in the source. Calculate this alignment and check it for sanity.
-    */
+    // The segment must have the combined alignment of all separate alignments
+    // in the source. Calculate this alignment and check it for sanity.
     CombinedAlignment = LeastCommonMultiple (ActiveSeg->Align, Alignment);
     if (CombinedAlignment > MAX_ALIGNMENT) {
         Error ("Combined alignment for active segment is %lu which exceeds %lu",
                CombinedAlignment, MAX_ALIGNMENT);
 
-        /* Avoid creating large fills for an object file that is thrown away
-        ** later.
-        */
+        // Avoid creating large fills for an object file that is thrown away
+        // later.
         Count = 1;
 
     } else {
@@ -378,11 +371,10 @@ void SegDone (void)
 
                 } else if (RelaxChecks == 0) {
 
-                    /* We cannot evaluate the expression now, leave the job for
-                    ** the linker. However, we can check if the address size
-                    ** matches the fragment size. Mismatches are errors in
-                    ** most situations.
-                    */
+                    // We cannot evaluate the expression now, leave the job for
+                    // the linker. However, we can check if the address size
+                    // matches the fragment size. Mismatches are errors in
+                    // most situations.
                     if ((F->Len == 1 && ED.AddrSize > ADDR_SIZE_ZP)  ||
                         (F->Len == 2 && ED.AddrSize > ADDR_SIZE_ABS) ||
                         (F->Len == 3 && ED.AddrSize > ADDR_SIZE_FAR)) {
@@ -458,10 +450,9 @@ void SegInit (void)
 void SetSegmentSizes (void)
 // Set the default segment sizes according to the memory model
 {
-    /* Initialize segment sizes. The segment definitions do already contain
-    ** the correct values for the default case (near), so we must only change
-    ** things that should be different.
-    */
+    // Initialize segment sizes. The segment definitions do already contain
+    // the correct values for the default case (near), so we must only change
+    // things that should be different.
     switch (MemoryModel) {
 
         case MMODEL_NEAR:
@@ -490,9 +481,8 @@ static void WriteOneSeg (Segment* Seg)
     unsigned long DataSize;
     unsigned long EndPos;
 
-    /* Remember the file position, then write a dummy for the size of the
-    ** following data
-    */
+    // Remember the file position, then write a dummy for the size of the
+    // following data
     unsigned long SizePos = ObjGetFilePos ();
     ObjWrite32 (0);
 
@@ -504,9 +494,8 @@ static void WriteOneSeg (Segment* Seg)
     ObjWrite8 (Seg->Def->AddrSize);             // Address size of the segment
     ObjWriteVar (Seg->FragCount);               // Number of fragments
 
-    /* Now walk through the fragment list for this segment and write the
-    ** fragments.
-    */
+    // Now walk through the fragment list for this segment and write the
+    // fragments.
     Frag = Seg->Root;
     while (Frag) {
 

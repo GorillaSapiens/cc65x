@@ -96,31 +96,27 @@ ObjData* NewObjData (void);
 // Allocate a new structure on the heap, insert it into the list, return it
 
 void FreeObjData (ObjData* O);
-/* Free an ObjData object. NOTE: This function works only for unused object
-** data, that is, ObjData objects that aren't used because they aren't
-** referenced.
-*/
+// Free an ObjData object. NOTE: This function works only for unused object
+// data, that is, ObjData objects that aren't used because they aren't
+// referenced.
 
 void FreeObjStrings (ObjData* O);
-/* Free the module string data. Used once the object file is loaded completely
-** when all strings are converted to global strings.
-*/
+// Free the module string data. Used once the object file is loaded completely
+// when all strings are converted to global strings.
 
 void InsertObjData (ObjData* O);
 // Insert the ObjData object into the collection of used ObjData objects.
 
 void InsertObjGlobals (ObjData* O);
-/* Insert imports and exports from the object file into the global import and
-** export lists.
-*/
+// Insert imports and exports from the object file into the global import and
+// export lists.
 
 unsigned MakeGlobalStringId (const ObjData* O, unsigned Index);
 // Convert a local string id into a global one and return it.
 
 const char* GetObjFileName (const ObjData* O);
-/* Get the name of the object file. Return "[linker generated]" if the object
-** file is NULL.
-*/
+// Get the name of the object file. Return "[linker generated]" if the object
+// file is NULL.
 
 #if defined(HAVE_INLINE)
 INLINE int ObjHasFiles (const ObjData* O)

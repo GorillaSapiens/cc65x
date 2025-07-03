@@ -62,9 +62,8 @@ const char* CPUNames[CPU_COUNT] = {
     "65CE02",   // CMOS with CSG extensions
 };
 
-/* Tables with CPU instruction sets
- * NOTE: make sure to only combine the instruction sets that are 100% compatible
- */
+// Tables with CPU instruction sets
+// NOTE: make sure to only combine the instruction sets that are 100% compatible
 const unsigned CPUIsets[CPU_COUNT] = {
     CPU_ISET_NONE,
     CPU_ISET_6502,
@@ -120,9 +119,8 @@ int ValidAddrSizeForCPU (unsigned char AddrSize)
 }
 
 cpu_t FindCPU (const char* Name)
-/* Find a CPU by name and return the target id. CPU_UNKNOWN is returned if
-** the given name is no valid target.
-*/
+// Find a CPU by name and return the target id. CPU_UNKNOWN is returned if
+// the given name is no valid target.
 {
     unsigned I;
 

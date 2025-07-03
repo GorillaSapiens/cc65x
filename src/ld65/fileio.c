@@ -126,11 +126,10 @@ void WriteVal (FILE* F, unsigned long Val, unsigned Size)
 void WriteVar (FILE* F, unsigned long V)
 // Write a variable sized value to the file in special encoding
 {
-    /* We will write the value to the file in 7 bit chunks. If the 8th bit
-    ** is clear, we're done, if it is set, another chunk follows. This will
-    ** allow us to encode smaller values with less bytes, at the expense of
-    ** needing 5 bytes if a 32 bit value is written to file.
-    */
+    // We will write the value to the file in 7 bit chunks. If the 8th bit
+    // is clear, we're done, if it is set, another chunk follows. This will
+    // allow us to encode smaller values with less bytes, at the expense of
+    // needing 5 bytes if a 32 bit value is written to file.
     do {
         unsigned char C = (V & 0x7F);
         V >>= 7;
@@ -219,9 +218,8 @@ long Read32Signed (FILE* F)
 unsigned long ReadVar (FILE* F)
 // Read a variable size value from the file
 {
-    /* The value was written to the file in 7 bit chunks LSB first. If there
-    ** are more bytes, bit 8 is set, otherwise it is clear.
-    */
+    // The value was written to the file in 7 bit chunks LSB first. If there
+    // are more bytes, bit 8 is set, otherwise it is clear.
     unsigned char C;
     unsigned long V = 0;
     unsigned Shift = 0;
@@ -239,9 +237,8 @@ unsigned long ReadVar (FILE* F)
 }
 
 unsigned ReadStr (FILE* F)
-/* Read a string from the file, place it into the global string pool, and
-** return its string id.
-*/
+// Read a string from the file, place it into the global string pool, and
+// return its string id.
 {
     unsigned    Id;
     StrBuf      Buf = STATIC_STRBUF_INITIALIZER;

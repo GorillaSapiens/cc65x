@@ -64,10 +64,9 @@ ExprDesc* ED_Init (ExprDesc* Expr)
 ////////////////////////////////////////////////////////////////////////////////
 
 const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
-/* Return the assembler label name of the given expression. Beware: This
-** function may use a static buffer, so the name may get "lost" on the second
-** call to the function.
-*/
+// Return the assembler label name of the given expression. Beware: This
+// function may use a static buffer, so the name may get "lost" on the second
+// call to the function.
 {
     static StrBuf Buf = STATIC_STRBUF_INITIALIZER;
 
@@ -125,9 +124,8 @@ const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
 }
 
 int ED_GetStackOffs (const ExprDesc* Expr, int Offs)
-/* Get the stack offset of an address on the stack in Expr taking into account
-** an additional offset in Offs.
-*/
+// Get the stack offset of an address on the stack in Expr taking into account
+// an additional offset in Offs.
 {
     PRECONDITION (ED_IsLocStack (Expr));
     Offs += ((int) Expr->IVal) - StackPtr;
@@ -141,9 +139,8 @@ int ED_GetStackOffs (const ExprDesc* Expr, int Offs)
 
 #if !defined(HAVE_INLINE)
 int ED_IsLocQuasiConst (const ExprDesc* Expr)
-/* Return true if the expression is a constant location of some sort or on the
-** stack.
-*/
+// Return true if the expression is a constant location of some sort or on the
+// stack.
 {
     return ED_IsLocConst (Expr) || ED_IsLocStack (Expr);
 }
@@ -194,9 +191,8 @@ int ED_IsAbs (const ExprDesc* Expr)
 
 #if !defined(HAVE_INLINE)
 int ED_IsConstAbs (const ExprDesc* Expr)
-/* Return true if the expression denotes a constant absolute value. This can be
-** a numeric constant, cast to any type.
-*/
+// Return true if the expression denotes a constant absolute value. This can be
+// a numeric constant, cast to any type.
 {
     return ED_IsRVal (Expr) && ED_IsAbs (Expr);
 }
@@ -215,9 +211,8 @@ int ED_IsConstBool (const ExprDesc* Expr)
 }
 
 int ED_IsConstTrue (const ExprDesc* Expr)
-/* Return true if the constant expression can be evaluated as boolean true at
-** compile time.
-*/
+// Return true if the constant expression can be evaluated as boolean true at
+// compile time.
 {
     // Non-zero arithmetics and objects addresses are boolean true
     return (ED_IsConstAbsInt (Expr) && Expr->IVal != 0) ||
@@ -225,9 +220,8 @@ int ED_IsConstTrue (const ExprDesc* Expr)
 }
 
 int ED_IsConstFalse (const ExprDesc* Expr)
-/* Return true if the constant expression can be evaluated as boolean false at
-** compile time.
-*/
+// Return true if the constant expression can be evaluated as boolean false at
+// compile time.
 {
     // Zero arithmetics and null pointers are boolean false
     return (ED_IsConstAbsInt (Expr) && Expr->IVal == 0) ||
@@ -235,34 +229,30 @@ int ED_IsConstFalse (const ExprDesc* Expr)
 }
 
 int ED_IsConst (const ExprDesc* Expr)
-/* Return true if the expression denotes a constant of some sort. This can be a
-** numeric constant, the address of a global variable (maybe with offset) or
-** similar.
-*/
+// Return true if the expression denotes a constant of some sort. This can be a
+// numeric constant, the address of a global variable (maybe with offset) or
+// similar.
 {
     return (Expr->Flags & E_MASK_LOC) == E_LOC_NONE || ED_IsConstAddr (Expr);
 }
 
 int ED_IsQuasiConst (const ExprDesc* Expr)
-/* Return true if the expression denotes a quasi-constant of some sort. This
-** can be a numeric constant, a constant address or a stack variable address.
-*/
+// Return true if the expression denotes a quasi-constant of some sort. This
+// can be a numeric constant, a constant address or a stack variable address.
 {
     return (Expr->Flags & E_MASK_LOC) == E_LOC_NONE || ED_IsQuasiConstAddr (Expr);
 }
 
 int ED_IsConstAddr (const ExprDesc* Expr)
-/* Return true if the expression denotes a constant address of some sort. This
-** can be the address of a global variable (maybe with offset) or similar.
-*/
+// Return true if the expression denotes a constant address of some sort. This
+// can be the address of a global variable (maybe with offset) or similar.
 {
     return ED_IsAddrExpr (Expr) && ED_IsLocConst (Expr);
 }
 
 int ED_IsQuasiConstAddr (const ExprDesc* Expr)
-/* Return true if the expression denotes a quasi-constant address of some sort.
-** This can be a constant address or a stack variable address.
-*/
+// Return true if the expression denotes a quasi-constant address of some sort.
+// This can be a constant address or a stack variable address.
 {
     return ED_IsAddrExpr (Expr) && ED_IsLocQuasiConst (Expr);
 }
@@ -280,9 +270,8 @@ int ED_IsZPInd (const ExprDesc* Expr)
 }
 
 int ED_IsNullPtr (const ExprDesc* Expr)
-/* Return true if the given expression is a null pointer.
-** Note: A null pointer constant converted to a pointer type is a null pointer.
-*/
+// Return true if the given expression is a null pointer.
+// Note: A null pointer constant converted to a pointer type is a null pointer.
 {
     return ED_IsConstAbs (Expr) &&
            Expr->IVal == 0      &&
@@ -290,12 +279,11 @@ int ED_IsNullPtr (const ExprDesc* Expr)
 }
 
 int ED_IsNullPtrConstant (const ExprDesc* Expr)
-/* Return true if the given expression is a null pointer constant.
-** Note: An integer constant expression with value 0, or such an
-** expression cast to void* is a null pointer constant. However, a
-** null pointer constant converted to a pointer type is just a null
-** pointer, not necessarily a constant in ISO C.
-*/
+// Return true if the given expression is a null pointer constant.
+// Note: An integer constant expression with value 0, or such an
+// expression cast to void* is a null pointer constant. However, a
+// null pointer constant converted to a pointer type is just a null
+// pointer, not necessarily a constant in ISO C.
 {
     return ED_IsConstAbs (Expr) &&
            Expr->IVal == 0      &&
@@ -305,8 +293,7 @@ int ED_IsNullPtrConstant (const ExprDesc* Expr)
 }
 
 int ED_IsEntityAddr (const ExprDesc* Expr)
-/* Return true if the expression denotes the address of an object or function.
-*/
+// Return true if the expression denotes the address of an object or function.
 {
     return ED_IsAddrExpr (Expr) &&
            Expr->Sym != 0       &&
@@ -314,9 +301,8 @@ int ED_IsEntityAddr (const ExprDesc* Expr)
 }
 
 int ED_IsBool (const ExprDesc* Expr)
-/* Return true if the expression can be treated as a boolean, that is, it can
-** be an operand to a compare operation.
-*/
+// Return true if the expression can be treated as a boolean, that is, it can
+// be an operand to a compare operation.
 {
     // Either ints, floats, or pointers can be used in a boolean context
     return IsClassInt (Expr->Type)   ||
@@ -396,9 +382,8 @@ void ED_AddrExpr (ExprDesc* Expr)
                 Expr->Flags &= ~E_MASK_RTYPE;
                 Expr->Flags |= E_ADDRESS_OF | E_RTYPE_RVAL;
             } else {
-                /* Due to the way we handle arrays, this may happen if we take
-                ** the address of a pointer to an array element.
-                */
+                // Due to the way we handle arrays, this may happen if we take
+                // the address of a pointer to an array element.
                 if (!IsTypePtr (Expr->Type)) {
                     Error ("Cannot get the address of an address");
                 }
@@ -428,16 +413,15 @@ void ED_IndExpr (ExprDesc* Expr)
                 Expr->Flags &= ~(E_MASK_RTYPE | E_ADDRESS_OF);
                 Expr->Flags |= E_RTYPE_LVAL;
             } else {
-                /* Due to the limitation of LoadExpr, this may happen after we
-                ** have loaded the value from a referenced address, in which
-                ** case the content in the primary no longer refers to the
-                ** original address. We simply mark this as E_LOC_EXPR so that
-                ** some info about the original location can be retained.
-                ** If it's really meant to dereference a "pointer value", it
-                ** should be done in two steps where the pointer value should
-                ** be the manually loaded first before a call into this, and
-                ** the offset should be manually cleared somewhere outside.
-                */
+                // Due to the limitation of LoadExpr, this may happen after we
+                // have loaded the value from a referenced address, in which
+                // case the content in the primary no longer refers to the
+                // original address. We simply mark this as E_LOC_EXPR so that
+                // some info about the original location can be retained.
+                // If it's really meant to dereference a "pointer value", it
+                // should be done in two steps where the pointer value should
+                // be the manually loaded first before a call into this, and
+                // the offset should be manually cleared somewhere outside.
                 Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE);
                 Expr->Flags |= E_LOC_EXPR | E_RTYPE_LVAL;
             }

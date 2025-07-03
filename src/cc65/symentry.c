@@ -210,9 +210,8 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
 int SymIsOutputFunc (const SymEntry* Sym)
 // Return true if this is a function that must be output
 {
-    /* Symbol must be a function which is defined and either extern or
-    ** static and referenced.
-    */
+    // Symbol must be a function which is defined and either extern or
+    // static and referenced.
     return IsTypeFunc (Sym->Type)                       &&
            SymIsDef (Sym)                               &&
            ((Sym->Flags & SC_REF) ||
@@ -259,9 +258,8 @@ void SymUseAttr (SymEntry* Sym, struct Declarator* D)
 }
 
 void SymSetAsmName (SymEntry* Sym)
-/* Set the assembler name for an external symbol from the name of the symbol.
-** The symbol must have no assembler name set yet.
-*/
+// Set the assembler name for an external symbol from the name of the symbol.
+// The symbol must have no assembler name set yet.
 {
     unsigned Len;
 

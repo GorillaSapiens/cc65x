@@ -135,10 +135,9 @@ typedef enum {
     PP_ERROR,
 } PushPopResult;
 
-/* Effective scope of the pragma.
-** This talks about how far the pragma has effects on whenever it shows up,
-** even in the middle of an expression, statement or something.
-*/
+// Effective scope of the pragma.
+// This talks about how far the pragma has effects on whenever it shows up,
+// even in the middle of an expression, statement or something.
 typedef enum {
     PES_NONE,
     PES_IMM,                    // No way back
@@ -155,9 +154,8 @@ typedef enum {
 ////////////////////////////////////////////////////////////////////////////////
 
 static void PragmaErrorSkip (void)
-/* Called in case of an error, skips tokens until the closing paren or a
-** semicolon is reached.
-*/
+// Called in case of an error, skips tokens until the closing paren or a
+// semicolon is reached.
 {
     static const token_t TokenList[] = { TOK_RPAREN, TOK_SEMI };
     SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
@@ -170,9 +168,8 @@ static int CmpKey (const void* Key, const void* Elem)
 }
 
 static pragma_t FindPragma (const StrBuf* Key)
-/* Find a pragma and return the token. Return PRAGMA_ILLEGAL if the keyword is
-** not a valid pragma.
-*/
+// Find a pragma and return the token. Return PRAGMA_ILLEGAL if the keyword is
+// not a valid pragma.
 {
     struct Pragma* P;
     P = bsearch (SB_GetConstBuf (Key), Pragmas, PRAGMA_COUNT, sizeof (Pragmas[0]), CmpKey);
@@ -180,9 +177,8 @@ static pragma_t FindPragma (const StrBuf* Key)
 }
 
 static int GetComma (StrBuf* B)
-/* Expects and skips a comma in B. Prints an error and returns zero if no
-** comma is found. Return a value <> 0 otherwise.
-*/
+// Expects and skips a comma in B. Prints an error and returns zero if no
+// comma is found. Return a value <> 0 otherwise.
 {
     SB_SkipWhite (B);
     if (SB_Get (B) != ',') {
@@ -194,9 +190,8 @@ static int GetComma (StrBuf* B)
 }
 
 static int GetString (StrBuf* B, StrBuf* S)
-/* Expects and skips a string in B. Prints an error and returns zero if no
-** string is found. Returns a value <> 0 otherwise.
-*/
+// Expects and skips a string in B. Prints an error and returns zero if no
+// string is found. Returns a value <> 0 otherwise.
 {
     if (!SB_GetString (B, S)) {
         Error ("String literal expected");
@@ -206,9 +201,8 @@ static int GetString (StrBuf* B, StrBuf* S)
 }
 
 static int GetNumber (StrBuf* B, long* Val)
-/* Expects and skips a number in B. Prints an eror and returns zero if no
-** number is found. Returns a value <> 0 otherwise.
-*/
+// Expects and skips a number in B. Prints an eror and returns zero if no
+// number is found. Returns a value <> 0 otherwise.
 {
     if (!SB_GetNumber (B, Val)) {
         Error ("Constant integer expected");
@@ -218,10 +212,9 @@ static int GetNumber (StrBuf* B, long* Val)
 }
 
 static IntStack* GetWarning (StrBuf* B)
-/* Get a warning name from the string buffer. Returns a pointer to the intstack
-** that holds the state of the warning, and NULL in case of errors. The
-** function will output error messages in case of problems.
-*/
+// Get a warning name from the string buffer. Returns a pointer to the intstack
+// that holds the state of the warning, and NULL in case of errors. The
+// function will output error messages in case of problems.
 {
     IntStack* S = 0;
     StrBuf W = AUTO_STRBUF_INITIALIZER;
@@ -260,9 +253,8 @@ static int HasStr (StrBuf* B, const char* E)
 }
 
 static PushPopResult ParsePushPop (StrBuf* B)
-/* Check for and parse the "push" and "pop" keywords. In case of "push", a
-** following comma is expected and skipped.
-*/
+// Check for and parse the "push" and "pop" keywords. In case of "push", a
+// following comma is expected and skipped.
 {
     StrBuf Ident      = AUTO_STRBUF_INITIALIZER;
     PushPopResult Res = PP_NONE;
@@ -322,9 +314,8 @@ static void PushInt (IntStack* S, long Val)
 }
 
 static int IsBoolKeyword (StrBuf* Ident)
-/* Check if the identifier in Ident is a keyword for a boolean value. Currently
-** accepted are true/false/on/off.
-*/
+// Check if the identifier in Ident is a keyword for a boolean value. Currently
+// accepted are true/false/on/off.
 {
     if (SB_CompareStr (Ident, "true") == 0) {
         return 1;
@@ -626,9 +617,8 @@ static void CharMapPragma (pragma_scope_t Scope, StrBuf* B)
         return;
     }
 
-    /* Warn about remapping character code 0x00
-    ** (except when remapping it back to itself).
-    */
+    // Warn about remapping character code 0x00
+    // (except when remapping it back to itself).
     if (Index + C != 0 && IS_Get (&WarnRemapZero)) {
         if (Index == 0) {
             Warning ("Remapping from 0 is dangerous with string functions");
@@ -803,9 +793,8 @@ static void IntPragma (pragma_scope_t Scope, pragma_t Token, StrBuf* B, IntStack
 }
 
 static void NoteMessagePragma (const char* Message)
-/* Wrapper for printf-like Note() function protected from user-provided format
-** specifiers.
-*/
+// Wrapper for printf-like Note() function protected from user-provided format
+// specifiers.
 {
     Note ("%s", Message);
 }
@@ -836,9 +825,8 @@ static void ParsePragmaString (void)
 
     // Do we know this pragma?
     if (Pragma == PRAGMA_ILLEGAL) {
-        /* According to the ANSI standard, we're not allowed to generate errors
-        ** for unknown pragmas, but warn about them if enabled (the default).
-        */
+        // According to the ANSI standard, we're not allowed to generate errors
+        // for unknown pragmas, but warn about them if enabled (the default).
         if (IS_Get (&WarnUnknownPragma)) {
             Warning ("Unknown pragma '%s'", SB_GetConstBuf (&Ident));
         }
@@ -995,9 +983,8 @@ ExitPoint:
 ////////////////////////////////////////////////////////////////////////////////
 
 void ConsumePragma (void)
-/* Parse a pragma. The pragma comes always in the form of the new C99 _Pragma()
-** operator.
-*/
+// Parse a pragma. The pragma comes always in the form of the new C99 _Pragma()
+// operator.
 {
     // Skip the _Pragma token
     NextToken ();
@@ -1016,9 +1003,8 @@ void ConsumePragma (void)
         // Print a diagnostic
         Error ("String literal expected");
 
-        /* Try some smart error recovery: Skip tokens until we reach the
-        ** enclosing paren, or a semicolon.
-        */
+        // Try some smart error recovery: Skip tokens until we reach the
+        // enclosing paren, or a semicolon.
         PragmaErrorSkip ();
     } else {
         // Parse the pragma

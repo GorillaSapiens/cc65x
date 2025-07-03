@@ -58,13 +58,12 @@ struct CallDesc {
     const char* ShortFunc;      // Short function name
 };
 
-/* Note: The table is sorted. If there is more than one entry with the same
-** name, entries are sorted best match first, so when searching linear for
-** a match, the first one can be used because it is also the best one (or
-** at least none of the following ones are better).
-** Note^2: Ptr1 and Tmp1 aren't evaluated, because runtime routines don't
-** expect parameters here.
-*/
+// Note: The table is sorted. If there is more than one entry with the same
+// name, entries are sorted best match first, so when searching linear for
+// a match, the first one can be used because it is also the best one (or
+// at least none of the following ones are better).
+// Note^2: Ptr1 and Tmp1 aren't evaluated, because runtime routines don't
+// expect parameters here.
 static const CallDesc CallTable [] = {
     // Name          A register      X register     Y register     flags     replacement
     {
@@ -807,9 +806,8 @@ static const CallDesc CallTable [] = {
 ////////////////////////////////////////////////////////////////////////////////
 
 static const CallDesc* FindCall (const char* Name)
-/* Find the function with the given name. Return a pointer to the table entry
-** or NULL if the function was not found.
-*/
+// Find the function with the given name. Return a pointer to the table entry
+// or NULL if the function was not found.
 {
     // Do a binary search
     int First = 0;
@@ -828,9 +826,8 @@ static const CallDesc* FindCall (const char* Name)
         } else {
             Last = Current - 1;
             if (Result == 0) {
-                /* Found. Repeat the procedure until the first of all entries
-                ** with the same name is found.
-                */
+                // Found. Repeat the procedure until the first of all entries
+                // with the same name is found.
                 Found = 1;
             }
         }
@@ -841,9 +838,8 @@ static const CallDesc* FindCall (const char* Name)
 }
 
 static int RegMatch (short Expected, short Actual)
-/* Check for a register match. If Expected has a value, it must be identical
-** to Actual.
-*/
+// Check for a register match. If Expected has a value, it must be identical
+// to Actual.
 {
     return RegValIsUnknown (Expected) || (Expected == Actual);
 }
@@ -853,10 +849,9 @@ static int RegMatch (short Expected, short Actual)
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptSize1 (CodeSeg* S)
-/* Do size optimization by calling special subroutines that preload registers.
-** This routine does not work standalone, it needs a following register load
-** removal pass.
-*/
+// Do size optimization by calling special subroutines that preload registers.
+// This routine does not work standalone, it needs a following register load
+// removal pass.
 {
     CodeEntry* E;
     unsigned Changes = 0;
@@ -880,15 +875,13 @@ unsigned OptSize1 (CodeSeg* S)
             // Get input register info for this insn
             const RegContents* In = &E->RI->In;
 
-            /* FindCall finds the first entry that matches our function name.
-            ** The names are listed in "best match" order, so search for the
-            ** first one, that fulfills our conditions.
-            */
+            // FindCall finds the first entry that matches our function name.
+            // The names are listed in "best match" order, so search for the
+            // first one, that fulfills our conditions.
             while (1) {
 
-                /* Check the registers and allow slower code only if
-                ** optimizing for size.
-                */
+                // Check the registers and allow slower code only if
+                // optimizing for size.
                 if ((OptForSize || (D->Flags & F_SLOWER) == 0)          &&
                     RegMatch (D->Regs.RegA,    In->RegA)                &&
                     RegMatch (D->Regs.RegX,    In->RegX)                &&
@@ -928,10 +921,9 @@ unsigned OptSize1 (CodeSeg* S)
 }
 
 unsigned OptSize2 (CodeSeg* S)
-/* Do size optimization by using shorter code sequences, even if this
-** introduces relations between instructions. This step must be one of the
-** last steps, because it makes further work much more difficult.
-*/
+// Do size optimization by using shorter code sequences, even if this
+// introduces relations between instructions. This step must be one of the
+// last steps, because it makes further work much more difficult.
 {
     unsigned Changes = 0;
     unsigned I;

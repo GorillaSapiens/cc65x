@@ -42,38 +42,35 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptSub1 (CodeSeg* S);
-/* Search for the sequence
-**
-**      sbc     ...
-**      bcs     L
-**      dex
-** L:
-**
-** and remove the handling of the high byte if X is not used later.
-*/
+// Search for the sequence
+// 
+// sbc     ...
+// bcs     L
+// dex
+// L:
+// 
+// and remove the handling of the high byte if X is not used later.
 
 unsigned OptSub2 (CodeSeg* S);
-/* Search for the sequence
-**
-**      lda     xx
-**      sec
-**      sta     tmp1
-**      lda     yy
-**      sbc     tmp1
-**      sta     yy
-**
-** and replace it by
-**
-**      sec
-**      lda     yy
-**      sbc     xx
-**      sta     yy
-*/
+// Search for the sequence
+// 
+// lda     xx
+// sec
+// sta     tmp1
+// lda     yy
+// sbc     tmp1
+// sta     yy
+// 
+// and replace it by
+// 
+// sec
+// lda     yy
+// sbc     xx
+// sta     yy
 
 unsigned OptSub3 (CodeSeg* S);
-/* Search for a call to decaxn and replace it by an 8 bit sub if the X register
-** is not used later.
-*/
+// Search for a call to decaxn and replace it by an 8 bit sub if the X register
+// is not used later.
 
 // End of coptsub.h
 

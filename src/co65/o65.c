@@ -72,9 +72,8 @@ static O65Data* NewO65Data (void)
 ////////////////////////////////////////////////////////////////////////////////
 
 static unsigned long ReadO65Size (FILE* F, const O65Header* H)
-/* Read a size variable (16 or 32 bit, depending on the mode word in the
-** header) from the o65 file.
-*/
+// Read a size variable (16 or 32 bit, depending on the mode word in the
+// header) from the o65 file.
 {
     unsigned long Size = 0;     // Initialize to avoid warnings
     switch (H->mode & O65_SIZE_MASK) {
@@ -86,9 +85,8 @@ static unsigned long ReadO65Size (FILE* F, const O65Header* H)
 }
 
 static void ReadO65Header (FILE* F, O65Header* H)
-/* Read an o65 header from the given file. The function will call Error if
-** something is wrong.
-*/
+// Read an o65 header from the given file. The function will call Error if
+// something is wrong.
 {
     static const char Magic[3] = {
         O65_MAGIC_0, O65_MAGIC_1, O65_MAGIC_2   // "o65"
@@ -130,10 +128,9 @@ static void ReadO65Header (FILE* F, O65Header* H)
 }
 
 static O65Option* ReadO65Option (FILE* F)
-/* Read the next O65 option from the given file. The option is stored into a
-** dynamically allocated O65Option struct which is returned. On end of options,
-** NULL is returned. On error, Error is called which terminates the program.
-*/
+// Read the next O65 option from the given file. The option is stored into a
+// dynamically allocated O65Option struct which is returned. On end of options,
+// NULL is returned. On error, Error is called which terminates the program.
 {
     O65Option* O;
 
@@ -281,9 +278,8 @@ static O65Export* ReadO65Export (FILE* F, const O65Header* H)
 }
 
 static O65Data* ReadO65Data (FILE* F)
-/* Read a complete o65 file into dynamically allocated memory and return the
-** created O65Data struct.
-*/
+// Read a complete o65 file into dynamically allocated memory and return the
+// created O65Data struct.
 {
     unsigned long Count;
     O65Option* O;
@@ -328,9 +324,8 @@ static O65Data* ReadO65Data (FILE* F)
 }
 
 O65Data* ReadO65File (const char* Name)
-/* Read a complete o65 file into dynamically allocated memory and return the
-** created O65Data struct.
-*/
+// Read a complete o65 file into dynamically allocated memory and return the
+// created O65Data struct.
 {
     O65Data* D;
 
@@ -362,10 +357,9 @@ const char* GetO65OSName (unsigned char OS)
 }
 
 const char* GetO65OptionText (const O65Option* O)
-/* Return the data of the given option as a readable text. The function returns
-** a pointer to a static buffer that is reused on the next call, so if in doubt,
-** make a copy (and no, the function is not thread safe).
-*/
+// Return the data of the given option as a readable text. The function returns
+// a pointer to a static buffer that is reused on the next call, so if in doubt,
+// make a copy (and no, the function is not thread safe).
 {
     static char Buf[256];
     unsigned I, J;

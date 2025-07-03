@@ -41,19 +41,18 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptPush1 (CodeSeg* S)
-/* Given a sequence
-**
-**     jsr     ldaxysp
-**     jsr     pushax
-**
-** If a/x are not used later, and Y is known, replace that by
-**
-**     ldy     #xx+2
-**     jsr     pushwysp
-**     ldy     #$00     ; present if later code expects Y = 0
-**
-** saving several cycles.
-*/
+// Given a sequence
+// 
+// jsr     ldaxysp
+// jsr     pushax
+// 
+// If a/x are not used later, and Y is known, replace that by
+// 
+// ldy     #xx+2
+// jsr     pushwysp
+// ldy     #$00     ; present if later code expects Y = 0
+// 
+// saving several cycles.
 {
     unsigned I;
     unsigned Changes = 0;
@@ -121,15 +120,14 @@ unsigned OptPush1 (CodeSeg* S)
 }
 
 unsigned OptPush2 (CodeSeg* S)
-/* A sequence
-**
-**     jsr     ldaxidx
-**     jsr     pushax
-**
-** may get replaced by
-**
-**     jsr     pushwidx
-*/
+// A sequence
+// 
+// jsr     ldaxidx
+// jsr     pushax
+// 
+// may get replaced by
+// 
+// jsr     pushwidx
 {
     unsigned I;
     unsigned Changes = 0;

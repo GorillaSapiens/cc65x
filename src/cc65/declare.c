@@ -152,9 +152,8 @@ static unsigned ParseOneFuncSpec (void)
 }
 
 static int ParseStorageClass (DeclSpec* Spec)
-/* Parse storage class specifiers. Return true if a specifier is read even if
-** it was duplicated or disallowed.
-*/
+// Parse storage class specifiers. Return true if a specifier is read even if
+// it was duplicated or disallowed.
 {
     // Check the storage class given
     unsigned StorageClass = ParseOneStorageClass ();
@@ -178,9 +177,8 @@ static int ParseStorageClass (DeclSpec* Spec)
 }
 
 static int ParseFuncSpecClass (DeclSpec* Spec)
-/* Parse function specifiers. Return true if a specifier is read even if it
-** was duplicated or disallowed.
-*/
+// Parse function specifiers. Return true if a specifier is read even if it
+// was duplicated or disallowed.
 {
     // Check the function specifiers given
     unsigned FuncSpec = ParseOneFuncSpec ();
@@ -207,9 +205,8 @@ static void DuplicateQualifier (const char* Name)
 }
 
 static TypeCode OptionalQualifiers (TypeCode Qualifiers, TypeCode Allowed)
-/* Read type qualifiers if we have any. Allowed specifies the allowed
-** qualifiers. Return any read qualifiers even if they caused errors.
-*/
+// Read type qualifiers if we have any. Allowed specifies the allowed
+// qualifiers. Return any read qualifiers even if they caused errors.
 {
     // We start without any qualifiers
     TypeCode Q = T_QUAL_NONE;
@@ -340,12 +337,11 @@ Done:
 }
 
 static void OptionalSpecifiers (DeclSpec* Spec, TypeCode* Qualifiers, typespec_t TSFlags)
-/* Read storage specifiers and/or type qualifiers if we have any. Storage class
-** specifiers require the corresponding typespec_t flag set to be allowed, and
-** only const and volatile type qualifiers are allowed under any circumstance.
-** Read storage class specifiers are output in *Spec and type qualifiers are
-** output in *Qualifiers with error checking.
-*/
+// Read storage specifiers and/or type qualifiers if we have any. Storage class
+// specifiers require the corresponding typespec_t flag set to be allowed, and
+// only const and volatile type qualifiers are allowed under any circumstance.
+// Read storage class specifiers are output in *Spec and type qualifiers are
+// output in *Qualifiers with error checking.
 {
     TypeCode Q = T_QUAL_NONE;
     int HasStorageClass;
@@ -406,10 +402,9 @@ static void UseDefaultType (DeclSpec* Spec, typespec_t TSFlags)
 }
 
 static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
-/* Parse a type specifier.  Store whether one of "signed" or "unsigned" was
-** specified, so bit-fields of unspecified signedness can be treated as
-** unsigned; without special handling, it would be treated as signed.
-*/
+// Parse a type specifier.  Store whether one of "signed" or "unsigned" was
+// specified, so bit-fields of unspecified signedness can be treated as
+// unsigned; without special handling, it would be treated as signed.
 {
     ident       Ident;
     SymEntry*   TagEntry;
@@ -628,9 +623,8 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
             Spec->Type[0].C |= T_ENUM;
             SetESUTagSym (Spec->Type, TagEntry);
             Spec->Type[1].C = T_END;
-            /* The signedness of enums is determined by the type, so say this is specified to avoid
-            ** the int -> unsigned int handling for plain int bit-fields in AddBitField.
-            */
+            // The signedness of enums is determined by the type, so say this is specified to avoid
+            // the int -> unsigned int handling for plain int bit-fields in AddBitField.
             Spec->Flags |= DS_EXPLICIT_SIGNEDNESS;
             break;
 
@@ -642,12 +636,11 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
                     // It's a typedef
                     NextToken ();
                     TypeCopy (Spec->Type, TagEntry->Type);
-                    /* If it's a typedef, we should actually use whether the signedness was
-                    ** specified on the typedef, but that information has been lost.  Treat the
-                    ** signedness as being specified to work around the ICE in #1267.
-                    ** Unforunately, this will cause plain int bit-fields defined via typedefs
-                    ** to be treated as signed rather than unsigned.
-                    */
+                    // If it's a typedef, we should actually use whether the signedness was
+                    // specified on the typedef, but that information has been lost.  Treat the
+                    // signedness as being specified to work around the ICE in #1267.
+                    // Unforunately, this will cause plain int bit-fields defined via typedefs
+                    // to be treated as signed rather than unsigned.
                     Spec->Flags |= DS_EXPLICIT_SIGNEDNESS;
                     break;
                 } else if ((TSFlags & TS_MASK_DEFAULT_TYPE) == TS_DEFAULT_TYPE_NONE) {
@@ -658,10 +651,9 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
                     break;
                 }
             } else {
-                /* This is a label. Use the default type flag to end the loop
-                ** in DeclareLocals. The type code used here doesn't matter as
-                ** long as it has no qualifiers.
-                */
+                // This is a label. Use the default type flag to end the loop
+                // in DeclareLocals. The type code used here doesn't matter as
+                // long as it has no qualifiers.
                 UseDefaultType (Spec, TS_DEFAULT_TYPE_INT);
                 break;
             }
@@ -684,9 +676,8 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
 static SymEntry* ForwardESU (const char* Name, unsigned Flags, unsigned* DSFlags)
 // Handle an enum, struct or union forward declaration
 {
-    /* Try to find an enum/struct/union with the given name. If there is none,
-    ** insert a forward declaration into the current lexical level.
-    */
+    // Try to find an enum/struct/union with the given name. If there is none,
+    // insert a forward declaration into the current lexical level.
     SymEntry* TagEntry = FindTagSym (Name);
     if (TagEntry == 0) {
         if ((Flags & SC_TYPEMASK) != SC_ENUM) {
@@ -702,12 +693,11 @@ static SymEntry* ForwardESU (const char* Name, unsigned Flags, unsigned* DSFlags
 }
 
 static const Type* GetEnumeratorType (long Min, unsigned long Max, int Signed)
-/* GitHub #1093 - We use unsigned types to save spaces whenever possible.
-** If both the signed and unsigned integer types of the same minimum size
-** capable of representing all values of the enum, we prefer the unsigned
-** one.
-** Return 0 if impossible to represent Min and Max as the same integer type.
-*/
+// GitHub #1093 - We use unsigned types to save spaces whenever possible.
+// If both the signed and unsigned integer types of the same minimum size
+// capable of representing all values of the enum, we prefer the unsigned
+// one.
+// Return 0 if impossible to represent Min and Max as the same integer type.
 {
     const Type* Underlying = type_int;      // default type
 
@@ -799,9 +789,8 @@ static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
             EnumVal = (long)(((unsigned long)EnumVal + 1UL) & 0xFFFFFFFFUL);
 
             if (GetUnqualRawTypeCode (MemberType) == T_ULONG && EnumVal == 0) {
-                /* Error since the new value cannot be represented in the
-                ** largest unsigned integer type supported by cc65 for enum.
-                */
+                // Error since the new value cannot be represented in the
+                // largest unsigned integer type supported by cc65 for enum.
                 Error ("Enumerator '%s' overflows the range of '%s'",
                        Ident,
                        GetBasicTypeName (type_ulong));
@@ -810,9 +799,8 @@ static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
             IsIncremented = 1;
         }
 
-        /* Track down the min/max values and evaluate the type of EnumVal
-        ** using GetEnumeratorType in a tricky way.
-        */
+        // Track down the min/max values and evaluate the type of EnumVal
+        // using GetEnumeratorType in a tricky way.
         if (!IsSigned || EnumVal >= 0) {
             if ((unsigned long)EnumVal > MaxConstant) {
                 MaxConstant = (unsigned long)EnumVal;
@@ -834,9 +822,8 @@ static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
             NewType = type_int;
         }
 
-        /* Warn if the incremented value exceeds the range of the previous
-        ** type.
-        */
+        // Warn if the incremented value exceeds the range of the previous
+        // type.
         if (PrevErrorCount == ErrorCount    &&
             IsIncremented                   &&
             (!IsSigned || EnumVal >= 0)     &&
@@ -905,9 +892,8 @@ static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
 }
 
 static int ParseFieldWidth (Declarator* D)
-/* Parse an optional field width. Returns -1 if no field width is specified,
-** otherwise the width of the field.
-*/
+// Parse an optional field width. Returns -1 if no field width is specified,
+// otherwise the width of the field.
 {
     ExprDesc Expr;
 
@@ -921,9 +907,8 @@ static int ParseFieldWidth (Declarator* D)
         Error ("Bit-field has invalid type '%s', must be integral",
                GetBasicTypeName (D->Type));
 
-        /* Avoid a diagnostic storm by giving the bit-field the widest valid
-        ** signed type, and continuing to parse.
-        */
+        // Avoid a diagnostic storm by giving the bit-field the widest valid
+        // signed type, and continuing to parse.
         D->Type[0].C = T_LONG;
     }
 
@@ -967,22 +952,19 @@ static int ParseFieldWidth (Declarator* D)
 }
 
 static unsigned PadWithBitField (unsigned StructSize, unsigned BitOffs)
-/* Pad the current struct with an anonymous bit-field aligned to the next byte.
-** Return how many bits are used to pad.
-*/
+// Pad the current struct with an anonymous bit-field aligned to the next byte.
+// Return how many bits are used to pad.
 {
-    /* MSVC complains about unary negation of unsigned,
-    ** so it has been rewritten as subtraction.
-    */
+    // MSVC complains about unary negation of unsigned,
+    // so it has been rewritten as subtraction.
     unsigned PaddingBits = (0 - BitOffs) % CHAR_BITS;
 
     // We need an anonymous name
     ident Ident;
     AnonName (Ident, "bit-field");
 
-    /* Add an anonymous bit-field that aligns to the next
-    ** byte.
-    */
+    // Add an anonymous bit-field that aligns to the next
+    // byte.
     AddBitField (Ident, type_uchar, StructSize, BitOffs, PaddingBits,
                  /*SignednessSpecified=*/1);
 
@@ -990,26 +972,23 @@ static unsigned PadWithBitField (unsigned StructSize, unsigned BitOffs)
 }
 
 static unsigned AliasAnonStructFields (const Declarator* D, SymEntry* Anon)
-/* Create alias fields from an anon union/struct in the current lexical level.
-** The function returns the count of created aliases.
-*/
+// Create alias fields from an anon union/struct in the current lexical level.
+// The function returns the count of created aliases.
 {
     unsigned Count = 0;
     SymEntry* Field;
     SymEntry* Alias;
 
-    /* Get the symbol table containing the fields. If it is empty, there has
-    ** been an error before, so bail out.
-    */
+    // Get the symbol table containing the fields. If it is empty, there has
+    // been an error before, so bail out.
     SymTable* Tab = GetESUTagSym (D->Type)->V.S.SymTab;
     if (Tab == 0) {
         // Incomplete definition - has been flagged before
         return 0;
     }
 
-    /* Get a pointer to the list of symbols. Then walk the list adding copies
-    ** of the embedded struct to the current level.
-    */
+    // Get a pointer to the list of symbols. Then walk the list adding copies
+    // of the embedded struct to the current level.
     Field = Tab->SymHead;
     while (Field) {
 
@@ -1021,9 +1000,8 @@ static unsigned AliasAnonStructFields (const Declarator* D, SymEntry* Anon)
             ++Count;
         }
 
-        /* Currently, there can not be any attributes, but if there will be
-        ** some in the future, we want to know this.
-        */
+        // Currently, there can not be any attributes, but if there will be
+        // some in the future, we want to know this.
         CHECK (Field->Attr == 0);
 
         // Next entry
@@ -1127,9 +1105,8 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
             // Check for fields without names
             if (Decl.Ident[0] == '\0') {
                 if (FieldWidth < 0) {
-                    /* In cc65 mode, we allow anonymous structs/unions within
-                    ** a union.
-                    */
+                    // In cc65 mode, we allow anonymous structs/unions within
+                    // a union.
                     AnonFieldName (Decl.Ident, GetBasicTypeName (Decl.Type), UnionTagEntry->V.S.ACount);
 
                     // Ignore CVR qualifiers
@@ -1165,9 +1142,8 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
 
             // Add a field entry to the table
             if (FieldWidth > 0) {
-                /* For a union, allocate space for the type specified by the
-                ** bit-field.
-                */
+                // For a union, allocate space for the type specified by the
+                // bit-field.
                 AddBitField (Decl.Ident, Decl.Type, 0, 0, FieldWidth,
                              (Spec.Flags & DS_EXPLICIT_SIGNEDNESS) != 0);
             } else if (Decl.Ident[0] != '\0') {
@@ -1321,9 +1297,8 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
 
             Declarator Decl;
 
-            /* If we had a flexible array member before, no other fields can
-            ** follow.
-            */
+            // If we had a flexible array member before, no other fields can
+            // follow.
             if (FlexibleMember) {
                 Error ("Flexible array member must be last field");
                 FlexibleMember = 0;     // Avoid further errors
@@ -1340,17 +1315,15 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
             // Check for a bit-field declaration
             FieldWidth = ParseFieldWidth (&Decl);
 
-            /* If this is not a bit field, or the bit field is too large for
-            ** the remainder of the allocated unit, or we have a bit field
-            ** with width zero, align the struct to the next member by adding
-            ** a member with an anonymous name.
-            */
+            // If this is not a bit field, or the bit field is too large for
+            // the remainder of the allocated unit, or we have a bit field
+            // with width zero, align the struct to the next member by adding
+            // a member with an anonymous name.
             if (BitOffs > 0) {
                 if (FieldWidth <= 0 ||
                     (BitOffs + FieldWidth) > CHAR_BITS * SizeOf (Decl.Type)) {
-                    /* Add an anonymous bit-field that aligns to the next
-                    ** byte.
-                    */
+                    // Add an anonymous bit-field that aligns to the next
+                    // byte.
                     unsigned PaddingBits = PadWithBitField (StructSize, BitOffs);
 
                     // No bits left
@@ -1362,9 +1335,8 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
             // Check for fields without names
             if (Decl.Ident[0] == '\0') {
                 if (FieldWidth < 0) {
-                    /* In cc65 mode, we allow anonymous structs/unions within
-                    ** a struct.
-                    */
+                    // In cc65 mode, we allow anonymous structs/unions within
+                    // a struct.
                     AnonFieldName (Decl.Ident, GetBasicTypeName (Decl.Type), StructTagEntry->V.S.ACount);
 
                     // Ignore CVR qualifiers
@@ -1377,9 +1349,8 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
                     AnonName (Decl.Ident, "bit-field");
                 }
             } else {
-                /* Check if this field is a flexible array member, and
-                ** calculate the size of the field.
-                */
+                // Check if this field is a flexible array member, and
+                // calculate the size of the field.
                 if (IsTypeArray (Decl.Type) && GetElementCount (Decl.Type) == UNSPECIFIED) {
                     // Array with unspecified size
                     if (StructSize == 0) {
@@ -1404,20 +1375,18 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
                 Flags |= SC_HAVECONST;
             }
 
-            /* Apart from the above, a bit field with width 0 is not processed
-            ** further.
-            */
+            // Apart from the above, a bit field with width 0 is not processed
+            // further.
             if (FieldWidth == 0) {
                 goto NextMember;
             }
 
             // Add a field entry to the table
             if (FieldWidth > 0) {
-                /* Full bytes have already been added to the StructSize,
-                ** which is passed to the offset of AddBitField.  BitOffs
-                ** is always within a char, which simplifies handling the
-                ** bit-field as a char type in expressions.
-                */
+                // Full bytes have already been added to the StructSize,
+                // which is passed to the offset of AddBitField.  BitOffs
+                // is always within a char, which simplifies handling the
+                // bit-field as a char type in expressions.
                 CHECK (BitOffs < CHAR_BITS);
                 AddBitField (Decl.Ident, Decl.Type, StructSize, BitOffs, FieldWidth,
                              (Spec.Flags & DS_EXPLICIT_SIGNEDNESS) != 0);
@@ -1525,10 +1494,9 @@ static void NeedTypeSpace (Declarator* D, unsigned Count)
 // Check if there is enough space for Count type specifiers within D
 {
     if (D->Index + Count >= MAXTYPELEN) {
-        /* We must call Fatal() here, since calling Error() will try to
-        ** continue, and the declaration type is not correctly terminated
-        ** in case we come here.
-        */
+        // We must call Fatal() here, since calling Error() will try to
+        // continue, and the declaration type is not correctly terminated
+        // in case we come here.
         Fatal ("Too many type specifiers");
     }
 }
@@ -1546,10 +1514,9 @@ static void FixQualifiers (Type* DataType)
     Type*    T;
     TypeCode Q;
 
-    /* Using typedefs, it is possible to generate declarations that have
-    ** type qualifiers attached to an array, not the element type. Go and
-    ** fix these here.
-    */
+    // Using typedefs, it is possible to generate declarations that have
+    // type qualifiers attached to an array, not the element type. Go and
+    // fix these here.
     T = DataType;
     Q = T_QUAL_NONE;
     while (T->C != T_END) {
@@ -1603,9 +1570,8 @@ static void FixQualifiers (Type* DataType)
             if (Q == T_QUAL_NONE) {
                 // No address size qualifiers specified
                 if (IsTypeFunc (T+1)) {
-                    /* Pointer to function. Use the qualifier from the function,
-                    ** or the default if the function doesn't have one.
-                    */
+                    // Pointer to function. Use the qualifier from the function,
+                    // or the default if the function doesn't have one.
                     Q = (T[1].C & T_QUAL_ADDRSIZE);
                     if (Q == T_QUAL_NONE) {
                         Q = CodeAddrSizeQualifier ();
@@ -1615,9 +1581,8 @@ static void FixQualifiers (Type* DataType)
                 }
                 T[0].C |= Q;
             } else {
-                /* We have address size qualifiers. If followed by a function,
-                ** apply them to the function also.
-                */
+                // We have address size qualifiers. If followed by a function,
+                // apply them to the function also.
                 if (IsTypeFunc (T+1)) {
                     TypeCode FQ = (T[1].C & T_QUAL_ADDRSIZE);
                     if (FQ == T_QUAL_NONE) {
@@ -1667,9 +1632,8 @@ static void FixQualifiers (Type* DataType)
 }
 
 static void FixFunctionReturnType (Type* T)
-/* Check if the data type consists of any functions returning forbidden return
-** types and remove qualifiers from the return types if they are not void.
-*/
+// Check if the data type consists of any functions returning forbidden return
+// types and remove qualifiers from the return types if they are not void.
 {
     while (T->C != T_END) {
         if (IsTypeFunc (T)) {
@@ -1705,9 +1669,8 @@ static void CheckArrayElementType (const Type* T)
 {
     while (T->C != T_END) {
         if (IsTypeArray (T)) {
-            /* If the array is multi-dimensional, keep going until we get the
-            ** true element type.
-            */
+            // If the array is multi-dimensional, keep going until we get the
+            // true element type.
             ++T;
             if (SizeOf (T) == 0) {
                 if (IsTypeArray (T) || IsIncompleteESUType (T)) {
@@ -1797,9 +1760,8 @@ static void ParseOldStyleParamDeclList (FuncDesc* F attribute ((unused)))
         // Read the declaration specifier
         ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_NONE, SC_AUTO);
 
-        /* We accept only auto and register as storage class specifiers, but
-        ** we ignore all this, since we use auto anyway.
-        */
+        // We accept only auto and register as storage class specifiers, but
+        // we ignore all this, since we use auto anyway.
         if ((Spec.StorageClass & SC_STORAGEMASK) != SC_AUTO &&
             (Spec.StorageClass & SC_STORAGEMASK) != SC_REGISTER) {
             Error ("Illegal storage class");
@@ -1839,9 +1801,8 @@ static void ParseOldStyleParamDeclList (FuncDesc* F attribute ((unused)))
                 SymEntry* Param = FindLocalSym (Decl.Ident);
 
                 if (Param) {
-                    /* Check if we already changed the type for this
-                    ** parameter.
-                    */
+                    // Check if we already changed the type for this
+                    // parameter.
                     if (Param->Flags & SC_DEFTYPE) {
                         // Found it, change the default type to the one given
                         SymChangeType (Param, PtrConversion (Decl.Type));
@@ -1935,15 +1896,13 @@ static void ParseAnsiParamList (FuncDesc* F)
                      GetFullTypeName (Spec.Type));
         }
 
-        /* Allow parameters without a name, but remember if we had some to
-        ** eventually print an error message later.
-        */
+        // Allow parameters without a name, but remember if we had some to
+        // eventually print an error message later.
         ParseDecl (&Spec, &Decl, DM_ACCEPT_PARAM_IDENT);
         if (Decl.Ident[0] == '\0') {
 
-            /* Unnamed symbol. Generate a name that is not user accessible,
-            ** then handle the symbol normal.
-            */
+            // Unnamed symbol. Generate a name that is not user accessible,
+            // then handle the symbol normal.
             AnonName (Decl.Ident, "param");
             F->Flags |= FD_UNNAMED_PARAMS;
 
@@ -2005,11 +1964,10 @@ static void ParseFuncDecl (Declarator* D, declmode_t Mode, TypeCode Qualifiers)
     } else if (Mode != DM_NO_IDENT &&
                CurTok.Tok == TOK_IDENT &&
                (NextTok.Tok == TOK_COMMA || NextTok.Tok == TOK_RPAREN)) {
-        /* If the identifier is a typedef, we have a new-style parameter list;
-        ** if it's some other identifier, it's an old-style parameter list.
-        ** Note: Non-empty Old-style (K&R) parameter list is not allowed in
-        ** type names.
-        */
+        // If the identifier is a typedef, we have a new-style parameter list;
+        // if it's some other identifier, it's an old-style parameter list.
+        // Note: Non-empty Old-style (K&R) parameter list is not allowed in
+        // type names.
         SymEntry* Sym = FindSym (CurTok.Ident);
         if (Sym == 0 || !SymIsTypeDef (Sym)) {
             // Old-style (K&R) function
@@ -2038,19 +1996,17 @@ static void ParseFuncDecl (Declarator* D, declmode_t Mode, TypeCode Qualifiers)
 
     PopLexicalLevel ();
 
-    /* Remember the last function parameter. We need it later for several
-    ** purposes, for example when passing stuff to fastcall functions. Since
-    ** more symbols are added to the table, it is easier if we remember it
-    ** now, since it is currently the last entry in the symbol table.
-    */
+    // Remember the last function parameter. We need it later for several
+    // purposes, for example when passing stuff to fastcall functions. Since
+    // more symbols are added to the table, it is easier if we remember it
+    // now, since it is currently the last entry in the symbol table.
     F->LastParam = GetSymTab ()->SymTail;
 
     // Leave the lexical level remembering the symbol tables
     RememberFunctionLevel (F);
 
-    /* It is allowed to use incomplete types in function prototypes, so we
-    ** won't always get to know the parameter sizes here and may do that later.
-    */
+    // It is allowed to use incomplete types in function prototypes, so we
+    // won't always get to know the parameter sizes here and may do that later.
     F->Flags |= FD_INCOMPLETE_PARAM;
 
     // We cannot specify fastcall for variadic functions
@@ -2069,9 +2025,8 @@ static void ParseFuncDecl (Declarator* D, declmode_t Mode, TypeCode Qualifiers)
 static void DirectDecl (DeclSpec* Spec, Declarator* D, TypeCode* RemQ, declmode_t Mode)
 // Recursively process direct declarators. Build a type array in reverse order.
 {
-    /* Read optional function or pointer qualifiers that modify the identifier
-    ** or token to the right.
-    */
+    // Read optional function or pointer qualifiers that modify the identifier
+    // or token to the right.
     TypeCode Qualifiers = *RemQ | OptionalQualifiers (*RemQ, T_QUAL_ADDRSIZE | T_QUAL_CCONV);
 
     // Pointer to something
@@ -2090,11 +2045,10 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, TypeCode* RemQ, declmode_
         // Allow const, restrict, and volatile qualifiers
         Q |= OptionalQualifiers (Qualifiers, T_QUAL_CVR);
 
-        /* For convenience, we allow a calling convention also for pointers
-        ** here. If it's a pointer-to-function, the qualifier later will be
-        ** transfered to the function itself. If it's a pointer to something
-        ** else, it will be flagged as an error.
-        */
+        // For convenience, we allow a calling convention also for pointers
+        // here. If it's a pointer-to-function, the qualifier later will be
+        // transfered to the function itself. If it's a pointer to something
+        // else, it will be flagged as an error.
         *RemQ = T_QUAL_NONE;
 
         // Parse the type that derives from the pointer
@@ -2103,9 +2057,8 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, TypeCode* RemQ, declmode_
         // Add the type
         AddTypeCodeToDeclarator (D, T_PTR | Q | *RemQ);
 
-        /* Return the calling convention and address size specifiers on the
-        ** pointee type.
-        */
+        // Return the calling convention and address size specifiers on the
+        // pointee type.
         *RemQ = Qualifiers;
         return;
     }
@@ -2114,9 +2067,8 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, TypeCode* RemQ, declmode_
         int       Nested = 0;
         SymEntry* Entry;
 
-        /* An empty declaration cannot contain parentheses where an identifier
-        ** would show up if it were a non-empty declaration.
-        */
+        // An empty declaration cannot contain parentheses where an identifier
+        // would show up if it were a non-empty declaration.
         if (Mode == DM_IDENT_OR_EMPTY) {
             Spec->Flags |= DS_NO_EMPTY_DECL;
         }
@@ -2124,10 +2076,9 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, TypeCode* RemQ, declmode_
         // Skip the opening paren
         NextToken ();
 
-        /* We have to disambiguate the meanings of 'type (identifier' when
-        ** the identifier can be a typedef'ed parameter type specifier or
-        ** a declarator enclosed in parentheses in some cases.
-        */
+        // We have to disambiguate the meanings of 'type (identifier' when
+        // the identifier can be a typedef'ed parameter type specifier or
+        // a declarator enclosed in parentheses in some cases.
         if (Mode == DM_IDENT_OR_EMPTY ||                // If we are in a declaration...
             CurTok.Tok == TOK_LPAREN  ||                // or the next token is one more paren...
             CurTok.Tok == TOK_STAR    ||                // or a '*' ...
@@ -2284,20 +2235,18 @@ Type* ParseType (Type* T)
 }
 
 int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
-/* Parse a variable, type or function declarator. Return -1 if this stops at
-** an unpaired right parenthesis/bracket/curly brace. Return 0 if this stops
-** after consuming a semicolon or closing curly brace, or reaching an EOF.
-** Return 1 otherwise.
-*/
+// Parse a variable, type or function declarator. Return -1 if this stops at
+// an unpaired right parenthesis/bracket/curly brace. Return 0 if this stops
+// after consuming a semicolon or closing curly brace, or reaching an EOF.
+// Return 1 otherwise.
 {
     TypeCode Q = T_QUAL_NONE;
 
     // Used to check if we have any errors during parsing this
     unsigned PrevErrorCount = ErrorCount;
 
-    /* If there is no explicit type specifier, an optional identifier becomes
-    ** required.
-    */
+    // If there is no explicit type specifier, an optional identifier becomes
+    // required.
     if (Mode == DM_IDENT_OR_EMPTY &&
         (Spec->Flags & DS_TYPE_MASK) == DS_DEF_TYPE) {
         Spec->Flags |= DS_NO_EMPTY_DECL;
@@ -2327,9 +2276,8 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
     // Do several fixes on qualifiers
     FixQualifiers (D->Type);
 
-    /* Check if the data type consists of any functions returning forbidden return
-    ** types and remove qualifiers from the return types if they are not void.
-    */
+    // Check if the data type consists of any functions returning forbidden return
+    // types and remove qualifiers from the return types if they are not void.
     FixFunctionReturnType (D->Type);
 
     // Check recursively if the data type consists of arrays of forbidden types
@@ -2342,9 +2290,8 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
     if (D->Ident[0] != '\0') {
         // Check a few pre-C99 things
         if ((Spec->Flags & DS_TYPE_MASK) == DS_DEF_TYPE && IsRankInt (Spec->Type)) {
-            /* If the standard was not set explicitly to C89, print a warning
-            ** for typedefs with implicit int type specifier.
-            */
+            // If the standard was not set explicitly to C89, print a warning
+            // for typedefs with implicit int type specifier.
             if (IS_Get (&Standard) >= STD_C99) {
                 if ((D->StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
                     Warning ("Implicit 'int' type specifier is an obsolete feature");
@@ -2373,9 +2320,8 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
 
                 // Check return type
                 if (GetUnqualRawTypeCode (GetFuncReturnType (D->Type)) != T_INT) {
-                    /* If cc65 extensions aren't enabled, don't allow a main function
-                    ** that doesn't return an int.
-                    */
+                    // If cc65 extensions aren't enabled, don't allow a main function
+                    // that doesn't return an int.
                     if (IS_Get (&Standard) != STD_CC65) {
                         Error ("'main' must always return an int");
                     }
@@ -2443,9 +2389,8 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
         if (Mode == DM_NO_IDENT) {
             return SimpleErrorSkip ();
         } else if (CurTok.Tok != TOK_LCURLY || !IsTypeFunc (D->Type)) {
-            /* Skip to the end of the whole declaration if it is not part of a
-            ** parameter list.
-            */
+            // Skip to the end of the whole declaration if it is not part of a
+            // parameter list.
             return SmartErrorSkip (Mode == DM_IDENT_OR_EMPTY);
         }
     }
@@ -2473,10 +2418,9 @@ void ParseDeclSpec (DeclSpec* Spec, typespec_t TSFlags, unsigned DefStorage)
 }
 
 void CheckEmptyDecl (const DeclSpec* Spec)
-/* Called after an empty type declaration (that is, a type declaration without
-** a variable). Checks if the declaration does really make sense and issues a
-** warning if not.
-*/
+// Called after an empty type declaration (that is, a type declaration without
+// a variable). Checks if the declaration does really make sense and issues a
+// warning if not.
 {
     if ((Spec->StorageClass & SC_INLINE) == SC_INLINE) {
         Error ("'inline' on empty declaration");
@@ -2486,15 +2430,13 @@ void CheckEmptyDecl (const DeclSpec* Spec)
         // Empty declaration of basic types
         Warning ("Useless declaration");
     } else if (IsAnonStructClass (Spec->Type)) {
-        /* This could be that the user made a wrong attempt to declare an
-        ** anonymous struct/union field outside a struct/union.
-        */
+        // This could be that the user made a wrong attempt to declare an
+        // anonymous struct/union field outside a struct/union.
         Warning ("Unnamed %s that defines no instances", GetBasicTypeName (Spec->Type));
     } else if (GetLexicalLevel () == LEX_LEVEL_STRUCT) {
-        /* This could be that the user made a wrong attempt to declare an
-        ** anonymous struct/union field inside a struct/union. Perhaps just
-        ** paranoid since it is not so uncommon to do forward declarations.
-        */
+        // This could be that the user made a wrong attempt to declare an
+        // anonymous struct/union field inside a struct/union. Perhaps just
+        // paranoid since it is not so uncommon to do forward declarations.
         if (!IsTypeEnum (Spec->Type) || ((Spec->Flags & DS_NEW_TYPE_DEF) == 0)) {
             Warning ("Declaration defines no instances");
         }

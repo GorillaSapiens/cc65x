@@ -58,16 +58,14 @@ static int MemAccess (CodeSeg* S, unsigned From, unsigned To, const CodeEntry* N
         Word    = 0x02,         // Check for location with "+1" added
     } What = None;
 
-    /* If the argument of N is a zero page location that ends with "+1", we
-    ** must also check for word accesses to the location without +1.
-    */
+    // If the argument of N is a zero page location that ends with "+1", we
+    // must also check for word accesses to the location without +1.
     if (N->AM == AM65_ZP && NLen > 2 && strcmp (N->Arg + NLen - 2, "+1") == 0) {
         What |= Base;
     }
 
-    /* If the argument is zero page indirect, we must also check for accesses
-    ** to "arg+1"
-    */
+    // If the argument is zero page indirect, we must also check for accesses
+    // to "arg+1"
     if (N->AM == AM65_ZP_INDY || N->AM == AM65_ZPX_IND || N->AM == AM65_ZP_IND) {
         What |= Word;
     }
@@ -78,9 +76,8 @@ static int MemAccess (CodeSeg* S, unsigned From, unsigned To, const CodeEntry* N
         // Get the next entry
         CodeEntry* E = CS_GetEntry (S, From);
 
-        /* Check if there is an argument and if this argument equals Arg in
-        ** some variants.
-        */
+        // Check if there is an argument and if this argument equals Arg in
+        // some variants.
         if (E->Arg[0] != '\0') {
 
             unsigned ELen;
@@ -138,9 +135,8 @@ static short ZPRegVal (unsigned short Use, const RegContents* RC)
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptUnusedLoads (CodeSeg* S)
-/* Remove loads of or operations with registers where the value loaded or
-** produced is not used later.
-*/
+// Remove loads of or operations with registers where the value loaded or
+// produced is not used later.
 {
     unsigned Changes = 0;
 
@@ -224,9 +220,8 @@ unsigned OptUnusedStores (CodeSeg* S)
             E->AM == AM65_ZP             &&
             (E->Chg & REG_ZP) != 0) {
 
-            /* Check for the zero page location. We know that there cannot be
-            ** more than one zero page location involved in the store.
-            */
+            // Check for the zero page location. We know that there cannot be
+            // more than one zero page location involved in the store.
             unsigned R = E->Chg & REG_ZP;
 
             // Get register usage and check if the register value is used later
@@ -275,9 +270,8 @@ unsigned OptLoad3 (CodeSeg* S)
 
             CodeEntry* N;
 
-            /* If we had a preceeding load that is identical, remove this one.
-            ** If it is not identical, or we didn't have one, remember it.
-            */
+            // If we had a preceeding load that is identical, remove this one.
+            // If it is not identical, or we didn't have one, remember it.
             if (Load != 0                               &&
                 E->OPC == Load->OPC                     &&
                 E->AM == Load->AM                       &&
@@ -367,10 +361,9 @@ unsigned OptDupLoads (CodeSeg* S)
                 break;
 
             case OP65_STA:
-                /* If we store into a known zero page location, and this
-                ** location does already contain the value to be stored,
-                ** remove the store.
-                */
+                // If we store into a known zero page location, and this
+                // location does already contain the value to be stored,
+                // remove the store.
                 if (RegValIsKnown (In->RegA)          && // Value of A is known
                     E->AM == AM65_ZP                  && // Store into zp
                     In->RegA == ZPRegVal (E->Chg, In)) { // Value identical
@@ -380,22 +373,20 @@ unsigned OptDupLoads (CodeSeg* S)
                 break;
 
             case OP65_STX:
-                /* If we store into a known zero page location, and this
-                ** location does already contain the value to be stored,
-                ** remove the store.
-                */
+                // If we store into a known zero page location, and this
+                // location does already contain the value to be stored,
+                // remove the store.
                 if (RegValIsKnown (In->RegX)          && // Value of A is known
                     E->AM == AM65_ZP                  && // Store into zp
                     In->RegX == ZPRegVal (E->Chg, In)) { // Value identical
 
                     Delete = 1;
 
-                /* If the value in the X register is known and the same as
-                ** that in the A register, replace the store by a STA. The
-                ** optimizer will then remove the load instruction for X
-                ** later. STX does support the zeropage,y addressing mode,
-                ** so be sure to check for that.
-                */
+                // If the value in the X register is known and the same as
+                // that in the A register, replace the store by a STA. The
+                // optimizer will then remove the load instruction for X
+                // later. STX does support the zeropage,y addressing mode,
+                // so be sure to check for that.
                 } else if (RegValIsKnown (In->RegX)   &&
                            In->RegX == In->RegA       &&
                            E->AM != AM65_ABSY         &&
@@ -406,23 +397,21 @@ unsigned OptDupLoads (CodeSeg* S)
                 break;
 
             case OP65_STY:
-                /* If we store into a known zero page location, and this
-                ** location does already contain the value to be stored,
-                ** remove the store.
-                */
+                // If we store into a known zero page location, and this
+                // location does already contain the value to be stored,
+                // remove the store.
                 if (RegValIsKnown (In->RegY)          && // Value of Y is known
                     E->AM == AM65_ZP                  && // Store into zp
                     In->RegY == ZPRegVal (E->Chg, In)) { // Value identical
 
                     Delete = 1;
 
-                /* If the value in the Y register is known and the same as
-                ** that in the A register, replace the store by a STA. The
-                ** optimizer will then remove the load instruction for Y
-                ** later. If replacement by A is not possible try a
-                ** replacement by X, but check for invalid addressing modes
-                ** in this case.
-                */
+                // If the value in the Y register is known and the same as
+                // that in the A register, replace the store by a STA. The
+                // optimizer will then remove the load instruction for Y
+                // later. If replacement by A is not possible try a
+                // replacement by X, but check for invalid addressing modes
+                // in this case.
                 } else if (RegValIsKnown (In->RegY)) {
                     if (In->RegY == In->RegA) {
                         NewOPC = OP65_STA;
@@ -435,10 +424,9 @@ unsigned OptDupLoads (CodeSeg* S)
                 break;
 
             case OP65_STZ:
-                /* If we store into a known zero page location, and this
-                ** location does already contain the value to be stored,
-                ** remove the store.
-                */
+                // If we store into a known zero page location, and this
+                // location does already contain the value to be stored,
+                // remove the store.
                 if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0 && E->AM == AM65_ZP) {
                     if (ZPRegVal (E->Chg, In) == 0) {
                         Delete = 1;
@@ -536,9 +524,8 @@ unsigned OptStoreLoad (CodeSeg* S)
         // Get next entry
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check if it is a store instruction followed by a load from the
-        ** same address which is itself not followed by a conditional branch.
-        */
+        // Check if it is a store instruction followed by a load from the
+        // same address which is itself not followed by a conditional branch.
         if ((E->Info & OF_STORE) != 0                       &&
             (N = CS_GetNextEntry (S, I)) != 0               &&
             !CE_HasLabel (N)                                &&
@@ -581,9 +568,8 @@ unsigned OptLoadStore1 (CodeSeg* S)
         // Get next entry
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check if it is a load instruction followed by a store into the
-        ** same address.
-        */
+        // Check if it is a load instruction followed by a store into the
+        // same address.
         if ((E->Info & OF_LOAD) != 0                        &&
             (N = CS_GetNextEntry (S, I)) != 0               &&
             !CE_HasLabel (N)                                &&
@@ -609,14 +595,13 @@ unsigned OptLoadStore1 (CodeSeg* S)
 }
 
 unsigned OptLoadStoreLoad (CodeSeg* S)
-/* Search for the sequence
-**
-**      ld.     xx
-**      st.     yy
-**      ld.     xx
-**
-** and remove the useless load.
-*/
+// Search for the sequence
+// 
+// ld.     xx
+// st.     yy
+// ld.     xx
+// 
+// and remove the useless load.
 {
     unsigned Changes = 0;
 
@@ -688,10 +673,9 @@ unsigned OptTransfers1 (CodeSeg* S)
                 (E->OPC == OP65_TXA && N->OPC == OP65_TAX && !RegAUsed (S, I+2)) ||
                 (E->OPC == OP65_TYA && N->OPC == OP65_TAY && !RegAUsed (S, I+2))) {
 
-                /* If the next insn is a conditional branch, check if the insn
-                ** preceeding the first xfr will set the flags right, otherwise we
-                ** may not remove the sequence.
-                */
+                // If the next insn is a conditional branch, check if the insn
+                // preceeding the first xfr will set the flags right, otherwise we
+                // may not remove the sequence.
                 if ((X = CS_GetNextEntry (S, I+1)) == 0) {
                     goto NextEntry;
                 }
@@ -727,9 +711,8 @@ NextEntry:
 }
 
 unsigned OptTransfers2 (CodeSeg* S)
-/* Replace loads followed by a register transfer by a load with the second
-** register if possible.
-*/
+// Replace loads followed by a register transfer by a load with the second
+// register if possible.
 {
     unsigned Changes = 0;
 
@@ -742,9 +725,8 @@ unsigned OptTransfers2 (CodeSeg* S)
         // Get next entry
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check if we have a load followed by a transfer where the loaded
-        ** register is not used later.
-        */
+        // Check if we have a load followed by a transfer where the loaded
+        // register is not used later.
         if ((E->Info & OF_LOAD) != 0                &&
             (N = CS_GetNextEntry (S, I)) != 0       &&
             !CE_HasLabel (N)                        &&
@@ -776,9 +758,8 @@ unsigned OptTransfers2 (CodeSeg* S)
                 // LDY/TYA. LDA supports all addressing modes LDY does
                 X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, 0, N->LI);
             } else if (E->OPC == OP65_LDX && N->OPC == OP65_TXA) {
-                /* LDX/TXA. LDA doesn't support zp,y, so we must map it to
-                ** abs,y instead.
-                */
+                // LDX/TXA. LDA doesn't support zp,y, so we must map it to
+                // abs,y instead.
                 am_t AM = (E->AM == AM65_ZPY)? AM65_ABSY : E->AM;
                 X = NewCodeEntry (OP65_LDA, AM, E->Arg, 0, N->LI);
             }
@@ -801,9 +782,8 @@ unsigned OptTransfers2 (CodeSeg* S)
 }
 
 unsigned OptTransfers3 (CodeSeg* S)
-/* Replace a register transfer followed by a store of the second register by a
-** store of the first register if this is possible.
-*/
+// Replace a register transfer followed by a store of the second register by a
+// store of the first register if this is possible.
 {
     unsigned Changes      = 0;
     unsigned UsedRegs     = REG_NONE;   // Track used registers
@@ -819,9 +799,8 @@ unsigned OptTransfers3 (CodeSeg* S)
         FoundStore
     } State = Initialize;
 
-    /* Walk over the entries. Look for a xfer instruction that is followed by
-    ** a store later, where the value of the register is not used later.
-    */
+    // Walk over the entries. Look for a xfer instruction that is followed by
+    // a store later, where the value of the register is not used later.
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
@@ -845,9 +824,8 @@ unsigned OptTransfers3 (CodeSeg* S)
                 break;
 
             case FoundXfer:
-                /* If we find a conditional jump, abort the sequence, since
-                ** handling them makes things really complicated.
-                */
+                // If we find a conditional jump, abort the sequence, since
+                // handling them makes things really complicated.
                 if (E->Info & OF_CBRA) {
 
                     // Switch back to searching
@@ -857,9 +835,8 @@ unsigned OptTransfers3 (CodeSeg* S)
                 // Does this insn use the target register of the transfer?
                 } else if ((E->Use & XferEntry->Chg) != 0) {
 
-                    /* It it's a store instruction, and the block is a basic
-                    ** block, proceed. Otherwise restart
-                    */
+                    // It it's a store instruction, and the block is a basic
+                    // block, proceed. Otherwise restart
                     if ((E->Info & OF_STORE) != 0       &&
                         CS_IsBasicBlock (S, Xfer, I)) {
                         Store = I;
@@ -873,10 +850,9 @@ unsigned OptTransfers3 (CodeSeg* S)
                 // Does this insn change the target register of the transfer?
                 } else if (E->Chg & XferEntry->Chg & ~PSTATE_ZN) {
 
-                    /* We *may* add code here to remove the transfer, but I'm
-                    ** currently not sure about the consequences, so I won't
-                    ** do that and bail out instead.
-                    */
+                    // We *may* add code here to remove the transfer, but I'm
+                    // currently not sure about the consequences, so I won't
+                    // do that and bail out instead.
                     I = Xfer;
                     State = Initialize;
 
@@ -894,10 +870,9 @@ unsigned OptTransfers3 (CodeSeg* S)
                 break;
 
             case FoundStore:
-                /* We are at the instruction behind the store. If the register
-                ** isn't used later, and we have an address mode match, we can
-                ** replace the transfer by a store and remove the store here.
-                */
+                // We are at the instruction behind the store. If the register
+                // isn't used later, and we have an address mode match, we can
+                // replace the transfer by a store and remove the store here.
                 if ((GetRegInfo (S, I, XferEntry->Chg & REG_ALL) &
                     XferEntry->Chg & REG_ALL) == 0                              &&
                     (StoreEntry->AM == AM65_ABS ||
@@ -984,9 +959,8 @@ unsigned OptTransfers3 (CodeSeg* S)
 }
 
 unsigned OptTransfers4 (CodeSeg* S)
-/* Replace a load of a register followed by a transfer insn of the same register
-** by a load of the second register if possible.
-*/
+// Replace a load of a register followed by a transfer insn of the same register
+// by a load of the second register if possible.
 {
     unsigned Changes      = 0;
     unsigned Load         = 0;  // Index of load insn
@@ -1000,9 +974,8 @@ unsigned OptTransfers4 (CodeSeg* S)
         FoundXfer
     } State = Search;
 
-    /* Walk over the entries. Look for a load instruction that is followed by
-    ** a load later.
-    */
+    // Walk over the entries. Look for a load instruction that is followed by
+    // a load later.
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
@@ -1021,9 +994,8 @@ unsigned OptTransfers4 (CodeSeg* S)
                 break;
 
             case FoundLoad:
-                /* If we find a conditional jump, abort the sequence, since
-                ** handling them makes things really complicated.
-                */
+                // If we find a conditional jump, abort the sequence, since
+                // handling them makes things really complicated.
                 if (E->Info & OF_CBRA) {
 
                     // Switch back to searching
@@ -1033,9 +1005,8 @@ unsigned OptTransfers4 (CodeSeg* S)
                 // Does this insn use the target register of the load?
                 } else if ((E->Use & LoadEntry->Chg) != 0) {
 
-                    /* It it's a xfer instruction, and the block is a basic
-                    ** block, proceed. Otherwise restart
-                    */
+                    // It it's a xfer instruction, and the block is a basic
+                    // block, proceed. Otherwise restart
                     if ((E->Info & OF_XFR) != 0       &&
                         CS_IsBasicBlock (S, Load, I)) {
                         Xfer = I;
@@ -1049,20 +1020,18 @@ unsigned OptTransfers4 (CodeSeg* S)
                 // Does this insn change the target register of the load?
                 } else if (E->Chg & LoadEntry->Chg & ~PSTATE_ZN) {
 
-                    /* We *may* add code here to remove the load, but I'm
-                    ** currently not sure about the consequences, so I won't
-                    ** do that and bail out instead.
-                    */
+                    // We *may* add code here to remove the load, but I'm
+                    // currently not sure about the consequences, so I won't
+                    // do that and bail out instead.
                     I = Load;
                     State = Search;
                 }
                 break;
 
             case FoundXfer:
-                /* We are at the instruction behind the xfer. If the register
-                ** isn't used later, and we have an address mode match, we can
-                ** replace the transfer by a load and remove the initial load.
-                */
+                // We are at the instruction behind the xfer. If the register
+                // isn't used later, and we have an address mode match, we can
+                // replace the transfer by a load and remove the initial load.
                 if ((GetRegInfo (S, I, LoadEntry->Chg & REG_ALL) &
                     LoadEntry->Chg & REG_ALL) == 0                              &&
                     (LoadEntry->AM == AM65_ABS ||
@@ -1153,15 +1122,14 @@ unsigned OptPushPop1 (CodeSeg* S)
         FoundPop
     } State = Searching;
 
-    /* Walk over the entries. Look for a push instruction that is followed by
-    ** a pop later, where the pop is not followed by an conditional branch,
-    ** and where the value of the A register is not used later on.
-    ** Look out for the following problems:
-    **
-    **  - There may be another PHA/PLA inside the sequence: Restart it.
-    **  - If the PLA has a label, all jumps to this label must be inside
-    **    the sequence, otherwise we cannot remove the PHA/PLA.
-    */
+    // Walk over the entries. Look for a push instruction that is followed by
+    // a pop later, where the pop is not followed by an conditional branch,
+    // and where the value of the A register is not used later on.
+    // Look out for the following problems:
+    // 
+    // - There may be another PHA/PLA inside the sequence: Restart it.
+    // - If the PLA has a label, all jumps to this label must be inside
+    // the sequence, otherwise we cannot remove the PHA/PLA.
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
@@ -1190,9 +1158,8 @@ unsigned OptPushPop1 (CodeSeg* S)
                 } else if (E->OPC == OP65_PLA) {
                     // Found a matching pop
                     Pop = I;
-                    /* Check that the block between Push and Pop is a basic
-                    ** block (one entry, one exit). Otherwise ignore it.
-                    */
+                    // Check that the block between Push and Pop is a basic
+                    // block (one entry, one exit). Otherwise ignore it.
                     if (CS_IsBasicBlock (S, Push, Pop)) {
                         State = FoundPop;
                     } else {
@@ -1205,17 +1172,16 @@ unsigned OptPushPop1 (CodeSeg* S)
                 break;
 
             case FoundPop:
-                /* We're at the instruction after the PLA.
-                ** Check for the following conditions:
-                **   - If this instruction is a store of A that doesn't use
-                **     another register, if the instruction does not have a
-                **     label, and A is not used later, we may replace the PHA
-                **     by the store and remove pla if several other conditions
-                **     are met.
-                **   - If this instruction is not a conditional branch, and A
-                **     is either unused later, or not changed by the code
-                **     between push and pop, we may remove PHA and PLA.
-                */
+                // We're at the instruction after the PLA.
+                // Check for the following conditions:
+                // - If this instruction is a store of A that doesn't use
+                // another register, if the instruction does not have a
+                // label, and A is not used later, we may replace the PHA
+                // by the store and remove pla if several other conditions
+                // are met.
+                // - If this instruction is not a conditional branch, and A
+                // is either unused later, or not changed by the code
+                // between push and pop, we may remove PHA and PLA.
                 if (E->OPC == OP65_STA                          &&
                     (E->AM == AM65_ABS || E->AM == AM65_ZP)     &&
                     !CE_HasLabel (E)                            &&
@@ -1280,15 +1246,14 @@ unsigned OptPushPop2 (CodeSeg* S)
         FoundPop
     } State = Searching;
 
-    /* Walk over the entries. Look for a push instruction that is followed by
-    ** a pop later, where the pop is not followed by an conditional branch,
-    ** and where the value of the A register is not used later on.
-    ** Look out for the following problems:
-    **
-    **  - There may be another PHP/PLP inside the sequence: Restart it.
-    **  - All jumps inside the sequence must not go outside the sequence,
-    **    otherwise it would be too complicated to remove the PHP/PLP.
-    */
+    // Walk over the entries. Look for a push instruction that is followed by
+    // a pop later, where the pop is not followed by an conditional branch,
+    // and where the value of the A register is not used later on.
+    // Look out for the following problems:
+    // 
+    // - There may be another PHP/PLP inside the sequence: Restart it.
+    // - All jumps inside the sequence must not go outside the sequence,
+    // otherwise it would be too complicated to remove the PHP/PLP.
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
@@ -1312,9 +1277,8 @@ unsigned OptPushPop2 (CodeSeg* S)
                 } else if (E->OPC == OP65_PLP) {
                     // Found a matching pop
                     Pop = I;
-                    /* Check that the block between Push and Pop is a basic
-                    ** block (one entry, one exit). Otherwise ignore it.
-                    */
+                    // Check that the block between Push and Pop is a basic
+                    // block (one entry, one exit). Otherwise ignore it.
                     if (CS_IsBasicBlock (S, Push, Pop)) {
                         State = FoundPop;
                     } else {
@@ -1369,9 +1333,8 @@ unsigned OptPushPop3 (CodeSeg* S)
         FoundPla
     } State = Searching;
 
-    /* Walk over the entries. Look for a PHA instruction where the contents
-    ** of A is known followed by a PLA later.
-    */
+    // Walk over the entries. Look for a PHA instruction where the contents
+    // of A is known followed by a PLA later.
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
@@ -1395,12 +1358,11 @@ unsigned OptPushPop3 (CodeSeg* S)
                 break;
 
             case FoundPha:
-                /* Check for several things that abort the sequence:
-                ** - End of the basic block
-                ** - Another PHA or any other stack manipulating instruction
-                ** If we find something that aborts the sequence, start over
-                ** searching for the next PHA.
-                */
+                // Check for several things that abort the sequence:
+                // - End of the basic block
+                // - Another PHA or any other stack manipulating instruction
+                // If we find something that aborts the sequence, start over
+                // searching for the next PHA.
                 if (CE_HasLabel (E)) {
                     // Switch back to searching at this instruction
                     State = Searching;
@@ -1415,9 +1377,8 @@ unsigned OptPushPop3 (CodeSeg* S)
                     // Start over at the next instruction
                     State = Searching;
                 } else if (E->OPC == OP65_PLA) {
-                    /* Switch state. This will also switch to the next insn
-                    ** which is ok.
-                    */
+                    // Switch state. This will also switch to the next insn
+                    // which is ok.
                     Pla = I;
                     State = FoundPla;
                 }
@@ -1444,9 +1405,8 @@ unsigned OptPushPop3 (CodeSeg* S)
 }
 
 unsigned OptPrecalc (CodeSeg* S)
-/* Replace immediate operations with the accu where the current contents are
-** known by a load of the final value.
-*/
+// Replace immediate operations with the accu where the current contents are
+// known by a load of the final value.
 {
     unsigned Changes = 0;
     unsigned I;
@@ -1495,19 +1455,18 @@ unsigned OptPrecalc (CodeSeg* S)
             case OP65_ADC:
             case OP65_SBC:
                 if (CE_IsKnownImm (E, 0x00)) {
-                    /* If this is an operation with an immediate operand of zero,
-                    ** and the Z/N flags reflect the current states of the content
-                    ** in A, then the operation won't give us any results we don't
-                    ** already have (including the flags) as long as the C flag is
-                    ** set normally (cleared for ADC and set for SBC) for the
-                    ** operation. So we can remove the operation if it is the
-                    ** normal case or the result in A is not used later.
-                    ** Something like this is generated as a result of a compare
-                    ** where parts of the values are known to be zero.
-                    ** The only situation where we need to leave things as they
-                    ** are is when an indeterminate V flag is being tested later,
-                    ** because ADC/SBC #0 always clears it.
-                    */
+                    // If this is an operation with an immediate operand of zero,
+                    // and the Z/N flags reflect the current states of the content
+                    // in A, then the operation won't give us any results we don't
+                    // already have (including the flags) as long as the C flag is
+                    // set normally (cleared for ADC and set for SBC) for the
+                    // operation. So we can remove the operation if it is the
+                    // normal case or the result in A is not used later.
+                    // Something like this is generated as a result of a compare
+                    // where parts of the values are known to be zero.
+                    // The only situation where we need to leave things as they
+                    // are is when an indeterminate V flag is being tested later,
+                    // because ADC/SBC #0 always clears it.
                     int CondC = PStatesAreKnown (In->PFlags, PSTATE_C) &&
                                 ((E->OPC == OP65_ADC && (In->PFlags & PFVAL_C) == 0) ||
                                  (E->OPC == OP65_SBC && (In->PFlags & PFVAL_C) != 0));
@@ -1533,9 +1492,8 @@ unsigned OptPrecalc (CodeSeg* S)
                         ++Changes;
                     }
                 } else if (E->OPC == OP65_ADC && In->RegA == 0) {
-                    /* 0 + arg. In this case we need only care about the C/V flags and
-                    ** let the load set the Z/N flags properly.
-                    */
+                    // 0 + arg. In this case we need only care about the C/V flags and
+                    // let the load set the Z/N flags properly.
                     int CondC = PStatesAreClear (In->PFlags, PSTATE_C);
                     int CondV = PStatesAreClear (In->PFlags, PSTATE_V);
                     unsigned R = (CondC ? 0 : REG_A | PSTATE_C) | (CondC && CondV ? 0 : PSTATE_V);
@@ -1631,9 +1589,8 @@ unsigned OptPrecalc (CodeSeg* S)
 }
 
 unsigned OptShiftBack (CodeSeg* S)
-/* Remove a pair of shifts to the opposite directions if none of the bits of
-** the register A or the Z/N flags modified by these shifts are used later.
-*/
+// Remove a pair of shifts to the opposite directions if none of the bits of
+// the register A or the Z/N flags modified by these shifts are used later.
 {
     unsigned Changes = 0;
     CodeEntry* E;
@@ -1681,29 +1638,28 @@ unsigned OptShiftBack (CodeSeg* S)
 }
 
 unsigned OptSignExtended (CodeSeg* S)
-/* Change
-**
-**      lda     xxx     ; X is 0
-**      bpl     L1
-**      dex/ldx #$FF
-**  L1: cpx     #$00
-**      bpl     L2
-**
-** or
-**
-**      lda     xxx     ; X is 0
-**      bpl     L1
-**      dex/ldx #$FF
-**  L1: cpx     #$80
-**      bcc/bmi L2
-**
-** into
-**      lda     xxx     ; X is 0
-**      bpl     L2
-**      dex/ldx #$FF
-**
-** provided the C flag isn't used later.
-*/
+// Change
+// 
+// lda     xxx     ; X is 0
+// bpl     L1
+// dex/ldx #$FF
+// L1: cpx     #$00
+// bpl     L2
+// 
+// or
+// 
+// lda     xxx     ; X is 0
+// bpl     L1
+// dex/ldx #$FF
+// L1: cpx     #$80
+// bcc/bmi L2
+// 
+// into
+// lda     xxx     ; X is 0
+// bpl     L2
+// dex/ldx #$FF
+// 
+// provided the C flag isn't used later.
 {
     unsigned Changes = 0;
     CodeEntry* L[5];

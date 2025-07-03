@@ -133,9 +133,8 @@ static IFile* NewIFile (const char* Name, InputType Type)
 ////////////////////////////////////////////////////////////////////////////////
 
 static AFile* NewAFile (IFile* IF, FILE* F)
-/* Create a new AFile, push it onto the stack, add the path of the file to
-** the path search list, and finally return a pointer to the new AFile struct.
-*/
+// Create a new AFile, push it onto the stack, add the path of the file to
+// the path search list, and finally return a pointer to the new AFile struct.
 {
     StrBuf Path = AUTO_STRBUF_INITIALIZER;
 
@@ -151,20 +150,18 @@ static AFile* NewAFile (IFile* IF, FILE* F)
     AF->IfStack.Index = -1;
     AF->MissingNL = 0;
 
-    /* Increment the usage counter of the corresponding IFile. If this
-    ** is the first use, set the file data and output debug info if
-    ** requested.
-    */
+    // Increment the usage counter of the corresponding IFile. If this
+    // is the first use, set the file data and output debug info if
+    // requested.
     if (IF->Usage++ == 0) {
 
-        /* Get file size and modification time. There a race condition here,
-        ** since we cannot use fileno() (non standard identifier in standard
-        ** header file), and therefore not fstat. When using stat with the
-        ** file name, there's a risk that the file was deleted and recreated
-        ** while it was open. Since mtime and size are only used to check
-        ** if a file has changed in the debugger, we will ignore this problem
-        ** here.
-        */
+        // Get file size and modification time. There a race condition here,
+        // since we cannot use fileno() (non standard identifier in standard
+        // header file), and therefore not fstat. When using stat with the
+        // file name, there's a risk that the file was deleted and recreated
+        // while it was open. Since mtime and size are only used to check
+        // if a file has changed in the debugger, we will ignore this problem
+        // here.
         struct stat Buf;
         if (FileStat (IF->Name, &Buf) != 0) {
             // Error
@@ -180,10 +177,9 @@ static AFile* NewAFile (IFile* IF, FILE* F)
     // Insert the new structure into the AFile collection
     CollAppend (&AFiles, AF);
 
-    /* Get the path of this file and add it as an extra search path.
-    ** To avoid file search overhead, we will add one path only once.
-    ** This is checked by the PushSearchPath function.
-    */
+    // Get the path of this file and add it as an extra search path.
+    // To avoid file search overhead, we will add one path only once.
+    // This is checked by the PushSearchPath function.
     SB_CopyBuf (&Path, IF->Name, FindName (IF->Name) - IF->Name);
     SB_Terminate (&Path);
     AF->SearchPath = PushSearchPath (UsrIncSearchPath, SB_GetConstBuf (&Path));
@@ -207,10 +203,9 @@ static void FreeAFile (AFile* AF)
 ////////////////////////////////////////////////////////////////////////////////
 
 static IFile* FindFile (const char* Name)
-/* Find the file with the given name in the list of all files. Since the list
-** is not large (usually less than 10), I don't care about using hashes or
-** similar things and do a linear search.
-*/
+// Find the file with the given name in the list of all files. Since the list
+// is not large (usually less than 10), I don't care about using hashes or
+// similar things and do a linear search.
 {
     unsigned I;
     for (I = 0; I < CollCount (&IFiles); ++I) {
@@ -254,9 +249,8 @@ void OpenMainFile (const char* Name)
     // Allocate the input line buffer
     Line = NewStrBuf ();
 
-    /* Update the line infos, so we have a valid line info even at start of
-    ** the main file before the first line is read.
-    */
+    // Update the line infos, so we have a valid line info even at start of
+    // the main file before the first line is read.
     UpdateCurrentLineInfo (Line);
 
     // Initialize the __COUNTER__ counter
@@ -284,11 +278,10 @@ void OpenIncludeFile (const char* Name, InputType IT)
         return;
     }
 
-    /* Search the list of all input files for this file. If we don't find
-    ** it, create a new IFile object. If we do already know the file and it
-    ** has an include guard, check for the include guard before opening the
-    ** file.
-    */
+    // Search the list of all input files for this file. If we don't find
+    // it, create a new IFile object. If we do already know the file and it
+    // has an include guard, check for the include guard before opening the
+    // file.
     IF = FindFile (N);
     if (IF == 0) {
         IF = NewIFile (N, IT);
@@ -327,20 +320,17 @@ void OpenIncludeFile (const char* Name, InputType IT)
 }
 
 void CloseIncludeFile (void)
-/* Close an include file and switch to the higher level file. Set Input to
-** NULL if this was the main file.
-*/
+// Close an include file and switch to the higher level file. Set Input to
+// NULL if this was the main file.
 {
-    /* Get the currently active input file and remove it from set of active
-    ** files. CollPop will FAIL if the collection is empty so no need to
-    ** check this here.
-    */
+    // Get the currently active input file and remove it from set of active
+    // files. CollPop will FAIL if the collection is empty so no need to
+    // check this here.
     AFile* Input = CollPop (&AFiles);
 
-    /* Determine the file that is active after closing this one. We never
-    ** actually close the main file, since it is needed for errors found after
-    ** compilation is completed.
-    */
+    // Determine the file that is active after closing this one. We never
+    // actually close the main file, since it is needed for errors found after
+    // compilation is completed.
     AFile* NextInput = (CollCount (&AFiles) > 0)? CollLast (&AFiles) : Input;
 
     // End preprocessing for the current input file
@@ -364,10 +354,9 @@ void CloseIncludeFile (void)
 }
 
 static void GetInputChar (void)
-/* Read the next character from the input stream and make CurC and NextC
-** valid. If end of line is reached, both are set to NUL, no more lines
-** are read by this function.
-*/
+// Read the next character from the input stream and make CurC and NextC
+// valid. If end of line is reached, both are set to NUL, no more lines
+// are read by this function.
 {
     // Get the next-next character from the line
     if (SB_GetIndex (Line) + 1 < SB_GetLen (Line)) {
@@ -385,10 +374,9 @@ static void GetInputChar (void)
 }
 
 void NextChar (void)
-/* Skip the current input character and read the next one from the input
-** stream. CurC and NextC are valid after the call. If end of line is
-** reached, both are set to NUL, no more lines are read by this function.
-*/
+// Skip the current input character and read the next one from the input
+// stream. CurC and NextC are valid after the call. If end of line is
+// reached, both are set to NUL, no more lines are read by this function.
 {
     // Skip the last character read
     SB_Skip (Line);
@@ -398,9 +386,8 @@ void NextChar (void)
 }
 
 Collection* UseInputStack (Collection* InputStack)
-/* Use the provided input stack for incoming input. Return the previously used
-** InputStack.
-*/
+// Use the provided input stack for incoming input. Return the previously used
+// InputStack.
 {
     Collection* OldInputStack = CurrentInputStack;
 
@@ -433,9 +420,8 @@ void ClearLine (void)
 }
 
 StrBuf* InitLine (StrBuf* Buf)
-/* Initialize Line from Buf and read CurC and NextC from the new input line.
-** The function returns the old input line.
-*/
+// Initialize Line from Buf and read CurC and NextC from the new input line.
+// The function returns the old input line.
 {
     StrBuf* OldLine = Line;
     Line  = Buf;
@@ -445,9 +431,8 @@ StrBuf* InitLine (StrBuf* Buf)
 }
 
 int NextLine (void)
-/* Get a line from the current input. Returns 0 on end of file with no new
-** input bytes.
-*/
+// Get a line from the current input. Returns 0 on end of file with no new
+// input bytes.
 {
     int         C;
     AFile*      Input;
@@ -467,9 +452,8 @@ int NextLine (void)
 
     // If there are pushed input lines, read from them
     if (CurrentInputStack != 0 && CollCount (CurrentInputStack) > 0) {
-        /* Drop all pushed fragments that have no data left until one can be
-        ** used as input.
-        */
+        // Drop all pushed fragments that have no data left until one can be
+        // used as input.
         do {
             // Use data move to resolve the issue that Line may be impersistent
             if (Line != CollLast (CurrentInputStack)) {
@@ -529,17 +513,15 @@ int NextLine (void)
             // We got a new line
             ++Input->LineNum;
 
-            /* If the \n is preceeded by a \r, remove the \r, so we can read
-            ** DOS/Windows files under *nix.
-            */
+            // If the \n is preceeded by a \r, remove the \r, so we can read
+            // DOS/Windows files under *nix.
             if (SB_LookAtLast (Line) == '\r') {
                 SB_Drop (Line, 1);
             }
 
-            /* If we don't have a line continuation character at the end, we
-            ** are done with this line. Otherwise just skip the character and
-            ** continue reading.
-            */
+            // If we don't have a line continuation character at the end, we
+            // are done with this line. Otherwise just skip the character and
+            // continue reading.
             if (SB_LookAtLast (Line) != '\\') {
                 Input->MissingNL = 0;
                 break;
@@ -570,15 +552,13 @@ int NextLine (void)
 }
 
 int PreprocessNextLine (void)
-/* Get a line from opened input files and do preprocess. Returns 0 on end of
-** main file.
-*/
+// Get a line from opened input files and do preprocess. Returns 0 on end of
+// main file.
 {
     while (NextLine() == 0) {
 
-        /* If there is no input file open, bail out. Otherwise get the previous
-        ** input file and start over.
-        */
+        // If there is no input file open, bail out. Otherwise get the previous
+        // input file and start over.
         if (CollCount (&AFiles) == 0) {
             return 0;
         }
@@ -677,9 +657,8 @@ void FreeFileInclusionInfo (struct LineInfo* LI)
 static int IsDifferentLineInfoFile (const LineInfoFile* Lhs, const LineInfoFile* Rhs)
 // Return true if the two files are different
 {
-    /* If the input files are the same but their presumed names are different,
-    ** we still consider the files same.
-    */
+    // If the input files are the same but their presumed names are different,
+    // we still consider the files same.
     return Lhs->InputFile != Rhs->InputFile || Lhs->LineNum != Rhs->LineNum;
 }
 
@@ -823,9 +802,8 @@ static void WriteDep (FILE* F, InputType Types)
 }
 
 static void CreateDepFile (const char* Name, InputType Types)
-/* Create a dependency file with the given name and place dependencies for
-** all files with the given types there.
-*/
+// Create a dependency file with the given name and place dependencies for
+// all files with the given types there.
 {
     // Open the file
     FILE* F = fopen (Name, "w");
@@ -833,9 +811,8 @@ static void CreateDepFile (const char* Name, InputType Types)
         Fatal ("Cannot open dependency file '%s': %s", Name, strerror (errno));
     }
 
-    /* If a dependency target was given, use it, otherwise use the output
-    ** file name as target, followed by a tab character.
-    */
+    // If a dependency target was given, use it, otherwise use the output
+    // file name as target, followed by a tab character.
     if (SB_IsEmpty (&DepTarget)) {
         WriteEscaped (F, OutputFilename);
     } else {

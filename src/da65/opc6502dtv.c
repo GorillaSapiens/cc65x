@@ -39,9 +39,8 @@
 //                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Descriptions for all opcodes. Base table from opc6502x.c with DTV opcodes,
-** where illegal opcodes are filtered based on their support on DTV.
-*/
+// Descriptions for all opcodes. Base table from opc6502x.c with DTV opcodes,
+// where illegal opcodes are filtered based on their support on DTV.
 const OpcDesc OpcTable_6502DTV[256] = {
     {   "brk",  1,  flNone,                   OH_Implicit              }, // $00
     {   "ora",  2,  flUseLabel,               OH_DirectXIndirect       }, // $01

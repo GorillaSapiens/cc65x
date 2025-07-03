@@ -59,9 +59,8 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
     // Remember the old type
     OldType = Expr->Type;
 
-    /* If we're converting to void, we're done. Note: This does also cover a
-    ** conversion void -> void.
-    */
+    // If we're converting to void, we're done. Note: This does also cover a
+    // conversion void -> void.
     if (IsTypeVoid (NewType)) {
         ED_MarkExprAsRVal (Expr);     // Never an lvalue
         goto ExitPoint;
@@ -73,9 +72,8 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
         goto ExitPoint;
     }
 
-    /* Get the sizes of the types. Since we've excluded void types, checking
-    ** for known sizes makes sense here.
-    */
+    // Get the sizes of the types. Since we've excluded void types, checking
+    // for known sizes makes sense here.
     if (IsTypeBitField (OldType)) {
         OldBits = OldType->A.B.Width;
     } else {
@@ -91,14 +89,13 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
     // lvalue?
     if (ED_IsLVal (Expr)) {
 
-        /* We have an lvalue. If the new size is smaller than the old one,
-        ** we don't need to do anything. The compiler will generate code
-        ** to load only the portion of the value that is actually needed.
-        ** This works only on a little endian architecture, but that's
-        ** what we support.
-        ** If both sizes are equal, do also leave the value alone.
-        ** If the new size is larger, we must convert the value.
-        */
+        // We have an lvalue. If the new size is smaller than the old one,
+        // we don't need to do anything. The compiler will generate code
+        // to load only the portion of the value that is actually needed.
+        // This works only on a little endian architecture, but that's
+        // what we support.
+        // If both sizes are equal, do also leave the value alone.
+        // If the new size is larger, we must convert the value.
         if ((NewBits > OldBits) ||
             // FIXME: float
             // when either side is float, emit the call to the conversion code
@@ -115,9 +112,8 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
 
     } else if (ED_IsConstAbs (Expr)) {
 
-        /* A cast of a constant numeric value to another type. Be sure
-        ** to handle sign extension correctly.
-        */
+        // A cast of a constant numeric value to another type. Be sure
+        // to handle sign extension correctly.
 
         // convert from float to (signed) long first
         if (IsTypeFloat (OldType) && !IsTypeFloat (NewType)) {
@@ -128,9 +124,8 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
             Expr->V.FVal = FP_D_FromInt(Expr->IVal);
         }
 
-        /* If this is a floating point constant, convert to integer,
-        ** and warn if precision is discarded.
-        */
+        // If this is a floating point constant, convert to integer,
+        // and warn if precision is discarded.
         if (IsClassFloat (OldType) && IsClassInt (NewType)) {
             long IVal = (long)Expr->V.FVal.V;
             if ((Expr->V.FVal.V != FP_D_FromInt(IVal).V) && !Explicit) {
@@ -139,10 +134,9 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
             Expr->IVal = IVal;
         }
 
-        /* Check if the new datatype will have a smaller range. If it
-        ** has a larger range, things are OK, since the value is
-        ** internally already represented by a long.
-        */
+        // Check if the new datatype will have a smaller range. If it
+        // has a larger range, things are OK, since the value is
+        // internally already represented by a long.
         if (NewBits <= OldBits) {
             long OldVal = Expr->IVal;
 
@@ -173,10 +167,9 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
 
     } else {
 
-        /* The value is not a constant. If the sizes of the types are
-        ** not equal, add conversion code. Be sure to convert chars
-        ** correctly.
-        */
+        // The value is not a constant. If the sizes of the types are
+        // not equal, add conversion code. Be sure to convert chars
+        // correctly.
         if ((OldBits != NewBits) ||
             // FIXME: float
             // when either side is float, emit the call to the conversion code
@@ -199,10 +192,9 @@ ExitPoint:
 }
 
 void TypeConversion (ExprDesc* Expr, const Type* NewType)
-/* Do an automatic conversion of the given expression to the new type. Output
-** warnings or errors where this automatic conversion is suspicious or
-** impossible.
-*/
+// Do an automatic conversion of the given expression to the new type. Output
+// warnings or errors where this automatic conversion is suspicious or
+// impossible.
 {
 #if 0
     // Debugging
@@ -251,13 +243,12 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
         // Handle conversions to pointer type
         if (IsClassPtr (Expr->Type)) {
 
-            /* Implicit pointer-to-pointer conversion is valid, if:
-            **   - both point to the same types, or
-            **   - the rhs pointer is a void pointer, or
-            **   - the lhs pointer is a void pointer.
-            ** Note: We additionally allow converting function pointers to and from
-            **       void pointers, just with warnings.
-            */
+            // Implicit pointer-to-pointer conversion is valid, if:
+            // - both point to the same types, or
+            // - the rhs pointer is a void pointer, or
+            // - the lhs pointer is a void pointer.
+            // Note: We additionally allow converting function pointers to and from
+            // void pointers, just with warnings.
             if (Result.C == TC_PTR_SIGN_DIFF) {
                 // Specific warning for pointer signedness difference
                 if (IS_Get (&WarnPointerSign)) {
@@ -306,10 +297,9 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
             // Do the actual conversion
             DoConversion (Expr, NewType, 0);
         } else {
-            /* We should have already generated error elsewhere so that we
-            ** could just silently fail here to avoid excess errors, but to
-            ** be safe, we must ensure that we do have errors.
-            */
+            // We should have already generated error elsewhere so that we
+            // could just silently fail here to avoid excess errors, but to
+            // be safe, we must ensure that we do have errors.
             if (IsIncompleteESUType (NewType)) {
                 Error ("Conversion to incomplete type '%s'", GetFullTypeName (NewType));
             } else {
@@ -337,9 +327,8 @@ void TypeCast (ExprDesc* Expr)
             Expr->Type = PtrConversion (Expr->Type);
 
             if (TypeCmp (NewType, Expr->Type).C >= TC_PTR_INCOMPATIBLE) {
-                /* If the new type has the same underlying presentation, just
-                ** use it to replace the old one.
-                */
+                // If the new type has the same underlying presentation, just
+                // use it to replace the old one.
                 ReplaceType (Expr, NewType);
             } else if (IsCastType (Expr->Type)) {
                 // Convert the value. The result has always the new type
@@ -387,9 +376,8 @@ static void ComposeFuncParamList (const FuncDesc* F1, const FuncDesc* F2)
         const Type* Type1 = Sym1->Type;
         const Type* Type2 = Sym2->Type;
 
-        /* If either of both functions is old style, apply the default
-        ** promotions to the parameter type.
-        */
+        // If either of both functions is old style, apply the default
+        // promotions to the parameter type.
         if (F1->Flags & FD_OLDSTYLE) {
             if (IsClassInt (Type1)) {
                 Type1 = IntPromotion (Type1);
@@ -401,13 +389,12 @@ static void ComposeFuncParamList (const FuncDesc* F1, const FuncDesc* F2)
             }
         }
 
-        /* When we compose two function parameter lists with any FD_OLDSTYLE
-        ** flags set, we are either refining the declaration of the function
-        ** with its definition seen, or determining the result type of a
-        ** ternary operation. In either case, we can just replace the types
-        ** with the promoted ones since the original types of the parameters
-        ** only matters inside the function definition.
-        */
+        // When we compose two function parameter lists with any FD_OLDSTYLE
+        // flags set, we are either refining the declaration of the function
+        // with its definition seen, or determining the result type of a
+        // ternary operation. In either case, we can just replace the types
+        // with the promoted ones since the original types of the parameters
+        // only matters inside the function definition.
         if (Type1 != Sym1->Type) {
             Sym1->Type = TypeDup (Type1);
         }
@@ -422,9 +409,8 @@ static void ComposeFuncParamList (const FuncDesc* F1, const FuncDesc* F2)
 }
 
 void TypeComposition (Type* lhs, const Type* rhs)
-/* Recursively compose two types into lhs. The two types must have compatible
-** type or this fails with a critical check.
-*/
+// Recursively compose two types into lhs. The two types must have compatible
+// type or this fails with a critical check.
 {
     // Compose two types
     while (lhs->C != T_END) {
@@ -443,12 +429,11 @@ void TypeComposition (Type* lhs, const Type* rhs)
             FuncDesc* F1 = GetFuncDesc (lhs);
             FuncDesc* F2 = GetFuncDesc (rhs);
 
-            /* If F1 has an empty parameter list (which does also mean, it is
-            ** not a function definition, because the flag is reset in this
-            ** case), its declaration is replaced by the other declaration. If
-            ** neither of the parameter lists is empty, we have to compose them
-            ** as well as other attributes.
-            */
+            // If F1 has an empty parameter list (which does also mean, it is
+            // not a function definition, because the flag is reset in this
+            // case), its declaration is replaced by the other declaration. If
+            // neither of the parameter lists is empty, we have to compose them
+            // as well as other attributes.
             if ((F1->Flags & FD_EMPTY) == FD_EMPTY) {
                 if ((F2->Flags & FD_EMPTY) == 0) {
                     // Copy the parameters and flags

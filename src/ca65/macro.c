@@ -63,10 +63,9 @@ static const void* HT_GetKey (const void* Entry);
 // Given a pointer to the user entry data, return a pointer to the key
 
 static int HT_Compare (const void* Key1, const void* Key2);
-/* Compare two keys. The function must return a value less than zero if
-** Key1 is smaller than Key2, zero if both are equal, and a value greater
-** than zero if Key1 is greater then Key2.
-*/
+// Compare two keys. The function must return a value less than zero if
+// Key1 is smaller than Key2, zero if both are equal, and a value greater
+// than zero if Key1 is greater then Key2.
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                   Data
@@ -155,10 +154,9 @@ static const void* HT_GetKey (const void* Entry)
 }
 
 static int HT_Compare (const void* Key1, const void* Key2)
-/* Compare two keys. The function must return a value less than zero if
-** Key1 is smaller than Key2, zero if both are equal, and a value greater
-** than zero if Key1 is greater then Key2.
-*/
+// Compare two keys. The function must return a value less than zero if
+// Key1 is smaller than Key2, zero if both are equal, and a value greater
+// than zero if Key1 is greater then Key2.
 {
     return SB_Compare (Key1, Key2);
 }
@@ -354,15 +352,13 @@ void MacDef (unsigned Style)
     int HaveParams;
     int LastTokWasSep;
 
-    /* For classic macros, remember if we are at the beginning of the line.
-    ** If the macro name and parameters pass our checks then we will be on a
-    ** new line, so set it now
-    */
+    // For classic macros, remember if we are at the beginning of the line.
+    // If the macro name and parameters pass our checks then we will be on a
+    // new line, so set it now
     LastTokWasSep = 1;
 
-    /* Save the position of the start of the macro definition to allow
-    ** using Perror to display the error if .endmacro isn't found
-    */
+    // Save the position of the start of the macro definition to allow
+    // using Perror to display the error if .endmacro isn't found
     Pos = CurTok.Pos;
 
     // We expect a macro name here
@@ -371,9 +367,8 @@ void MacDef (unsigned Style)
         MacSkipDef (Style);
         return;
     } else if (!UbiquitousIdents && FindInstruction (&CurTok.SVal) >= 0) {
-        /* The identifier is a name of a 6502 instruction, which is not
-        ** allowed if not explicitly enabled.
-        */
+        // The identifier is a name of a 6502 instruction, which is not
+        // allowed if not explicitly enabled.
         Error ("Cannot use an instruction as macro name");
         MacSkipDef (Style);
         return;
@@ -395,9 +390,8 @@ void MacDef (unsigned Style)
     EnterRawTokenMode ();
     NextTok ();
 
-    /* If we have a DEFINE-style macro, we may have parameters in parentheses;
-    ** otherwise, we may have parameters without parentheses.
-    */
+    // If we have a DEFINE-style macro, we may have parameters in parentheses;
+    // otherwise, we may have parameters without parentheses.
     if (Style == MAC_STYLE_CLASSIC) {
         HaveParams = 1;
     } else {
@@ -447,26 +441,23 @@ void MacDef (unsigned Style)
         }
     }
 
-    /* For classic macros, we expect a separator token, for define-style macros,
-    ** we expect the closing paren.
-    */
+    // For classic macros, we expect a separator token, for define-style macros,
+    // we expect the closing paren.
     if (Style == MAC_STYLE_CLASSIC) {
         ConsumeSep ();
     } else if (HaveParams) {
         ConsumeRParen ();
     }
 
-    /* Preparse the macro body. We will read the tokens until we reach end of
-    ** file, or a .endmacro (or end of line for DEFINE-style macros) and store
-    ** them into a token list internal to the macro. For classic macros,
-    ** the .LOCAL command is detected and removed, at this time.
-    */
+    // Preparse the macro body. We will read the tokens until we reach end of
+    // file, or a .endmacro (or end of line for DEFINE-style macros) and store
+    // them into a token list internal to the macro. For classic macros,
+    // the .LOCAL command is detected and removed, at this time.
     while (1) {
         // Check for end of macro
         if (Style == MAC_STYLE_CLASSIC) {
-            /* In classic macros, if .endmacro is not at the start of the line
-            ** it will be added to the macro definition instead of closing it.
-            */
+            // In classic macros, if .endmacro is not at the start of the line
+            // it will be added to the macro definition instead of closing it.
             if (CurTok.Tok == TOK_ENDMACRO && LastTokWasSep) {
                 // Done
                 break;
@@ -548,9 +539,8 @@ void MacDef (unsigned Style)
         }
         ++M->TokCount;
 
-        /* Save if last token was a separator to know if .endmacro is at
-        ** the start of a line
-        */
+        // Save if last token was a separator to know if .endmacro is at
+        // the start of a line
         LastTokWasSep = TokIsSep(CurTok.Tok);
 
         // Read the next token
@@ -571,9 +561,8 @@ Done:
 }
 
 void MacUndef (const StrBuf* Name, unsigned char Style)
-/* Undefine the macro with the given name and style. A style mismatch is
-** treated as if the macro didn't exist.
-*/
+// Undefine the macro with the given name and style. A style mismatch is
+// treated as if the macro didn't exist.
 {
     // Search for the macro
     Macro* M = HT_Find (&MacroTab, Name);
@@ -596,10 +585,9 @@ void MacUndef (const StrBuf* Name, unsigned char Style)
 }
 
 static int MacExpand (void* Data)
-/* If we're currently expanding a macro, set the scanner token and
-** attribute to the next value and return true. If we are not expanding
-** a macro, return false.
-*/
+// If we're currently expanding a macro, set the scanner token and
+// attribute to the next value and return true. If we are not expanding
+// a macro, return false.
 {
     // Cast the Data pointer to the actual data structure
     MacExp* Mac = (MacExp*) Data;
@@ -617,9 +605,8 @@ static int MacExpand (void* Data)
         goto MacEnd;
     }
 
-    /* We're expanding a macro. Check if we are expanding one of the
-    ** macro parameters.
-    */
+    // We're expanding a macro. Check if we are expanding one of the
+    // macro parameters.
 ExpandParam:
     if (Mac->ParamExp) {
 
@@ -646,9 +633,8 @@ ExpandParam:
 
     }
 
-    /* We're not expanding macro parameters. Check if we have tokens left from
-    ** the macro itself.
-    */
+    // We're not expanding macro parameters. Check if we have tokens left from
+    // the macro itself.
     if (Mac->Exp) {
 
         // Use next macro token
@@ -688,11 +674,10 @@ ExpandParam:
             IdDesc* I = Mac->M->Locals;
             while (I) {
                 if (SB_Compare (&CurTok.SVal, &I->Id) == 0) {
-                    /* This is in fact a local symbol, change the name. Be sure
-                    ** to generate a local label name if the original name was
-                    ** a local label, and also generate a name that cannot be
-                    ** generated by a user.
-                    */
+                    // This is in fact a local symbol, change the name. Be sure
+                    // to generate a local label name if the original name was
+                    // a local label, and also generate a name that cannot be
+                    // generated by a user.
                     if (SB_At (&I->Id, 0) == LocalStart) {
                         // Must generate a local symbol
                         SB_Printf (&CurTok.SVal, "%cLOCAL-MACRO_SYMBOL-%04X",
@@ -725,15 +710,15 @@ ExpandParam:
         FreeTokNode (Mac->Final);
         Mac->Final = 0;
 
-        /* Problem: When a .define-style macro is expanded within the call
-        ** of a classic one, the latter may be terminated and removed while
-        ** the expansion of the .define-style macro is still active. Because
-        ** line info slots are "stacked", this runs into a CHECK FAILED. For
-        ** now, we will fix that by removing the .define-style macro expansion
-        ** immediately, once the final token is placed. The better solution
-        ** would probably be to not require AllocLineInfoSlot/FreeLineInfoSlot
-        ** to be called in FIFO order, but this is a bigger change.
-        */
+        // Problem: When a .define-style macro is expanded within the call
+        // of a classic one, the latter may be terminated and removed while
+        // the expansion of the .define-style macro is still active. Because
+        // line info slots are "stacked", this runs into a CHECK FAILED. For
+        // now, we will fix that by removing the .define-style macro expansion
+        // immediately, once the final token is placed. The better solution
+        // would probably be to not require AllocLineInfoSlot/FreeLineInfoSlot
+        // to be called in FIFO order, but this is a bigger change.
+        // 
         // End of macro expansion and pop the input function
         FreeMacExp (Mac);
         PopInput ();
@@ -804,9 +789,8 @@ static void StartExpClassic (MacExp* E)
             // One parameter more
             ++E->ParamCount;
 
-            /* If the macro argument was enclosed in curly braces, end-of-line
-            ** is an error. Skip the closing curly brace.
-            */
+            // If the macro argument was enclosed in curly braces, end-of-line
+            // is an error. Skip the closing curly brace.
             if (Term == TOK_RCURLY) {
                 if (CurTok.Tok == TOK_SEP) {
                     Error ("End of line encountered within macro argument");
@@ -834,9 +818,8 @@ static void StartExpClassic (MacExp* E)
 static void StartExpDefine (MacExp* E)
 // Start expanding a DEFINE-style macro
 {
-    /* A define-style macro must be called with as many actual parameters
-    ** as there are formal ones. Get the parameter count.
-    */
+    // A define-style macro must be called with as many actual parameters
+    // as there are formal ones. Get the parameter count.
     unsigned Count = E->M->ParamCount;
 
     // Read the actual parameters
@@ -877,9 +860,8 @@ static void StartExpDefine (MacExp* E)
         // One parameter more
         ++E->ParamCount;
 
-        /* If the macro argument was enclosed in curly braces, end-of-line
-        ** is an error. Skip the closing curly brace.
-        */
+        // If the macro argument was enclosed in curly braces, end-of-line
+        // is an error. Skip the closing curly brace.
         if (Term == TOK_RCURLY) {
             if (TokIsSep (CurTok.Tok)) {
                 Error ("End of line encountered within macro argument");
@@ -898,11 +880,10 @@ static void StartExpDefine (MacExp* E)
         }
     }
 
-    /* Macro expansion will overwrite the current token. This is a problem
-    ** for define-style macros since these are called from the scanner level.
-    ** To avoid it, remember the current token and re-insert it, once macro
-    ** expansion is done.
-    */
+    // Macro expansion will overwrite the current token. This is a problem
+    // for define-style macros since these are called from the scanner level.
+    // To avoid it, remember the current token and re-insert it, once macro
+    // expansion is done.
     E->Final = NewTokNode ();
 
     // Insert a new token input function
@@ -928,9 +909,8 @@ void MacExpandStart (Macro* M)
         return;
     }
 
-    /* Don't allow too many nested macro expansions - otherwise it is possible
-    ** to force an endless loop and assembler crash.
-    */
+    // Don't allow too many nested macro expansions - otherwise it is possible
+    // to force an endless loop and assembler crash.
     if (MacExpansions >= MAX_MACEXPANSIONS) {
         PError (&Pos, "Too many nested macro expansions");
         return;
@@ -958,18 +938,16 @@ void MacAbort (void)
 }
 
 Macro* FindMacro (const StrBuf* Name)
-/* Try to find the macro with the given name and return it. If no macro with
-** this name was found, return NULL.
-*/
+// Try to find the macro with the given name and return it. If no macro with
+// this name was found, return NULL.
 {
     Macro* M = HT_Find (&MacroTab, Name);
     return (M != 0 && M->Style == MAC_STYLE_CLASSIC)? M : 0;
 }
 
 Macro* FindDefine (const StrBuf* Name)
-/* Try to find the define-style macro with the given name; and, return it.
-** If no such macro was found, return NULL.
-*/
+// Try to find the define-style macro with the given name; and, return it.
+// If no such macro was found, return NULL.
 {
     Macro* M;
 
@@ -996,9 +974,8 @@ void DisableDefineStyleMacros (void)
 }
 
 void EnableDefineStyleMacros (void)
-/* Re-enable define-style macros previously disabled with
-** DisableDefineStyleMacros().
-*/
+// Re-enable define-style macros previously disabled with
+// DisableDefineStyleMacros().
 {
     PRECONDITION (DisableDefines > 0);
     --DisableDefines;

@@ -42,106 +42,97 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptCmp1 (CodeSeg* S);
-/* Search for the sequence
-**
-**      ldx     xx
-**      stx     tmp1
-**      ora     tmp1
-**
-** and replace it by
-**
-**      ora     xx
-*/
+// Search for the sequence
+// 
+// ldx     xx
+// stx     tmp1
+// ora     tmp1
+// 
+// and replace it by
+// 
+// ora     xx
 
 unsigned OptCmp2 (CodeSeg* S);
-/* Search for the sequence
-**
-**      stx     xx
-**      stx     tmp1
-**      ora     tmp1
-**
-** and replace it by
-**
-**      stx     xx
-**      ora     xx
-*/
+// Search for the sequence
+// 
+// stx     xx
+// stx     tmp1
+// ora     tmp1
+// 
+// and replace it by
+// 
+// stx     xx
+// ora     xx
 
 unsigned OptCmp3 (CodeSeg* S);
-/* Search for
-**
-**      lda/and/ora/eor ...
-**      cmp #$00
-**      jeq/jne
-** or
-**      lda/and/ora/eor ...
-**      cmp #$00
-**      jsr boolxx
-**
-** and remove the cmp.
-*/
+// Search for
+// 
+// lda/and/ora/eor ...
+// cmp #$00
+// jeq/jne
+// or
+// lda/and/ora/eor ...
+// cmp #$00
+// jsr boolxx
+// 
+// and remove the cmp.
 
 unsigned OptCmp4 (CodeSeg* S);
-/* Search for
-**
-**      lda     x
-**      ldx     y
-**      cpx     #a
-**      bne     L1
-**      cmp     #b
-**      jne/jeq L2
-**
-** If a is zero, we may remove the compare. If a and b are both zero, we may
-** replace it by the sequence
-**
-**      lda     x
-**      ora     x+1
-**      jne/jeq ...
-**
-** L1 may be either the label at the branch instruction, or the target label
-** of this instruction.
-*/
+// Search for
+// 
+// lda     x
+// ldx     y
+// cpx     #a
+// bne     L1
+// cmp     #b
+// jne/jeq L2
+// 
+// If a is zero, we may remove the compare. If a and b are both zero, we may
+// replace it by the sequence
+// 
+// lda     x
+// ora     x+1
+// jne/jeq ...
+// 
+// L1 may be either the label at the branch instruction, or the target label
+// of this instruction.
 
 unsigned OptCmp5 (CodeSeg* S);
-/* Optimize compares of local variables:
-**
-**      ldy     #o
-**      lda     (c_sp),y
-**      tax
-**      dey
-**      lda     (c_sp),y
-**      cpx     #a
-**      bne     L1
-**      cmp     #b
-**      jne/jeq L2
-*/
+// Optimize compares of local variables:
+// 
+// ldy     #o
+// lda     (c_sp),y
+// tax
+// dey
+// lda     (c_sp),y
+// cpx     #a
+// bne     L1
+// cmp     #b
+// jne/jeq L2
 
 unsigned OptCmp6 (CodeSeg* S);
-/* Remove compare instructions before an RTS or an exit by jumping to some
-** other function.
-*/
+// Remove compare instructions before an RTS or an exit by jumping to some
+// other function.
 
 unsigned OptCmp7 (CodeSeg* S);
-/* Search for a sequence ldx/txa/branch and remove the txa if A is not
-** used later.
-*/
+// Search for a sequence ldx/txa/branch and remove the txa if A is not
+// used later.
 
 unsigned OptCmp8 (CodeSeg* S);
-/* Check for register compares where the contents of the register and therefore
-** the result of the compare is known.
-*/
+// Check for register compares where the contents of the register and therefore
+// the result of the compare is known.
 
 unsigned OptCmp9 (CodeSeg* S);
-/* Search for the sequence
-**
-**    sbc       xx
-**    bvs/bvc   L
-**    eor       #$80
-** L: asl       a
-**    bcc/bcs   somewhere
-**
-** If A is not used later (which should be the case), we can branch on the N
-** flag instead of the carry flag and remove the asl.
-*/
+// Search for the sequence
+// 
+// sbc       xx
+// bvs/bvc   L
+// eor       #$80
+// L: asl       a
+// bcc/bcs   somewhere
+// 
+// If A is not used later (which should be the case), we can branch on the N
+// flag instead of the carry flag and remove the asl.
 
 // End of coptcmp.h
 

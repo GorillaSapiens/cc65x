@@ -148,18 +148,16 @@ void DefLabel (const char* Name)
 // Define a label with the given name
 {
     Output ("%s:", Name);
-    /* If the label is longer than the configured maximum, or if it runs into
-    ** the opcode column, start a new line.
-    */
+    // If the label is longer than the configured maximum, or if it runs into
+    // the opcode column, start a new line.
     if (Col > LBreak+2 || Col > MCol) {
         LineFeed ();
     }
 }
 
 void DefForward (const char* Name, const char* Comment, unsigned Offs)
-/* Define a label as "* + x", where x is the offset relative to the
-** current PC.
-*/
+// Define a label as "* + x", where x is the offset relative to the
+// current PC.
 {
     if (Pass == PASS_FINAL) {
         // Flush existing output if necessary

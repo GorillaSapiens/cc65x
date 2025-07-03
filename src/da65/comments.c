@@ -54,11 +54,10 @@ struct Comment {
     char                Text[1];        // Text, dynamically allocated
 };
 
-/* Comments use a hash table and a linear list for collision resolution. The
-** hash function is easy and effective. It evaluates just the lower bits of
-** the address. Since we don't expect many comments, we can keep the table
-** small.
-*/
+// Comments use a hash table and a linear list for collision resolution. The
+// hash function is easy and effective. It evaluates just the lower bits of
+// the address. Since we don't expect many comments, we can keep the table
+// small.
 #define COMMENT_HASH_SIZE       256u    // Must be power of two
 static Comment* CommentTab[COMMENT_HASH_SIZE];
 
@@ -91,9 +90,8 @@ static uint32_t GetCommentHash (uint32_t Addr)
 }
 
 static Comment* FindComment (uint32_t Addr)
-/* Search for a comment for the given address and return it. Returns NULL if
-** no comment exists for the address.
-*/
+// Search for a comment for the given address and return it. Returns NULL if
+// no comment exists for the address.
 {
     Comment* C = CommentTab[GetCommentHash (Addr)];
     while (C) {

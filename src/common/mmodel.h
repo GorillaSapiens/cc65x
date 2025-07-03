@@ -63,9 +63,8 @@ mmodel_t FindMemoryModel (const char* Name);
 // Find a memory model by name. Return MMODEL_UNKNOWN for an unknown name.
 
 void SetMemoryModel (mmodel_t Model);
-/* Set the memory model updating the MemoryModel variables and the address
-** sizes for the segments.
-*/
+// Set the memory model updating the MemoryModel variables and the address
+// sizes for the segments.
 
 // End of mmodel.h
 

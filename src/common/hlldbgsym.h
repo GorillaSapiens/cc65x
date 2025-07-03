@@ -31,11 +31,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-/* This module contains definitions for high level language symbols passed
-** down from the C compiler. They're collected in the assembler and written to
-** the object file in binary form, then again read by the linker and finally
-** placed in the debug info file.
-*/
+// This module contains definitions for high level language symbols passed
+// down from the C compiler. They're collected in the assembler and written to
+// the object file in binary form, then again read by the linker and finally
+// placed in the debug info file.
 
 #ifndef HLLDBGSYM_H
 #define HLLDBGSYM_H

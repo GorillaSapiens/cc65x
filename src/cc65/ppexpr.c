@@ -71,9 +71,8 @@ static void PPExprInit (PPExpr* Expr)
 }
 
 static void PPErrorSkipLine (void)
-/* Set the expression parser error flag, skip the remain tokens till the end
-** of the line, clear the current and the next tokens.
-*/
+// Set the expression parser error flag, skip the remain tokens till the end
+// of the line, clear the current and the next tokens.
 {
     PPEvaluationFailed = 1;
     SkipTokens (0, 0);
@@ -94,9 +93,8 @@ static void PPhiePrimary (PPExpr* Expr)
         case TOK_WCCONST:
             // Character and integer constants
             Expr->IVal = CurTok.IVal;
-            /* According to the C standard, all signed types act as intmax_t
-            ** and all unsigned types act as uintmax_t.
-            */
+            // According to the C standard, all signed types act as intmax_t
+            // and all unsigned types act as uintmax_t.
             if (IsSignUnsigned (CurTok.Type)) {
                 Expr->Flags |= PPEXPR_UNSIGNED;
             }
@@ -111,18 +109,16 @@ static void PPhiePrimary (PPExpr* Expr)
             break;
 
         case TOK_LPAREN:
-            /* Parse parenthesized subexpression by calling the whole parser
-            ** recursively.
-            */
+            // Parse parenthesized subexpression by calling the whole parser
+            // recursively.
             NextToken ();
             PPhie1 (Expr);
             ConsumeRParen ();
             break;
 
         case TOK_IDENT:
-            /* Assume that this identifier is an undefined macro and replace
-            ** it by a constant value of zero.
-            */
+            // Assume that this identifier is an undefined macro and replace
+            // it by a constant value of zero.
             NextToken ();
             Expr->Flags |= PPEXPR_UNDEFINED;
             Expr->IVal = 0;
@@ -159,9 +155,8 @@ static void PPhie11 (PPExpr* Expr)
                 break;
 
             case TOK_LPAREN:
-                /* Function call syntax is not recognized in preprocessor
-                ** expressions.
-                */
+                // Function call syntax is not recognized in preprocessor
+                // expressions.
                 PPError ("Missing binary operator before token \"(\"");
                 PPErrorSkipLine ();
                 break;
@@ -247,9 +242,8 @@ void PPhie10 (PPExpr* Expr)
         case TOK_AND:
         case TOK_SIZEOF:
         default:
-            /* Type cast, sizeof, *, &, are not recognized in preprocessor
-            ** expressions. So everything is treated as as expression here.
-            */
+            // Type cast, sizeof, *, &, are not recognized in preprocessor
+            // expressions. So everything is treated as as expression here.
             PPhie11 (Expr);
             break;
     }
@@ -457,10 +451,9 @@ static void PPhie7 (PPExpr* Expr)
                 Rhs.IVal = -(long)LONG_BITS;
             }
 
-            /* Positive count for left-shift and negative for right-shift. So
-            ** to shift by a count is equivalent to shift to the opposite
-            ** direction by the negated count.
-            */
+            // Positive count for left-shift and negative for right-shift. So
+            // to shift by a count is equivalent to shift to the opposite
+            // direction by the negated count.
             if (Op == TOK_SHR) {
                 Rhs.IVal = -Rhs.IVal;
             }

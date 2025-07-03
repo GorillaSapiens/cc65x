@@ -84,10 +84,9 @@ static LineInfo* NewLineInfo (const StrBuf* Line)
     LI->IncFiles  = 0;
     GetFileInclusionInfo (LI);
 
-    /* Copy the line, replacing tabs by spaces in the given line since tabs
-    ** will give rather arbitrary results when used in the output later, and
-    ** if we do it here, we won't need another copy later.
-    */
+    // Copy the line, replacing tabs by spaces in the given line since tabs
+    // will give rather arbitrary results when used in the output later, and
+    // if we do it here, we won't need another copy later.
     T = LI->Line;
     while (Len--) {
         if (*S == '\t') {
@@ -122,9 +121,8 @@ LineInfo* UseLineInfo (LineInfo* LI)
 }
 
 void ReleaseLineInfo (LineInfo* LI)
-/* Release a reference to the given line info, free the structure if the
-** reference count drops to zero.
-*/
+// Release a reference to the given line info, free the structure if the
+// reference count drops to zero.
 {
     CHECK (LI && LI->RefCount > 0);
     if (--LI->RefCount == 0) {
@@ -134,9 +132,8 @@ void ReleaseLineInfo (LineInfo* LI)
 }
 
 LineInfo* GetCurLineInfo (void)
-/* Return a pointer to the current line info. The reference count is NOT
-** increased, use UseLineInfo for that purpose.
-*/
+// Return a pointer to the current line info. The reference count is NOT
+// increased, use UseLineInfo for that purpose.
 {
     return CurLineInfo;
 }
@@ -149,9 +146,8 @@ void UpdateCurrentLineInfo (const StrBuf* Line)
         ReleaseLineInfo (CurLineInfo);
     }
 
-    /* If we have intermixed assembly switched off, use an empty line instead
-    ** of the supplied one to save some memory.
-    */
+    // If we have intermixed assembly switched off, use an empty line instead
+    // of the supplied one to save some memory.
     if (!AddSource) {
         Line = &EmptyStrBuf;
     }

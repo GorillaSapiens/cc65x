@@ -63,15 +63,13 @@ struct RLE {
 ////////////////////////////////////////////////////////////////////////////////
 
 static void StoreByte (struct RLE* RLE)
-/* Store a unique byte or a run of repeated bytes. If count is zero, the
-** function will flush the internal buffers, so that all data is in RLE->D.
-*/
+// Store a unique byte or a run of repeated bytes. If count is zero, the
+// function will flush the internal buffers, so that all data is in RLE->D.
 {
 
     if (RLE->Count == 1 || RLE->Count == 2) {
-        /* A run of two identical bytes is treated as two unique bytes, since
-        ** this will usually merge with the following run.
-        */
+        // A run of two identical bytes is treated as two unique bytes, since
+        // this will usually merge with the following run.
         SB_AppendChar (&RLE->UniqueData, RLE->LastVal);
         if (RLE->Count == 2) {
             SB_AppendChar (&RLE->UniqueData, RLE->LastVal);
@@ -82,9 +80,8 @@ static void StoreByte (struct RLE* RLE)
 
     } else {
 
-        /* Run of repeated bytes. First flush the temp buffer for unique
-        ** bytes.
-        */
+        // Run of repeated bytes. First flush the temp buffer for unique
+        // bytes.
         const char* Buf = SB_GetConstBuf (&RLE->UniqueData);
         unsigned Count  = SB_GetLen (&RLE->UniqueData);
         while (Count) {
@@ -126,10 +123,9 @@ static void StoreByte (struct RLE* RLE)
 }
 
 StrBuf* GenGeosBitmap (const Bitmap* B, const Collection* A attribute ((unused)))
-/* Generate binary output in GEOS compacted bitmap format for the bitmap B.
-** The output is stored in a string buffer (which is actually a dynamic char
-** array) and returned.
-*/
+// Generate binary output in GEOS compacted bitmap format for the bitmap B.
+// The output is stored in a string buffer (which is actually a dynamic char
+// array) and returned.
 {
     unsigned        LineWidth;
     unsigned char*  Buf;
@@ -175,9 +171,8 @@ StrBuf* GenGeosBitmap (const Bitmap* B, const Collection* A attribute ((unused))
     D = NewStrBuf ();
     SB_Realloc (D, 64);
 
-    /* Compact the image. We're currently using only REPEAT and UNIQUE opcodes.
-    ** BIGCOUNT is rather difficult to apply.
-    */
+    // Compact the image. We're currently using only REPEAT and UNIQUE opcodes.
+    // BIGCOUNT is rather difficult to apply.
     RLE.Buf        = Buf;
     RLE.Remaining  = LineWidth * GetBitmapHeight (B) - 1;
     RLE.LastVal    = *RLE.Buf++;
@@ -185,7 +180,6 @@ StrBuf* GenGeosBitmap (const Bitmap* B, const Collection* A attribute ((unused))
     RLE.D          = D;
     RLE.UniqueData = EmptyStrBuf;
     while (RLE.Remaining--) {
-        //
         if (RLE.LastVal == *RLE.Buf) {
             ++RLE.Buf;
             ++RLE.Count;

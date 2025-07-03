@@ -199,9 +199,8 @@ static unsigned char ReadProgramFile (void)
         Error ("'%s': Invalid header version.", ProgramFile);
     }
 
-    /* Get the CPU type from the file header.
-     * Use it to set the CPU type, unless CPUOverrideActive is set.
-     */
+    // Get the CPU type from the file header.
+    // Use it to set the CPU type, unless CPUOverrideActive is set.
     if ((Val = fgetc(F)) != EOF) {
         if (!CPUOverrideActive) {
             switch (Val) {
@@ -350,14 +349,12 @@ int main (int argc, char* argv[])
     // Reset peripherals.
     PeripheralsInit ();
 
-    /* Read program file into memory.
-     * This also sets the CPU type, unless a CPU override is in effect.
-     */
+    // Read program file into memory.
+    // This also sets the CPU type, unless a CPU override is in effect.
     SPAddr = ReadProgramFile ();
 
-    /* Initialize the paravirtualization subsystem. It requires the stack pointer address, to be able to
-     * simulate 6502 subroutine calls.
-     */
+    // Initialize the paravirtualization subsystem. It requires the stack pointer address, to be able to
+    // simulate 6502 subroutine calls.
 
     TraceInit(SPAddr);
     ParaVirtInit (I, SPAddr);
@@ -376,8 +373,7 @@ int main (int argc, char* argv[])
         }
     }
 
-    /* Unreachable. sim65 program must exit through paravirtual PVExit
-    ** or timeout from MaxCycles producing an error.
-    */
+    // Unreachable. sim65 program must exit through paravirtual PVExit
+    // or timeout from MaxCycles producing an error.
     return SIM65_ERROR;
 }

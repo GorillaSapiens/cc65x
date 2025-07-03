@@ -45,32 +45,27 @@ void TgtTranslateInit (void);
 // Initialize the translation tables
 
 int TgtTranslateChar (int C);
-/* Translate one character from the source character set into the target
-** system character set.
-*/
+// Translate one character from the source character set into the target
+// system character set.
 
 void TgtTranslateBuf (void* Buf, unsigned Len);
-/* Translate a buffer of the given length from the source character set into
-** the target system character set.
-*/
+// Translate a buffer of the given length from the source character set into
+// the target system character set.
 
 void TgtTranslateStrBuf (StrBuf* Buf);
-/* Translate a string buffer from the source character set into the target
-** system character set.
-*/
+// Translate a string buffer from the source character set into the target
+// system character set.
 
 void TgtTranslateSet (unsigned Index, unsigned char C);
 // Set the translation code for the given character
 
 int TgtTranslatePush (void);
-/* Pushes the current translation table to the internal stack
-** Returns 1 on success, 0 on stack full
-*/
+// Pushes the current translation table to the internal stack
+// Returns 1 on success, 0 on stack full
 
 int TgtTranslatePop (void);
-/* Pops a translation table from the internal stack into the current table
-** Returns 1 on success, 0 on stack empty
-*/
+// Pops a translation table from the internal stack into the current table
+// Returns 1 on success, 0 on stack empty
 
 int TgtTranslateStackIsEmpty (void);
 // Returns 1 if the internal stack is empty

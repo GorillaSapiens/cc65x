@@ -341,9 +341,8 @@ static void UseCharSource (CharSource* S)
     S->SkipN    = 0;
     S->Func->NextChar (S);
 
-    /* Setup the next token so it will be skipped on the next call to
-    ** NextRawTok().
-    */
+    // Setup the next token so it will be skipped on the next call to
+    // NextRawTok().
     CurTok.Tok = TOK_SEP;
 }
 
@@ -406,9 +405,8 @@ static void IFNextChar (CharSource* S)
                     break;
                 }
 
-                /* No more data - add an empty line to the listing. This
-                ** is a small hack needed to keep the PC output in sync.
-                */
+                // No more data - add an empty line to the listing. This
+                // is a small hack needed to keep the PC output in sync.
                 NewListingLine (&EmptyStrBuf, S->V.File.Pos.Name, FCount);
                 C = EOF;
                 return;
@@ -431,10 +429,9 @@ static void IFNextChar (CharSource* S)
             }
         }
 
-        /* If we come here, we have a new input line. To avoid problems
-        ** with strange line terminators, remove all whitespace from the
-        ** end of the line, then add a single newline.
-        */
+        // If we come here, we have a new input line. To avoid problems
+        // with strange line terminators, remove all whitespace from the
+        // end of the line, then add a single newline.
         Len = SB_GetLen (&S->V.File.Line);
         while (Len > 0 && IsSpace (SB_AtUnchecked (&S->V.File.Line, Len-1))) {
             --Len;
@@ -463,12 +460,11 @@ static void IFNextChar (CharSource* S)
 void IFDone (CharSource* S)
 // Close the current input file
 {
-    /* We're at the end of an include file. Check if we have any
-    ** open .IFs, or any open token lists in this file. This
-    ** enforcement is artificial, using conditionals that start
-    ** in one file and end in another are uncommon, and don't
-    ** allowing these things will help finding errors.
-    */
+    // We're at the end of an include file. Check if we have any
+    // open .IFs, or any open token lists in this file. This
+    // enforcement is artificial, using conditionals that start
+    // in one file and end in another are uncommon, and don't
+    // allowing these things will help finding errors.
     CheckOpenIfs ();
 
     // If we've added search paths for this file, remove them
@@ -482,9 +478,8 @@ void IFDone (CharSource* S)
     // Free the line buffer
     SB_Done (&S->V.File.Line);
 
-    /* Close the input file and decrement the file count. We will ignore
-    ** errors here, since we were just reading from the file.
-    */
+    // Close the input file and decrement the file count. We will ignore
+    // errors here, since we were just reading from the file.
     (void) fclose (S->V.File.F);
     --FCount;
 }
@@ -497,9 +492,8 @@ static const CharSourceFunctions IFFunc = {
 };
 
 int NewInputFile (const char* Name)
-/* Open a new input file. Returns true if the file could be successfully opened
-** and false otherwise.
-*/
+// Open a new input file. Returns true if the file could be successfully opened
+// and false otherwise.
 {
     int         RetCode = 0;            // Return code. Assume an error.
     char*       PathName = 0;
@@ -510,9 +504,8 @@ int NewInputFile (const char* Name)
     unsigned    FileIdx;
     CharSource* S;
 
-    /* If this is the main file, just try to open it. If it's an include file,
-    ** search for it using the include path list.
-    */
+    // If this is the main file, just try to open it. If it's an include file,
+    // search for it using the include path list.
     if (FCount == 0) {
         // Main file
         F = fopen (Name, "r");
@@ -520,9 +513,8 @@ int NewInputFile (const char* Name)
             Fatal ("Cannot open input file '%s': %s", Name, strerror (errno));
         }
     } else {
-        /* We are on include level. Search for the file in the include
-        ** directories.
-        */
+        // We are on include level. Search for the file in the include
+        // directories.
         PathName = SearchFile (IncSearchPath, Name);
         if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
             // Not found or cannot open, print an error and bail out
@@ -534,14 +526,13 @@ int NewInputFile (const char* Name)
         Name = PathName;
     }
 
-    /* Stat the file and remember the values. There's a race condition here,
-    ** since we cannot use fileno() (non-standard identifier in standard
-    ** header file), and therefore not fstat. When using stat with the
-    ** file name, there's a risk that the file was deleted and recreated
-    ** while it was open. Since mtime and size are only used to check
-    ** if a file has changed in the debugger, we will ignore this problem
-    ** here.
-    */
+    // Stat the file and remember the values. There's a race condition here,
+    // since we cannot use fileno() (non-standard identifier in standard
+    // header file), and therefore not fstat. When using stat with the
+    // file name, there's a risk that the file was deleted and recreated
+    // while it was open. Since mtime and size are only used to check
+    // if a file has changed in the debugger, we will ignore this problem
+    // here.
     if (FileStat (Name, &Buf) != 0) {
         Fatal ("Cannot stat input file '%s': %s", Name, strerror (errno));
     }
@@ -695,9 +686,8 @@ static int CmpDotKeyword (const void* K1, const void* K2)
 }
 
 static token_t FindDotKeyword (void)
-/* Find the dot keyword in SVal. Return the corresponding token if found,
-** return TOK_NONE if not found.
-*/
+// Find the dot keyword in SVal. Return the corresponding token if found,
+// return TOK_NONE if not found.
 {
     struct DotKeyword K;
     struct DotKeyword* R;
@@ -722,11 +712,10 @@ static token_t FindDotKeyword (void)
 }
 
 static void ReadIdent (void)
-/* Read an identifier from the current input position into Ident. Filling SVal
-** starts at the current position with the next character in C. It is assumed
-** that any characters already filled in are ok, and the character in C is
-** checked.
-*/
+// Read an identifier from the current input position into Ident. Filling SVal
+// starts at the current position with the next character in C. It is assumed
+// that any characters already filled in are ok, and the character in C is
+// checked.
 {
     // Read the identifier
     do {
@@ -816,10 +805,9 @@ static void ReadStringConst (int StringTerm)
                 case '\'':
                     C = '\''; // unnecessary but more readable
                     if (StringTerm == 0) {
-                        /* special case used by character constants
-                        ** when LooseStringTerm not set.  this will
-                        ** cause '\' to be a valid character constant
-                        */
+                        // special case used by character constants
+                        // when LooseStringTerm not set.  this will
+                        // cause '\' to be a valid character constant
                         C = '\\';
                         NeedNext = 0;
                     }
@@ -887,9 +875,8 @@ static void ReadStringConst (int StringTerm)
 }
 
 static int Sweet16Reg (const StrBuf* Id)
-/* Check if the given identifier is a sweet16 register. Return -1 if this is
-** not the case, return the register number otherwise.
-*/
+// Check if the given identifier is a sweet16 register. Return -1 if this is
+// not the case, return the register number otherwise.
 {
     unsigned RegNum;
     char Check;
@@ -1058,10 +1045,9 @@ Again:
                 }
             }
             if (IsXDigit (C)) {
-                /* Buf is big enough to allow any decimal and hex number to
-                ** overflow, so ignore excess digits here, they will be detected
-                ** when we convert the value.
-                */
+                // Buf is big enough to allow any decimal and hex number to
+                // overflow, so ignore excess digits here, they will be detected
+                // when we convert the value.
                 if (Digits < sizeof (Buf)) {
                     Buf[Digits++] = C;
                 }
@@ -1132,9 +1118,8 @@ Again:
                     goto Again;
                 }
 
-                /* An identifier with a dot. Check if it's a define style
-                ** macro.
-                */
+                // An identifier with a dot. Check if it's a define style
+                // macro.
                 if ((M = FindDefine (&CurTok.SVal)) != 0) {
                     // This is a define style macro - expand it
                     MacExpandStart (M);
@@ -1149,9 +1134,8 @@ Again:
         return;
     }
 
-    /* Indirect op for sweet16 cpu. Must check this before checking for local
-    ** symbols, because these may also use the '@' symbol.
-    */
+    // Indirect op for sweet16 cpu. Must check this before checking for local
+    // symbols, because these may also use the '@' symbol.
     if (CPU == CPU_SWEET16 && C == '@') {
         NextChar ();
         CurTok.Tok = TOK_AT;
@@ -1197,9 +1181,8 @@ Again:
         // Read the identifier
         ReadIdent ();
 
-        /* Check for special names. Bail out if we have identified the type of
-        ** the token. Go on if the token is an identifier.
-        */
+        // Check for special names. Bail out if we have identified the type of
+        // the token. Go on if the token is an identifier.
         switch (SB_GetLen (&CurTok.SVal)) {
             case 1:
                 switch (toupper (SB_AtUnchecked (&CurTok.SVal, 0))) {
@@ -1503,10 +1486,9 @@ CharAgain:
 
         case '\'':
             if (LooseStringTerm) {
-                /* Hack: If we allow ' as terminating character for strings, read
-                ** the following stuff as a string, and check for a one character
-                ** string later.
-                */
+                // Hack: If we allow ' as terminating character for strings, read
+                // the following stuff as a string, and check for a one character
+                // string later.
                 ReadStringConst ('\'');
                 if (SB_GetLen (&CurTok.SVal) == 1) {
                     CurTok.IVal = SB_AtUnchecked (&CurTok.SVal, 0);
@@ -1515,9 +1497,8 @@ CharAgain:
                     CurTok.Tok = TOK_STRCON;
                 }
             } else {
-                /* Always a character constant
-                ** Hack: Pass 0 to ReadStringConst for special handling.
-                */
+                // Always a character constant
+                // Hack: Pass 0 to ReadStringConst for special handling.
                 ReadStringConst(0);
                 if (SB_GetLen(&CurTok.SVal) != 1) {
                     Error ("Illegal character constant");
@@ -1566,20 +1547,18 @@ CharAgain:
             return;
     }
 
-    /* If we go here, we could not identify the current character. Skip it
-    ** and try again.
-    */
+    // If we go here, we could not identify the current character. Skip it
+    // and try again.
     Error ("Invalid input character: 0x%02X", C & 0xFF);
     NextChar ();
     goto Again;
 }
 
 int GetSubKey (const char* const* Keys, unsigned Count)
-/* Search for a subkey in a table of keywords. The current token must be an
-** identifier and all keys must be in upper case. The identifier will be
-** uppercased in the process. The function returns the index of the keyword,
-** or -1 if the keyword was not found.
-*/
+// Search for a subkey in a table of keywords. The current token must be an
+// identifier and all keys must be in upper case. The identifier will be
+// uppercased in the process. The function returns the index of the keyword,
+// or -1 if the keyword was not found.
 {
     unsigned I;
 
@@ -1604,10 +1583,9 @@ int GetSubKey (const char* const* Keys, unsigned Count)
 }
 
 unsigned char ParseAddrSize (void)
-/* Check if the next token is a keyword that denotes an address size specifier.
-** If so, return the corresponding address size constant, otherwise output an
-** error message and return ADDR_SIZE_DEFAULT.
-*/
+// Check if the next token is a keyword that denotes an address size specifier.
+// If so, return the corresponding address size constant, otherwise output an
+// error message and return ADDR_SIZE_DEFAULT.
 {
     unsigned char AddrSize;
 

@@ -42,9 +42,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptUnusedLoads (CodeSeg* S);
-/* Remove loads of or operations with registers where the value loaded or
-** produced is not used later.
-*/
+// Remove loads of or operations with registers where the value loaded or
+// produced is not used later.
 
 unsigned OptUnusedStores (CodeSeg* S);
 // Remove stores into zero page registers that aren't used later
@@ -68,19 +67,16 @@ unsigned OptTransfers1 (CodeSeg* S);
 // Remove transfers from one register to another and back
 
 unsigned OptTransfers2 (CodeSeg* S);
-/* Replace loads followed by a register transfer by a load with the second
-** register if possible.
-*/
+// Replace loads followed by a register transfer by a load with the second
+// register if possible.
 
 unsigned OptTransfers3 (CodeSeg* S);
-/* Replace a register transfer followed by a store of the second register by a
-** store of the first register if this is possible.
-*/
+// Replace a register transfer followed by a store of the second register by a
+// store of the first register if this is possible.
 
 unsigned OptTransfers4 (CodeSeg* S);
-/* Replace a load of a register followed by a transfer insn of the same register
-** by a load of the second register if possible.
-*/
+// Replace a load of a register followed by a transfer insn of the same register
+// by a load of the second register if possible.
 
 unsigned OptPushPop1 (CodeSeg* S);
 // Remove a PHA/PLA sequence were A not used later
@@ -92,39 +88,36 @@ unsigned OptPushPop3 (CodeSeg* S);
 // Remove a pha/pla sequence where the contents of A are known
 
 unsigned OptPrecalc (CodeSeg* S);
-/* Replace immediate operations with the accu where the current contents are
-** known by a load of the final value.
-*/
+// Replace immediate operations with the accu where the current contents are
+// known by a load of the final value.
 
 unsigned OptShiftBack (CodeSeg* S);
-/* Remove a pair of shifts to the opposite directions if none of the bits of
-** the register A or the Z/N flags modified by these shifts are used later.
-*/
+// Remove a pair of shifts to the opposite directions if none of the bits of
+// the register A or the Z/N flags modified by these shifts are used later.
 
 unsigned OptSignExtended (CodeSeg* S);
-/* Change
-**
-**      lda     xxx     ; X is 0
-**      bpl     L1
-**      dex/ldx #$FF
-**  L1: cpx     #$00
-**      bpl     L2
-**
-** or
-**
-**      lda     xxx     ; X is 0
-**      bpl     L1
-**      dex/ldx #$FF
-**  L1: cpx     #$80
-**      bcc/bmi L2
-**
-** into
-**      lda     xxx     ; X is 0
-**      bpl     L2
-**      dex/ldx #$FF
-**
-** provided the C flag isn't used later.
-*/
+// Change
+// 
+// lda     xxx     ; X is 0
+// bpl     L1
+// dex/ldx #$FF
+// L1: cpx     #$00
+// bpl     L2
+// 
+// or
+// 
+// lda     xxx     ; X is 0
+// bpl     L1
+// dex/ldx #$FF
+// L1: cpx     #$80
+// bcc/bmi L2
+// 
+// into
+// lda     xxx     ; X is 0
+// bpl     L2
+// dex/ldx #$FF
+// 
+// provided the C flag isn't used later.
 
 // End of coptind.h
 

@@ -53,12 +53,11 @@ static const unsigned char CmpInvertTab[] = {
 ////////////////////////////////////////////////////////////////////////////////
 
 static void ReplaceBranchCond (CodeSeg* S, unsigned I, cmp_t Cond)
-/* Helper function for the replacement of routines that return a boolean
-** followed by a conditional jump. Instead of the boolean value, the condition
-** codes are evaluated directly.
-** I is the index of the conditional branch, the sequence is already checked
-** to be correct.
-*/
+// Helper function for the replacement of routines that return a boolean
+// followed by a conditional jump. Instead of the boolean value, the condition
+// codes are evaluated directly.
+// I is the index of the conditional branch, the sequence is already checked
+// to be correct.
 {
     CodeEntry* N;
     CodeLabel* L;
@@ -78,11 +77,10 @@ static void ReplaceBranchCond (CodeSeg* S, unsigned I, cmp_t Cond)
             break;
 
         case CMP_GT:
-            /* Replace by
-            **     beq @L
-            **     jpl Target
-            ** @L: ...
-            */
+            // Replace by
+            // beq @L
+            // jpl Target
+            // @L: ...
             if ((N = CS_GetNextEntry (S, I)) == 0) {
                 // No such entry
                 Internal ("Invalid program flow");
@@ -102,10 +100,9 @@ static void ReplaceBranchCond (CodeSeg* S, unsigned I, cmp_t Cond)
             break;
 
         case CMP_LE:
-            /* Replace by
-            **     jmi Target
-            **     jeq Target
-            */
+            // Replace by
+            // jmi Target
+            // jeq Target
             CE_ReplaceOPC (E, OP65_JMI);
             L = E->JumpTo;
             N = NewCodeEntry (OP65_JEQ, AM65_BRA, L->Name, L, E->LI);
@@ -113,11 +110,10 @@ static void ReplaceBranchCond (CodeSeg* S, unsigned I, cmp_t Cond)
             break;
 
         case CMP_UGT:
-            /* Replace by
-            **     beq @L
-            **     jcs Target
-            ** @L: ...
-            */
+            // Replace by
+            // beq @L
+            // jcs Target
+            // @L: ...
             if ((N = CS_GetNextEntry (S, I)) == 0) {
                 // No such entry
                 Internal ("Invalid program flow");
@@ -137,10 +133,9 @@ static void ReplaceBranchCond (CodeSeg* S, unsigned I, cmp_t Cond)
             break;
 
         case CMP_ULE:
-            /* Replace by
-            **     jcc Target
-            **     jeq Target
-            */
+            // Replace by
+            // jcc Target
+            // jeq Target
             CE_ReplaceOPC (E, OP65_JCC);
             L = E->JumpTo;
             N = NewCodeEntry (OP65_JEQ, AM65_BRA, L->Name, L, E->LI);
@@ -159,11 +154,10 @@ static void ReplaceBranchCond (CodeSeg* S, unsigned I, cmp_t Cond)
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptBoolCmp (CodeSeg* S)
-/* Search for calls to compare subroutines followed by a conditional branch
-** and replace them by cheaper versions, since the branch means that the
-** boolean value returned by these routines is not needed (we may also check
-** that explicitly, but for the current code generator it is always true).
-*/
+// Search for calls to compare subroutines followed by a conditional branch
+// and replace them by cheaper versions, since the branch means that the
+// boolean value returned by these routines is not needed (we may also check
+// that explicitly, but for the current code generator it is always true).
 {
     unsigned Changes = 0;
 
@@ -184,13 +178,12 @@ unsigned OptBoolCmp (CodeSeg* S)
             (N->Info & OF_ZBRA) != 0                    &&
             !CE_HasLabel (N)) {
 
-            /* The tos... functions will return a boolean value in a/x and
-            ** the Z flag says if this value is zero or not. We will call
-            ** a cheaper subroutine instead, one that does not return a
-            ** boolean value but only valid flags. Note: jeq jumps if
-            ** the condition is not met, jne jumps if the condition is met.
-            ** Invert the code if we jump on condition not met.
-            */
+            // The tos... functions will return a boolean value in a/x and
+            // the Z flag says if this value is zero or not. We will call
+            // a cheaper subroutine instead, one that does not return a
+            // boolean value but only valid flags. Note: jeq jumps if
+            // the condition is not met, jne jumps if the condition is met.
+            // Invert the code if we jump on condition not met.
             if (GetBranchCond (N->OPC) == BC_EQ) {
                 // Jumps if condition false, invert condition
                 Cond = CmpInvertTab [Cond];
@@ -219,9 +212,8 @@ unsigned OptBoolCmp (CodeSeg* S)
 }
 
 unsigned OptBoolTrans (CodeSeg* S)
-/* Try to remove the call to boolean transformer routines where the call is
-** not really needed and change following branch condition accordingly.
-*/
+// Try to remove the call to boolean transformer routines where the call is
+// not really needed and change following branch condition accordingly.
 {
     unsigned Changes = 0;
 
@@ -242,12 +234,11 @@ unsigned OptBoolTrans (CodeSeg* S)
             (N->Info & OF_ZBRA) != 0                     &&
             (GetRegInfo (S, I + 2, PSTATE_Z) & PSTATE_Z) == 0) {
 
-            /* Make the boolean transformer unnecessary by changing the
-            ** the conditional jump to evaluate the condition flags that
-            ** are set after the compare directly. Note: jeq jumps if
-            ** the condition is not met, jne jumps if the condition is met.
-            ** Invert the code if we jump on condition not met.
-            */
+            // Make the boolean transformer unnecessary by changing the
+            // the conditional jump to evaluate the condition flags that
+            // are set after the compare directly. Note: jeq jumps if
+            // the condition is not met, jne jumps if the condition is met.
+            // Invert the code if we jump on condition not met.
             if (GetBranchCond (N->OPC) == BC_EQ) {
                 // Jumps if condition false, invert condition
                 Cond = CmpInvertTab [Cond];
@@ -274,9 +265,8 @@ unsigned OptBoolTrans (CodeSeg* S)
 }
 
 unsigned OptBoolUnary (CodeSeg* S)
-/* Try to remove the call to a bcastax/bnegax routines where the call is
-** not really needed and change following branch condition accordingly.
-*/
+// Try to remove the call to a bcastax/bnegax routines where the call is
+// not really needed and change following branch condition accordingly.
 {
     unsigned Changes = 0;
 
@@ -296,12 +286,11 @@ unsigned OptBoolUnary (CodeSeg* S)
             (N = CS_GetNextEntry (S, I)) != 0            &&
             (N->Info & OF_ZBRA) != 0) {
 
-            /* Make the boolean transformer unnecessary by changing the
-            ** the conditional jump to evaluate the condition flags that
-            ** are set after the compare directly. Note: jeq jumps if
-            ** the condition is not met, jne jumps if the condition is met.
-            ** Invert the code if we jump on condition not met.
-            */
+            // Make the boolean transformer unnecessary by changing the
+            // the conditional jump to evaluate the condition flags that
+            // are set after the compare directly. Note: jeq jumps if
+            // the condition is not met, jne jumps if the condition is met.
+            // Invert the code if we jump on condition not met.
             if (GetBranchCond (N->OPC) == BC_EQ) {
                 // Jumps if condition false, invert condition
                 Cond = CmpInvertTab [Cond];
@@ -332,10 +321,9 @@ unsigned OptBoolUnary (CodeSeg* S)
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptBoolUnary1 (CodeSeg* S)
-/* Search for and remove cmp #0/bcastax/boolne following a bcastax/bnegax.
-** Or search for and remove cmp #1/bnegax/booleq following a bcastax/bnegax
-** and invert the bcastax/bnegax.
-*/
+// Search for and remove cmp #0/bcastax/boolne following a bcastax/bnegax.
+// Or search for and remove cmp #1/bnegax/booleq following a bcastax/bnegax
+// and invert the bcastax/bnegax.
 {
     unsigned Changes = 0;
     int      Neg = 0;
@@ -349,9 +337,8 @@ unsigned OptBoolUnary1 (CodeSeg* S)
         // Get next entry
         L[0] = CS_GetEntry (S, I);
 
-        /* Check for the sequence.
-        ** We allow the first entry to have labels.
-        */
+        // Check for the sequence.
+        // We allow the first entry to have labels.
         if (L[0]->OPC == OP65_JSR                   &&
             (L[1] = CS_GetNextEntry (S, I)) != 0    &&
             !CE_HasLabel (L[1])) {
@@ -403,10 +390,9 @@ unsigned OptBoolUnary1 (CodeSeg* S)
 }
 
 unsigned OptBoolUnary2 (CodeSeg* S)
-/* Search for and remove cmp #0/bcastax/boolne following a boolean transformer.
-** Or search for and remove cmp #1/bnegax/booleq following a boolean transformer
-** and invert the boolean transformer.
-*/
+// Search for and remove cmp #0/bcastax/boolne following a boolean transformer.
+// Or search for and remove cmp #1/bnegax/booleq following a boolean transformer
+// and invert the boolean transformer.
 {
     unsigned Changes = 0;
     cmp_t Cond;
@@ -421,9 +407,8 @@ unsigned OptBoolUnary2 (CodeSeg* S)
         // Get next entry
         L[0] = CS_GetEntry (S, I);
 
-        /* Check for the sequence.
-        ** We allow the first entry to have labels.
-        */
+        // Check for the sequence.
+        // We allow the first entry to have labels.
         if (L[0]->OPC == OP65_JSR                   &&
             (L[1] = CS_GetNextEntry (S, I)) != 0    &&
             !CE_HasLabel (L[1])                     &&
@@ -470,17 +455,16 @@ unsigned OptBoolUnary2 (CodeSeg* S)
 }
 
 unsigned OptBoolUnary3 (CodeSeg* S)
-/* If A == 0, replace bcastax/bnegax with
-**
-**      cpx #0
-**      jsr boolne/booleq
-**
-** Or if X == 0, replace bcastax/bnegax with
-**
-**      cmp #0
-**      jsr boolne/booleq
-**
-*/
+// If A == 0, replace bcastax/bnegax with
+// 
+// cpx #0
+// jsr boolne/booleq
+// 
+// Or if X == 0, replace bcastax/bnegax with
+// 
+// cmp #0
+// jsr boolne/booleq
+// 
 {
     unsigned    Changes = 0;
     opc_t       Op      = OP65_COUNT;
@@ -545,14 +529,13 @@ unsigned OptBoolUnary3 (CodeSeg* S)
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptBNegA1 (CodeSeg* S)
-/* Check for
-**
-**      ldx     #$00
-**      lda     ..
-**      jsr     bnega
-**
-** Remove the ldx if the lda does not use it.
-*/
+// Check for
+// 
+// ldx     #$00
+// lda     ..
+// jsr     bnega
+// 
+// Remove the ldx if the lda does not use it.
 {
     unsigned Changes = 0;
 
@@ -595,14 +578,13 @@ unsigned OptBNegA1 (CodeSeg* S)
 }
 
 unsigned OptBNegA2 (CodeSeg* S)
-/* Check for
-**
-**      lda     ..
-**      jsr     bnega
-**      jeq/jne ..
-**
-** Adjust the conditional branch and remove the call to the subroutine.
-*/
+// Check for
+// 
+// lda     ..
+// jsr     bnega
+// jeq/jne ..
+// 
+// Adjust the conditional branch and remove the call to the subroutine.
 {
     unsigned Changes = 0;
 
@@ -659,10 +641,9 @@ unsigned OptBNegA2 (CodeSeg* S)
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptBNegAX1 (CodeSeg* S)
-/* On a call to bnegax, if X is zero, the result depends only on the value in
-** A, so change the call to a call to bnega. This will get further optimized
-** later if possible.
-*/
+// On a call to bnegax, if X is zero, the result depends only on the value in
+// A, so change the call to a call to bnega. This will get further optimized
+// later if possible.
 {
     unsigned Changes = 0;
     unsigned I;
@@ -695,21 +676,20 @@ unsigned OptBNegAX1 (CodeSeg* S)
 }
 
 unsigned OptBNegAX2 (CodeSeg* S)
-/* Search for the sequence:
-**
-**      ldy     #xx
-**      jsr     ldaxysp
-**      jsr     bnegax
-**      jne/jeq ...
-**
-** and replace it by
-**
-**      ldy     #xx
-**      lda     (c_sp),y
-**      dey
-**      ora     (c_sp),y
-**      jeq/jne ...
-*/
+// Search for the sequence:
+// 
+// ldy     #xx
+// jsr     ldaxysp
+// jsr     bnegax
+// jne/jeq ...
+// 
+// and replace it by
+// 
+// ldy     #xx
+// lda     (c_sp),y
+// dey
+// ora     (c_sp),y
+// jeq/jne ...
 {
     unsigned Changes = 0;
 
@@ -767,19 +747,18 @@ unsigned OptBNegAX2 (CodeSeg* S)
 }
 
 unsigned OptBNegAX3 (CodeSeg* S)
-/* Search for the sequence:
-**
-**      lda     xx
-**      ldx     yy
-**      jsr     bnegax
-**      jne/jeq ...
-**
-** and replace it by
-**
-**      lda     xx
-**      ora     xx+1
-**      jeq/jne ...
-*/
+// Search for the sequence:
+// 
+// lda     xx
+// ldx     yy
+// jsr     bnegax
+// jne/jeq ...
+// 
+// and replace it by
+// 
+// lda     xx
+// ora     xx+1
+// jeq/jne ...
 {
     unsigned Changes = 0;
 
@@ -827,18 +806,17 @@ unsigned OptBNegAX3 (CodeSeg* S)
 }
 
 unsigned OptBNegAX4 (CodeSeg* S)
-/* Search for the sequence:
-**
-**      jsr     xxx
-**      jsr     bnega(x)
-**      jeq/jne ...
-**
-** and replace it by:
-**
-**      jsr     xxx
-**      <boolean test>
-**      jne/jeq ...
-*/
+// Search for the sequence:
+// 
+// jsr     xxx
+// jsr     bnega(x)
+// jeq/jne ...
+// 
+// and replace it by:
+// 
+// jsr     xxx
+// <boolean test>
+// jne/jeq ...
 {
     unsigned Changes = 0;
 

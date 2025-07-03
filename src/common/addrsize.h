@@ -53,9 +53,8 @@ const char* AddrSizeToStr (unsigned char AddrSize);
 // Return the name for an address size specifier
 
 unsigned char AddrSizeFromStr (const char* Str);
-/* Return the address size for a given string. Returns ADDR_SIZE_INVALID if
-** the string cannot be mapped to an address size.
-*/
+// Return the address size for a given string. Returns ADDR_SIZE_INVALID if
+// the string cannot be mapped to an address size.
 
 // End of addrsize.h
 

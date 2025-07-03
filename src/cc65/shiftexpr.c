@@ -130,10 +130,9 @@ void ShiftExpr (struct ExprDesc* Expr)
             // Remove the code that pushes the rhs onto the stack.
             RemoveCode (&Mark2);
 
-            /* If the shift count is greater than or equal to the width of the
-            ** promoted left operand, the behaviour is undefined according to
-            ** the standard.
-            */
+            // If the shift count is greater than or equal to the width of the
+            // promoted left operand, the behaviour is undefined according to
+            // the standard.
             if (!ED_IsUneval (Expr)) {
                 if (Expr2.IVal < 0) {
                     Warning ("Negative shift count %ld treated as %u for %s",
@@ -191,12 +190,11 @@ void ShiftExpr (struct ExprDesc* Expr)
                 goto MakeRVal;
             }
 
-            /* If we're shifting an integer or unsigned to the right, the lhs
-            ** has a quasi-const address, and the shift count is larger than 8,
-            ** we can load just the high byte as a char with the correct
-            ** signedness, and reduce the shift count by 8. If the remaining
-            ** shift count is zero, we're done.
-            */
+            // If we're shifting an integer or unsigned to the right, the lhs
+            // has a quasi-const address, and the shift count is larger than 8,
+            // we can load just the high byte as a char with the correct
+            // signedness, and reduce the shift count by 8. If the remaining
+            // shift count is zero, we're done.
             if (Tok == TOK_SHR &&
                 IsClassInt (Expr->Type) &&
                 SizeOf (Expr->Type) == SIZEOF_INT &&
@@ -208,9 +206,8 @@ void ShiftExpr (struct ExprDesc* Expr)
                 ++Expr->IVal;
                 Expr2.IVal -= 8;
 
-                /* Replace the type of the expression temporarily by the
-                ** corresponding char type.
-                */
+                // Replace the type of the expression temporarily by the
+                // corresponding char type.
                 if (IsSignUnsigned (Expr->Type)) {
                     Expr->Type = type_uchar;
                 } else {

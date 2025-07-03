@@ -51,41 +51,40 @@
 
 // Defines for the flags field of the expression descriptor
 enum {
-    /* Location: Where is the value we're talking about?
-    **
-    ** Remarks:
-    ** - E_LOC_<else> refers to any other than E_LOC_NONE and E_LOC_PRIMARY.
-    ** - E_LOC_EXPR can be regarded as a generalized E_LOC_<else>.
-    ** - E_LOC_NONE can be regarded as E_LOC_PRIMARY + E_ADDRESS_OF unless
-    **    remarked otherwise (see below).
-    ** - An E_LOC_NONE value is not considered to be an "address".
-    ** - ref-load doesn't change the location, while rval-load puts into the
-    **    primary register a "temporary" that is the straight integer rvalue or
-    **    a "delegate" to the real rvalue somewhere else.
-    ** - ref-load doesn't change the rval/lval category of the expression,
-    **    while rval-load converts it to an rvalue if it wasn't.
-    ** - In practice, ref-load is unimplemented, and can be simulated with
-    **    adding E_ADDRESS_OF temporaily through LoadExpr + FinalizeLoad,
-    **    whilst val-load is done with LoadExpr + FinalizeRValLoad.
-    **
-    ** E_LOC_NONE     -- ref-load     -> + E_LOADED (int rvalue)
-    ** E_LOC_PRIMARY  -- ref-load     -> + E_LOADED (unchanged)
-    ** E_LOC_<else>   -- ref-load     -> + E_LOADED (reference lvalue)
-    ** + E_ADDRESS_OF -- ref-load     -> + E_LOADED (address rvalue)
-    ** E_LOC_NONE     -- val-load     -> E_LOC_PRIMARY (int rvalue)
-    ** E_LOC_PRIMARY  -- val-load     -> E_LOC_PRIMARY (unchanged)
-    ** E_LOC_<else>   -- val-load     -> E_LOC_PRIMARY (rvalue/delegate)
-    ** + E_ADDRESS_OF -- val-load     -> E_LOC_PRIMARY (address rvalue)
-    ** E_LOC_NONE     -- take address -> (error)
-    ** E_LOC_PRIMARY  -- take address -> + E_ADDRESS_OF (or error)
-    ** E_LOC_EXPR     -- take address -> E_LOC_PRIMARY (address)
-    ** E_LOC_<else>   -- take address -> + E_ADDRESS_OF (address)
-    ** + E_ADDRESS_OF -- take address -> (error)
-    ** E_LOC_NONE     -- dereference  -> E_LOC_ABS (lvalue reference)
-    ** E_LOC_PRIMARY  -- dereference  -> E_LOC_EXPR (lvalue reference)
-    ** E_LOC_<else>   -- dereference  -> E_LOC_EXPR (pointed-to-value, must load)
-    ** + E_ADDRESS_OF -- dereference  -> (lvalue reference)
-    */
+    // Location: Where is the value we're talking about?
+    // 
+    // Remarks:
+    // - E_LOC_<else> refers to any other than E_LOC_NONE and E_LOC_PRIMARY.
+    // - E_LOC_EXPR can be regarded as a generalized E_LOC_<else>.
+    // - E_LOC_NONE can be regarded as E_LOC_PRIMARY + E_ADDRESS_OF unless
+    // remarked otherwise (see below).
+    // - An E_LOC_NONE value is not considered to be an "address".
+    // - ref-load doesn't change the location, while rval-load puts into the
+    // primary register a "temporary" that is the straight integer rvalue or
+    // a "delegate" to the real rvalue somewhere else.
+    // - ref-load doesn't change the rval/lval category of the expression,
+    // while rval-load converts it to an rvalue if it wasn't.
+    // - In practice, ref-load is unimplemented, and can be simulated with
+    // adding E_ADDRESS_OF temporaily through LoadExpr + FinalizeLoad,
+    // whilst val-load is done with LoadExpr + FinalizeRValLoad.
+    // 
+    // E_LOC_NONE     -- ref-load     -> + E_LOADED (int rvalue)
+    // E_LOC_PRIMARY  -- ref-load     -> + E_LOADED (unchanged)
+    // E_LOC_<else>   -- ref-load     -> + E_LOADED (reference lvalue)
+    // + E_ADDRESS_OF -- ref-load     -> + E_LOADED (address rvalue)
+    // E_LOC_NONE     -- val-load     -> E_LOC_PRIMARY (int rvalue)
+    // E_LOC_PRIMARY  -- val-load     -> E_LOC_PRIMARY (unchanged)
+    // E_LOC_<else>   -- val-load     -> E_LOC_PRIMARY (rvalue/delegate)
+    // + E_ADDRESS_OF -- val-load     -> E_LOC_PRIMARY (address rvalue)
+    // E_LOC_NONE     -- take address -> (error)
+    // E_LOC_PRIMARY  -- take address -> + E_ADDRESS_OF (or error)
+    // E_LOC_EXPR     -- take address -> E_LOC_PRIMARY (address)
+    // E_LOC_<else>   -- take address -> + E_ADDRESS_OF (address)
+    // + E_ADDRESS_OF -- take address -> (error)
+    // E_LOC_NONE     -- dereference  -> E_LOC_ABS (lvalue reference)
+    // E_LOC_PRIMARY  -- dereference  -> E_LOC_EXPR (lvalue reference)
+    // E_LOC_<else>   -- dereference  -> E_LOC_EXPR (pointed-to-value, must load)
+    // + E_ADDRESS_OF -- dereference  -> (lvalue reference)
     E_MASK_LOC          = 0x01FF,
     E_LOC_NONE          = 0x0000,       // Pure rvalue with no storage
     E_LOC_ABS           = 0x0001,       // Absolute numeric addressed variable
@@ -125,43 +124,42 @@ enum {
     E_NEED_NONE         = 0x010000,     // Expression result is unused
     E_NEED_TEST         = 0x020000,     // Expression needs a test to set cc
 
-    /* Expression evaluation requirements.
-    ** Usage: (Flags & E_EVAL_<Flag>) == E_EVAL_<Flag>
-    **
-    ** Remark:
-    ** - Expression result, that is the "final value" of the expression, is no
-    **    more than one of the effects of the whole expression. Effects other
-    **    than it are usually consided "side-effects" in this regard.
-    ** - The compiler front end cannot know things determined by the linker,
-    **    such as the actual address of an object with static storage. What it
-    **    can know is categorized as "compiler-known" here.
-    ** - The concept "immutable" here means that once something is determined
-    **    (not necessarily by the compiler), it will never change. This is not
-    **    the same meaning as the "constant" word in the C standard.
-    ** - The concept "compile-time" ( not to be confued with "compiler-known"),
-    **    or "static" (compared to "run-time" as in "_Static_assert" in C, not
-    **    to be confused with the "static" storage) here means that something
-    **    has no run-time behaviors, enforced by the fact that it generates no
-    **    target code (hence "no-code"). It is closely related to the concepts
-    **    above but not the same.
-    ** - An "unevaluated" expression is special and different from the above:
-    **    while it generates no code, cannot change its "value" (it actually has
-    **    no value), and must be completely handled by the compiler front-end,
-    **    it is unique in that it is not "evaluated" while the others are, and
-    **    the codegen routine of such an expression is usually separated from
-    **    the normally evaluated ones. Therefore it is treated differently from
-    **    the above and uses a separate flag that implies none of the above.
-    ** - The "maybe-unused" flag is to suppress the checking and warning on
-    **    expressions with no effects. It doesn't have any special meanings
-    **    beyond that, and is independent from the E_NEED_<flag>s. All
-    **    "unevaluated" expressions are  flagged as "maybe-unused" just to
-    **    avoid unnecessary warnings.
-    **
-    ** Relationship of some concepts:
-    ** - "no-code" implies "no-side-effects"
-    ** - "immutable" = "compiler-known" OR "no-code"
-    ** - "constant expression" in C = "compiler-known" AND "no-code", with minor differences
-    */
+    // Expression evaluation requirements.
+    // Usage: (Flags & E_EVAL_<Flag>) == E_EVAL_<Flag>
+    // 
+    // Remark:
+    // - Expression result, that is the "final value" of the expression, is no
+    // more than one of the effects of the whole expression. Effects other
+    // than it are usually consided "side-effects" in this regard.
+    // - The compiler front end cannot know things determined by the linker,
+    // such as the actual address of an object with static storage. What it
+    // can know is categorized as "compiler-known" here.
+    // - The concept "immutable" here means that once something is determined
+    // (not necessarily by the compiler), it will never change. This is not
+    // the same meaning as the "constant" word in the C standard.
+    // - The concept "compile-time" ( not to be confued with "compiler-known"),
+    // or "static" (compared to "run-time" as in "_Static_assert" in C, not
+    // to be confused with the "static" storage) here means that something
+    // has no run-time behaviors, enforced by the fact that it generates no
+    // target code (hence "no-code"). It is closely related to the concepts
+    // above but not the same.
+    // - An "unevaluated" expression is special and different from the above:
+    // while it generates no code, cannot change its "value" (it actually has
+    // no value), and must be completely handled by the compiler front-end,
+    // it is unique in that it is not "evaluated" while the others are, and
+    // the codegen routine of such an expression is usually separated from
+    // the normally evaluated ones. Therefore it is treated differently from
+    // the above and uses a separate flag that implies none of the above.
+    // - The "maybe-unused" flag is to suppress the checking and warning on
+    // expressions with no effects. It doesn't have any special meanings
+    // beyond that, and is independent from the E_NEED_<flag>s. All
+    // "unevaluated" expressions are  flagged as "maybe-unused" just to
+    // avoid unnecessary warnings.
+    // 
+    // Relationship of some concepts:
+    // - "no-code" implies "no-side-effects"
+    // - "immutable" = "compiler-known" OR "no-code"
+    // - "constant expression" in C = "compiler-known" AND "no-code", with minor differences
     E_MASK_EVAL             = 0xFC0000,
     E_EVAL_NONE             = 0x000000, // No requirements
     E_EVAL_IMMUTABLE_RESULT = 0x040000, // Expression result must be immutable
@@ -240,15 +238,13 @@ INLINE int ED_GetNeeds (const ExprDesc* Expr)
 #endif
 
 const char* ED_GetLabelName (const ExprDesc* Expr, long Offs);
-/* Return the assembler label name of the given expression. Beware: This
-** function may use a static buffer, so the name may get "lost" on the second
-** call to the function.
-*/
+// Return the assembler label name of the given expression. Beware: This
+// function may use a static buffer, so the name may get "lost" on the second
+// call to the function.
 
 int ED_GetStackOffs (const ExprDesc* Expr, int Offs);
-/* Get the stack offset of an address on the stack in Expr taking into account
-** an additional offset in Offs.
-*/
+// Get the stack offset of an address on the stack in Expr taking into account
+// an additional offset in Offs.
 
 ////////////////////////////////////////////////////////////////////////////////
 //                                Predicates
@@ -336,17 +332,15 @@ INLINE int ED_IsLocConst (const ExprDesc* Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLocQuasiConst (const ExprDesc* Expr)
-/* Return true if the expression is a constant location of some sort or on the
-** stack.
-*/
+// Return true if the expression is a constant location of some sort or on the
+// stack.
 {
     return ED_IsLocConst (Expr) || ED_IsLocStack (Expr);
 }
 #else
 int ED_IsLocQuasiConst (const ExprDesc* Expr);
-/* Return true if the expression denotes a constant address of some sort. This
-** can be the address of a global variable (maybe with offset) or similar.
-*/
+// Return true if the expression denotes a constant address of some sort. This
+// can be the address of a global variable (maybe with offset) or similar.
 #endif
 
 int ED_IsLocZP (const ExprDesc* Expr);
@@ -405,9 +399,8 @@ INLINE int ED_YetToTest (const ExprDesc* Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLoaded (const ExprDesc* Expr)
-/* Check if the expression is loaded.
-** NOTE: This is currently unused and not working due to code complexity.
-*/
+// Check if the expression is loaded.
+// NOTE: This is currently unused and not working due to code complexity.
 {
     return (Expr->Flags & E_LOADED) != 0;
 }
@@ -450,8 +443,7 @@ INLINE int ED_MayHaveNoEffect (const ExprDesc* Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsAddrExpr (const ExprDesc* Expr)
-/* Check if the expression is taken address of instead of its value.
-*/
+// Check if the expression is taken address of instead of its value.
 {
     return (Expr->Flags & E_ADDRESS_OF) != 0;
 }
@@ -505,17 +497,15 @@ int ED_IsAbs (const ExprDesc* Expr);
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsConstAbs (const ExprDesc* Expr)
-/* Return true if the expression denotes a constant absolute value. This can be
-** a numeric constant, cast to any type.
-*/
+// Return true if the expression denotes a constant absolute value. This can be
+// a numeric constant, cast to any type.
 {
     return ED_IsRVal (Expr) && ED_IsAbs (Expr);
 }
 #else
 int ED_IsConstAbs (const ExprDesc* Expr);
-/* Return true if the expression denotes a constant absolute value. This can be
-** a numeric constant, cast to any type.
-*/
+// Return true if the expression denotes a constant absolute value. This can be
+// a numeric constant, cast to any type.
 #endif
 
 int ED_IsConstAbsInt (const ExprDesc* Expr);
@@ -525,35 +515,29 @@ int ED_IsConstBool (const ExprDesc* Expr);
 // Return true if the expression can be constantly evaluated as a boolean.
 
 int ED_IsConstTrue (const ExprDesc* Expr);
-/* Return true if the constant expression can be evaluated as boolean true at
-** compile time.
-*/
+// Return true if the constant expression can be evaluated as boolean true at
+// compile time.
 
 int ED_IsConstFalse (const ExprDesc* Expr);
-/* Return true if the constant expression can be evaluated as boolean false at
-** compile time.
-*/
+// Return true if the constant expression can be evaluated as boolean false at
+// compile time.
 
 int ED_IsConst (const ExprDesc* Expr);
-/* Return true if the expression denotes a constant of some sort. This can be a
-** numeric constant, the address of a global variable (maybe with offset) or
-** similar.
-*/
+// Return true if the expression denotes a constant of some sort. This can be a
+// numeric constant, the address of a global variable (maybe with offset) or
+// similar.
 
 int ED_IsQuasiConst (const ExprDesc* Expr);
-/* Return true if the expression denotes a quasi-constant of some sort. This
-** can be a numeric constant, a constant address or a stack variable address.
-*/
+// Return true if the expression denotes a quasi-constant of some sort. This
+// can be a numeric constant, a constant address or a stack variable address.
 
 int ED_IsConstAddr (const ExprDesc* Expr);
-/* Return true if the expression denotes a constant address of some sort. This
-** can be the address of a global variable (maybe with offset) or similar.
-*/
+// Return true if the expression denotes a constant address of some sort. This
+// can be the address of a global variable (maybe with offset) or similar.
 
 int ED_IsQuasiConstAddr (const ExprDesc* Expr);
-/* Return true if the expression denotes a quasi-constant address of some sort.
-** This can be a constant address or a stack variable address.
-*/
+// Return true if the expression denotes a quasi-constant address of some sort.
+// This can be a constant address or a stack variable address.
 
 int ED_IsStackAddr (const ExprDesc* Expr);
 // Return true if the expression denotes a fixed address on stack
@@ -562,26 +546,22 @@ int ED_IsZPInd (const ExprDesc* Expr);
 // Return true if the expression is located on the zeropage
 
 int ED_IsNullPtr (const ExprDesc* Expr);
-/* Return true if the given expression is a null pointer.
-** Note: A null pointer constant converted to a pointer type is a null pointer.
-*/
+// Return true if the given expression is a null pointer.
+// Note: A null pointer constant converted to a pointer type is a null pointer.
 
 int ED_IsNullPtrConstant (const ExprDesc* Expr);
-/* Return true if the given expression is a null pointer constant.
-** Note: An integer constant expression with value 0, or such an
-** expression cast to void* is a null pointer constant. However, a
-** null pointer constant converted to a pointer type is just a null
-** pointer, not necessarily a constant in ISO C.
-*/
+// Return true if the given expression is a null pointer constant.
+// Note: An integer constant expression with value 0, or such an
+// expression cast to void* is a null pointer constant. However, a
+// null pointer constant converted to a pointer type is just a null
+// pointer, not necessarily a constant in ISO C.
 
 int ED_IsEntityAddr (const ExprDesc* Expr);
-/* Return true if the expression denotes the address of an object or function.
-*/
+// Return true if the expression denotes the address of an object or function.
 
 int ED_IsBool (const ExprDesc* Expr);
-/* Return true if the expression can be treated as a boolean, that is, it can
-** be an operand to a compare operation with 0/NULL.
-*/
+// Return true if the expression can be treated as a boolean, that is, it can
+// be an operand to a compare operation with 0/NULL.
 
 ////////////////////////////////////////////////////////////////////////////////
 //                               Manipulation
@@ -601,11 +581,10 @@ ExprDesc* ED_FinalizeRValLoad (ExprDesc* Expr);
 
 #if defined(HAVE_INLINE)
 INLINE void ED_MarkExprAsLVal (ExprDesc* Expr)
-/* Mark the expression as an lvalue.
-** HINT: Consider using ED_IndExpr instead of this, unless you know what
-**       consequence there will be, as there are both a big part in the code
-**       assuming rvalue = const and a big part assuming rvalue = address.
-*/
+// Mark the expression as an lvalue.
+// HINT: Consider using ED_IndExpr instead of this, unless you know what
+// consequence there will be, as there are both a big part in the code
+// assuming rvalue = const and a big part assuming rvalue = address.
 {
     Expr->Flags |= E_RTYPE_LVAL;
 }
@@ -615,11 +594,10 @@ INLINE void ED_MarkExprAsLVal (ExprDesc* Expr)
 
 #if defined(HAVE_INLINE)
 INLINE void ED_MarkExprAsRVal (ExprDesc* Expr)
-/* Mark the expression as an rvalue.
-** HINT: Consider using ED_AddrExpr instead of this, unless you know what
-**       consequence there will be, as there are both a big part in the code
-**       assuming rvalue = const and a big part assuming rvalue = address.
-*/
+// Mark the expression as an rvalue.
+// HINT: Consider using ED_AddrExpr instead of this, unless you know what
+// consequence there will be, as there are both a big part in the code
+// assuming rvalue = const and a big part assuming rvalue = address.
 {
     Expr->Flags &= ~E_RTYPE_LVAL;
 }

@@ -111,17 +111,15 @@ static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
 }
 
 Segment* GetSegment (unsigned Name, unsigned char AddrSize, const char* ObjName)
-/* Search for a segment and return an existing one. If the segment does not
-** exist, create a new one and return that. ObjName is only used for the error
-** message and may be NULL if the segment is linker generated.
-*/
+// Search for a segment and return an existing one. If the segment does not
+// exist, create a new one and return that. ObjName is only used for the error
+// message and may be NULL if the segment is linker generated.
 {
     // Try to locate the segment in the table
     Segment* S = SegFind (Name);
 
-    /* If we don't have that segment already, allocate it using the type of
-    ** the first section.
-    */
+    // If we don't have that segment already, allocate it using the type of
+    // the first section.
     if (S == 0) {
         // Create a new segment
         S = NewSegment (Name, AddrSize);
@@ -286,9 +284,8 @@ Segment* SegFind (unsigned Name)
 }
 
 int IsBSSType (Segment* S)
-/* Check if the given segment is a BSS style segment, that is, it does not
-** contain non-zero data.
-*/
+// Check if the given segment is a BSS style segment, that is, it does not
+// contain non-zero data.
 {
     // Loop over all sections
     unsigned I;
@@ -379,9 +376,8 @@ void SegDump (void)
 }
 
 unsigned SegWriteConstExpr (FILE* F, ExprNode* E, int Signed, unsigned Size)
-/* Write a supposedly constant expression to the target file. Do a range
-** check and return one of the SEG_EXPR_xxx codes.
-*/
+// Write a supposedly constant expression to the target file. Do a range
+// check and return one of the SEG_EXPR_xxx codes.
 {
     static const unsigned long U_Hi[4] = {
         0x000000FFUL, 0x0000FFFFUL, 0x00FFFFFFUL, 0xFFFFFFFFUL
@@ -420,9 +416,8 @@ unsigned SegWriteConstExpr (FILE* F, ExprNode* E, int Signed, unsigned Size)
 }
 
 void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void* Data)
-/* Write the data from the given segment to a file. For expressions, F is
-** called (see description of SegWriteFunc above).
-*/
+// Write the data from the given segment to a file. For expressions, F is
+// called (see description of SegWriteFunc above).
 {
     unsigned      I;
     int           Sign;
@@ -442,10 +437,9 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
         // Output were this section is from
         Print (stdout, 2, "      Section from \"%s\"\n", GetObjFileName (Sec->Obj));
 
-        /* If we have fill bytes, write them now. Beware: If this is the
-        ** first section, the fill value is not considered part of the segment
-        ** and therefore taken from the memory area.
-        */
+        // If we have fill bytes, write them now. Beware: If this is the
+        // first section, the fill value is not considered part of the segment
+        // and therefore taken from the memory area.
         FillVal = (I == 0)? S->MemArea->FillVal : S->FillVal;
         Print (stdout, 2, "        Filling 0x%lx bytes with 0x%02x\n",
                Sec->Fill, FillVal);
@@ -613,9 +607,8 @@ void PrintDbgSegments (FILE* F)
 }
 
 void CheckSegments (void)
-/* Walk through the segment list and check if there are segments that were
-** not written to the output file. Output an error if this is the case.
-*/
+// Walk through the segment list and check if there are segments that were
+// not written to the output file. Output an error if this is the case.
 {
     unsigned I;
     for (I = 0; I < CollCount (&SegmentList); ++I) {

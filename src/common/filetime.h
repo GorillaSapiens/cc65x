@@ -31,12 +31,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-/* This module works around bugs in the time conversion code supplied by
-** Microsoft. The problem described here:
-**   http://www.codeproject.com/KB/datetime/dstbugs.aspx
-** is also true when setting file times via utime(), so we need a
-** replacement
-*/
+// This module works around bugs in the time conversion code supplied by
+// Microsoft. The problem described here:
+// http://www.codeproject.com/KB/datetime/dstbugs.aspx
+// is also true when setting file times via utime(), so we need a
+// replacement
 
 #ifndef FILETIME_H
 #define FILETIME_H
@@ -48,10 +47,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 int SetFileTimes (const char* Path, time_t T);
-/* Set the time of last modification and the time of last access of a file to
-** the given time T. This calls utime() for system where it works, and applies
-** workarounds for all others (which in fact means "WINDOWS").
-*/
+// Set the time of last modification and the time of last access of a file to
+// the given time T. This calls utime() for system where it works, and applies
+// workarounds for all others (which in fact means "WINDOWS").
 
 // End of filestat.h
 

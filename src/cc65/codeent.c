@@ -98,17 +98,15 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
 {
     const ZPInfo* Info;
 
-    /* If this is a subroutine call, or a jump to an external function,
-    ** lookup the information about this function and use it. The jump itself
-    ** does not change any registers, so we don't need to use the data from D.
-    */
+    // If this is a subroutine call, or a jump to an external function,
+    // lookup the information about this function and use it. The jump itself
+    // does not change any registers, so we don't need to use the data from D.
     if ((E->Info & (OF_UBRA | OF_CALL)) != 0 && E->JumpTo == 0) {
         // A subroutine call or jump to external symbol (function exit)
         GetFuncInfo (E->Arg, &E->Use, &E->Chg);
     } else {
-        /* Some other instruction. Use the values from the opcode description
-        ** plus addressing mode info.
-        */
+        // Some other instruction. Use the values from the opcode description
+        // plus addressing mode info.
         E->Use = D->Use | GetAMUseInfo (E->AM);
         E->Chg = D->Chg;
 
@@ -314,12 +312,11 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
 ////////////////////////////////////////////////////////////////////////////////
 
 int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Name, long* Offset)
-/* Break the opcode argument string into a symbol name/label part plus an offset.
-** Both parts are optional, but if there are any characters in the string that
-** can't be parsed, it's an failure.
-** The caller is responsible for managing the StrBuf.
-** Return whether parsing succeeds or not.
-*/
+// Break the opcode argument string into a symbol name/label part plus an offset.
+// Both parts are optional, but if there are any characters in the string that
+// can't be parsed, it's an failure.
+// The caller is responsible for managing the StrBuf.
+// Return whether parsing succeeds or not.
 {
     unsigned short  Flags = 0;
     const char*     OffsetPart = 0;
@@ -385,10 +382,9 @@ int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Nam
             }
         }
 
-        /* If the symbol name starts with an underline, it is an external symbol.
-        ** If the symbol does not start with an underline, it may be a built-in
-        ** symbol.
-        */
+        // If the symbol name starts with an underline, it is an external symbol.
+        // If the symbol does not start with an underline, it may be a built-in
+        // symbol.
         if (Arg[0] == '_') {
             Flags |= AIF_EXTERNAL;
         } else {
@@ -443,9 +439,8 @@ int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Nam
             Flags |= AIF_HAS_NAME;
         }
 
-        /* A byte size expression with no parentheses but an offset is not
-        ** handled correctly for now, so just bail out in such cases.
-        */
+        // A byte size expression with no parentheses but an offset is not
+        // handled correctly for now, so just bail out in such cases.
         if ((Flags & AIF_FAR) != 0  &&
             Parentheses == 0        &&
             OffsetPart != 0         &&
@@ -481,10 +476,9 @@ int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Nam
             ++OffsetPart;
         }
 
-        /* Determine the base and convert the value. strtol/strtoul is not
-        ** exactly what we want here, but it's cheap and may be replaced by
-        ** something fancier later.
-        */
+        // Determine the base and convert the value. strtol/strtoul is not
+        // exactly what we want here, but it's cheap and may be replaced by
+        // something fancier later.
         if (OffsetPart[0] == '$') {
             // Base 16 hexedemical
             NumVal = strtoul (OffsetPart+1, &End, 16);
@@ -550,12 +544,11 @@ int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Nam
 }
 
 const char* MakeHexArg (unsigned Num)
-/* Convert Num into a string in the form $XY, suitable for passing it as an
-** argument to NewCodeEntry, and return a pointer to the string.
-** BEWARE: The function returns a pointer to a static buffer, so the value is
-** gone if you call it twice (and apart from that it's not thread and signal
-** safe).
-*/
+// Convert Num into a string in the form $XY, suitable for passing it as an
+// argument to NewCodeEntry, and return a pointer to the string.
+// BEWARE: The function returns a pointer to a static buffer, so the value is
+// gone if you call it twice (and apart from that it's not thread and signal
+// safe).
 {
     static char Buf[16];
     xsprintf (Buf, sizeof (Buf), "$%02X", (unsigned char) Num);
@@ -652,9 +645,8 @@ void FreeCodeEntry (CodeEntry* E)
 }
 
 void CE_ReplaceOPC (CodeEntry* E, opc_t OPC)
-/* Replace the opcode of the instruction. This will also replace related info,
-** Size, Use and Chg, but it will NOT update any arguments or labels.
-*/
+// Replace the opcode of the instruction. This will also replace related info,
+// Size, Use and Chg, but it will NOT update any arguments or labels.
 {
     // Get the opcode descriptor
     const OPCDesc* D = GetOPCDesc (OPC);
@@ -683,10 +675,9 @@ void CE_AttachLabel (CodeEntry* E, CodeLabel* L)
 }
 
 void CE_ClearJumpTo (CodeEntry* E)
-/* Clear the JumpTo entry and the argument (which contained the name of the
-** label). Note: The function will not clear the backpointer from the label,
-** so use it with care.
-*/
+// Clear the JumpTo entry and the argument (which contained the name of the
+// label). Note: The function will not clear the backpointer from the label,
+// so use it with care.
 {
     // Clear the JumpTo entry
     E->JumpTo = 0;
@@ -726,9 +717,8 @@ void CE_SetArg (CodeEntry* E, const char* Arg)
 }
 
 void CE_SetArgBaseAndOff (CodeEntry* E, const char* ArgBase, long ArgOff)
-/* Replace the new argument base and offset. Argument base is always applied.
-** Argument offset is applied if and only if E has the AIF_HAS_OFFSET flag set.
-*/
+// Replace the new argument base and offset. Argument base is always applied.
+// Argument offset is applied if and only if E has the AIF_HAS_OFFSET flag set.
 {
     if (ArgBase != 0 && ArgBase[0] != '\0') {
 
@@ -787,9 +777,8 @@ void CE_SetArgBaseAndOff (CodeEntry* E, const char* ArgBase, long ArgOff)
 }
 
 void CE_SetArgBase (CodeEntry* E, const char* ArgBase)
-/* Replace the argument base by the new one.
-** The entry must have an existing base.
-*/
+// Replace the argument base by the new one.
+// The entry must have an existing base.
 {
     // Check that the entry has a base name
     CHECK (CE_HasArgBase (E));
@@ -804,9 +793,8 @@ void CE_SetArgOffset (CodeEntry* E, long ArgOff)
 }
 
 void CE_SetNumArg (CodeEntry* E, long Num)
-/* Set a new numeric argument for the given code entry that must already
-** have a numeric argument.
-*/
+// Set a new numeric argument for the given code entry that must already
+// have a numeric argument.
 {
     char Buf[16];
 
@@ -853,21 +841,18 @@ int CE_IsConstImm (const CodeEntry* E)
 }
 
 int CE_IsKnownImm (const CodeEntry* E, unsigned long Num)
-/* Return true if the argument of E is a constant immediate value that is
-** equal to Num.
-*/
+// Return true if the argument of E is a constant immediate value that is
+// equal to Num.
 {
     return (E->AM == AM65_IMM && CE_HasNumArg (E) && E->Num == Num);
 }
 
 int CE_UseLoadFlags (CodeEntry* E)
-/* Return true if the instruction uses any flags that are set by a load of
-** a register (N and Z).
-*/
+// Return true if the instruction uses any flags that are set by a load of
+// a register (N and Z).
 {
-    /* Follow unconditional branches, but beware of endless loops. After this,
-    ** E will point to the first entry that is not a branch.
-    */
+    // Follow unconditional branches, but beware of endless loops. After this,
+    // E will point to the first entry that is not a branch.
     if (E->Info & OF_UBRA) {
         Collection C = AUTO_COLLECTION_INITIALIZER;
 
@@ -966,9 +951,8 @@ static void DeduceZN (RegContents* C, short Val)
 }
 
 static short KnownOpADCDeduceCZVN (RegContents* Out, RegContents* In, short Rhs)
-/* Do the ADC and auto-set C/Z/V/N flags.
-** Both operands and the C flag must be known.
-*/
+// Do the ADC and auto-set C/Z/V/N flags.
+// Both operands and the C flag must be known.
 {
     short SVal, UVal;
     SVal = (signed char)(In->RegA & 0xFF) + (signed char)(Rhs & 0xFF);
@@ -993,9 +977,8 @@ static short KnownOpADCDeduceCZVN (RegContents* Out, RegContents* In, short Rhs)
 }
 
 static short KnownOpSBCDeduceCZVN (RegContents* Out, RegContents* In, short Rhs)
-/* Do the SBC and auto-set C/Z/V/N flags.
-** Both operands and the C flag must be known.
-*/
+// Do the SBC and auto-set C/Z/V/N flags.
+// Both operands and the C flag must be known.
 {
     short SVal, UVal;
     SVal = (signed char)(In->RegA & 0xFF) - (signed char)(Rhs & 0xFF);
@@ -1020,9 +1003,8 @@ static short KnownOpSBCDeduceCZVN (RegContents* Out, RegContents* In, short Rhs)
 }
 
 static short KnownOpCmpDeduceCZN (RegContents* C, short Lhs, short Rhs)
-/* Do the CMP and auto-set C/Z/N flags.
-** Both operands must be known.
- */
+// Do the CMP and auto-set C/Z/N flags.
+// Both operands must be known.
 {
     short Val = (Lhs & 0xFF) - (Rhs & 0xFF);
 
@@ -1116,9 +1098,8 @@ static void BranchDeduceOnProcessorFlag (RegContents* True, RegContents* False, 
 }
 
 static int MightAffectKnownZP (CodeEntry* E, RegContents* In)
-/* TODO: This is supposed to check if any builtin ZP could be affected.
-** It simply returns TRUE in most cases for now.
-*/
+// TODO: This is supposed to check if any builtin ZP could be affected.
+// It simply returns TRUE in most cases for now.
 {
     unsigned Index = 0;
 
@@ -1138,9 +1119,8 @@ static int MightAffectKnownZP (CodeEntry* E, RegContents* In)
 }
 
 void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
-/* Generate register info for this instruction. If an old info exists, it is
-** overwritten.
-*/
+// Generate register info for this instruction. If an old info exists, it is
+// overwritten.
 {
     // Pointers to the register contents
     RegContents* In;
@@ -1311,12 +1291,11 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
                 Val = (short) E->Num;
             }
 
-            /* BIT is unique with regards to the Z/V/N flags:
-            ** - The Z is set/cleared according to whether the AND result is zero.
-            ** - The V is coped directly from Bit 6 of the orginal argument.
-            ** - The N is coped directly from Bit 7 of the orginal argument.
-            ** Note the V/N flags are not affected in imm addressing mode supported by 65c02!
-            */
+            // BIT is unique with regards to the Z/V/N flags:
+            // - The Z is set/cleared according to whether the AND result is zero.
+            // - The V is coped directly from Bit 6 of the orginal argument.
+            // - The N is coped directly from Bit 7 of the orginal argument.
+            // Note the V/N flags are not affected in imm addressing mode supported by 65c02!
             if (E->AM == AM65_IMM) {
                 if (RegValIsKnown (Val)) {
                     Out->PFlags &= ~(UNKNOWN_PFVAL_V | UNKNOWN_PFVAL_N);

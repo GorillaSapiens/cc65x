@@ -56,9 +56,8 @@ struct LineInfoFile {
     char                Name[1];        // Presumed name of the file
 };
 
-/* The text for the actual line is allocated at the end of the structure, so
-** the size of the structure varies.
-*/
+// The text for the actual line is allocated at the end of the structure, so
+// the size of the structure varies.
 typedef struct LineInfo LineInfo;
 struct LineInfo {
     unsigned            RefCount;       // Reference counter
@@ -76,14 +75,12 @@ LineInfo* UseLineInfo (LineInfo* LI);
 // Increase the reference count of the given line info and return it.
 
 void ReleaseLineInfo (LineInfo* LI);
-/* Release a reference to the given line info, free the structure if the
-** reference count drops to zero.
-*/
+// Release a reference to the given line info, free the structure if the
+// reference count drops to zero.
 
 LineInfo* GetCurLineInfo (void);
-/* Return a pointer to the current line info. The reference count is NOT
-** increased, use UseLineInfo for that purpose.
-*/
+// Return a pointer to the current line info. The reference count is NOT
+// increased, use UseLineInfo for that purpose.
 
 void UpdateCurrentLineInfo (const StrBuf* Line);
 // Update the current line info - called if a new line is read

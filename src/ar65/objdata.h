@@ -81,9 +81,8 @@ void ClearObjData (ObjData* O);
 // Remove any data stored in O
 
 ObjData* FindObjData (const char* Module);
-/* Search for the module with the given name and return it. Return NULL if the
-** module is not in the list.
-*/
+// Search for the module with the given name and return it. Return NULL if the
+// module is not in the list.
 
 void DelObjData (const char* Module);
 // Delete the object module from the list

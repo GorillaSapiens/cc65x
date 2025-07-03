@@ -48,10 +48,9 @@ void DeclareLocals (void);
 // Declare local variables and types.
 
 void RestoreRegVars (int HaveResult);
-/* Restore the register variables for the local function if there are any.
-** The parameter tells us if there is a return value in ax, in that case,
-** the accumulator must be saved across the restore.
-*/
+// Restore the register variables for the local function if there are any.
+// The parameter tells us if there is a return value in ax, in that case,
+// the accumulator must be saved across the restore.
 
 // End of locals.h
 

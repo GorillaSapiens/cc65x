@@ -69,9 +69,8 @@ static const char* const FeatureKeys[FEAT_COUNT] = {
 ////////////////////////////////////////////////////////////////////////////////
 
 feature_t FindFeature (const StrBuf* Key)
-/* Find the feature in a table and return the corresponding enum value. If the
-** feature is invalid, return FEAT_UNKNOWN.
-*/
+// Find the feature in a table and return the corresponding enum value. If the
+// feature is invalid, return FEAT_UNKNOWN.
 {
     feature_t F;
 
@@ -88,8 +87,7 @@ feature_t FindFeature (const StrBuf* Key)
 }
 
 void SetFeature (feature_t Feature, unsigned char On)
-/* Set the corresponding feature flag if Feature is valid.
-*/
+// Set the corresponding feature flag if Feature is valid.
 {
     // Set the flags
     switch (Feature) {

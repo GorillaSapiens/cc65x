@@ -88,10 +88,9 @@ uint16_t MemReadWord (uint16_t Addr)
 }
 
 uint16_t MemReadZPWord (uint8_t Addr)
-/* Read a word from the zero page. This function differs from MemReadWord in that
-** the read will always be in the zero page, even in case of an address
-** overflow.
-*/
+// Read a word from the zero page. This function differs from MemReadWord in that
+// the read will always be in the zero page, even in case of an address
+// overflow.
 {
     uint8_t W = MemReadByte (Addr++);
     return (W | (MemReadByte (Addr) << 8));

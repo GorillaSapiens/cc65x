@@ -150,21 +150,18 @@ int IsZPArg (const char* Arg);
 // Exam if the main part of the arg string indicates a ZP loc
 
 fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg);
-/* For the given function, lookup register information and store it into
-** the given variables. If the function is unknown, assume it will use and
-** load all registers.
-** Return the whatever category the function is in.
-*/
+// For the given function, lookup register information and store it into
+// the given variables. If the function is unknown, assume it will use and
+// load all registers.
+// Return the whatever category the function is in.
 
 const ZPInfo* GetZPInfo (const char* Name);
-/* If the given name is a zero page symbol, return a pointer to the info
-** struct for this symbol, otherwise return NULL.
-*/
+// If the given name is a zero page symbol, return a pointer to the info
+// struct for this symbol, otherwise return NULL.
 
 unsigned GetRegInfo (struct CodeSeg* S, unsigned Index, unsigned Wanted);
-/* Determine register usage information for the instructions starting at the
-** given index.
-*/
+// Determine register usage information for the instructions starting at the
+// given index.
 
 int RegAUsed (struct CodeSeg* S, unsigned Index);
 // Check if the value in A is used.
@@ -185,21 +182,18 @@ int LoadFlagsUsed (struct CodeSeg* S, unsigned Index);
 // Check if one of the flags set by a register load (Z and N) are used.
 
 unsigned GetKnownReg (unsigned Use, const struct RegContents* RC);
-/* Return the register or zero page location from the set in Use, thats
-** contents are known. If Use does not contain any register, or if the
-** register in question does not have a known value, return REG_NONE.
-*/
+// Return the register or zero page location from the set in Use, thats
+// contents are known. If Use does not contain any register, or if the
+// register in question does not have a known value, return REG_NONE.
 
 cmp_t FindBoolCmpCond (const char* Name);
-/* Check if the given string is the name of one of the boolean transformer
-** subroutine, and if so, return the condition that is evaluated by this
-** routine. Return CMP_INV if the condition is not recognised.
-*/
+// Check if the given string is the name of one of the boolean transformer
+// subroutine, and if so, return the condition that is evaluated by this
+// routine. Return CMP_INV if the condition is not recognised.
 
 cmp_t FindTosCmpCond (const char* Name);
-/* Check if this is a call to one of the TOS compare functions (tosgtax).
-** Return the condition code or CMP_INV on failure.
-*/
+// Check if this is a call to one of the TOS compare functions (tosgtax).
+// Return the condition code or CMP_INV on failure.
 
 const char* GetBoolTransformer (cmp_t Cond);
 // Get the bool transformer corresponding to the given compare condition
@@ -214,17 +208,15 @@ const char* GetCmpSuffix (cmp_t Cond);
 // Return the compare suffix by the given a compare condition or 0 on failure
 
 char* GetBoolCmpSuffix (char* Buf, cmp_t Cond);
-/* Search for a boolean transformer subroutine (eg. booleq) by the given compare
-** condition.
-** Return the output buffer filled with the name of the correct subroutine or 0
-** on failure.
-*/
+// Search for a boolean transformer subroutine (eg. booleq) by the given compare
+// condition.
+// Return the output buffer filled with the name of the correct subroutine or 0
+// on failure.
 
 char* GetTosCmpSuffix (char* Buf, cmp_t Cond);
-/* Search for a TOS compare function (eg. tosgtax) by the given compare condition.
-** Return the output buffer filled with the name of the correct function or 0 on
-** failure.
-*/
+// Search for a TOS compare function (eg. tosgtax) by the given compare condition.
+// Return the output buffer filled with the name of the correct function or 0 on
+// failure.
 
 // End of codeinfo.h
 

@@ -42,9 +42,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned ParseInit (Type* T);
-/* Parse initialization of variables. Return the number of initialized data
-** bytes.
-*/
+// Parse initialization of variables. Return the number of initialized data
+// bytes.
 
 // End of initdata.h
 
