@@ -1,35 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 scanner.h                                 */
-/*                                                                           */
-/*                  The scanner for the ca65 macroassembler                  */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                 scanner.h
+//
+//                  The scanner for the ca65 macroassembler
+//
+//
+//
+// (C) 1998-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
@@ -38,34 +38,34 @@
 
 
 
-/* ca65 */
+// ca65
 #include "token.h"
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* Scanner variables */
-extern Token CurTok;            /* Current input token incl. attributes */
-extern int   ForcedEnd;         /* Force end of assembly */
+// Scanner variables
+extern Token CurTok;            // Current input token incl. attributes
+extern int   ForcedEnd;         // Force end of assembly
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 int IsIdChar (int C);
-/* Return true if the character is a valid character for an identifier */
+// Return true if the character is a valid character for an identifier
 
 int IsIdStart (int C);
-/* Return true if the character may start an identifier */
+// Return true if the character may start an identifier
 
 int NewInputFile (const char* Name);
 /* Open a new input file. Returns true if the file could be successfully opened
@@ -73,16 +73,16 @@ int NewInputFile (const char* Name);
 */
 
 void NewInputData (char* Text, int Malloced);
-/* Add a chunk of input data to the input stream */
+// Add a chunk of input data to the input stream
 
 void LocaseSVal (void);
-/* Make SVal lower case */
+// Make SVal lower case
 
 void UpcaseSVal (void);
-/* Make SVal upper case */
+// Make SVal upper case
 
 void NextRawTok (void);
-/* Read the next raw token from the input stream */
+// Read the next raw token from the input stream
 
 int GetSubKey (const char* const* Keys, unsigned Count);
 /* Search for a subkey in a table of keywords. The current token must be an
@@ -98,13 +98,13 @@ unsigned char ParseAddrSize (void);
 */
 
 void InitScanner (const char* InFile);
-/* Initialize the scanner, open the given input file */
+// Initialize the scanner, open the given input file
 
 void DoneScanner (void);
-/* Release scanner resources */
+// Release scanner resources
 
 
 
-/* End of scanner.h */
+// End of scanner.h
 
 #endif

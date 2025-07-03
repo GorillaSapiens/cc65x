@@ -1,35 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 labels.h                                  */
-/*                                                                           */
-/*                         Label management for da65                         */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2006      Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                 labels.h
+//
+//                         Label management for da65
+//
+//
+//
+// (C) 2006      Ullrich von Bassewitz
+//               Roemerstrasse 52
+//               D-70794 Filderstadt
+// EMail:        uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
@@ -40,25 +40,25 @@
 
 #include <stdint.h>
 
-/* da65 */
+// da65
 #include "attrtab.h"
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 void AddIntLabel (uint32_t Addr);
-/* Add an internal label using the address to generate the name. */
+// Add an internal label using the address to generate the name.
 
 void AddExtLabel (uint32_t Addr, const char* Name);
-/* Add an external label */
+// Add an external label
 
 void AddUnnamedLabel (uint32_t Addr);
-/* Add an unnamed label */
+// Add an unnamed label
 
 void AddDepLabel (uint32_t Addr, attr_t Attr, const char* BaseName, unsigned Offs);
 /* Add a dependent label at the given address using "base name+Offs" as the new
@@ -76,7 +76,7 @@ void AddExtLabelRange (uint32_t Addr, const char* Name, unsigned Count);
 */
 
 int HaveLabel (uint32_t Addr);
-/* Check if there is a label for the given address */
+// Check if there is a label for the given address
 
 int MustDefLabel (uint32_t Addr);
 /* Return true if we must define a label for this address, that is, if there
@@ -84,7 +84,7 @@ int MustDefLabel (uint32_t Addr);
 */
 
 const char* GetLabelName (uint32_t Addr);
-/* Return the label name for an address */
+// Return the label name for an address
 
 const char* GetLabel (uint32_t Addr, uint32_t RefFrom);
 /* Return the label name for an address, as it is used in a label reference.
@@ -98,13 +98,13 @@ void ForwardLabel (unsigned Offs);
 */
 
 void DefOutOfRangeLabels (void);
-/* Output any labels that are out of the loaded code range */
+// Output any labels that are out of the loaded code range
 
 unsigned long GetLabelCount (void);
-/* Return the total number of labels defined so far */
+// Return the total number of labels defined so far
 
 
 
-/* End of labels.h */
+// End of labels.h
 
 #endif

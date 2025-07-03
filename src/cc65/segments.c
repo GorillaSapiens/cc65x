@@ -1,42 +1,42 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                segments.c                                 */
-/*                                                                           */
-/*                   Lightweight segment management stuff                    */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2009, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                segments.c
+//
+//                   Lightweight segment management stuff
+//
+//
+//
+// (C) 2001-2009, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
 #include <stdarg.h>
 #include <string.h>
 
-/* common */
+// common
 #include "addrsize.h"
 #include "chartype.h"
 #include "check.h"
@@ -46,7 +46,7 @@
 #include "strstack.h"
 #include "xmalloc.h"
 
-/* cc65 */
+// cc65
 #include "codeent.h"
 #include "codeseg.h"
 #include "dataseg.h"
@@ -56,29 +56,29 @@
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* Table struct for address sizes of segments */
+// Table struct for address sizes of segments
 typedef struct {
     StrBuf Name;
     unsigned char AddrSize;
 } SegAddrSize_t;
 
 
-/* Pointer to the current segment context. Output goes here. */
+// Pointer to the current segment context. Output goes here.
 SegContext* CS = 0;
 
-/* Pointer to the global segment context */
+// Pointer to the global segment context
 SegContext* GS = 0;
 
-/* Actual names for the segments */
+// Actual names for the segments
 static StrStack SegmentNames[SEG_COUNT];
 
-/* Address size for the segments */
+// Address size for the segments
 static Collection SegmentAddrSizes;
 
 /* We're using a collection for the stack instead of a linked list. Since
@@ -90,14 +90,14 @@ static Collection SegContextStack = STATIC_COLLECTION_INITIALIZER;
 
 
 
-/*****************************************************************************/
-/*                       Segment name and address size                       */
-/*****************************************************************************/
+//***************************************************************************
+//                       Segment name and address size
+//***************************************************************************
 
 
 
 void InitSegAddrSizes (void)
-/* Initialize the segment address sizes */
+// Initialize the segment address sizes
 {
     InitCollection (&SegmentAddrSizes);
 }
@@ -105,7 +105,7 @@ void InitSegAddrSizes (void)
 
 
 void DoneSegAddrSizes (void)
-/* Free the segment address sizes */
+// Free the segment address sizes
 {
     SegAddrSize_t* A;
     int I;
@@ -138,24 +138,24 @@ static SegAddrSize_t* FindSegAddrSize (const char* Name)
 
 
 void SetSegAddrSize (const char* Name, unsigned char AddrSize)
-/* Set the address size for a segment */
+// Set the address size for a segment
 {
     SegAddrSize_t* A = FindSegAddrSize (Name);
     if (!A) {
-        /* New one */
+        // New one
         A = xmalloc (sizeof (SegAddrSize_t));
         SB_Init (&A->Name);
         SB_CopyStr (&A->Name, Name);
         SB_Terminate (&A->Name);
         CollAppend (&SegmentAddrSizes, A);
     } else {
-        /* Check for mismatching address sizes */
+        // Check for mismatching address sizes
         if (A->AddrSize != AddrSize) {
             Warning ("Segment address size changed from last time!");
         }
     }
 
-    /* Set the address size anyway */
+    // Set the address size anyway
     A->AddrSize = AddrSize;
 }
 
@@ -176,7 +176,7 @@ unsigned char GetSegAddrSize (const char* Name)
 
 
 void InitSegNames (void)
-/* Initialize the segment names */
+// Initialize the segment names
 {
     SS_Push (&SegmentNames[SEG_BSS], SEGNAME_BSS);
     SS_Push (&SegmentNames[SEG_CODE], SEGNAME_CODE);
@@ -187,7 +187,7 @@ void InitSegNames (void)
 
 
 void SetSegName (segment_t Seg, const char* Name)
-/* Set a new name for a segment */
+// Set a new name for a segment
 {
     SS_Set (&SegmentNames[Seg], Name);
 }
@@ -195,7 +195,7 @@ void SetSegName (segment_t Seg, const char* Name)
 
 
 void PushSegName (segment_t Seg, const char* Name)
-/* Push the current segment name and set a new name for a segment */
+// Push the current segment name and set a new name for a segment
 {
     if (SS_IsFull (&SegmentNames[Seg])) {
         Error ("Segment name stack overflow");
@@ -207,7 +207,7 @@ void PushSegName (segment_t Seg, const char* Name)
 
 
 void PopSegName (segment_t Seg)
-/* Restore a segment name from the segment name stack */
+// Restore a segment name from the segment name stack
 {
     if (SS_GetCount (&SegmentNames[Seg]) < 2) {
         Error ("Segment name stack is empty");
@@ -219,26 +219,26 @@ void PopSegName (segment_t Seg)
 
 
 const char* GetSegName (segment_t Seg)
-/* Get the name of the given segment */
+// Get the name of the given segment
 {
     return SS_Get (&SegmentNames[Seg]);
 }
 
 
 
-/*****************************************************************************/
-/*                              Segment context                              */
-/*****************************************************************************/
+//***************************************************************************
+//                              Segment context
+//***************************************************************************
 
 
 
 static SegContext* NewSegContext (SymEntry* Func)
-/* Initialize a SegContext structure (set all fields to NULL) */
+// Initialize a SegContext structure (set all fields to NULL)
 {
-    /* Allocate memory */
+    // Allocate memory
     SegContext* S = xmalloc (sizeof (SegContext));
 
-    /* Initialize the fields */
+    // Initialize the fields
     S->Text    = NewTextSeg (Func);
     S->Code    = NewCodeSeg (GetSegName (SEG_CODE), Func);
     S->Data    = NewDataSeg (GetSegName (SEG_DATA), Func);
@@ -248,41 +248,41 @@ static SegContext* NewSegContext (SymEntry* Func)
     S->NextLabel     = 0;
     S->NextDataLabel = 0;
 
-    /* Return the new struct */
+    // Return the new struct
     return S;
 }
 
 
 
 SegContext* PushSegContext (SymEntry* Func)
-/* Make the new segment context current but remember the old one */
+// Make the new segment context current but remember the old one
 {
-    /* Push the current pointer onto the stack */
+    // Push the current pointer onto the stack
     CollAppend (&SegContextStack, CS);
 
-    /* Create a new SegContext structure */
+    // Create a new SegContext structure
     CS = NewSegContext (Func);
 
-    /* Return the new struct */
+    // Return the new struct
     return CS;
 }
 
 
 
 void PopSegContext (void)
-/* Pop the old segment context (make it current) */
+// Pop the old segment context (make it current)
 {
-    /* Must have something on the stack */
+    // Must have something on the stack
     PRECONDITION (CollCount (&SegContextStack) > 0);
 
-    /* Pop the last segment and set it as current */
+    // Pop the last segment and set it as current
     CS = CollPop (&SegContextStack);
 }
 
 
 
 void CreateGlobalSegments (void)
-/* Create the global segments and remember them in GS */
+// Create the global segments and remember them in GS
 {
     GS = PushSegContext (0);
 }
@@ -290,19 +290,19 @@ void CreateGlobalSegments (void)
 
 
 void UseDataSeg (segment_t DSeg)
-/* For the current segment context, use the data segment DSeg */
+// For the current segment context, use the data segment DSeg
 {
-    /* Check the input */
+    // Check the input
     PRECONDITION (CS && DSeg != SEG_CODE);
 
-    /* Set the new segment to use */
+    // Set the new segment to use
     CS->CurDSeg = DSeg;
 }
 
 
 
 struct DataSeg* GetDataSeg (void)
-/* Return the current data segment */
+// Return the current data segment
 {
     PRECONDITION (CS != 0);
     switch (CS->CurDSeg) {
@@ -318,7 +318,7 @@ struct DataSeg* GetDataSeg (void)
 
 
 void AddTextLine (const char* Format, ...)
-/* Add a line of code to the current text segment */
+// Add a line of code to the current text segment
 {
     va_list ap;
     va_start (ap, Format);
@@ -330,7 +330,7 @@ void AddTextLine (const char* Format, ...)
 
 
 void AddCodeLine (const char* Format, ...)
-/* Add a line of code to the current code segment */
+// Add a line of code to the current code segment
 {
     va_list ap;
     va_start (ap, Format);
@@ -342,7 +342,7 @@ void AddCodeLine (const char* Format, ...)
 
 
 void AddCode (opc_t OPC, am_t AM, const char* Arg, struct CodeLabel* JumpTo)
-/* Add a code entry to the current code segment */
+// Add a code entry to the current code segment
 {
     CHECK (CS != 0);
     CS_AddEntry (CS->Code, NewCodeEntry (OPC, AM, Arg, JumpTo, CurTok.LI));
@@ -351,7 +351,7 @@ void AddCode (opc_t OPC, am_t AM, const char* Arg, struct CodeLabel* JumpTo)
 
 
 void AddDataLine (const char* Format, ...)
-/* Add a line of data to the current data segment */
+// Add a line of data to the current data segment
 {
     va_list ap;
     va_start (ap, Format);
@@ -363,7 +363,7 @@ void AddDataLine (const char* Format, ...)
 
 
 int HaveGlobalCode (void)
-/* Return true if the global code segment contains entries (which is an error) */
+// Return true if the global code segment contains entries (which is an error)
 {
     return (CS_GetEntryCount (GS->Code) > 0);
 }
@@ -371,7 +371,7 @@ int HaveGlobalCode (void)
 
 
 void RemoveGlobalCode (void)
-/* Remove all code from the global code segment. Used for error recovery. */
+// Remove all code from the global code segment. Used for error recovery.
 {
     CS_DelEntries (GS->Code, 0, CS_GetEntryCount (GS->Code));
 }
@@ -379,22 +379,22 @@ void RemoveGlobalCode (void)
 
 
 void OutputSegments (const SegContext* S)
-/* Output the given segments to the output file */
+// Output the given segments to the output file
 {
-    /* Output the function prologue if the segments came from a function */
+    // Output the function prologue if the segments came from a function
     CS_OutputPrologue (S->Code);
 
-    /* Output the text segment */
+    // Output the text segment
     TS_Output (S->Text);
 
-    /* Output the code segment */
+    // Output the code segment
     CS_Output (S->Code);
 
-    /* Output the three data segments */
+    // Output the three data segments
     DS_Output (S->Data);
     DS_Output (S->ROData);
     DS_Output (S->BSS);
 
-    /* Output the code segment epiloque */
+    // Output the code segment epiloque
     CS_OutputEpilogue (S->Code);
 }

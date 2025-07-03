@@ -1,35 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                  coll.h                                   */
-/*                                                                           */
-/*                        Collection (dynamic array)                         */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                  coll.h
+//
+//                        Collection (dynamic array)
+//
+//
+//
+// (C) 2000-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
@@ -38,46 +38,46 @@
 
 
 
-/* common */
+// common
 #include "attrib.h"
 #include "check.h"
 #include "inline.h"
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* An array of pointers that grows if needed */
+// An array of pointers that grows if needed
 typedef struct Collection Collection;
 struct Collection {
-    unsigned            Count;          /* Number of items in the list */
-    unsigned            Size;           /* Size of allocated array */
-    void**              Items;          /* Array with dynamic size */
+    unsigned            Count;          // Number of items in the list
+    unsigned            Size;           // Size of allocated array
+    void**              Items;          // Array with dynamic size
 };
 
-/* An empty collection */
+// An empty collection
 extern const Collection EmptyCollection;
 
-/* Initializer for static collections */
+// Initializer for static collections
 #define STATIC_COLLECTION_INITIALIZER   { 0, 0, 0 }
 
-/* Initializer for auto collections */
+// Initializer for auto collections
 #define AUTO_COLLECTION_INITIALIZER     EmptyCollection
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 Collection* InitCollection (Collection* C);
-/* Initialize a collection and return it. */
+// Initialize a collection and return it.
 
 void DoneCollection (Collection* C);
 /* Free the data for a collection. This will not free the data contained in
@@ -85,10 +85,10 @@ void DoneCollection (Collection* C);
 */
 
 Collection* NewCollection (void);
-/* Create and return a new collection */
+// Create and return a new collection
 
 void FreeCollection (Collection* C);
-/* Free a collection */
+// Free a collection
 
 void CollGrow (Collection* C, unsigned Size);
 /* Grow the collection C so it is able to hold Size items without a resize
@@ -98,7 +98,7 @@ void CollGrow (Collection* C, unsigned Size);
 
 #if defined(HAVE_INLINE)
 INLINE unsigned CollCount (const Collection* C)
-/* Return the number of items in the collection */
+// Return the number of items in the collection
 {
     return C->Count;
 }
@@ -107,40 +107,40 @@ INLINE unsigned CollCount (const Collection* C)
 #endif
 
 void CollInsert (Collection* C, void* Item, unsigned Index);
-/* Insert the data at the given position in the collection */
+// Insert the data at the given position in the collection
 
 #if defined(HAVE_INLINE)
 INLINE void CollAppend (Collection* C, void* Item)
-/* Append an item to the end of the collection */
+// Append an item to the end of the collection
 {
-    /* Insert the item at the end of the current list */
+    // Insert the item at the end of the current list
     CollInsert (C, Item, C->Count);
 }
 #else
 void CollAppend (Collection* C, void* Item);
-/* Append an item to the end of the collection */
+// Append an item to the end of the collection
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE void* CollAt (const Collection* C, unsigned Index)
-/* Return the item at the given index */
+// Return the item at the given index
 {
-    /* Check the index */
+    // Check the index
     PRECONDITION (Index < C->Count);
 
-    /* Return the element */
+    // Return the element
     return C->Items[Index];
 }
 #else
 void* CollAt (const Collection* C, unsigned Index);
-/* Return the item at the given index */
+// Return the item at the given index
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE void* CollAtUnchecked (const Collection* C, unsigned Index)
-/* Return the item at the given index */
+// Return the item at the given index
 {
-    /* Return the element */
+    // Return the element
     return C->Items[Index];
 }
 #else
@@ -149,47 +149,47 @@ INLINE void* CollAtUnchecked (const Collection* C, unsigned Index)
 
 #if defined(HAVE_INLINE)
 INLINE const void* CollConstAt (const Collection* C, unsigned Index)
-/* Return the item at the given index */
+// Return the item at the given index
 {
-    /* Check the index */
+    // Check the index
     PRECONDITION (Index < C->Count);
 
-    /* Return the element */
+    // Return the element
     return C->Items[Index];
 }
 #else
 const void* CollConstAt (const Collection* C, unsigned Index);
-/* Return the item at the given index */
+// Return the item at the given index
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE void* CollLast (Collection* C)
-/* Return the last item in a collection */
+// Return the last item in a collection
 {
-    /* We must have at least one entry */
+    // We must have at least one entry
     PRECONDITION (C->Count > 0);
 
-    /* Return the element */
+    // Return the element
     return C->Items[C->Count-1];
 }
 #else
 void* CollLast (Collection* C);
-/* Return the last item in a collection */
+// Return the last item in a collection
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE const void* CollConstLast (const Collection* C)
-/* Return the last item in a collection */
+// Return the last item in a collection
 {
-    /* We must have at least one entry */
+    // We must have at least one entry
     PRECONDITION (C->Count > 0);
 
-    /* Return the element */
+    // Return the element
     return C->Items[C->Count-1];
 }
 #else
 const void* CollConstLast (const Collection* C);
-/* Return the last item in a collection */
+// Return the last item in a collection
 #endif
 
 #if defined(HAVE_INLINE)
@@ -198,10 +198,10 @@ INLINE void* CollPop (Collection* C)
 ** collection is empty.
 */
 {
-    /* We must have at least one entry */
+    // We must have at least one entry
     PRECONDITION (C->Count > 0);
 
-    /* Return the element */
+    // Return the element
     return C->Items[--C->Count];
 }
 #else
@@ -233,7 +233,7 @@ INLINE void CollDeleteAll (Collection* C)
 ** itself, it will only remove the pointers.
 */
 {
-    /* This one is easy... */
+    // This one is easy...
     C->Count = 0;
 }
 #else
@@ -246,10 +246,10 @@ INLINE void CollReplace (Collection* C, void* Item, unsigned Index)
 ** just the pointer will get replaced.
 */
 {
-    /* Check the index */
+    // Check the index
     PRECONDITION (Index < C->Count);
 
-    /* Replace the item pointer */
+    // Replace the item pointer
     C->Items[Index] = Item;
 }
 #else
@@ -298,6 +298,6 @@ void CollSort (Collection* C,
 
 
 
-/* End of coll.h */
+// End of coll.h
 
 #endif

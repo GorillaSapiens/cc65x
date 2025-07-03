@@ -1,35 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                  main.c                                   */
-/*                                                                           */
-/*                 Main program for the ca65 macroassembler                  */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2013, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                  main.c
+//
+//                 Main program for the ca65 macroassembler
+//
+//
+//
+// (C) 1998-2013, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
@@ -38,7 +38,7 @@
 #include <string.h>
 #include <time.h>
 
-/* common */
+// common
 #include "addrsize.h"
 #include "chartype.h"
 #include "cmdline.h"
@@ -51,7 +51,7 @@
 #include "tgttrans.h"
 #include "version.h"
 
-/* ca65 */
+// ca65
 #include "abend.h"
 #include "asserts.h"
 #include "dbginfo.h"
@@ -81,14 +81,14 @@
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 static void Usage (void)
-/* Print usage information and exit */
+// Print usage information and exit
 {
     printf ("Usage: %s [options] file\n"
             "Short options:\n"
@@ -136,55 +136,55 @@ static void Usage (void)
 
 
 static void SetOptions (void)
-/* Set the option for the translator */
+// Set the option for the translator
 {
     StrBuf Buf = STATIC_STRBUF_INITIALIZER;
 
-    /* Set the translator */
+    // Set the translator
     SB_Printf (&Buf, "ca65 V%s", GetVersionAsString ());
     OptTranslator (&Buf);
 
-    /* Set date and time */
+    // Set date and time
     OptDateTime ((unsigned long) time(0));
 
-    /* Release memory for the string */
+    // Release memory for the string
     SB_Done (&Buf);
 }
 
 
 
 static void NewSymbol (const char* SymName, long Val)
-/* Define a symbol with a fixed numeric value in the current scope */
+// Define a symbol with a fixed numeric value in the current scope
 {
     ExprNode* Expr;
     SymEntry* Sym;
 
-    /* Convert the name to a string buffer */
+    // Convert the name to a string buffer
     StrBuf SymBuf = STATIC_STRBUF_INITIALIZER;
     SB_CopyStr (&SymBuf, SymName);
 
-    /* Search for the symbol, allocate a new one if it doesn't exist */
+    // Search for the symbol, allocate a new one if it doesn't exist
     Sym = SymFind (CurrentScope, &SymBuf, SYM_ALLOC_NEW);
 
-    /* Check if have already a symbol with this name */
+    // Check if have already a symbol with this name
     if (SymIsDef (Sym)) {
         AbEnd ("'%s' is already defined", SymName);
     }
 
-    /* Generate an expression for the symbol */
+    // Generate an expression for the symbol
     Expr = GenLiteralExpr (Val);
 
-    /* Mark the symbol as defined */
+    // Mark the symbol as defined
     SymDef (Sym, Expr, ADDR_SIZE_DEFAULT, SF_NONE);
 
-    /* Free string buffer memory */
+    // Free string buffer memory
     SB_Done (&SymBuf);
 }
 
 
 
 static void CBMSystem (const char* Sys)
-/* Define a CBM system */
+// Define a CBM system
 {
     NewSymbol ("__CBM__", 1);
     NewSymbol (Sys, 1);
@@ -193,7 +193,7 @@ static void CBMSystem (const char* Sys)
 
 
 static void SetSys (const char* Sys)
-/* Define a target system */
+// Define a target system
 {
     switch (Target = FindTarget (Sys)) {
 
@@ -280,7 +280,7 @@ static void SetSys (const char* Sys)
             break;
 
         case TGT_GEOS_CBM:
-            /* Do not handle as a CBM system */
+            // Do not handle as a CBM system
             NewSymbol ("__GEOS__", 1);
             NewSymbol ("__GEOS_CBM__", 1);
             break;
@@ -363,20 +363,20 @@ static void SetSys (const char* Sys)
 
     }
 
-    /* Initialize the translation tables for the target system */
+    // Initialize the translation tables for the target system
     TgtTranslateInit ();
 }
 
 
 
 static void FileNameOption (const char* Opt, const char* Arg, StrBuf* Name)
-/* Handle an option that remembers a file name for later */
+// Handle an option that remembers a file name for later
 {
-    /* Cannot have the option twice */
+    // Cannot have the option twice
     if (SB_NotEmpty (Name)) {
         AbEnd ("Cannot use option '%s' twice", Opt);
     }
-    /* Remember the file name for later */
+    // Remember the file name for later
     SB_CopyStr (Name, Arg);
     SB_Terminate (Name);
 }
@@ -384,33 +384,33 @@ static void FileNameOption (const char* Opt, const char* Arg, StrBuf* Name)
 
 
 static void DefineSymbol (const char* Def)
-/* Define a symbol from the command line */
+// Define a symbol from the command line
 {
     const char* P;
     long Val;
     StrBuf SymName = AUTO_STRBUF_INITIALIZER;
 
 
-    /* The symbol must start with a character or underline */
+    // The symbol must start with a character or underline
     if (!IsIdStart (Def [0])) {
         InvDef (Def);
     }
     P = Def;
 
-    /* Copy the symbol, checking the rest */
+    // Copy the symbol, checking the rest
     while (IsIdChar (*P)) {
         SB_AppendChar (&SymName, *P++);
     }
     SB_Terminate (&SymName);
 
-    /* Do we have a value given? */
+    // Do we have a value given?
     if (*P != '=') {
         if (*P != '\0') {
             InvDef (Def);
         }
         Val = 0;
     } else {
-        /* We have a value */
+        // We have a value
         ++P;
         if (*P == '$') {
             ++P;
@@ -424,10 +424,10 @@ static void DefineSymbol (const char* Def)
         }
     }
 
-    /* Define the new symbol */
+    // Define the new symbol
     NewSymbol (SB_GetConstBuf (&SymName), Val);
 
-    /* Release string memory */
+    // Release string memory
     SB_Done (&SymName);
 }
 
@@ -435,7 +435,7 @@ static void DefineSymbol (const char* Def)
 
 static void OptAutoImport (const char* Opt attribute ((unused)),
                            const char* Arg attribute ((unused)))
-/* Mark unresolved symbols as imported */
+// Mark unresolved symbols as imported
 {
     AutoImport = 1;
 }
@@ -443,7 +443,7 @@ static void OptAutoImport (const char* Opt attribute ((unused)),
 
 
 static void OptBinIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
-/* Add an include search path for binaries */
+// Add an include search path for binaries
 {
     AddSearchPath (BinSearchPath, Arg);
 }
@@ -451,7 +451,7 @@ static void OptBinIncludeDir (const char* Opt attribute ((unused)), const char* 
 
 
 static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
-/* Handle the --cpu option */
+// Handle the --cpu option
 {
     cpu_t CPU = FindCPU (Arg);
     if (CPU == CPU_UNKNOWN) {
@@ -464,7 +464,7 @@ static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptCreateDep (const char* Opt, const char* Arg)
-/* Handle the --create-dep option */
+// Handle the --create-dep option
 {
     FileNameOption (Opt, Arg, &DepName);
 }
@@ -473,7 +473,7 @@ static void OptCreateDep (const char* Opt, const char* Arg)
 
 static void OptCreateFullDep (const char* Opt attribute ((unused)),
                               const char* Arg)
-/* Handle the --create-full-dep option */
+// Handle the --create-full-dep option
 {
     FileNameOption (Opt, Arg, &FullDepName);
 }
@@ -482,7 +482,7 @@ static void OptCreateFullDep (const char* Opt attribute ((unused)),
 
 static void OptDebug (const char* Opt attribute ((unused)),
                       const char* Arg attribute ((unused)))
-/* Compiler debug mode */
+// Compiler debug mode
 {
     ++Debug;
 }
@@ -491,7 +491,7 @@ static void OptDebug (const char* Opt attribute ((unused)),
 
 static void OptDebugInfo (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
-/* Add debug info to the object file */
+// Add debug info to the object file
 {
     DbgSyms = 1;
 }
@@ -499,13 +499,13 @@ static void OptDebugInfo (const char* Opt attribute ((unused)),
 
 
 static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
-/* Set an emulation feature */
+// Set an emulation feature
 {
-    /* Make a string buffer from Arg and use it to find the feature. */
+    // Make a string buffer from Arg and use it to find the feature.
     StrBuf StrFeature;
     feature_t Feature = FindFeature (SB_InitFromString (&StrFeature, Arg));
 
-    /* Enable the feature, check for errors */
+    // Enable the feature, check for errors
     if (Feature == FEAT_UNKNOWN) {
         AbEnd ("Illegal emulation feature: '%s'", Arg);
     } else {
@@ -517,7 +517,7 @@ static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
 
 static void OptHelp (const char* Opt attribute ((unused)),
                      const char* Arg attribute ((unused)))
-/* Print usage information and exit */
+// Print usage information and exit
 {
     Usage ();
     exit (EXIT_SUCCESS);
@@ -527,7 +527,7 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 static void OptIgnoreCase (const char* Opt attribute ((unused)),
                            const char* Arg attribute ((unused)))
-/* Ignore case on symbols */
+// Ignore case on symbols
 {
     IgnoreCase = 1;
 }
@@ -535,7 +535,7 @@ static void OptIgnoreCase (const char* Opt attribute ((unused)),
 
 
 static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
-/* Add an include search path */
+// Add an include search path
 {
     AddSearchPath (IncSearchPath, Arg);
 }
@@ -544,7 +544,7 @@ static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg
 
 static void OptLargeAlignment (const char* Opt attribute ((unused)),
                                const char* Arg attribute ((unused)))
-/* Don't warn about large alignments */
+// Don't warn about large alignments
 {
     LargeAlignment = 1;
 }
@@ -552,29 +552,29 @@ static void OptLargeAlignment (const char* Opt attribute ((unused)),
 
 
 static void OptListBytes (const char* Opt, const char* Arg)
-/* Set the maximum number of bytes per listing line */
+// Set the maximum number of bytes per listing line
 {
     unsigned Num;
     char     Check;
 
-    /* Convert the argument to a number */
+    // Convert the argument to a number
     if (sscanf (Arg, "%u%c", &Num, &Check) != 1) {
         InvArg (Opt, Arg);
     }
 
-    /* Check the bounds */
+    // Check the bounds
     if (Num != 0 && (Num < MIN_LIST_BYTES || Num > MAX_LIST_BYTES)) {
         AbEnd ("Argument for option '%s' is out of range", Opt);
     }
 
-    /* Use the value */
+    // Use the value
     SetListBytes (Num);
 }
 
 
 
 static void OptListing (const char* Opt, const char* Arg)
-/* Create a listing file */
+// Create a listing file
 {
     /* Since the meaning of -l and --listing has changed, print an error if
     ** the filename is empty or begins with the option char.
@@ -584,23 +584,23 @@ static void OptListing (const char* Opt, const char* Arg)
                "expect a file name as argument.", Opt);
     }
 
-    /* Get the file name */
+    // Get the file name
     FileNameOption (Opt, Arg, &ListingName);
 }
 
 
 
 static void OptMemoryModel (const char* Opt, const char* Arg)
-/* Set the memory model */
+// Set the memory model
 {
     mmodel_t M;
 
-    /* Check the current memory model */
+    // Check the current memory model
     if (MemoryModel != MMODEL_UNKNOWN) {
         AbEnd ("Cannot use option '%s' twice", Opt);
     }
 
-    /* Translate the memory model name and check it */
+    // Translate the memory model name and check it
     M = FindMemoryModel (Arg);
     if (M == MMODEL_UNKNOWN) {
         AbEnd ("Unknown memory model: %s", Arg);
@@ -608,14 +608,14 @@ static void OptMemoryModel (const char* Opt, const char* Arg)
         AbEnd ("Unsupported memory model: %s", Arg);
     }
 
-    /* Set the memory model */
+    // Set the memory model
     SetMemoryModel (M);
 }
 
 
 
 static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg)
-/* Handle the --pagelength option */
+// Handle the --pagelength option
 {
     int Len = atoi (Arg);
     if (Len != -1 && (Len < MIN_PAGE_LEN || Len > MAX_PAGE_LEN)) {
@@ -628,7 +628,7 @@ static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg
 
 static void OptRelaxChecks (const char* Opt attribute ((unused)),
                             const char* Arg attribute ((unused)))
-/* Handle the --relax-checks options */
+// Handle the --relax-checks options
 {
     RelaxChecks = 1;
 }
@@ -637,7 +637,7 @@ static void OptRelaxChecks (const char* Opt attribute ((unused)),
 
 static void OptSmart (const char* Opt attribute ((unused)),
                       const char* Arg attribute ((unused)))
-/* Handle the -s/--smart options */
+// Handle the -s/--smart options
 {
     SmartMode = 1;
 }
@@ -645,7 +645,7 @@ static void OptSmart (const char* Opt attribute ((unused)),
 
 
 static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
-/* Set the target system */
+// Set the target system
 {
     SetSys (Arg);
 }
@@ -654,7 +654,7 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 
 static void OptVerbose (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
-/* Increase verbosity */
+// Increase verbosity
 {
     ++Verbosity;
 }
@@ -663,7 +663,7 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
-/* Print the assembler version */
+// Print the assembler version
 {
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
     exit(EXIT_SUCCESS);
@@ -673,7 +673,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
                                  const char* Arg attribute ((unused)))
-/* Generate an error if any warnings occur */
+// Generate an error if any warnings occur
 {
     WarningsAsErrors = 1;
 }
@@ -681,7 +681,7 @@ static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
 
 
 static void DoPCAssign (void)
-/* Start absolute code */
+// Start absolute code
 {
     long PC = ConstExpression ();
     if (PC < 0 || PC > 0xFFFFFF) {
@@ -694,7 +694,7 @@ static void DoPCAssign (void)
 
 
 static void OneLine (void)
-/* Assemble one line */
+// Assemble one line
 {
     Segment*      Seg   = 0;
     unsigned long PC    = 0;
@@ -709,13 +709,13 @@ static void OneLine (void)
         InitListingLine ();
     }
 
-    /* Single colon means unnamed label */
+    // Single colon means unnamed label
     if (CurTok.Tok == TOK_COLON) {
         ULabDef ();
         NextTok ();
     }
 
-    /* Handle @-style unnamed labels */
+    // Handle @-style unnamed labels
     if (CurTok.Tok == TOK_ULABEL) {
         if (CurTok.IVal != 0) {
             Error ("Invalid unnamed label definition");
@@ -738,13 +738,13 @@ static void OneLine (void)
     */
     if (CurTok.Tok == TOK_IDENT) {
         if (UbiquitousIdents) {
-            /* Macros CAN be instructions, so check for them first */
+            // Macros CAN be instructions, so check for them first
             Mac = FindMacro (&CurTok.SVal);
             if (Mac == 0) {
                 Instr = FindInstruction (&CurTok.SVal);
             }
         } else {
-            /* Macros and symbols may NOT use the names of instructions */
+            // Macros and symbols may NOT use the names of instructions
             Instr = FindInstruction (&CurTok.SVal);
             if (Instr < 0) {
                 Mac = FindMacro (&CurTok.SVal);
@@ -760,10 +760,10 @@ static void OneLine (void)
         CurTok.Tok == TOK_NAMESPACE   ||
         (CurTok.Tok == TOK_IDENT && Instr < 0 && Mac == 0)) {
 
-        /* Did we have whitespace before the ident? */
+        // Did we have whitespace before the ident?
         int HadWS = CurTok.WS;
 
-        /* Generate the symbol table entry, then skip the name */
+        // Generate the symbol table entry, then skip the name
         Sym = ParseAnySymName (SYM_ALLOC_NEW);
 
         /* If a colon follows, this is a label definition. If there
@@ -771,16 +771,16 @@ static void OneLine (void)
         */
         if (CurTok.Tok == TOK_EQ || CurTok.Tok == TOK_ASSIGN) {
 
-            /* Determine the symbol flags from the assignment token */
+            // Determine the symbol flags from the assignment token
             unsigned Flags = (CurTok.Tok == TOK_ASSIGN)? SF_LABEL : SF_NONE;
 
-            /* Skip the '=' */
+            // Skip the '='
             NextTok ();
 
-            /* Define the symbol with the expression following the '=' */
+            // Define the symbol with the expression following the '='
             SymDef (Sym, Expression(), ADDR_SIZE_DEFAULT, Flags);
 
-            /* Don't allow anything after a symbol definition */
+            // Don't allow anything after a symbol definition
             ConsumeSep ();
             return;
 
@@ -788,10 +788,10 @@ static void OneLine (void)
 
             ExprNode* Expr;
 
-            /* .SET defines variables (= redefinable symbols) */
+            // .SET defines variables (= redefinable symbols)
             NextTok ();
 
-            /* Read the assignment expression, which must be constant */
+            // Read the assignment expression, which must be constant
             Expr = GenLiteralExpr (ConstExpression ());
 
             /* Define the symbol with the constant expression following
@@ -799,7 +799,7 @@ static void OneLine (void)
             */
             SymDef (Sym, Expr, ADDR_SIZE_DEFAULT, SF_VAR);
 
-            /* Don't allow anything after a symbol definition */
+            // Don't allow anything after a symbol definition
             ConsumeSep ();
             return;
 
@@ -811,7 +811,7 @@ static void OneLine (void)
             Seg = ActiveSeg;
             PC  = GetPC ();
 
-            /* Define the label */
+            // Define the label
             SymDef (Sym, GenCurrentPC (), ADDR_SIZE_DEFAULT, SF_LABEL);
 
             /* Skip the colon. If NoColonLabels is enabled, allow labels
@@ -821,13 +821,13 @@ static void OneLine (void)
             if (CurTok.Tok != TOK_COLON) {
                 if (HadWS || !NoColonLabels) {
                     Error ("':' expected");
-                    /* Try some smart error recovery */
+                    // Try some smart error recovery
                     if (CurTok.Tok == TOK_NAMESPACE) {
                         NextTok ();
                     }
                 }
             } else {
-                /* Skip the colon */
+                // Skip the colon
                 NextTok ();
             }
 
@@ -836,13 +836,13 @@ static void OneLine (void)
             */
             if (CurTok.Tok == TOK_IDENT) {
                 if (UbiquitousIdents) {
-                    /* Macros CAN be instructions, so check for them first */
+                    // Macros CAN be instructions, so check for them first
                     Mac = FindMacro (&CurTok.SVal);
                     if (Mac == 0) {
                         Instr = FindInstruction (&CurTok.SVal);
                     }
                 } else {
-                    /* Macros and symbols may NOT use the names of instructions */
+                    // Macros and symbols may NOT use the names of instructions
                     Instr = FindInstruction (&CurTok.SVal);
                     if (Instr < 0) {
                         Mac = FindMacro (&CurTok.SVal);
@@ -852,15 +852,15 @@ static void OneLine (void)
         }
     }
 
-    /* We've handled a possible label, now handle the remainder of the line */
+    // We've handled a possible label, now handle the remainder of the line
     if (CurTok.Tok >= TOK_FIRSTPSEUDO && CurTok.Tok <= TOK_LASTPSEUDO) {
-        /* A control command */
+        // A control command
         HandlePseudo ();
     } else if (Mac != 0) {
-        /* A macro expansion */
+        // A macro expansion
         MacExpandStart (Mac);
     } else if (Instr >= 0) {
-        /* A mnemonic - assemble one instruction */
+        // A mnemonic - assemble one instruction
         HandleInstruction (Instr);
     } else if (PCAssignment && (CurTok.Tok == TOK_STAR || CurTok.Tok == TOK_PC)) {
         NextTok ();
@@ -868,9 +868,9 @@ static void OneLine (void)
             Error ("'=' expected");
             SkipUntilSep ();
         } else {
-            /* Skip the equal sign */
+            // Skip the equal sign
             NextTok ();
-            /* Enter absolute mode */
+            // Enter absolute mode
             DoPCAssign ();
         }
     }
@@ -882,10 +882,10 @@ static void OneLine (void)
     if (Sym) {
         unsigned long Size;
         if (Seg == ActiveSeg) {
-            /* Same segment */
+            // Same segment
             Size = GetPC () - PC;
         } else {
-            /* The line has switched the segment */
+            // The line has switched the segment
             Size = 0;
         }
         /* Suppress .size Symbol if this Symbol already has a multiply-defined error,
@@ -896,19 +896,19 @@ static void OneLine (void)
         }
     }
 
-    /* Line separator must come here */
+    // Line separator must come here
     ConsumeSep ();
 }
 
 
 
 static void Assemble (void)
-/* Start the ball rolling ... */
+// Start the ball rolling ...
 {
-    /* Prime the pump */
+    // Prime the pump
     NextTok ();
 
-    /* Assemble lines until end of file */
+    // Assemble lines until end of file
     while (CurTok.Tok != TOK_EOF) {
         OneLine ();
     }
@@ -917,54 +917,54 @@ static void Assemble (void)
 
 
 static void CreateObjFile (void)
-/* Create the object file */
+// Create the object file
 {
-    /* Open the object, write the header */
+    // Open the object, write the header
     ObjOpen ();
 
-    /* Write the object file options */
+    // Write the object file options
     WriteOptions ();
 
-    /* Write the list of input files */
+    // Write the list of input files
     WriteFiles ();
 
-    /* Write the segment data to the file */
+    // Write the segment data to the file
     WriteSegments ();
 
-    /* Write the import list */
+    // Write the import list
     WriteImports ();
 
-    /* Write the export list */
+    // Write the export list
     WriteExports ();
 
-    /* Write debug symbols if requested */
+    // Write debug symbols if requested
     WriteDbgSyms ();
 
-    /* Write the scopes if requested */
+    // Write the scopes if requested
     WriteScopes ();
 
-    /* Write line infos if requested */
+    // Write line infos if requested
     WriteLineInfos ();
 
-    /* Write the string pool */
+    // Write the string pool
     WriteStrPool ();
 
-    /* Write the assertions */
+    // Write the assertions
     WriteAssertions ();
 
-    /* Write the spans */
+    // Write the spans
     WriteSpans ();
 
-    /* Write an updated header and close the file */
+    // Write an updated header and close the file
     ObjClose ();
 }
 
 
 
 int main (int argc, char* argv [])
-/* Assembler main program */
+// Assembler main program
 {
-    /* Program long options */
+    // Program long options
     static const LongOpt OptTab[] = {
         { "--auto-import",         0,      OptAutoImport           },
         { "--bin-include-dir",     1,      OptBinIncludeDir        },
@@ -990,21 +990,21 @@ int main (int argc, char* argv [])
         { "--warnings-as-errors",  0,      OptWarningsAsErrors     },
     };
 
-    /* Name of the global name space */
+    // Name of the global name space
     static const StrBuf GlobalNameSpace = STATIC_STRBUF_INITIALIZER;
 
     unsigned I;
 
-    /* Initialize the cmdline module */
+    // Initialize the cmdline module
     InitCmdLine (&argc, &argv, "ca65");
 
-    /* Initialize the string pool */
+    // Initialize the string pool
     InitStrPool ();
 
-    /* Initialize the include search paths */
+    // Initialize the include search paths
     InitIncludePaths ();
 
-    /* Create the predefined segments */
+    // Create the predefined segments
     SegInit ();
 
     /* Enter the base lexical level. We must do that here, since we may
@@ -1017,14 +1017,14 @@ int main (int argc, char* argv [])
     */
     InitLineInfo ();
 
-    /* Check the parameters */
+    // Check the parameters
     I = 1;
     while (I < ArgCount) {
 
-        /* Get the argument */
+        // Get the argument
         const char* Arg = ArgVec [I];
 
-        /* Check for an option */
+        // Check for an option
         if (Arg[0] == '-') {
             switch (Arg[1]) {
 
@@ -1102,7 +1102,7 @@ int main (int argc, char* argv [])
 
             }
         } else {
-            /* Filename. Check if we already had one */
+            // Filename. Check if we already had one
             if (InFile) {
                 fprintf (stderr, "%s: Don't know what to do with '%s'\n",
                          ProgName, Arg);
@@ -1112,20 +1112,20 @@ int main (int argc, char* argv [])
             }
         }
 
-        /* Next argument */
+        // Next argument
         ++I;
     }
 
-    /* Do we have an input file? */
+    // Do we have an input file?
     if (InFile == 0) {
         fprintf (stderr, "%s: No input files\n", ProgName);
         exit (EXIT_FAILURE);
     }
 
-    /* Add the default include search paths. */
+    // Add the default include search paths.
     FinishIncludePaths ();
 
-    /* If no CPU given, use the default CPU for the target */
+    // If no CPU given, use the default CPU for the target
     if (GetCPU () == CPU_UNKNOWN) {
         if (Target != TGT_UNKNOWN) {
             SetCPU (GetTargetProperties (Target)->DefaultCPU);
@@ -1134,59 +1134,59 @@ int main (int argc, char* argv [])
         }
     }
 
-    /* If no memory model was given, use the default */
+    // If no memory model was given, use the default
     if (MemoryModel == MMODEL_UNKNOWN) {
         SetMemoryModel (MMODEL_NEAR);
     }
 
-    /* Set the default segment sizes according to the memory model */
+    // Set the default segment sizes according to the memory model
     SetSegmentSizes ();
 
-    /* Initialize the scanner, open the input file */
+    // Initialize the scanner, open the input file
     InitScanner (InFile);
 
-    /* Define the default options */
+    // Define the default options
     SetOptions ();
 
-    /* Assemble the input */
+    // Assemble the input
     Assemble ();
 
-    /* If we didn't have any errors, check the pseudo insn stacks */
+    // If we didn't have any errors, check the pseudo insn stacks
     if (ErrorCount == 0) {
         CheckPseudo ();
     }
 
-    /* If we didn't have any errors, check and cleanup the unnamed labels */
+    // If we didn't have any errors, check and cleanup the unnamed labels
     if (ErrorCount == 0) {
         ULabDone ();
     }
 
-    /* If we didn't have any errors, check the symbol table */
+    // If we didn't have any errors, check the symbol table
     if (ErrorCount == 0) {
         SymCheck ();
     }
 
-    /* If we didn't have any errors, check the hll debug symbols */
+    // If we didn't have any errors, check the hll debug symbols
     if (ErrorCount == 0) {
         DbgInfoCheck ();
     }
 
-    /* If we didn't have any errors, close the file scope lexical level */
+    // If we didn't have any errors, close the file scope lexical level
     if (ErrorCount == 0) {
         SymLeaveLevel ();
     }
 
-    /* If we didn't have any errors, check and resolve the segment data */
+    // If we didn't have any errors, check and resolve the segment data
     if (ErrorCount == 0) {
         SegDone ();
     }
 
-    /* If we didn't have any errors, check the assertions */
+    // If we didn't have any errors, check the assertions
     if (ErrorCount == 0) {
         CheckAssertions ();
     }
 
-    /* Dump the data */
+    // Dump the data
     if (Verbosity >= 2) {
         SymDump (stdout);
         SegDump ();
@@ -1196,7 +1196,7 @@ int main (int argc, char* argv [])
         Error("Warnings as errors");
     }
 
-    /* If we didn't have an errors, finish off the line infos */
+    // If we didn't have an errors, finish off the line infos
     DoneLineInfo ();
 
     /* If we didn't have any errors, create the object, listing and
@@ -1210,9 +1210,9 @@ int main (int argc, char* argv [])
        CreateDependencies ();
     }
 
-    /* Close the input file */
+    // Close the input file
     DoneScanner ();
 
-    /* Return an apropriate exit code */
+    // Return an apropriate exit code
     return (ErrorCount == 0)? EXIT_SUCCESS : EXIT_FAILURE;
 }

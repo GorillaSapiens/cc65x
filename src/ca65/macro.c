@@ -1,48 +1,48 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                  macro.c                                  */
-/*                                                                           */
-/*                    Macros for the ca65 macroassembler                     */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                  macro.c
+//
+//                    Macros for the ca65 macroassembler
+//
+//
+//
+// (C) 1998-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
 #include <stdio.h>
 #include <string.h>
 
-/* common */
+// common
 #include "check.h"
 #include "hashfunc.h"
 #include "hashtab.h"
 #include "xmalloc.h"
 
-/* ca65 */
+// ca65
 #include "condasm.h"
 #include "error.h"
 #include "global.h"
@@ -56,17 +56,17 @@
 
 
 
-/*****************************************************************************/
-/*                                 Forwards                                  */
-/*****************************************************************************/
+//***************************************************************************
+//                                 Forwards
+//***************************************************************************
 
 
 
 static unsigned HT_GenHash (const void* Key);
-/* Generate the hash over a key. */
+// Generate the hash over a key.
 
 static const void* HT_GetKey (const void* Entry);
-/* Given a pointer to the user entry data, return a pointer to the key */
+// Given a pointer to the user entry data, return a pointer to the key
 
 static int HT_Compare (const void* Key1, const void* Key2);
 /* Compare two keys. The function must return a value less than zero if
@@ -76,90 +76,90 @@ static int HT_Compare (const void* Key1, const void* Key2);
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* Struct that describes an identifer (macro param, local list) */
+// Struct that describes an identifer (macro param, local list)
 typedef struct IdDesc IdDesc;
 struct IdDesc {
-    IdDesc*         Next;       /* Linked list */
-    StrBuf          Id;         /* Identifier, dynamically allocated */
+    IdDesc*         Next;       // Linked list
+    StrBuf          Id;         // Identifier, dynamically allocated
 };
 
 
 
-/* Struct that describes a macro definition */
+// Struct that describes a macro definition
 struct Macro {
-    HashNode        Node;       /* Hash list node */
-    Macro*          List;       /* List of all macros */
-    unsigned        LocalCount; /* Count of local symbols */
-    IdDesc*         Locals;     /* List of local symbols */
-    unsigned        ParamCount; /* Parameter count of macro */
-    IdDesc*         Params;     /* Identifiers of macro parameters */
-    unsigned        TokCount;   /* Number of tokens for this macro */
-    TokNode*        TokRoot;    /* Root of token list */
-    TokNode*        TokLast;    /* Pointer to last token in list */
-    StrBuf          Name;       /* Macro name, dynamically allocated */
-    unsigned        Expansions; /* Number of active macro expansions */
-    unsigned char   Style;      /* Macro style */
-    unsigned char   Incomplete; /* Macro is currently built */
+    HashNode        Node;       // Hash list node
+    Macro*          List;       // List of all macros
+    unsigned        LocalCount; // Count of local symbols
+    IdDesc*         Locals;     // List of local symbols
+    unsigned        ParamCount; // Parameter count of macro
+    IdDesc*         Params;     // Identifiers of macro parameters
+    unsigned        TokCount;   // Number of tokens for this macro
+    TokNode*        TokRoot;    // Root of token list
+    TokNode*        TokLast;    // Pointer to last token in list
+    StrBuf          Name;       // Macro name, dynamically allocated
+    unsigned        Expansions; // Number of active macro expansions
+    unsigned char   Style;      // Macro style
+    unsigned char   Incomplete; // Macro is currently built
 };
 
-/* Hash table functions */
+// Hash table functions
 static const HashFunctions HashFunc = {
     HT_GenHash,
     HT_GetKey,
     HT_Compare
 };
 
-/* Macro hash table */
+// Macro hash table
 static HashTable MacroTab = STATIC_HASHTABLE_INITIALIZER (117, &HashFunc);
 
-/* Structs that holds data for a macro expansion */
+// Structs that holds data for a macro expansion
 typedef struct MacExp MacExp;
 struct MacExp {
-    MacExp*     Next;           /* Pointer to next expansion */
-    Macro*      M;              /* Which macro do we expand? */
-    unsigned    IfSP;           /* .IF stack pointer at start of expansion */
-    TokNode*    Exp;            /* Pointer to current token */
-    TokNode*    Final;          /* Pointer to final token */
-    unsigned    MacExpansions;  /* Number of active macro expansions */
-    unsigned    LocalStart;     /* Start of counter for local symbol names */
-    unsigned    ParamCount;     /* Number of actual parameters */
-    TokNode**   Params;         /* List of actual parameters */
-    TokNode*    ParamExp;       /* Node for expanding parameters */
-    LineInfo*   LI;             /* Line info for the expansion */
-    LineInfo*   ParamLI;        /* Line info for parameter expansion */
+    MacExp*     Next;           // Pointer to next expansion
+    Macro*      M;              // Which macro do we expand?
+    unsigned    IfSP;           // .IF stack pointer at start of expansion
+    TokNode*    Exp;            // Pointer to current token
+    TokNode*    Final;          // Pointer to final token
+    unsigned    MacExpansions;  // Number of active macro expansions
+    unsigned    LocalStart;     // Start of counter for local symbol names
+    unsigned    ParamCount;     // Number of actual parameters
+    TokNode**   Params;         // List of actual parameters
+    TokNode*    ParamExp;       // Node for expanding parameters
+    LineInfo*   LI;             // Line info for the expansion
+    LineInfo*   ParamLI;        // Line info for parameter expansion
 };
 
-/* Maximum number of nested macro expansions */
+// Maximum number of nested macro expansions
 #define MAX_MACEXPANSIONS       256U
 
-/* Number of active macro expansions */
+// Number of active macro expansions
 static unsigned MacExpansions = 0;
 
-/* Flag if a macro expansion should get aborted */
+// Flag if a macro expansion should get aborted
 static int DoMacAbort = 0;
 
-/* Counter to create local names for symbols */
+// Counter to create local names for symbols
 static unsigned LocalName = 0;
 
-/* Define-style macros disabled if != 0 */
+// Define-style macros disabled if != 0
 static unsigned DisableDefines = 0;
 
 
 
-/*****************************************************************************/
-/*                           Hash table functions                            */
-/*****************************************************************************/
+//***************************************************************************
+//                           Hash table functions
+//***************************************************************************
 
 
 
 static unsigned HT_GenHash (const void* Key)
-/* Generate the hash over a key. */
+// Generate the hash over a key.
 {
     return HashBuf (Key);
 }
@@ -167,7 +167,7 @@ static unsigned HT_GenHash (const void* Key)
 
 
 static const void* HT_GetKey (const void* Entry)
-/* Given a pointer to the user entry data, return a pointer to the index */
+// Given a pointer to the user entry data, return a pointer to the index
 {
     return &((Macro*) Entry)->Name;
 }
@@ -185,43 +185,43 @@ static int HT_Compare (const void* Key1, const void* Key2)
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 static IdDesc* NewIdDesc (const StrBuf* Id)
-/* Create a new IdDesc, initialize and return it */
+// Create a new IdDesc, initialize and return it
 {
-    /* Allocate memory */
+    // Allocate memory
     IdDesc* ID = xmalloc (sizeof (IdDesc));
 
-    /* Initialize the struct */
+    // Initialize the struct
     ID->Next = 0;
     SB_Init (&ID->Id);
     SB_Copy (&ID->Id, Id);
 
-    /* Return the new struct */
+    // Return the new struct
     return ID;
 }
 
 
 
 static void FreeIdDesc (IdDesc* ID)
-/* Free an IdDesc */
+// Free an IdDesc
 {
-    /* Free the name */
+    // Free the name
     SB_Done (&ID->Id);
 
-    /* Free the structure itself */
+    // Free the structure itself
     xfree (ID);
 }
 
 
 
 static void FreeIdDescList (IdDesc* ID)
-/* Free a complete list of IdDesc structures */
+// Free a complete list of IdDesc structures
 {
     while (ID) {
         IdDesc* This = ID;
@@ -233,12 +233,12 @@ static void FreeIdDescList (IdDesc* ID)
 
 
 static Macro* NewMacro (const StrBuf* Name, unsigned char Style)
-/* Generate a new macro entry, initialize and return it */
+// Generate a new macro entry, initialize and return it
 {
-    /* Allocate memory */
+    // Allocate memory
     Macro* M = xmalloc (sizeof (Macro));
 
-    /* Initialize the macro struct */
+    // Initialize the macro struct
     InitHashNode (&M->Node);
     M->LocalCount = 0;
     M->Locals     = 0;
@@ -253,55 +253,55 @@ static Macro* NewMacro (const StrBuf* Name, unsigned char Style)
     M->Style      = Style;
     M->Incomplete = 1;
 
-    /* Insert the macro into the hash table */
+    // Insert the macro into the hash table
     HT_Insert (&MacroTab, &M->Node);
 
-    /* Return the new macro struct */
+    // Return the new macro struct
     return M;
 }
 
 
 
 static void FreeMacro (Macro* M)
-/* Free a macro entry which has already been removed from the macro table. */
+// Free a macro entry which has already been removed from the macro table.
 {
     TokNode* T;
 
-    /* Free locals */
+    // Free locals
     FreeIdDescList (M->Locals);
 
-    /* Free identifiers of parameters */
+    // Free identifiers of parameters
     FreeIdDescList (M->Params);
 
-    /* Free the token list for the macro */
+    // Free the token list for the macro
     while ((T = M->TokRoot) != 0) {
         M->TokRoot = T->Next;
         FreeTokNode (T);
     }
 
-    /* Free the macro name */
+    // Free the macro name
     SB_Done (&M->Name);
 
-    /* Free the macro structure itself */
+    // Free the macro structure itself
     xfree (M);
 }
 
 
 
 static MacExp* NewMacExp (Macro* M)
-/* Create a new expansion structure for the given macro */
+// Create a new expansion structure for the given macro
 {
     unsigned I;
 
-    /* Allocate memory */
+    // Allocate memory
     MacExp* E = xmalloc (sizeof (MacExp));
 
-    /* Initialize the data */
+    // Initialize the data
     E->M                = M;
     E->IfSP             = GetIfStack ();
     E->Exp              = M->TokRoot;
     E->Final            = 0;
-    E->MacExpansions    = ++MacExpansions;      /* One macro expansion more */
+    E->MacExpansions    = ++MacExpansions;      // One macro expansion more
     E->LocalStart       = LocalName;
     LocalName          += M->LocalCount;
     E->ParamCount       = 0;
@@ -313,29 +313,29 @@ static MacExp* NewMacExp (Macro* M)
     E->LI               = 0;
     E->ParamLI          = 0;
 
-    /* Mark the macro as expanding */
+    // Mark the macro as expanding
     ++M->Expansions;
 
-    /* Return the new macro expansion */
+    // Return the new macro expansion
     return E;
 }
 
 
 
 static void FreeMacExp (MacExp* E)
-/* Remove and free the current macro expansion */
+// Remove and free the current macro expansion
 {
     unsigned I;
 
-    /* One macro expansion less */
+    // One macro expansion less
     --MacExpansions;
 
-    /* No longer expanding this macro */
+    // No longer expanding this macro
     --E->M->Expansions;
 
-    /* Free the parameter lists */
+    // Free the parameter lists
     for (I = 0; I < E->ParamCount; ++I) {
-        /* Free one parameter list */
+        // Free one parameter list
         TokNode* N = E->Params[I];
         while (N) {
             TokNode* P = N->Next;
@@ -345,7 +345,7 @@ static void FreeMacExp (MacExp* E)
     }
     xfree (E->Params);
 
-    /* Free the additional line info */
+    // Free the additional line info
     if (E->ParamLI) {
         EndLine (E->ParamLI);
     }
@@ -353,22 +353,22 @@ static void FreeMacExp (MacExp* E)
         EndLine (E->LI);
     }
 
-    /* Free the final token if we have one */
+    // Free the final token if we have one
     if (E->Final) {
         FreeTokNode (E->Final);
     }
 
-    /* Free the structure itself */
+    // Free the structure itself
     xfree (E);
 }
 
 
 
 static void MacSkipDef (unsigned Style)
-/* Skip a macro definition */
+// Skip a macro definition
 {
     if (Style == MAC_STYLE_CLASSIC) {
-        /* Skip tokens until we reach the final .endmacro */
+        // Skip tokens until we reach the final .endmacro
         while (CurTok.Tok != TOK_ENDMACRO && CurTok.Tok != TOK_EOF) {
             NextTok ();
         }
@@ -378,7 +378,7 @@ static void MacSkipDef (unsigned Style)
             Error ("'.ENDMACRO' expected");
         }
     } else {
-        /* Skip until end of line */
+        // Skip until end of line
         SkipUntilSep ();
     }
 }
@@ -386,7 +386,7 @@ static void MacSkipDef (unsigned Style)
 
 
 void MacDef (unsigned Style)
-/* Parse a macro definition */
+// Parse a macro definition
 {
     Macro* M;
     TokNode* N;
@@ -405,7 +405,7 @@ void MacDef (unsigned Style)
     */
     Pos = CurTok.Pos;
 
-    /* We expect a macro name here */
+    // We expect a macro name here
     if (CurTok.Tok != TOK_IDENT) {
         Error ("Identifier expected");
         MacSkipDef (Style);
@@ -419,19 +419,19 @@ void MacDef (unsigned Style)
         return;
     }
 
-    /* Did we already define that macro? */
+    // Did we already define that macro?
     if (HT_Find (&MacroTab, &CurTok.SVal) != 0) {
-        /* Macro is already defined */
+        // Macro is already defined
         Error ("A macro named '%m%p' is already defined", &CurTok.SVal);
-        /* Skip tokens until we reach the final .endmacro */
+        // Skip tokens until we reach the final .endmacro
         MacSkipDef (Style);
         return;
     }
 
-    /* Define the macro */
+    // Define the macro
     M = NewMacro (&CurTok.SVal, Style);
 
-    /* Switch to raw token mode and skip the macro name */
+    // Switch to raw token mode and skip the macro name
     EnterRawTokenMode ();
     NextTok ();
 
@@ -449,13 +449,13 @@ void MacDef (unsigned Style)
         }
     }
 
-    /* Parse the parameter list */
+    // Parse the parameter list
     if (HaveParams) {
         while (CurTok.Tok == TOK_IDENT) {
-            /* Create a struct holding the identifier */
+            // Create a struct holding the identifier
             IdDesc* I = NewIdDesc (&CurTok.SVal);
 
-            /* Insert the struct into the list, checking for duplicate idents */
+            // Insert the struct into the list, checking for duplicate idents
             if (M->ParamCount == 0) {
                 M->Params = I;
             } else {
@@ -475,10 +475,10 @@ void MacDef (unsigned Style)
             }
             ++M->ParamCount;
 
-            /* Skip the name */
+            // Skip the name
             NextTok ();
 
-            /* Maybe there are more params... */
+            // Maybe there are more params...
             if (CurTok.Tok == TOK_COMMA) {
                 NextTok ();
             } else {
@@ -502,72 +502,72 @@ void MacDef (unsigned Style)
     ** the .LOCAL command is detected and removed, at this time.
     */
     while (1) {
-        /* Check for end of macro */
+        // Check for end of macro
         if (Style == MAC_STYLE_CLASSIC) {
             /* In classic macros, if .endmacro is not at the start of the line
             ** it will be added to the macro definition instead of closing it.
             */
             if (CurTok.Tok == TOK_ENDMACRO && LastTokWasSep) {
-                /* Done */
+                // Done
                 break;
             }
-            /* May not have end of file in a macro definition */
+            // May not have end of file in a macro definition
             if (CurTok.Tok == TOK_EOF) {
                 PError (&Pos, "'.ENDMACRO' expected for macro '%m%p'", &M->Name);
                 goto Done;
             }
         } else {
-            /* Accept a newline or end of file for new style macros */
+            // Accept a newline or end of file for new style macros
             if (TokIsSep (CurTok.Tok)) {
                 break;
             }
         }
 
-        /* Check for a .LOCAL declaration */
+        // Check for a .LOCAL declaration
         if (CurTok.Tok == TOK_LOCAL && Style == MAC_STYLE_CLASSIC) {
             while (1) {
                 IdDesc* I;
 
-                /* Skip .local or comma */
+                // Skip .local or comma
                 NextTok ();
 
-                /* Need an identifer */
+                // Need an identifer
                 if (CurTok.Tok != TOK_IDENT && CurTok.Tok != TOK_LOCAL_IDENT) {
                     Error ("Identifier expected");
                     SkipUntilSep ();
                     break;
                 }
 
-                /* Put the identifier into the locals list and skip it */
+                // Put the identifier into the locals list and skip it
                 I = NewIdDesc (&CurTok.SVal);
                 I->Next = M->Locals;
                 M->Locals = I;
                 ++M->LocalCount;
                 NextTok ();
 
-                /* Check for end of list */
+                // Check for end of list
                 if (CurTok.Tok != TOK_COMMA) {
                     break;
                 }
 
             }
 
-            /* We need end of line after the locals */
+            // We need end of line after the locals
             ConsumeSep ();
             continue;
         }
 
-        /* Create a token node for the current token */
+        // Create a token node for the current token
         N = NewTokNode ();
 
-        /* If the token is an identifier, check if it is a local parameter */
+        // If the token is an identifier, check if it is a local parameter
         if (CurTok.Tok == TOK_IDENT) {
             unsigned Count = 0;
             IdDesc* I = M->Params;
 
             while (I) {
                 if (SB_Compare (&I->Id, &CurTok.SVal) == 0) {
-                    /* Local param name, replace it */
+                    // Local param name, replace it
                     N->T.Tok  = TOK_MACPARAM;
                     N->T.IVal = Count;
                     break;
@@ -577,12 +577,12 @@ void MacDef (unsigned Style)
             }
         }
 
-        /* Insert the new token in the list */
+        // Insert the new token in the list
         if (M->TokCount == 0) {
-            /* First token */
+            // First token
             M->TokRoot = M->TokLast = N;
         } else {
-            /* We have already tokens */
+            // We have already tokens
             M->TokLast->Next = N;
             M->TokLast = N;
         }
@@ -593,20 +593,20 @@ void MacDef (unsigned Style)
         */
         LastTokWasSep = TokIsSep(CurTok.Tok);
 
-        /* Read the next token */
+        // Read the next token
         NextTok ();
     }
 
-    /* Skip the .endmacro for a classic macro */
+    // Skip the .endmacro for a classic macro
     if (Style == MAC_STYLE_CLASSIC) {
         NextTok ();
     }
 
-    /* Reset the Incomplete flag now that parsing is done */
+    // Reset the Incomplete flag now that parsing is done
     M->Incomplete = 0;
 
 Done:
-    /* Switch out of raw token mode */
+    // Switch out of raw token mode
     LeaveRawTokenMode ();
 }
 
@@ -617,10 +617,10 @@ void MacUndef (const StrBuf* Name, unsigned char Style)
 ** treated as if the macro didn't exist.
 */
 {
-    /* Search for the macro */
+    // Search for the macro
     Macro* M = HT_Find (&MacroTab, Name);
 
-    /* Don't let the user kid with us */
+    // Don't let the user kid with us
     if (M == 0 || M->Style != Style) {
         Error ("No such macro: %m%p", Name);
         return;
@@ -630,10 +630,10 @@ void MacUndef (const StrBuf* Name, unsigned char Style)
         return;
     }
 
-    /* Remove the macro from the macro table */
+    // Remove the macro from the macro table
     HT_Remove (&MacroTab, M);
 
-    /* Free the macro structure */
+    // Free the macro structure
     FreeMacro (M);
 }
 
@@ -645,19 +645,19 @@ static int MacExpand (void* Data)
 ** a macro, return false.
 */
 {
-    /* Cast the Data pointer to the actual data structure */
+    // Cast the Data pointer to the actual data structure
     MacExp* Mac = (MacExp*) Data;
 
-    /* Check if we should abort this macro */
+    // Check if we should abort this macro
     if (DoMacAbort) {
 
-        /* Reset the flag */
+        // Reset the flag
         DoMacAbort = 0;
 
-        /* Abort any open .IF statements in this macro expansion */
+        // Abort any open .IF statements in this macro expansion
         CleanupIfStack (Mac->IfSP);
 
-        /* Terminate macro expansion */
+        // Terminate macro expansion
         goto MacEnd;
     }
 
@@ -667,24 +667,24 @@ static int MacExpand (void* Data)
 ExpandParam:
     if (Mac->ParamExp) {
 
-        /* Ok, use token from parameter list */
+        // Ok, use token from parameter list
         TokSet (Mac->ParamExp);
 
-        /* Create new line info for this parameter token */
+        // Create new line info for this parameter token
         if (Mac->ParamLI) {
             EndLine (Mac->ParamLI);
         }
         Mac->ParamLI = StartLine (&CurTok.Pos, LI_TYPE_MACPARAM, Mac->MacExpansions);
 
-        /* Set pointer to next token */
+        // Set pointer to next token
         Mac->ParamExp = Mac->ParamExp->Next;
 
-        /* Done */
+        // Done
         return 1;
 
     } else if (Mac->ParamLI) {
 
-        /* There's still line info open from the parameter expansion - end it */
+        // There's still line info open from the parameter expansion - end it
         EndLine (Mac->ParamLI);
         Mac->ParamLI = 0;
 
@@ -695,39 +695,39 @@ ExpandParam:
     */
     if (Mac->Exp) {
 
-        /* Use next macro token */
+        // Use next macro token
         TokSet (Mac->Exp);
 
-        /* Create new line info for this token */
+        // Create new line info for this token
         if (Mac->LI) {
             EndLine (Mac->LI);
         }
         Mac->LI = StartLine (&CurTok.Pos, LI_TYPE_MACRO, Mac->MacExpansions);
 
-        /* Set pointer to next token */
+        // Set pointer to next token
         Mac->Exp = Mac->Exp->Next;
 
-        /* Is it a request for actual parameter count? */
+        // Is it a request for actual parameter count?
         if (CurTok.Tok == TOK_PARAMCOUNT) {
             CurTok.Tok  = TOK_INTCON;
             CurTok.IVal = Mac->ParamCount;
             return 1;
         }
 
-        /* Is it the name of a macro parameter? */
+        // Is it the name of a macro parameter?
         if (CurTok.Tok == TOK_MACPARAM) {
 
-            /* Start to expand the parameter token list */
+            // Start to expand the parameter token list
             Mac->ParamExp = Mac->Params[CurTok.IVal];
 
-            /* Go back and expand the parameter */
+            // Go back and expand the parameter
             goto ExpandParam;
         }
 
-        /* If it's an identifier, it may in fact be a local symbol */
+        // If it's an identifier, it may in fact be a local symbol
         if ((CurTok.Tok == TOK_IDENT || CurTok.Tok == TOK_LOCAL_IDENT) &&
             Mac->M->LocalCount) {
-            /* Search for the local symbol in the list */
+            // Search for the local symbol in the list
             unsigned Index = 0;
             IdDesc* I = Mac->M->Locals;
             while (I) {
@@ -738,33 +738,33 @@ ExpandParam:
                     ** generated by a user.
                     */
                     if (SB_At (&I->Id, 0) == LocalStart) {
-                        /* Must generate a local symbol */
+                        // Must generate a local symbol
                         SB_Printf (&CurTok.SVal, "%cLOCAL-MACRO_SYMBOL-%04X",
                                    LocalStart, Mac->LocalStart + Index);
                     } else {
-                        /* Global symbol */
+                        // Global symbol
                         SB_Printf (&CurTok.SVal, "LOCAL-MACRO_SYMBOL-%04X",
                                    Mac->LocalStart + Index);
                     }
                     break;
                 }
-                /* Next symbol */
+                // Next symbol
                 ++Index;
                 I = I->Next;
             }
 
-            /* Done */
+            // Done
             return 1;
         }
 
-        /* The token was successfully set */
+        // The token was successfully set
         return 1;
     }
 
-    /* No more macro tokens. Do we have a final token? */
+    // No more macro tokens. Do we have a final token?
     if (Mac->Final) {
 
-        /* Set the final token and remove it */
+        // Set the final token and remove it
         TokSet (Mac->Final);
         FreeTokNode (Mac->Final);
         Mac->Final = 0;
@@ -778,64 +778,64 @@ ExpandParam:
         ** would probably be to not require AllocLineInfoSlot/FreeLineInfoSlot
         ** to be called in FIFO order, but this is a bigger change.
         */
-        /* End of macro expansion and pop the input function */
+        // End of macro expansion and pop the input function
         FreeMacExp (Mac);
         PopInput ();
 
-        /* The token was successfully set */
+        // The token was successfully set
         return 1;
     }
 
 MacEnd:
-    /* End of macro expansion */
+    // End of macro expansion
     FreeMacExp (Mac);
 
-    /* Pop the input function */
+    // Pop the input function
     PopInput ();
 
-    /* No token available */
+    // No token available
     return 0;
 }
 
 
 
 static void StartExpClassic (MacExp* E)
-/* Start expanding a classic macro */
+// Start expanding a classic macro
 {
     token_t Term;
 
-    /* Does this invocation have any arguments? */
+    // Does this invocation have any arguments?
     if (!TokIsSep (CurTok.Tok)) {
 
-        /* Read the actual parameters */
+        // Read the actual parameters
         while (1) {
             TokNode* Last;
 
-            /* Check for maximum parameter count */
+            // Check for maximum parameter count
             if (E->ParamCount >= E->M->ParamCount) {
                 ErrorSkip ("Too many macro parameters");
                 break;
             }
 
-            /* The macro argument optionally may be enclosed in curly braces */
+            // The macro argument optionally may be enclosed in curly braces
             Term = GetTokListTerm (TOK_COMMA);
 
-            /* Read tokens for one parameter, accept empty params */
+            // Read tokens for one parameter, accept empty params
             Last = 0;
             while (CurTok.Tok != Term && CurTok.Tok != TOK_SEP) {
                 TokNode* T;
 
-                /* Check for end of file */
+                // Check for end of file
                 if (CurTok.Tok == TOK_EOF) {
                     Error ("Unexpected end of file");
                     FreeMacExp (E);
                     return;
                 }
 
-                /* Get the next token in a node */
+                // Get the next token in a node
                 T = NewTokNode ();
 
-                /* Insert it into the list */
+                // Insert it into the list
                 if (Last == 0) {
                     E->Params [E->ParamCount] = T;
                 } else {
@@ -843,11 +843,11 @@ static void StartExpClassic (MacExp* E)
                 }
                 Last = T;
 
-                /* And skip it... */
+                // And skip it...
                 NextTok ();
             }
 
-            /* One parameter more */
+            // One parameter more
             ++E->ParamCount;
 
             /* If the macro argument was enclosed in curly braces, end-of-line
@@ -861,7 +861,7 @@ static void StartExpClassic (MacExp* E)
                 NextTok ();
             }
 
-            /* Check for a comma */
+            // Check for a comma
             if (CurTok.Tok == TOK_COMMA) {
                 NextTok ();
             } else {
@@ -870,46 +870,46 @@ static void StartExpClassic (MacExp* E)
         }
     }
 
-    /* We must be at end of line now, otherwise something is wrong */
+    // We must be at end of line now, otherwise something is wrong
     ExpectSep ();
 
-    /* Insert a new token input function */
+    // Insert a new token input function
     PushInput (MacExpand, E, ".MACRO");
 }
 
 
 
 static void StartExpDefine (MacExp* E)
-/* Start expanding a DEFINE-style macro */
+// Start expanding a DEFINE-style macro
 {
     /* A define-style macro must be called with as many actual parameters
     ** as there are formal ones. Get the parameter count.
     */
     unsigned Count = E->M->ParamCount;
 
-    /* Read the actual parameters */
+    // Read the actual parameters
     while (Count--) {
         TokNode* Last;
 
-        /* The macro argument optionally may be enclosed in curly braces */
+        // The macro argument optionally may be enclosed in curly braces
         token_t Term = GetTokListTerm (TOK_COMMA);
 
-        /* Check if there is really a parameter */
+        // Check if there is really a parameter
         if (TokIsSep (CurTok.Tok) || CurTok.Tok == Term) {
             ErrorSkip ("Macro parameter #%u is empty", E->ParamCount+1);
             FreeMacExp (E);
             return;
         }
 
-        /* Read tokens for one parameter */
+        // Read tokens for one parameter
         Last = 0;
         do {
             TokNode* T;
 
-            /* Get the next token in a node */
+            // Get the next token in a node
             T = NewTokNode ();
 
-            /* Insert it into the list */
+            // Insert it into the list
             if (Last == 0) {
                 E->Params [E->ParamCount] = T;
             } else {
@@ -917,12 +917,12 @@ static void StartExpDefine (MacExp* E)
             }
             Last = T;
 
-            /* And skip it... */
+            // And skip it...
             NextTok ();
 
         } while (CurTok.Tok != Term && !TokIsSep (CurTok.Tok));
 
-        /* One parameter more */
+        // One parameter more
         ++E->ParamCount;
 
         /* If the macro argument was enclosed in curly braces, end-of-line
@@ -936,7 +936,7 @@ static void StartExpDefine (MacExp* E)
             NextTok ();
         }
 
-        /* Check for a comma */
+        // Check for a comma
         if (Count > 0) {
             if (CurTok.Tok == TOK_COMMA) {
                 NextTok ();
@@ -953,26 +953,26 @@ static void StartExpDefine (MacExp* E)
     */
     E->Final = NewTokNode ();
 
-    /* Insert a new token input function */
+    // Insert a new token input function
     PushInput (MacExpand, E, ".DEFINE");
 }
 
 
 
 void MacExpandStart (Macro* M)
-/* Start expanding a macro */
+// Start expanding a macro
 {
     FilePos Pos;
     MacExp* E;
 
-    /* Check the argument */
+    // Check the argument
     PRECONDITION (M && (M->Style != MAC_STYLE_DEFINE || DisableDefines == 0));
 
-    /* Remember the current file position, then skip the macro name token */
+    // Remember the current file position, then skip the macro name token
     Pos = CurTok.Pos;
     NextTok ();
 
-    /* We cannot expand an incomplete macro */
+    // We cannot expand an incomplete macro
     if (M->Incomplete) {
         PError (&Pos, "Cannot expand an incomplete macro");
         return;
@@ -986,10 +986,10 @@ void MacExpandStart (Macro* M)
         return;
     }
 
-    /* Create a structure holding expansion data */
+    // Create a structure holding expansion data
     E = NewMacExp (M);
 
-    /* Call the apropriate subroutine */
+    // Call the apropriate subroutine
     switch (M->Style) {
         case MAC_STYLE_CLASSIC: StartExpClassic (E);    break;
         case MAC_STYLE_DEFINE:  StartExpDefine (E);     break;
@@ -1000,12 +1000,12 @@ void MacExpandStart (Macro* M)
 
 
 void MacAbort (void)
-/* Abort the current macro expansion */
+// Abort the current macro expansion
 {
-    /* Must have an expansion */
+    // Must have an expansion
     CHECK (MacExpansions > 0);
 
-    /* Set a flag so macro expansion will terminate on the next call */
+    // Set a flag so macro expansion will terminate on the next call
     DoMacAbort = 1;
 }
 
@@ -1029,12 +1029,12 @@ Macro* FindDefine (const StrBuf* Name)
 {
     Macro* M;
 
-    /* Never if disabled */
+    // Never if disabled
     if (DisableDefines) {
         return 0;
     }
 
-    /* Check if we have such a macro */
+    // Check if we have such a macro
     M = HT_Find (&MacroTab, Name);
     return (M != 0 && M->Style == MAC_STYLE_DEFINE)? M : 0;
 }
@@ -1042,7 +1042,7 @@ Macro* FindDefine (const StrBuf* Name)
 
 
 int InMacExpansion (void)
-/* Return true if we're currently expanding a macro */
+// Return true if we're currently expanding a macro
 {
     return (MacExpansions > 0);
 }
@@ -1050,7 +1050,7 @@ int InMacExpansion (void)
 
 
 void DisableDefineStyleMacros (void)
-/* Disable define-style macros until EnableDefineStyleMacros() is called */
+// Disable define-style macros until EnableDefineStyleMacros() is called
 {
     ++DisableDefines;
 }

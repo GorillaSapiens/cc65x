@@ -1,47 +1,47 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                codeinfo.c                                 */
-/*                                                                           */
-/*                  Additional information about 6502 code                   */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2015, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                codeinfo.c
+//
+//                  Additional information about 6502 code
+//
+//
+//
+// (C) 2001-2015, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
 #include <stdlib.h>
 #include <string.h>
 
-/* common */
+// common
 #include "chartype.h"
 #include "coll.h"
 #include "debugflag.h"
 
-/* cc65 */
+// cc65
 #include "codeent.h"
 #include "codeseg.h"
 #include "datatype.h"
@@ -54,18 +54,18 @@
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* Table with the compare suffixes */
+// Table with the compare suffixes
 static const char CmpSuffixTab [][4] = {
     "eq", "ne", "gt", "ge", "lt", "le", "ugt", "uge", "ult", "ule"
 };
 
-/* Table with the bool transformers */
+// Table with the bool transformers
 static const char BoolTransformerTab [][8] = {
     "booleq", "boolne",
     "boolgt", "boolge", "boollt", "boolle",
@@ -77,9 +77,9 @@ static const char BoolTransformerTab [][8] = {
 */
 typedef struct FuncInfo FuncInfo;
 struct FuncInfo {
-    const char*     Name;       /* Function name */
-    unsigned        Use;        /* Register usage */
-    unsigned        Chg;        /* Changed/destroyed registers */
+    const char*     Name;       // Function name
+    unsigned        Use;        // Register usage
+    unsigned        Chg;        // Changed/destroyed registers
 };
 
 /* Functions that change the SP are regarded as using the SP as well.
@@ -90,9 +90,9 @@ struct FuncInfo {
 ** routines are marked to use only the A register. The remainder is ignored
 ** anyway.
 */
-/* CAUTION: table must be sorted for bsearch */
+// CAUTION: table must be sorted for bsearch
 static const FuncInfo FuncInfoTable[] = {
-/* BEGIN SORTED.SH */
+// BEGIN SORTED.SH
     { "addeq0sp",   SLV_TOP | REG_AX,   PSTATE_ALL | REG_AXY                        },
     { "addeqysp",   SLV_IND | REG_AXY,  PSTATE_ALL | REG_AXY                        },
     { "addysp",     REG_SP | REG_Y,     PSTATE_ALL | REG_SP                         },
@@ -136,7 +136,7 @@ static const FuncInfo FuncInfoTable[] = {
     { "boolugt",    PSTATE_CZ,          PSTATE_ALL | REG_AX                         },
     { "boolule",    PSTATE_CZ,          PSTATE_ALL | REG_AX                         },
     { "boolult",    PSTATE_C,           PSTATE_ALL | REG_AX                         },
-    { "callax",     REG_AX,             PSTATE_ALL | REG_ALL                        }, /* PSTATE_ZN | REG_PTR1 */
+    { "callax",     REG_AX,             PSTATE_ALL | REG_ALL                        }, // PSTATE_ZN | REG_PTR1
     { "complax",    REG_AX,             PSTATE_ALL | REG_AX                         },
     { "decax1",     REG_AX,             PSTATE_ALL | REG_AX                         },
     { "decax2",     REG_AX,             PSTATE_ALL | REG_AX                         },
@@ -174,7 +174,7 @@ static const FuncInfo FuncInfoTable[] = {
     { "incsp6",     REG_SP,             PSTATE_ALL | REG_SP | REG_Y                 },
     { "incsp7",     REG_SP,             PSTATE_ALL | REG_SP | REG_Y                 },
     { "incsp8",     REG_SP,             PSTATE_ALL | REG_SP | REG_Y                 },
-    { "jmpvec",     REG_EVERYTHING,         PSTATE_ALL | REG_ALL                    }, /* NONE */
+    { "jmpvec",     REG_EVERYTHING,         PSTATE_ALL | REG_ALL                    }, // NONE
     { "laddeq",     REG_EAXY | REG_PTR1_LO, PSTATE_ALL | REG_EAXY | REG_PTR1_HI     },
     { "laddeq0sp",  SLV_TOP | REG_EAX,      PSTATE_ALL | REG_EAXY                   },
     { "laddeq1",    REG_Y | REG_PTR1_LO,    PSTATE_ALL | REG_EAXY | REG_PTR1_HI     },
@@ -241,10 +241,10 @@ static const FuncInfo FuncInfoTable[] = {
     { "regswap",    REG_AXY,            PSTATE_ALL | REG_AXY | REG_TMP1             },
     { "regswap1",   REG_XY,             PSTATE_ALL | REG_A                          },
     { "regswap2",   REG_XY,             PSTATE_ALL | REG_A | REG_Y                  },
-    { "resteax",    REG_SAVE,           PSTATE_ZN  | REG_EAX                        }, /* also uses regsave+2/+3 */
+    { "resteax",    REG_SAVE,           PSTATE_ZN  | REG_EAX                        }, // also uses regsave+2/+3
     { "return0",    REG_NONE,           PSTATE_ALL | REG_AX                         },
     { "return1",    REG_NONE,           PSTATE_ALL | REG_AX                         },
-    { "saveeax",    REG_EAX,            PSTATE_ZN  | REG_Y | REG_SAVE               }, /* also regsave+2/+3 */
+    { "saveeax",    REG_EAX,            PSTATE_ZN  | REG_Y | REG_SAVE               }, // also regsave+2/+3
     { "shlax1",     REG_AX,             PSTATE_ALL | REG_AX | REG_TMP1              },
     { "shlax2",     REG_AX,             PSTATE_ALL | REG_AX | REG_TMP1              },
     { "shlax3",     REG_AX,             PSTATE_ALL | REG_AX | REG_TMP1              },
@@ -270,12 +270,12 @@ static const FuncInfo FuncInfoTable[] = {
     { "staxspidx",  SLV_TOP | REG_AXY,  PSTATE_ALL | REG_SP | REG_TMP1 | REG_PTR1   },
     { "staxysp",    REG_SP | REG_AXY,   PSTATE_ALL | SLV_IND | REG_Y                },
     { "steax0sp",   REG_SP | REG_EAX,   PSTATE_ALL | SLV_TOP | REG_Y                },
-    { "steaxspidx", SLV_TOP | REG_EAXY, PSTATE_ALL | REG_SP | REG_Y | REG_TMP1 | REG_PTR1   }, /* also tmp2, tmp3 */
+    { "steaxspidx", SLV_TOP | REG_EAXY, PSTATE_ALL | REG_SP | REG_Y | REG_TMP1 | REG_PTR1   }, // also tmp2, tmp3
     { "steaxysp",   REG_SP | REG_EAXY,  PSTATE_ALL | SLV_IND | REG_Y                },
     { "subeq0sp",   SLV_TOP | REG_AX,   PSTATE_ALL | REG_AXY                        },
     { "subeqysp",   SLV_IND | REG_AXY,  PSTATE_ALL | REG_AXY                        },
     { "subysp",     REG_SP | REG_Y,     PSTATE_ALL | REG_SP | REG_AY                },
-    { "swapstk",    SLV_TOP | REG_AX,   PSTATE_ALL | SLV_TOP | REG_AXY              }, /* also ptr4 */
+    { "swapstk",    SLV_TOP | REG_AX,   PSTATE_ALL | SLV_TOP | REG_AXY              }, // also ptr4
     { "tosadd0ax",  SLV_TOP | REG_AX,   PSTATE_ALL | REG_SP | REG_EAXY | REG_TMP1   },
     { "tosadda0",   SLV_TOP | REG_A,    PSTATE_ALL | REG_SP | REG_AXY               },
     { "tosaddax",   SLV_TOP | REG_AX,   PSTATE_ALL | REG_SP | REG_AXY               },
@@ -344,8 +344,8 @@ static const FuncInfo FuncInfoTable[] = {
     { "tossubax",   SLV_TOP | REG_AX,   PSTATE_ALL | REG_SP | REG_AXY               },
     { "tossubeax",  SLV_TOP | REG_EAX,  PSTATE_ALL | REG_SP | REG_EAXY              },
     { "tosudiv0ax", SLV_TOP | REG_AX,   PSTATE_ALL | (REG_ALL & ~REG_SAVE)          },
-    { "tosudiva0",  SLV_TOP | REG_A,    PSTATE_ALL | REG_SP | REG_EAXY | REG_PTR1   }, /* also ptr4 */
-    { "tosudivax",  SLV_TOP | REG_AX,   PSTATE_ALL | REG_SP | REG_EAXY | REG_PTR1   }, /* also ptr4 */
+    { "tosudiva0",  SLV_TOP | REG_A,    PSTATE_ALL | REG_SP | REG_EAXY | REG_PTR1   }, // also ptr4
+    { "tosudivax",  SLV_TOP | REG_AX,   PSTATE_ALL | REG_SP | REG_EAXY | REG_PTR1   }, // also ptr4
     { "tosudiveax", SLV_TOP | REG_EAX,  PSTATE_ALL | (REG_ALL & ~REG_SAVE)          },
     { "tosuge00",   SLV_TOP,            PSTATE_ALL | REG_SP | REG_AXY | REG_SREG    },
     { "tosugea0",   SLV_TOP | REG_A,    PSTATE_ALL | REG_SP | REG_AXY | REG_SREG    },
@@ -365,8 +365,8 @@ static const FuncInfo FuncInfoTable[] = {
     { "tosultax",   SLV_TOP | REG_AX,   PSTATE_ALL | REG_SP | REG_AXY | REG_SREG    },
     { "tosulteax",  SLV_TOP | REG_EAX,  PSTATE_ALL | REG_SP | REG_AXY | REG_PTR1    },
     { "tosumod0ax", SLV_TOP | REG_AX,   PSTATE_ALL | (REG_ALL & ~REG_SAVE)          },
-    { "tosumoda0",  SLV_TOP | REG_A,    PSTATE_ALL | REG_SP | REG_EAXY | REG_PTR1   }, /* also ptr4 */
-    { "tosumodax",  SLV_TOP | REG_AX,   PSTATE_ALL | REG_SP | REG_EAXY | REG_PTR1   }, /* also ptr4 */
+    { "tosumoda0",  SLV_TOP | REG_A,    PSTATE_ALL | REG_SP | REG_EAXY | REG_PTR1   }, // also ptr4
+    { "tosumodax",  SLV_TOP | REG_AX,   PSTATE_ALL | REG_SP | REG_EAXY | REG_PTR1   }, // also ptr4
     { "tosumodeax", SLV_TOP | REG_EAX,  PSTATE_ALL | (REG_ALL & ~REG_SAVE)          },
     { "tosumul0ax", SLV_TOP | REG_AX,   PSTATE_ALL | REG_ALL                        },
     { "tosumula0",  SLV_TOP | REG_A,    PSTATE_ALL | REG_ALL                        },
@@ -378,14 +378,14 @@ static const FuncInfo FuncInfoTable[] = {
     { "tosxoreax",  SLV_TOP | REG_EAX,  PSTATE_ALL | REG_SP | REG_EAXY | REG_TMP1   },
     { "tsteax",     REG_EAX,            PSTATE_ALL | REG_Y                          },
     { "utsteax",    REG_EAX,            PSTATE_ALL | REG_Y                          },
-/* END SORTED.SH */
+// END SORTED.SH
 };
 #define FuncInfoCount   (sizeof(FuncInfoTable) / sizeof(FuncInfoTable[0]))
 
-/* Table with names of zero page locations used by the compiler */
-/* CAUTION: table must be sorted for bsearch */
+// Table with names of zero page locations used by the compiler
+// CAUTION: table must be sorted for bsearch
 static const ZPInfo ZPInfoTable[] = {
-/* BEGIN SORTED.SH */
+// BEGIN SORTED.SH
     {   0, "c_sp",      2,  REG_SP_LO,      REG_SP      },
     {   0, "c_sp+1",    1,  REG_SP_HI,      REG_SP      },
     {   0, "ptr1",      2,  REG_PTR1_LO,    REG_PTR1    },
@@ -403,15 +403,15 @@ static const ZPInfo ZPInfoTable[] = {
     {   0, "tmp2",      1,  REG_NONE,       REG_NONE    },
     {   0, "tmp3",      1,  REG_NONE,       REG_NONE    },
     {   0, "tmp4",      1,  REG_NONE,       REG_NONE    },
-/* END SORTED.SH */
+// END SORTED.SH
 };
 #define ZPInfoCount     (sizeof(ZPInfoTable) / sizeof(ZPInfoTable[0]))
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
@@ -420,14 +420,14 @@ static int IsAddrOnZP (long Address)
 ** FIXME: ZP range may vary depending on the CPU settings.
 */
 {
-    /* ZP in range [0x00, 0xFF] */
+    // ZP in range [0x00, 0xFF]
     return Address >= 0 && Address < 0x100;
 }
 
 
 
 int IsZPArg (const char* Name)
-/* Exam if the main part of the arg string indicates a ZP loc */
+// Exam if the main part of the arg string indicates a ZP loc
 {
     unsigned short  ArgInfo = 0;
     long            Offset = 0;
@@ -436,37 +436,37 @@ int IsZPArg (const char* Name)
     const ZPInfo*   Info = 0;
 
     if (!ParseOpcArgStr (Name, &ArgInfo, &NameBuf, &Offset)) {
-        /* Parsing failed */
+        // Parsing failed
         SB_Done (&NameBuf);
         return 0;
     }
 
     if ((ArgInfo & AIF_HAS_NAME) == 0) {
-        /* Numeric locs have no names */
+        // Numeric locs have no names
         SB_Done (&NameBuf);
 
-        /* We can check it against the ZP boundary if it is known */
+        // We can check it against the ZP boundary if it is known
         return IsAddrOnZP (Offset);
     }
 
     if ((ArgInfo & AIF_BUILTIN) != 0) {
-        /* Search for the name in the list of builtin ZPs */
+        // Search for the name in the list of builtin ZPs
         Info = GetZPInfo (SB_GetConstBuf (&NameBuf));
 
         SB_Done (&NameBuf);
 
-        /* Do we know the ZP? */
+        // Do we know the ZP?
         if (Info != 0) {
-            /* Use the information we have */
+            // Use the information we have
             return Offset >= 0 && Offset < (int)Info->Size;
         }
 
-        /* Assume it be non-ZP */
+        // Assume it be non-ZP
         return 0;
     }
 
     if ((ArgInfo & AIF_EXTERNAL) == 0) {
-        /* We don't support local variables on ZP */
+        // We don't support local variables on ZP
         SB_Done (&NameBuf);
         return 0;
     }
@@ -486,14 +486,14 @@ int IsZPArg (const char* Name)
         return Offset >= 0 && (unsigned)Offset < CheckedSizeOf (E->Type);
     }
 
-    /* Not found on ZP */
+    // Not found on ZP
     return 0;
 }
 
 
 
 static int CompareFuncInfo (const void* Key, const void* Info)
-/* Compare function for bsearch */
+// Compare function for bsearch
 {
     return strcmp (Key, ((const FuncInfo*) Info)->Name);
 }
@@ -512,10 +512,10 @@ fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg)
     ** Search for it in the list of builtin functions.
     */
     if (Name[0] == '_') {
-        /* Search in the symbol table, skip the leading underscore */
+        // Search in the symbol table, skip the leading underscore
         SymEntry* E = FindGlobalSym (Name+1);
 
-        /* Did we find it in the top-level table? */
+        // Did we find it in the top-level table?
         if (E && IsTypeFunc (E->Type)) {
             FuncDesc* D = GetFuncDesc (E->Type);
             *Use = REG_NONE;
@@ -550,26 +550,26 @@ fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg)
                                 *Use = REG_EAX;
                         }
                         if (D->ParamCount > 1) {
-                            /* Passes other params on the stack */
+                            // Passes other params on the stack
                             *Use |= REG_SP | SLV_TOP;
                         }
                     } else {
-                        /* We'll assume all */
+                        // We'll assume all
                         *Use = REG_EAX | REG_SP | SLV_TOP;
                     }
                 } else {
-                    /* Passes all params on the stack */
+                    // Passes all params on the stack
                     *Use = REG_SP | SLV_TOP;
                 }
             } else {
-                /* Will not use any registers */
+                // Will not use any registers
                 *Use = REG_NONE;
             }
 
-            /* Will destroy all registers and processor flags */
+            // Will destroy all registers and processor flags
             *Chg = (REG_ALL | PSTATE_ALL);
 
-            /* Done */
+            // Done
             return FNCLS_GLOBAL;
         }
 
@@ -585,13 +585,13 @@ fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg)
 
     } else {
 
-        /* Search for the function in the list of builtin functions */
+        // Search for the function in the list of builtin functions
         const FuncInfo* Info = bsearch (Name, FuncInfoTable, FuncInfoCount,
                                         sizeof(FuncInfo), CompareFuncInfo);
 
-        /* Do we know the function? */
+        // Do we know the function?
         if (Info) {
-            /* Use the information we have */
+            // Use the information we have
             *Use = Info->Use;
             *Chg = Info->Chg;
             if ((*Use & (SLV_TOP | SLV_IND)) != 0) {
@@ -624,9 +624,9 @@ fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg)
 
 
 static int CompareZPInfo (const void* Name, const void* Info)
-/* Compare function for bsearch */
+// Compare function for bsearch
 {
-    /* Cast the pointers to the correct data type */
+    // Cast the pointers to the correct data type
     const char* N   = (const char*) Name;
     const ZPInfo* E = (const ZPInfo*) Info;
 
@@ -634,13 +634,13 @@ static int CompareZPInfo (const void* Name, const void* Info)
     ** more than just the zeropage name).
     */
     if (E->Len == 0) {
-        /* Do a full compare */
+        // Do a full compare
         return strcmp (N, E->Name);
     } else {
-        /* Only compare the first part */
+        // Only compare the first part
         int Res = strncmp (N, E->Name, E->Len);
         if (Res == 0 && (N[E->Len] != '\0' && N[E->Len] != '+')) {
-            /* Name is actually longer than Info->Name */
+            // Name is actually longer than Info->Name
             Res = -1;
         }
         return Res;
@@ -654,7 +654,7 @@ const ZPInfo* GetZPInfo (const char* Name)
 ** struct for this symbol, otherwise return NULL.
 */
 {
-    /* Search for the zp location in the list */
+    // Search for the zp location in the list
     return bsearch (Name, ZPInfoTable, ZPInfoCount,
                     sizeof(ZPInfo), CompareZPInfo);
 }
@@ -668,9 +668,9 @@ static unsigned GetRegInfo2 (CodeSeg* S,
                              unsigned Used,
                              unsigned Unused,
                              unsigned Wanted)
-/* Recursively called subfunction for GetRegInfo. */
+// Recursively called subfunction for GetRegInfo.
 {
-    /* Follow the instruction flow recording register usage. */
+    // Follow the instruction flow recording register usage.
     while (1) {
 
         unsigned R;
@@ -682,15 +682,15 @@ static unsigned GetRegInfo2 (CodeSeg* S,
             break;
         }
 
-        /* Mark this entry as already visited */
+        // Mark this entry as already visited
         CE_SetMark (E);
         CollAppend (Visited, E);
 
-        /* Evaluate the used registers */
+        // Evaluate the used registers
         R = E->Use;
         if (E->OPC == OP65_RTS ||
             ((E->Info & OF_UBRA) != 0 && E->JumpTo == 0)) {
-            /* This instruction will leave the function */
+            // This instruction will leave the function
             R |= S->ExitRegs;
         }
         if (R != REG_NONE) {
@@ -698,26 +698,26 @@ static unsigned GetRegInfo2 (CodeSeg* S,
             ** used before.
             */
             R &= ~Unused;
-            /* Remember the remaining registers */
+            // Remember the remaining registers
             Used |= R;
         }
 
-        /* Evaluate the changed registers */
+        // Evaluate the changed registers
         if ((R = E->Chg) != REG_NONE) {
             /* We are not interested in the use of any register that has been
             ** used before.
             */
             R &= ~Used;
-            /* Remember the remaining registers */
+            // Remember the remaining registers
             Unused |= R;
         }
 
-        /* If we know about all registers now, bail out */
+        // If we know about all registers now, bail out
         if (((Used | Unused) & Wanted) == Wanted) {
             break;
         }
 
-        /* If the instruction is an RTS or RTI, we're done */
+        // If the instruction is an RTS or RTI, we're done
         if ((E->Info & OF_RET) != 0) {
             break;
         }
@@ -727,15 +727,15 @@ static unsigned GetRegInfo2 (CodeSeg* S,
         */
         if ((E->Info & OF_UBRA) != 0) {
 
-            /* Does this jump have a valid target? */
+            // Does this jump have a valid target?
             if (E->JumpTo) {
 
-                /* Unconditional jump */
+                // Unconditional jump
                 E     = E->JumpTo->Owner;
-                Index = -1;             /* Invalidate */
+                Index = -1;             // Invalidate
 
             } else {
-                /* Jump outside means we're done */
+                // Jump outside means we're done
                 break;
             }
 
@@ -745,13 +745,13 @@ static unsigned GetRegInfo2 (CodeSeg* S,
         */
         } else if ((E->Info & OF_CBRA) != 0) {
 
-            /* Recursively determine register usage at the branch target */
+            // Recursively determine register usage at the branch target
             unsigned U1;
             unsigned U2;
 
             if (E->JumpTo) {
 
-                /* Jump to internal label */
+                // Jump to internal label
                 U1 = GetRegInfo2 (S, E->JumpTo->Owner, -1, Visited, Used, Unused, Wanted);
 
             } else {
@@ -763,7 +763,7 @@ static unsigned GetRegInfo2 (CodeSeg* S,
 
             }
 
-            /* Get the next entry */
+            // Get the next entry
             if (Index < 0) {
                 Index = CS_GetEntryIndex (S, E);
             }
@@ -771,21 +771,21 @@ static unsigned GetRegInfo2 (CodeSeg* S,
                 Internal ("GetRegInfo2: No next entry!");
             }
 
-            /* Follow flow if branch not taken */
+            // Follow flow if branch not taken
             U2 = GetRegInfo2 (S, E, Index, Visited, Used, Unused, Wanted);
 
-            /* Registers are used if they're use in any of the branches */
+            // Registers are used if they're use in any of the branches
             return U1 | U2;
 
         } else {
 
-            /* Just go to the next instruction */
+            // Just go to the next instruction
             if (Index < 0) {
                 Index = CS_GetEntryIndex (S, E);
             }
             E = CS_GetEntry (S, ++Index);
             if (E == 0) {
-                /* No next entry */
+                // No next entry
                 Internal ("GetRegInfo2: No next entry!");
             }
 
@@ -793,7 +793,7 @@ static unsigned GetRegInfo2 (CodeSeg* S,
 
     }
 
-    /* Return to the caller the complement of all unused registers */
+    // Return to the caller the complement of all unused registers
     return Used;
 }
 
@@ -806,15 +806,15 @@ static unsigned GetRegInfo1 (CodeSeg* S,
                              unsigned Used,
                              unsigned Unused,
                              unsigned Wanted)
-/* Recursively called subfunction for GetRegInfo. */
+// Recursively called subfunction for GetRegInfo.
 {
-    /* Remember the current count of the line collection */
+    // Remember the current count of the line collection
     unsigned Count = CollCount (Visited);
 
-    /* Call the worker routine */
+    // Call the worker routine
     unsigned R = GetRegInfo2 (S, E, Index, Visited, Used, Unused, Wanted);
 
-    /* Restore the old count, unmarking all new entries */
+    // Restore the old count, unmarking all new entries
     unsigned NewCount = CollCount (Visited);
     while (NewCount-- > Count) {
         CodeEntry* E = CollAt (Visited, NewCount);
@@ -822,7 +822,7 @@ static unsigned GetRegInfo1 (CodeSeg* S,
         CollDelete (Visited, NewCount);
     }
 
-    /* Return the registers used */
+    // Return the registers used
     return R;
 }
 
@@ -834,33 +834,33 @@ unsigned GetRegInfo (struct CodeSeg* S, unsigned Index, unsigned Wanted)
 */
 {
     CodeEntry*      E;
-    Collection      Visited;    /* Visited entries */
+    Collection      Visited;    // Visited entries
     unsigned        R;
 
-    /* Get the code entry for the given index */
+    // Get the code entry for the given index
     if (Index >= CS_GetEntryCount (S)) {
-        /* There is no such code entry */
+        // There is no such code entry
         return REG_NONE;
     }
     E = CS_GetEntry (S, Index);
 
-    /* Initialize the data structure used to collection information */
+    // Initialize the data structure used to collection information
     InitCollection (&Visited);
 
-    /* Call the recursive subfunction */
+    // Call the recursive subfunction
     R = GetRegInfo1 (S, E, Index, &Visited, REG_NONE, REG_NONE, Wanted);
 
-    /* Delete the line collection */
+    // Delete the line collection
     DoneCollection (&Visited);
 
-    /* Return the registers used */
+    // Return the registers used
     return R;
 }
 
 
 
 int RegAUsed (struct CodeSeg* S, unsigned Index)
-/* Check if the value in A is used. */
+// Check if the value in A is used.
 {
     return (GetRegInfo (S, Index, REG_A) & REG_A) != 0;
 }
@@ -868,7 +868,7 @@ int RegAUsed (struct CodeSeg* S, unsigned Index)
 
 
 int RegXUsed (struct CodeSeg* S, unsigned Index)
-/* Check if the value in X is used. */
+// Check if the value in X is used.
 {
     return (GetRegInfo (S, Index, REG_X) & REG_X) != 0;
 }
@@ -876,7 +876,7 @@ int RegXUsed (struct CodeSeg* S, unsigned Index)
 
 
 int RegYUsed (struct CodeSeg* S, unsigned Index)
-/* Check if the value in Y is used. */
+// Check if the value in Y is used.
 {
     return (GetRegInfo (S, Index, REG_Y) & REG_Y) != 0;
 }
@@ -884,7 +884,7 @@ int RegYUsed (struct CodeSeg* S, unsigned Index)
 
 
 int RegAXUsed (struct CodeSeg* S, unsigned Index)
-/* Check if the value in A or(!) the value in X are used. */
+// Check if the value in A or(!) the value in X are used.
 {
     return (GetRegInfo (S, Index, REG_AX) & REG_AX) != 0;
 }
@@ -892,7 +892,7 @@ int RegAXUsed (struct CodeSeg* S, unsigned Index)
 
 
 int RegEAXUsed (struct CodeSeg* S, unsigned Index)
-/* Check if any of the four bytes in EAX are used. */
+// Check if any of the four bytes in EAX are used.
 {
     return (GetRegInfo (S, Index, REG_EAX) & REG_EAX) != 0;
 }
@@ -900,7 +900,7 @@ int RegEAXUsed (struct CodeSeg* S, unsigned Index)
 
 
 int LoadFlagsUsed (struct CodeSeg* S, unsigned Index)
-/* Check if one of the flags set by a register load (Z and N) are used. */
+// Check if one of the flags set by a register load (Z and N) are used.
 {
     return (GetRegInfo (S, Index, PSTATE_ZN) & PSTATE_ZN) != 0;
 }
@@ -937,19 +937,19 @@ unsigned GetKnownReg (unsigned Use, const RegContents* RC)
 
 
 static cmp_t FindCmpCond (const char* Code, unsigned CodeLen)
-/* Search for a compare condition by the given code using the given length */
+// Search for a compare condition by the given code using the given length
 {
     unsigned I;
 
-    /* Linear search */
+    // Linear search
     for (I = 0; I < sizeof (CmpSuffixTab) / sizeof (CmpSuffixTab [0]); ++I) {
         if (strncmp (Code, CmpSuffixTab [I], CodeLen) == 0) {
-            /* Found */
+            // Found
             return I;
         }
     }
 
-    /* Not found */
+    // Not found
     return CMP_INV;
 }
 
@@ -961,12 +961,12 @@ cmp_t FindBoolCmpCond (const char* Name)
 ** routine. Return CMP_INV if the condition is not recognised.
 */
 {
-    /* Check for the correct subroutine name */
+    // Check for the correct subroutine name
     if (strncmp (Name, "bool", 4) == 0) {
-        /* Name is ok, search for the code in the table */
+        // Name is ok, search for the code in the table
         return FindCmpCond (Name+4, strlen(Name)-4);
     } else {
-        /* Not found */
+        // Not found
         return CMP_INV;
     }
 }
@@ -980,12 +980,12 @@ cmp_t FindTosCmpCond (const char* Name)
 {
     unsigned Len = strlen (Name);
 
-    /* Check for the correct subroutine name */
+    // Check for the correct subroutine name
     if (strncmp (Name, "tos", 3) == 0 && strcmp (Name+Len-2, "ax") == 0) {
-        /* Name is ok, search for the code in the table */
+        // Name is ok, search for the code in the table
         return FindCmpCond (Name+3, Len-3-2);
     } else {
-        /* Not found */
+        // Not found
         return CMP_INV;
     }
 }
@@ -993,15 +993,15 @@ cmp_t FindTosCmpCond (const char* Name)
 
 
 const char* GetCmpSuffix (cmp_t Cond)
-/* Return the compare suffix by the given a compare condition or 0 on failure */
+// Return the compare suffix by the given a compare condition or 0 on failure
 {
-    /* Check for the correct subroutine name */
+    // Check for the correct subroutine name
     if (Cond >= 0       &&
         Cond != CMP_INV &&
         (unsigned)Cond < sizeof (CmpSuffixTab) / sizeof (CmpSuffixTab[0])) {
         return CmpSuffixTab[Cond];
     } else {
-        /* Not found */
+        // Not found
         return 0;
     }
 }
@@ -1015,14 +1015,14 @@ char* GetBoolCmpSuffix (char* Buf, cmp_t Cond)
 ** on failure.
 */
 {
-    /* Check for the correct boolean transformer subroutine name */
+    // Check for the correct boolean transformer subroutine name
     const char* Suf = GetCmpSuffix (Cond);
 
     if (Suf != 0) {
         sprintf (Buf, "bool%s", Suf);
         return Buf;
     } else {
-        /* Not found */
+        // Not found
         return 0;
     }
 }
@@ -1035,14 +1035,14 @@ char* GetTosCmpSuffix (char* Buf, cmp_t Cond)
 ** failure.
 */
 {
-    /* Check for the correct TOS function name */
+    // Check for the correct TOS function name
     const char* Suf = GetCmpSuffix (Cond);
 
     if (Suf != 0) {
         sprintf (Buf, "tos%sax", Suf);
         return Buf;
     } else {
-        /* Not found */
+        // Not found
         return 0;
     }
 }
@@ -1050,19 +1050,19 @@ char* GetTosCmpSuffix (char* Buf, cmp_t Cond)
 
 
 const char* GetBoolTransformer (cmp_t Cond)
-/* Get the bool transformer corresponding to the given compare condition */
+// Get the bool transformer corresponding to the given compare condition
 {
     if (Cond > CMP_INV && Cond < CMP_END) {
         return BoolTransformerTab[Cond];
     }
 
-    /* Not found */
+    // Not found
     return 0;
 }
 
 
 cmp_t GetNegatedCond (cmp_t Cond)
-/* Get the logically opposite compare condition */
+// Get the logically opposite compare condition
 {
     switch (Cond) {
     case CMP_EQ: return CMP_NE;
@@ -1082,7 +1082,7 @@ cmp_t GetNegatedCond (cmp_t Cond)
 
 
 cmp_t GetRevertedCond (cmp_t Cond)
-/* Get the compare condition in reverted order of operands */
+// Get the compare condition in reverted order of operands
 {
     switch (Cond) {
     case CMP_EQ: return CMP_EQ;

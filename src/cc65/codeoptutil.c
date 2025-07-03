@@ -1,59 +1,59 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                               codeoptutil.c                               */
-/*                                                                           */
-/*           Optimize operations that take operands via the stack            */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                               codeoptutil.c
+//
+//           Optimize operations that take operands via the stack
+//
+//
+//
+// (C) 2001      Ullrich von Bassewitz
+//               Wacholderweg 14
+//               D-70597 Stuttgart
+// EMail:        uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
 #include <stdlib.h>
 
-/* common */
+// common
 #include "chartype.h"
 #include "xmalloc.h"
 
-/* cc65 */
+// cc65
 #include "codeinfo.h"
 #include "codeoptutil.h"
 #include "error.h"
 
 
 
-/*****************************************************************************/
-/*                            Load tracking code                             */
-/*****************************************************************************/
+//***************************************************************************
+//                            Load tracking code
+//***************************************************************************
 
 
 
 void ClearLoadRegInfo (LoadRegInfo* LRI)
-/* Clear a LoadRegInfo struct */
+// Clear a LoadRegInfo struct
 {
     LRI->Flags      = LI_NONE;
     LRI->LoadIndex  = -1;
@@ -68,7 +68,7 @@ void ClearLoadRegInfo (LoadRegInfo* LRI)
 
 
 void CopyLoadRegInfo (LoadRegInfo* To, LoadRegInfo* From)
-/* Copy a LoadRegInfo struct */
+// Copy a LoadRegInfo struct
 {
     To->Flags      = From->Flags;
     To->LoadIndex  = From->LoadIndex;
@@ -83,9 +83,9 @@ void CopyLoadRegInfo (LoadRegInfo* To, LoadRegInfo* From)
 
 
 void FinalizeLoadRegInfo (LoadRegInfo* LRI, CodeSeg* S)
-/* Prepare a LoadRegInfo struct for use */
+// Prepare a LoadRegInfo struct for use
 {
-    /* Get the entries */
+    // Get the entries
     if (LRI->LoadIndex >= 0) {
         LRI->LoadEntry = CS_GetEntry (S, LRI->LoadIndex);
     } else {
@@ -102,7 +102,7 @@ void FinalizeLoadRegInfo (LoadRegInfo* LRI, CodeSeg* S)
         LRI->ChgEntry = 0;
     }
 
-    /* Load from src not modified before op can be treated as direct */
+    // Load from src not modified before op can be treated as direct
     if ((LRI->Flags & (LI_SRC_CHG | LI_Y_SRC_CHG)) == 0 &&
         (LRI->Flags & (LI_CHECK_ARG | LI_CHECK_Y)) != 0) {
         LRI->Flags |= LI_DIRECT;
@@ -110,7 +110,7 @@ void FinalizeLoadRegInfo (LoadRegInfo* LRI, CodeSeg* S)
             LRI->Flags |= LI_RELOAD_Y;
         }
     }
-    /* We cannot ldy src,y or reload unknown Y */
+    // We cannot ldy src,y or reload unknown Y
     if ((LRI->Flags & (LI_CHECK_Y | LI_RELOAD_Y)) == (LI_CHECK_Y | LI_RELOAD_Y) &&
         (LRI->LoadYEntry == 0 ||
          (LRI->LoadYEntry->Use & REG_Y) == REG_Y)) {
@@ -127,30 +127,30 @@ void AdjustLoadRegInfo (LoadRegInfo* LRI, int Index, int Change)
 {
     CHECK (abs (Change) == 1);
     if (Change < 0) {
-        /* Deletion */
+        // Deletion
         if (Index < LRI->LoadIndex) {
             --LRI->LoadIndex;
         } else if (Index == LRI->LoadIndex) {
-            /* Has been removed */
+            // Has been removed
             LRI->LoadIndex = -1;
             LRI->LoadEntry = 0;
         }
         if (Index < LRI->LoadYIndex) {
             --LRI->LoadIndex;
         } else if (Index == LRI->LoadYIndex) {
-            /* Has been removed */
+            // Has been removed
             LRI->LoadYIndex = -1;
             LRI->LoadYEntry = 0;
         }
         if (Index < LRI->ChgIndex) {
             --LRI->ChgIndex;
         } else if (Index == LRI->ChgIndex) {
-            /* Has been removed */
+            // Has been removed
             LRI->ChgIndex = -1;
             LRI->ChgEntry = 0;
         }
     } else {
-        /* Insertion */
+        // Insertion
         if (Index <= LRI->LoadIndex) {
             ++LRI->LoadIndex;
         }
@@ -166,7 +166,7 @@ void AdjustLoadRegInfo (LoadRegInfo* LRI, int Index, int Change)
 
 
 void ClearLoadInfo (LoadInfo* LI)
-/* Clear a LoadInfo struct */
+// Clear a LoadInfo struct
 {
     ClearLoadRegInfo (&LI->A);
     ClearLoadRegInfo (&LI->X);
@@ -176,7 +176,7 @@ void ClearLoadInfo (LoadInfo* LI)
 
 
 void CopyLoadInfo (LoadInfo* To, LoadInfo* From)
-/* Copy a LoadInfo struct */
+// Copy a LoadInfo struct
 {
     CopyLoadRegInfo (&To->A, &From->A);
     CopyLoadRegInfo (&To->X, &From->X);
@@ -186,9 +186,9 @@ void CopyLoadInfo (LoadInfo* To, LoadInfo* From)
 
 
 void FinalizeLoadInfo (LoadInfo* LI, CodeSeg* S)
-/* Prepare a LoadInfo struct for use */
+// Prepare a LoadInfo struct for use
 {
-    /* Get the entries */
+    // Get the entries
     FinalizeLoadRegInfo (&LI->A, S);
     FinalizeLoadRegInfo (&LI->X, S);
     FinalizeLoadRegInfo (&LI->Y, S);
@@ -197,7 +197,7 @@ void FinalizeLoadInfo (LoadInfo* LI, CodeSeg* S)
 
 
 void AdjustLoadInfo (LoadInfo* LI, int Index, int Change)
-/* Adjust a load info struct after deleting entry with a given index */
+// Adjust a load info struct after deleting entry with a given index
 {
     AdjustLoadRegInfo (&LI->A, Index, Change);
     AdjustLoadRegInfo (&LI->X, Index, Change);
@@ -207,7 +207,7 @@ void AdjustLoadInfo (LoadInfo* LI, int Index, int Change)
 
 
 RegInfo* GetLastChangedRegInfo (StackOpData* D, LoadRegInfo* Reg)
-/* Get RegInfo of the last insn entry that changed the reg */
+// Get RegInfo of the last insn entry that changed the reg
 {
     CodeEntry* E;
 
@@ -237,7 +237,7 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
     CodeEntry*      YE  = 0;
 
     if ((LRI->Flags & (LI_CHECK_ARG | LI_CHECK_Y | LI_RELOAD_Y)) == 0) {
-        /* Nothing to check */
+        // Nothing to check
         return 0;
     }
 
@@ -256,12 +256,12 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
             UseToCheck |= AE->Use & ~REG_A & REG_ALL;
             ChgToCheck |= AE->Chg & ~REG_A & REG_ALL;
 
-            /* Check if the argument has been parsed successfully */
+            // Check if the argument has been parsed successfully
             if (!CE_IsArgStrParsed (AE)) {
-                /* Bail out and play it safe*/
+                // Bail out and play it safe
                 goto L_Affected;
             }
-            /* We have to manually set up the use/chg flags for builtin functions */
+            // We have to manually set up the use/chg flags for builtin functions
             ZI = GetZPInfo (AE->ArgBase);
             if (ZI != 0) {
                 UseToCheck |= ZI->ByteUse;
@@ -281,12 +281,12 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
         if (YE != 0) {
             UseToCheck |= YE->Use;
 
-            /* Check if the argument has been parsed successfully */
+            // Check if the argument has been parsed successfully
             if (!CE_IsArgStrParsed (YE)) {
-                /* Bail out and play it safe*/
+                // Bail out and play it safe
                 goto L_Affected;
             }
-            /* We have to manually set up the use/chg flags for builtin functions */
+            // We have to manually set up the use/chg flags for builtin functions
             ZI = GetZPInfo (YE->ArgBase);
             if (ZI != 0) {
                 UseToCheck |= ZI->ByteUse;
@@ -302,10 +302,10 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
     }
 
     if (E->OPC == OP65_JSR) {
-        /* Try to know about the function */
+        // Try to know about the function
         fncls = GetFuncInfo (E->Arg, &Use, &Chg);
         if (fncls == FNCLS_BUILTIN) {
-            /* Builtin functions are usually harmless */
+            // Builtin functions are usually harmless
             if ((ChgToCheck & Use & REG_ALL) != 0) {
                 Res |= LI_SRC_USE;
             }
@@ -314,15 +314,15 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
             }
             goto L_Result;
         }
-        /* Otherwise play it safe */
+        // Otherwise play it safe
         goto L_Affected;
 
     } else {
         if ((E->Info & (OF_READ | OF_WRITE)) != 0) {
 
-            /* Check if the argument has been parsed successfully */
+            // Check if the argument has been parsed successfully
             if (!CE_IsArgStrParsed (E)) {
-                /* Bail out and play it safe*/
+                // Bail out and play it safe
                 goto L_Affected;
             }
 
@@ -345,11 +345,11 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
                           strcmp (AE->ArgBase, E->ArgBase) == 0)) {
 
                         if ((E->Info & OF_READ) != 0) {
-                            /* Used */
+                            // Used
                             Res |= LI_SRC_USE;
                         }
                         if ((E->Info & OF_WRITE) != 0) {
-                            /* Changed */
+                            // Changed
                             Res |= LI_SRC_CHG;
                         }
                     }
@@ -363,17 +363,17 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
                         (YE->ArgOff == E->ArgOff && strcmp (YE->ArgBase, E->ArgBase) == 0)) {
 
                         if ((E->Info & OF_READ) != 0) {
-                            /* Used */
+                            // Used
                             Res |= LI_Y_SRC_USE;
                         }
                         if ((E->Info & OF_WRITE) != 0) {
-                            /* Changed */
+                            // Changed
                             Res |= LI_Y_SRC_CHG;
                         }
                     }
                 }
 
-                /* Otherwise unaffected */
+                // Otherwise unaffected
                 goto L_Result;
             }
             /* We could've check further for more cases where the load target
@@ -386,14 +386,14 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
 
 L_Affected:
     if ((E->Info & OF_READ) != 0) {
-        /* Used */
+        // Used
         Res |= LI_SRC_USE;
         if ((LRI->Flags & LI_CHECK_Y) != 0) {
             Res |= LI_Y_SRC_USE;
         }
     }
     if ((E->Info & OF_WRITE) != 0) {
-        /* Changed */
+        // Changed
         Res |= LI_SRC_CHG;
         if ((LRI->Flags & LI_CHECK_Y) != 0) {
             Res |= LI_Y_SRC_CHG;
@@ -416,10 +416,10 @@ L_Result:
 
 
 static void HonourUseAndChg (LoadRegInfo* LRI, unsigned Reg, const CodeEntry* E, int I)
-/* Honour use and change flags for an instruction */
+// Honour use and change flags for an instruction
 {
     if ((E->Chg & Reg) != 0) {
-        /* This changes the content of the reg */
+        // This changes the content of the reg
         ClearLoadRegInfo (LRI);
         LRI->ChgIndex = I;
         LRI->Flags = 0;
@@ -436,13 +436,13 @@ void PrepairLoadRegInfoForArgCheck (CodeSeg* S, LoadRegInfo* LRI, CodeEntry* E)
 */
 {
     if (E->AM == AM65_IMM) {
-        /* These insns are all ok and replaceable */
+        // These insns are all ok and replaceable
         LRI->Flags |= LI_DIRECT;
     } else if (E->AM == AM65_ZP || E->AM == AM65_ABS) {
-        /* These insns are replaceable only if they are not modified later */
+        // These insns are replaceable only if they are not modified later
         LRI->Flags |= LI_CHECK_ARG;
     } else if (E->AM == AM65_ZPY || E->AM == AM65_ABSY) {
-        /* These insns are replaceable only if they are not modified later */
+        // These insns are replaceable only if they are not modified later
         LRI->Flags |= LI_CHECK_ARG | LI_CHECK_Y;
     } else if ((E->AM == AM65_ZP_INDY) &&
                 strcmp (E->Arg, "c_sp") == 0) {
@@ -466,13 +466,13 @@ void PrepairLoadRegInfoForArgCheck (CodeSeg* S, LoadRegInfo* LRI, CodeEntry* E)
         }
     }
 
-    /* Watch for any change of the load target */
+    // Watch for any change of the load target
     if ((LRI->Flags & LI_CHECK_ARG) != 0) {
         LRI->LoadIndex = CS_GetEntryIndex (S, E);
         LRI->LoadEntry = E;
     }
 
-    /* We need to check if the src of Y is changed */
+    // We need to check if the src of Y is changed
     if (LRI->LoadYIndex >= 0) {
         LRI->LoadYEntry = CS_GetEntry (S, LRI->LoadYIndex);
     } else {
@@ -483,7 +483,7 @@ void PrepairLoadRegInfoForArgCheck (CodeSeg* S, LoadRegInfo* LRI, CodeEntry* E)
 
 
 void SetIfOperandSrcAffected (LoadInfo* LLI, CodeEntry* E)
-/* Check and flag operand src that may be affected */
+// Check and flag operand src that may be affected
 {
     LLI->A.Flags |= Affected (&LLI->A, E);
     LLI->X.Flags |= Affected (&LLI->X, E);
@@ -493,9 +493,9 @@ void SetIfOperandSrcAffected (LoadInfo* LLI, CodeEntry* E)
 
 
 void SetIfOperandLoadUnremovable (LoadInfo* LI, unsigned Used)
-/* Check and flag operand load that may be unremovable */
+// Check and flag operand load that may be unremovable
 {
-    /* Disallow removing the loads if the registers are used */
+    // Disallow removing the loads if the registers are used
     if ((Used & REG_A) != 0) {
         LI->A.Flags |= LI_DONT_REMOVE;
     }
@@ -518,7 +518,7 @@ unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
     CodeEntry* E = CS_GetEntry (S, I);
     CHECK (E != 0);
 
-    /* By default */
+    // By default
     Used = E->Use;
 
     /* Whether we had a load or xfer op before or not, the newly loaded value
@@ -529,7 +529,7 @@ unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
 
         LoadRegInfo* LRI = 0;
 
-        /* Determine, which register was loaded */
+        // Determine, which register was loaded
         if (E->Chg & REG_A) {
             LRI = &LI->A;
         } else if (E->Chg & REG_X) {
@@ -539,21 +539,21 @@ unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
         }
         CHECK (LRI != 0);
 
-        /* Remember the load */
+        // Remember the load
         LRI->LoadIndex  = I;
         LRI->ChgIndex   = I;
         LRI->LoadYIndex = -1;
 
-        /* Set load flags */
+        // Set load flags
         LRI->Flags = LI_LOAD_INSN;
         if (E->AM == AM65_IMM) {
-            /* These insns are all ok and replaceable */
+            // These insns are all ok and replaceable
             LRI->Flags |= LI_DIRECT;
         } else if (E->AM == AM65_ZP || E->AM == AM65_ABS) {
-            /* These insns are replaceable only if they are not modified later */
+            // These insns are replaceable only if they are not modified later
             LRI->Flags |= LI_CHECK_ARG;
         } else if (E->AM == AM65_ZPY || E->AM == AM65_ABSY) {
-            /* These insns are replaceable only if they are not modified later */
+            // These insns are replaceable only if they are not modified later
             LRI->Flags |= LI_CHECK_ARG | LI_CHECK_Y;
         } else if (E->AM == AM65_ZP_INDY &&
                    strcmp (E->Arg, "c_sp") == 0) {
@@ -565,7 +565,7 @@ unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
             */
             LRI->Flags |= LI_CHECK_ARG | LI_CHECK_Y | LI_SP;
 
-            /* Reg Y can be regarded as unused if this load is removed */
+            // Reg Y can be regarded as unused if this load is removed
             Used &= ~REG_Y;
             if (LRI == &LI->A) {
                 LI->Y.Flags |= LI_USED_BY_A;
@@ -583,12 +583,12 @@ unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
                 LRI->Flags &= ~LI_CHECK_Y;
                 LRI->Flags |= LI_RELOAD_Y;
             } else {
-                /* We need to check if the src of Y is changed */
+                // We need to check if the src of Y is changed
                 LRI->LoadYIndex = LI->Y.LoadIndex;
             }
         }
 
-        /* Watch for any change of the load target */
+        // Watch for any change of the load target
         if ((LRI->Flags & LI_CHECK_ARG) != 0) {
             LRI->LoadEntry = CS_GetEntry (S, I);
         }
@@ -601,7 +601,7 @@ unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
 
     } else if (E->Info & OF_XFR) {
 
-        /* Determine source and target of the transfer and handle the TSX insn */
+        // Determine source and target of the transfer and handle the TSX insn
         LoadRegInfo* Src;
         LoadRegInfo* Tgt;
         switch (E->OPC) {
@@ -637,7 +637,7 @@ unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
             default:            Internal ("Unknown XFR insn in TrackLoads");
         }
 
-        /* Transfer the data */
+        // Transfer the data
         Tgt->LoadIndex  = Src->LoadIndex;
         Tgt->LoadEntry  = Src->LoadEntry;
         Tgt->LoadYIndex = Src->LoadYIndex;
@@ -648,7 +648,7 @@ unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
 
     } else if (CE_IsCallTo (E, "ldaxysp") && RegValIsKnown (E->RI->In.RegY)) {
 
-        /* Both registers set, Y changed */
+        // Both registers set, Y changed
         LI->A.LoadIndex = I;
         LI->A.ChgIndex  = I;
         LI->A.Flags     = (LI_LOAD_INSN | LI_DIRECT | LI_RELOAD_Y | LI_SP);
@@ -659,7 +659,7 @@ unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
         LI->X.Flags     = (LI_LOAD_INSN | LI_DIRECT | LI_RELOAD_Y | LI_SP);
         LI->X.Offs      = (unsigned char) E->RI->In.RegY;
 
-        /* Reg Y can be regarded as unused if this load is removed */
+        // Reg Y can be regarded as unused if this load is removed
         Used &= ~REG_Y;
         LI->Y.Flags |= LI_USED_BY_A | LI_USED_BY_X;
 
@@ -675,13 +675,13 @@ unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
 
 
 void SetDontRemoveEntryFlag (LoadRegInfo* LRI)
-/* Flag the entry as non-removable according to register flags */
+// Flag the entry as non-removable according to register flags
 {
     if (LRI->Flags & LI_DONT_REMOVE) {
         if (LRI->LoadEntry != 0) {
             LRI->LoadEntry->Flags |= CEF_DONT_REMOVE;
 
-            /* If the load requires Y, then Y shouldn't be removed either */
+            // If the load requires Y, then Y shouldn't be removed either
             if (LRI->LoadYEntry != 0) {
                 LRI->LoadYEntry->Flags |= CEF_DONT_REMOVE;
             }
@@ -692,7 +692,7 @@ void SetDontRemoveEntryFlag (LoadRegInfo* LRI)
 
 
 void ResetDontRemoveEntryFlag (LoadRegInfo* LRI)
-/* Unflag the entry as non-removable according to register flags */
+// Unflag the entry as non-removable according to register flags
 {
     if (LRI->LoadEntry != 0) {
         LRI->LoadEntry->Flags &= ~CEF_DONT_REMOVE;
@@ -710,7 +710,7 @@ void ResetDontRemoveEntryFlag (LoadRegInfo* LRI)
 
 
 void SetDontRemoveEntryFlags (StackOpData* D)
-/* Flag the entries as non-removable according to register flags */
+// Flag the entries as non-removable according to register flags
 {
     SetDontRemoveEntryFlag (&D->Lhs.A);
     SetDontRemoveEntryFlag (&D->Lhs.X);
@@ -726,7 +726,7 @@ void SetDontRemoveEntryFlags (StackOpData* D)
 
 
 void ResetDontRemoveEntryFlags (StackOpData* D)
-/* Unflag the entries as non-removable according to register flags */
+// Unflag the entries as non-removable according to register flags
 {
     ResetDontRemoveEntryFlag (&D->Lhs.A);
     ResetDontRemoveEntryFlag (&D->Lhs.X);
@@ -742,7 +742,7 @@ void ResetDontRemoveEntryFlags (StackOpData* D)
 
 
 void ResetStackOpData (StackOpData* Data)
-/* Reset the given data structure */
+// Reset the given data structure
 {
     Data->OptFunc       = 0;
     Data->ZPUsage       = REG_NONE;
@@ -760,9 +760,9 @@ void ResetStackOpData (StackOpData* Data)
 
 
 
-/*****************************************************************************/
-/*                                  Helpers                                  */
-/*****************************************************************************/
+//***************************************************************************
+//                                  Helpers
+//***************************************************************************
 
 
 
@@ -771,14 +771,14 @@ void InsertEntry (StackOpData* D, CodeEntry* E, int Index)
 ** be adjusted by this function.
 */
 {
-    /* Insert the entry into the code segment */
+    // Insert the entry into the code segment
     CS_InsertEntry (D->Code, E, Index);
 
-    /* Adjust register loads if necessary */
+    // Adjust register loads if necessary
     AdjustLoadInfo (&D->Lhs, Index, 1);
     AdjustLoadInfo (&D->Rhs, Index, 1);
 
-    /* Adjust the indices if necessary */
+    // Adjust the indices if necessary
     if (D->PushEntry && Index <= D->PushIndex) {
         ++D->PushIndex;
     }
@@ -794,14 +794,14 @@ void DelEntry (StackOpData* D, int Index)
 ** adjusted by this function, and PushEntry/OpEntry may get invalidated.
 */
 {
-    /* Delete the entry from the code segment */
+    // Delete the entry from the code segment
     CS_DelEntry (D->Code, Index);
 
-    /* Adjust register loads if necessary */
+    // Adjust register loads if necessary
     AdjustLoadInfo (&D->Lhs, Index, -1);
     AdjustLoadInfo (&D->Rhs, Index, -1);
 
-    /* Adjust the other indices if necessary */
+    // Adjust the other indices if necessary
     if (Index < D->PushIndex) {
         --D->PushIndex;
     } else if (Index == D->PushIndex) {
@@ -821,13 +821,13 @@ void AdjustStackOffset (StackOpData* D, unsigned Offs)
 ** OpIndex is adjusted according to the insertions.
 */
 {
-    /* Walk over all entries */
+    // Walk over all entries
     int I = D->PushIndex + 1;
     while (I < D->OpIndex) {
 
         CodeEntry* E = CS_GetEntry (D->Code, I);
 
-        /* Check against some things that should not happen */
+        // Check against some things that should not happen
         CHECK ((E->Use & SLV_TOP) != SLV_TOP);
 
         /* Check if this entry does a stack access, and if so, if it's a plain
@@ -837,15 +837,15 @@ void AdjustStackOffset (StackOpData* D, unsigned Offs)
         if ((E->Use & SLV_IND) == SLV_IND) {
 
             if (E->OPC != OP65_JSR) {
-                /* Check against some things that should not happen */
+                // Check against some things that should not happen
                 CHECK (E->AM == AM65_ZP_INDY && E->RI->In.RegY >= (short) Offs);
                 CHECK (strcmp (E->Arg, "c_sp") == 0);
 
-                /* We need to correct this one */
+                // We need to correct this one
                 Correction = 2;
 
             } else {
-                /* We need to correct this one */
+                // We need to correct this one
                 Correction = 1;
             }
 
@@ -857,16 +857,16 @@ void AdjustStackOffset (StackOpData* D, unsigned Offs)
             */
             CodeEntry* P = CS_GetPrevEntry (D->Code, I);
             if (P && P->OPC == OP65_LDY && CE_IsConstImm (P) && !CE_HasLabel (E)) {
-                /* The Y load is just before the stack access, adjust it */
+                // The Y load is just before the stack access, adjust it
                 CE_SetNumArg (P, P->Num - Offs);
             } else {
-                /* Insert a new load instruction before the stack access */
+                // Insert a new load instruction before the stack access
                 const char* Arg = MakeHexArg (E->RI->In.RegY - Offs);
                 CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
                 InsertEntry (D, X, I++);
             }
 
-            /* If we need the value of Y later, be sure to reload it */
+            // If we need the value of Y later, be sure to reload it
             unsigned R = REG_Y | (E->Chg & ~REG_A);
             R = GetRegInfo (D->Code, I + 1, R) & R;
             if ((R & REG_Y) != 0) {
@@ -893,43 +893,43 @@ void AdjustStackOffset (StackOpData* D, unsigned Offs)
                         ** optimization whenever they detect a branch.
                         */
 
-                        /* Add load insn after the branch */
+                        // Add load insn after the branch
                         CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
                         InsertEntry (D, X, I+2);
 
-                        /* Add load insn before branch target */
+                        // Add load insn before branch target
                         CodeEntry* Y = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
                         int J = CS_GetEntryIndex (D->Code, N->JumpTo->Owner);
-                        CHECK (J > I);      /* Must not happen */
+                        CHECK (J > I);      // Must not happen
                         InsertEntry (D, Y, J);
 
-                        /* Move the label to the new insn */
+                        // Move the label to the new insn
                         CodeLabel* L = CS_GenLabel (D->Code, Y);
                         CS_MoveLabelRef (D->Code, N, L);
 
-                        /* Skip the next two instructions in the next round */
+                        // Skip the next two instructions in the next round
                         I += 2;
                     } else {
-                        /* This could be suboptimal but it will always work (unless stack overflows) */
+                        // This could be suboptimal but it will always work (unless stack overflows)
                         CodeEntry* X = NewCodeEntry (OP65_PHP, AM65_IMP, 0, 0, E->LI);
                         InsertEntry (D, X, I+1);
                         X = NewCodeEntry (OP65_LDY, AM65_IMM, 0, 0, E->LI);
                         InsertEntry (D, X, I+2);
                         X = NewCodeEntry (OP65_PLP, AM65_IMP, 0, 0, E->LI);
                         InsertEntry (D, X, I+3);
-                        /* Skip the three inserted instructions in the next round */
+                        // Skip the three inserted instructions in the next round
                         I += 3;
                     }
                 } else {
                     CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
                     InsertEntry (D, X, I+1);
-                    /* Skip this instruction in the next round */
+                    // Skip this instruction in the next round
                     ++I;
                 }
             }
         }
 
-        /* Next entry */
+        // Next entry
         ++I;
     }
 
@@ -956,30 +956,30 @@ int IsRegVar (StackOpData* D)
     CodeEntry*  LoadX = D->Lhs.X.LoadEntry;
     unsigned    Len;
 
-    /* Must be unchanged till Op */
+    // Must be unchanged till Op
     if ((D->Lhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) != LI_DIRECT ||
         (D->Lhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) != LI_DIRECT) {
         return 0;
     }
 
-    /* Must have both load insns */
+    // Must have both load insns
     if (LoadA == 0 || LoadX == 0) {
         return 0;
     }
 
-    /* Must be loads from zp */
+    // Must be loads from zp
     if (LoadA->AM != AM65_ZP || LoadX->AM != AM65_ZP) {
         return 0;
     }
 
-    /* Must be the same zp loc with high byte in X */
+    // Must be the same zp loc with high byte in X
     Len = strlen (LoadA->Arg);
     if (strncmp (LoadA->Arg, LoadX->Arg, Len) != 0      ||
         strcmp (LoadX->Arg + Len, "+1") != 0) {
         return 0;
     }
 
-    /* Use the zero page location directly */
+    // Use the zero page location directly
     D->ZPLo = LoadA->Arg;
     D->ZPHi = LoadX->Arg;
     return 1;
@@ -988,7 +988,7 @@ int IsRegVar (StackOpData* D)
 
 
 void AddStoreLhsA (StackOpData* D)
-/* Add a store to zero page after the push insn */
+// Add a store to zero page after the push insn
 {
     CodeEntry* X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPLo, 0, D->PushEntry->LI);
     InsertEntry (D, X, D->PushIndex+1);
@@ -997,7 +997,7 @@ void AddStoreLhsA (StackOpData* D)
 
 
 void AddStoreLhsX (StackOpData* D)
-/* Add a store to zero page after the push insn */
+// Add a store to zero page after the push insn
 {
     CodeEntry* X = NewCodeEntry (OP65_STX, AM65_ZP, D->ZPHi, 0, D->PushEntry->LI);
     InsertEntry (D, X, D->PushIndex+1);
@@ -1039,7 +1039,7 @@ void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
         */
         if ((LI->A.Flags & LI_RELOAD_Y) == 0) {
 
-            /* opc ... */
+            // opc ...
             CodeEntry* LoadA = LI->A.LoadEntry;
             X = NewCodeEntry (OPC, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
@@ -1047,31 +1047,31 @@ void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
         } else {
 
             if ((LI->A.Flags & LI_CHECK_Y) == 0) {
-                /* ldy #offs */
+                // ldy #offs
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (LI->A.Offs), 0, D->OpEntry->LI);
             } else {
-                /* ldy src */
+                // ldy src
                 X = NewCodeEntry (OP65_LDY, LI->A.LoadYEntry->AM, LI->A.LoadYEntry->Arg, 0, D->OpEntry->LI);
             }
             InsertEntry (D, X, D->IP++);
 
             if (LI->A.LoadEntry->OPC == OP65_JSR) {
-                /* opc (c_sp),y */
+                // opc (c_sp),y
                 X = NewCodeEntry (OPC, AM65_ZP_INDY, "c_sp", 0, D->OpEntry->LI);
             } else {
-                /* opc src,y */
+                // opc src,y
                 X = NewCodeEntry (OPC, LI->A.LoadEntry->AM, LI->A.LoadEntry->Arg, 0, D->OpEntry->LI);
             }
             InsertEntry (D, X, D->IP++);
 
         }
 
-        /* In both cases, we can remove the load */
+        // In both cases, we can remove the load
         LI->A.Flags |= LI_REMOVE;
 
     } else {
 
-        /* Op with temp storage */
+        // Op with temp storage
         X = NewCodeEntry (OPC, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
 
@@ -1089,12 +1089,12 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
     CodeEntry* X;
 
     if (KeepResult) {
-        /* pha */
+        // pha
         X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
     }
 
-    /* txa */
+    // txa
     X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
 
@@ -1102,7 +1102,7 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
 
         if ((LI->X.Flags & LI_RELOAD_Y) == 0) {
 
-            /* opc xxx */
+            // opc xxx
             CodeEntry* LoadX = LI->X.LoadEntry;
             X = NewCodeEntry (OPC, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
@@ -1110,41 +1110,41 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
         } else {
 
             if ((LI->X.Flags & LI_CHECK_Y) == 0) {
-                /* ldy #const */
+                // ldy #const
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (LI->X.Offs), 0, D->OpEntry->LI);
             } else {
-                /* ldy src */
+                // ldy src
                 X = NewCodeEntry (OP65_LDY, LI->X.LoadYEntry->AM, LI->X.LoadYEntry->Arg, 0, D->OpEntry->LI);
             }
             InsertEntry (D, X, D->IP++);
 
             if (LI->X.LoadEntry->OPC == OP65_JSR) {
-                /* opc (c_sp),y */
+                // opc (c_sp),y
                 X = NewCodeEntry (OPC, AM65_ZP_INDY, "c_sp", 0, D->OpEntry->LI);
             } else {
-                /* opc src,y */
+                // opc src,y
                 X = NewCodeEntry (OPC, LI->X.LoadEntry->AM, LI->X.LoadEntry->Arg, 0, D->OpEntry->LI);
             }
             InsertEntry (D, X, D->IP++);
         }
 
-        /* If this is the right hand side, we can remove the load. */
+        // If this is the right hand side, we can remove the load.
         if (LI == &D->Rhs) {
             LI->X.Flags |= LI_REMOVE;
         }
 
     } else {
-        /* opc zphi */
+        // opc zphi
         X = NewCodeEntry (OPC, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
     }
 
     if (KeepResult) {
-        /* tax */
+        // tax
         X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
 
-        /* pla */
+        // pla
         X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
     }
@@ -1153,7 +1153,7 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
 
 
 void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
-/* Remove register load insns */
+// Remove register load insns
 {
     if ((LI->A.Flags & LI_REMOVE) == LI_REMOVE) {
         if (LI->A.LoadIndex >= 0 &&
@@ -1174,7 +1174,7 @@ void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
     if (LI->A.LoadEntry != 0                &&
         (LI->A.Flags & LI_RELOAD_Y) != 0    &&
         LI->A.LoadYIndex >= 0) {
-        /* If an entry is using Y and not removed, then its Y load mustn't be removed */
+        // If an entry is using Y and not removed, then its Y load mustn't be removed
         LI->A.LoadYEntry->Flags |= CEF_DONT_REMOVE;
     }
 
@@ -1197,7 +1197,7 @@ void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
     if (LI->X.LoadEntry != 0                &&
         (LI->X.Flags & LI_RELOAD_Y) != 0    &&
         LI->X.LoadYIndex >= 0) {
-        /* If an entry is using Y and not removed, then its Y load mustn't be removed */
+        // If an entry is using Y and not removed, then its Y load mustn't be removed
         LI->X.LoadYEntry->Flags |= CEF_DONT_REMOVE;
     }
 }
@@ -1205,13 +1205,13 @@ void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
 
 
 void RemoveRemainders (StackOpData* D)
-/* Remove the code that is unnecessary after translation of the sequence */
+// Remove the code that is unnecessary after translation of the sequence
 {
-    /* Remove the register loads for lhs and rhs if nothing prevents that */
+    // Remove the register loads for lhs and rhs if nothing prevents that
     RemoveRegLoads (D, &D->Lhs);
     RemoveRegLoads (D, &D->Rhs);
 
-    /* Remove the push and the operator routine */
+    // Remove the push and the operator routine
     DelEntry (D, D->OpIndex);
     DelEntry (D, D->PushIndex);
 }
@@ -1219,17 +1219,17 @@ void RemoveRemainders (StackOpData* D)
 
 
 static int CmpHarmless (const void* Key, const void* Entry)
-/* Compare function for bsearch */
+// Compare function for bsearch
 {
     return strcmp (Key, *(const char**)Entry);
 }
 
 
-/* CAUTION: table must be sorted for bsearch */
+// CAUTION: table must be sorted for bsearch
 static const char* const Tab[] = {
-/* BEGIN SORTED.SH */
+// BEGIN SORTED.SH
     "_abs",
-/* END SORTED.SH */
+// END SORTED.SH
 };
 
 int HarmlessCall (const CodeEntry* E, int PushedBytes)
@@ -1269,20 +1269,20 @@ int HarmlessCall (const CodeEntry* E, int PushedBytes)
 
 
 
-/*****************************************************************************/
-/*                            Load tracking code                             */
-/*****************************************************************************/
+//***************************************************************************
+//                            Load tracking code
+//***************************************************************************
 
 
 
-/*****************************************************************************/
-/*                                  Helpers                                  */
-/*****************************************************************************/
+//***************************************************************************
+//                                  Helpers
+//***************************************************************************
 
 
 
 const char* GetZPName (unsigned ZPLoc)
-/* Get the name strings of certain known ZP Regs */
+// Get the name strings of certain known ZP Regs
 {
     if ((ZPLoc & REG_TMP1) != 0) {
         return "tmp1";
@@ -1335,7 +1335,7 @@ unsigned FindAvailableBackupLoc (BackupInfo* B, unsigned Type)
     }
 
     if (SizeType == BU_B8 && (Type & BU_REG) != 0 && (B->ZPUsage & REG_Y) == 0) {
-        /* Use the Y Reg only */
+        // Use the Y Reg only
         B->Type = BU_REG | SizeType;
         B->Where = REG_Y;
         B->ZPUsage |= REG_Y;
@@ -1343,7 +1343,7 @@ unsigned FindAvailableBackupLoc (BackupInfo* B, unsigned Type)
     }
 
     if (SizeType == BU_B8 && (Type & BU_ZP) != 0) {
-        /* For now we only check for tmp1 and sreg */
+        // For now we only check for tmp1 and sreg
         if ((B->ZPUsage & REG_TMP1) == 0) {
             B->Type = BU_ZP | BU_B8;
             B->Where = REG_TMP1;
@@ -1365,7 +1365,7 @@ unsigned FindAvailableBackupLoc (BackupInfo* B, unsigned Type)
     }
 
     if (SizeType == BU_B16 && (Type & BU_ZP) != 0) {
-        /* For now we only check for ptr1, sreg and ptr2 */
+        // For now we only check for ptr1, sreg and ptr2
         if ((B->ZPUsage & REG_PTR1) == 0) {
             B->Type = BU_ZP | BU_B16;
             B->Where = REG_PTR1;
@@ -1411,20 +1411,20 @@ unsigned FindAvailableBackupLoc (BackupInfo* B, unsigned Type)
     }
 
     if (SizeType < BU_B32 && (Type & BU_SP6502) != 0) {
-        /* Even for BU_B24, we just push/pop all 3 of AXY */
+        // Even for BU_B24, we just push/pop all 3 of AXY
         B->Type = BU_SP6502 | BU_B16;
         B->Where = 0;
         return B->Type;
     }
 
     if (SizeType != BU_B24 && SizeType <= BU_B32 && (Type & BU_SP) != 0) {
-        /* We may also use pusha/popa, pushax/popax and pusheax/popeax */
+        // We may also use pusha/popa, pushax/popax and pusheax/popeax
         B->Type = BU_SP | SizeType;
         B->Where = 0;
         return B->Type;
     }
 
-    /* No available */
+    // No available
     return BU_UNKNOWN;
 }
 
@@ -1439,7 +1439,7 @@ void AdjustEntryIndices (Collection* Indices, int Index, int Change)
     int* IndexPtr;
 
     if (Change > 0) {
-        /* Insertion */
+        // Insertion
         for (I = 0; I < (int)CollCount (Indices); ++I) {
             IndexPtr = CollAtUnchecked (Indices, I);
             if (Index <= *IndexPtr) {
@@ -1447,15 +1447,15 @@ void AdjustEntryIndices (Collection* Indices, int Index, int Change)
             }
         }
     } else if (Change < 0) {
-        /* Deletion */
+        // Deletion
         for (I = 0; I < (int)CollCount (Indices); ++I) {
             IndexPtr = CollAtUnchecked (Indices, I);
             if (Index <= *IndexPtr + Change) {
                 *IndexPtr += Change;
             } else if (Index <= *IndexPtr) {
-                /* Has been removed */
+                // Has been removed
                 *IndexPtr = -1;
-                /*CollDelete (Indices, I);*/
+                //CollDelete (Indices, I);
                 --I;
             }
         }
@@ -1465,7 +1465,7 @@ void AdjustEntryIndices (Collection* Indices, int Index, int Change)
 
 
 void DelEntryIdx (CodeSeg* S, int Idx, Collection* Indices)
-/* Delete an entry and adjust Indices if necessary */
+// Delete an entry and adjust Indices if necessary
 {
     CS_DelEntry (S, Idx);
     AdjustEntryIndices (Indices, Idx, -1);
@@ -1474,7 +1474,7 @@ void DelEntryIdx (CodeSeg* S, int Idx, Collection* Indices)
 
 
 void DelEntriesIdx (CodeSeg* S, int Idx, int Count, Collection* Indices)
-/* Delete entries and adjust Indices if necessary */
+// Delete entries and adjust Indices if necessary
 {
     CS_DelEntries (S, Idx, Count);
     AdjustEntryIndices (Indices, Idx, -Count);
@@ -1483,7 +1483,7 @@ void DelEntriesIdx (CodeSeg* S, int Idx, int Count, Collection* Indices)
 
 
 void RemoveFlaggedRegLoads (CodeSeg* S, LoadRegInfo* LRI, Collection* Indices)
-/* Remove flagged register load insns */
+// Remove flagged register load insns
 {
     if ((LRI->Flags & LI_REMOVE) == LI_REMOVE) {
         if (LRI->LoadIndex >= 0 &&
@@ -1504,14 +1504,14 @@ void RemoveFlaggedRegLoads (CodeSeg* S, LoadRegInfo* LRI, Collection* Indices)
     if (LRI->LoadEntry != 0 &&
         (LRI->Flags & LI_RELOAD_Y) != 0 &&
         LRI->LoadYIndex >= 0) {
-        /* If an entry is using Y and not removed, then its Y load mustn't be removed */
+        // If an entry is using Y and not removed, then its Y load mustn't be removed
         LRI->LoadYEntry->Flags |= CEF_DONT_REMOVE;
     }
 }
 
 
 void RemoveFlaggedLoads (CodeSeg* S, LoadInfo* LI, Collection* Indices)
-/* Remove flagged load insns */
+// Remove flagged load insns
 {
     RemoveFlaggedRegLoads (S, &LI->A, Indices);
     RemoveFlaggedRegLoads (S, &LI->X, Indices);
@@ -1521,26 +1521,26 @@ void RemoveFlaggedLoads (CodeSeg* S, LoadInfo* LI, Collection* Indices)
 
 
 static int BackupAAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, int After)
-/* Backup the content of A Before or After the specified index Idx depending on the After param */
+// Backup the content of A Before or After the specified index Idx depending on the After param
 {
     CodeEntry* E;
     CodeEntry* X;
     int OldIdx;
 
-    /* Adjust the insertion point if necessary */
+    // Adjust the insertion point if necessary
     if (After) {
         ++Idx;
     }
     OldIdx = Idx;
 
-    /* Cannot insert after the last insn */
+    // Cannot insert after the last insn
     CHECK ((unsigned)Idx < CollCount (&S->Entries));
 
-    /* Get the entry at Idx */
+    // Get the entry at Idx
     E = CS_GetEntry (S, Idx);
 
     if (E->RI != 0 && RegValIsKnown (E->RI->In.RegA)) {
-        /* Just memorize the value */
+        // Just memorize the value
         B->Type = BU_IMM | BU_B8;
         B->Imm = E->RI->In.RegA;
 
@@ -1576,50 +1576,50 @@ static int BackupAAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, i
                 break;
             }
 
-            /* Unable to do backup */
+            // Unable to do backup
             return 0;
 
         default:
-            /* Unable to do backup */
+            // Unable to do backup
             return 0;
         }
     }
 
-    /* Adjust all indices at once */
+    // Adjust all indices at once
     AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
 
-    /* Move labels if it was an insertion before Idx */
+    // Move labels if it was an insertion before Idx
     if (!After) {
         CS_MoveLabels (S, E, CS_GetEntry (S, OldIdx));
     }
 
-    /* Done */
+    // Done
     return 1;
 }
 
 
 
 static int BackupXAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, int After)
-/* Backup the content of X before or after the specified index Idx depending on the param After */
+// Backup the content of X before or after the specified index Idx depending on the param After
 {
     CodeEntry* E;
     CodeEntry* X;
     int OldIdx;
 
-    /* Adjust the insertion point if necessary */
+    // Adjust the insertion point if necessary
     if (After) {
         ++Idx;
     }
     OldIdx = Idx;
 
-    /* Cannot insert after the last insn */
+    // Cannot insert after the last insn
     CHECK ((unsigned)Idx < CollCount (&S->Entries));
 
-    /* Get the entry at Idx */
+    // Get the entry at Idx
     E = CS_GetEntry (S, Idx);
 
     if (E->RI != 0 && RegValIsKnown (E->RI->In.RegX)) {
-        /* Just memorize the value */
+        // Just memorize the value
         B->Type = BU_IMM | BU_B8;
         B->Imm = E->RI->In.RegX;
 
@@ -1640,7 +1640,7 @@ static int BackupXAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, i
                 break;
             }
 
-            /* Unable to do backup */
+            // Unable to do backup
             return 0;
 
         case BU_SP:
@@ -1652,53 +1652,53 @@ static int BackupXAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, i
                 break;
             }
 
-            /* Unable to do backup */
+            // Unable to do backup
             return 0;
 
         case BU_REG:
-            /* Fallthrough */
+            // Fallthrough
         default:
 
-            /* Unable to do backup */
+            // Unable to do backup
             return 0;
         }
     }
 
-    /* Adjust all indices at once */
+    // Adjust all indices at once
     AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
 
-    /* Move labels if it was an insertion before Idx */
+    // Move labels if it was an insertion before Idx
     if (!After) {
         CS_MoveLabels (S, E, CS_GetEntry (S, OldIdx));
     }
 
-    /* Done */
+    // Done
     return 1;
 }
 
 
 
 static int BackupYAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, int After)
-/* Backup the content of Y before or after the specified index Idx depending on the param After */
+// Backup the content of Y before or after the specified index Idx depending on the param After
 {
     CodeEntry* E;
     CodeEntry* X;
     int OldIdx;
 
-    /* Adjust the insertion point if necessary */
+    // Adjust the insertion point if necessary
     if (After) {
         ++Idx;
     }
     OldIdx = Idx;
 
-    /* Cannot insert after the last insn */
+    // Cannot insert after the last insn
     CHECK ((unsigned)Idx < CollCount (&S->Entries));
 
-    /* Get the entry at Idx */
+    // Get the entry at Idx
     E = CS_GetEntry (S, Idx);
 
     if (E->RI != 0 && RegValIsKnown (E->RI->In.RegY)) {
-        /* Just memorize the value */
+        // Just memorize the value
         B->Type = BU_IMM | BU_B8;
         B->Imm = E->RI->In.RegY;
 
@@ -1719,7 +1719,7 @@ static int BackupYAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, i
                 break;
             }
 
-            /* Unable to do backup */
+            // Unable to do backup
             return 0;
 
         case BU_SP:
@@ -1731,34 +1731,34 @@ static int BackupYAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, i
                 break;
             }
 
-            /* Unable to do backup */
+            // Unable to do backup
             return 0;
 
         case BU_REG:
-            /* Fallthrough */
+            // Fallthrough
         default:
 
-            /* Unable to do backup */
+            // Unable to do backup
             return 0;
         }
     }
 
-    /* Adjust all indices at once */
+    // Adjust all indices at once
     AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
 
-    /* Move labels if it was an insertion before Idx */
+    // Move labels if it was an insertion before Idx
     if (!After) {
         CS_MoveLabels (S, E, CS_GetEntry (S, OldIdx));
     }
 
-    /* Done */
+    // Done
     return 1;
 }
 
 
 
 static int BackupAXAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, int After)
-/* Backup the content of AX Before or After the specified index Idx depending on the After param */
+// Backup the content of AX Before or After the specified index Idx depending on the After param
 {
     CodeEntry* E;
     CodeEntry* X;
@@ -1767,20 +1767,20 @@ static int BackupAXAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, 
 
     SB_Init (&Arg);
 
-    /* Adjust the insertion point if necessary */
+    // Adjust the insertion point if necessary
     if (After) {
         ++Idx;
     }
     OldIdx = Idx;
 
-    /* Cannot insert after the last insn */
+    // Cannot insert after the last insn
     CHECK ((unsigned)Idx < CollCount (&S->Entries));
 
-    /* Get the entry at Idx */
+    // Get the entry at Idx
     E = CS_GetEntry (S, Idx);
 
     if (E->RI != 0 && RegValIsKnown (E->RI->In.RegA) && RegValIsKnown (E->RI->In.RegX)) {
-        /* Just memorize the value */
+        // Just memorize the value
         B->Type = BU_IMM | BU_B16;
         B->Imm = E->RI->In.RegA | (E->RI->In.RegX << 8);
 
@@ -1809,7 +1809,7 @@ static int BackupAXAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, 
                 break;
             }
 
-            /* Unable to do backup */
+            // Unable to do backup
             return 0;
 
         case BU_SP:
@@ -1819,29 +1819,29 @@ static int BackupAXAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices, 
                 break;
             }
 
-            /* Unable to do backup */
+            // Unable to do backup
             return 0;
 
         case BU_REG:
-            /* Fallthrough */
+            // Fallthrough
 
         default:
-            /* Unable to do backup */
+            // Unable to do backup
             return 0;
         }
     }
 
-    /* Adjust all indices at once */
+    // Adjust all indices at once
     AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
 
-    /* Move labels if it was an insertion before Idx */
+    // Move labels if it was an insertion before Idx
     if (!After) {
         CS_MoveLabels (S, E, CS_GetEntry (S, OldIdx));
     }
 
     SB_Done (&Arg);
 
-    /* Done */
+    // Done
     return 1;
 }
 
@@ -1859,23 +1859,23 @@ static int BackupAXYAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices,
 
     SB_Init (&Arg);
 
-    /* Adjust the insertion point if necessary */
+    // Adjust the insertion point if necessary
     if (After) {
         ++Idx;
     }
     OldIdx = Idx;
 
-    /* Cannot insert after the last insn */
+    // Cannot insert after the last insn
     CHECK ((unsigned)Idx < CollCount (&S->Entries));
 
-    /* Get the entry at Idx */
+    // Get the entry at Idx
     E = CS_GetEntry (S, Idx);
 
     if (E->RI != 0 &&
         RegValIsKnown (E->RI->In.RegA) &&
         RegValIsKnown (E->RI->In.RegX) &&
         RegValIsKnown (E->RI->In.RegY)) {
-        /* Just memorize the value */
+        // Just memorize the value
         B->Type = BU_IMM | BU_B24;
         B->Imm = E->RI->In.RegA | (E->RI->In.RegX << 8) | (E->RI->In.RegY << 16);
 
@@ -1911,7 +1911,7 @@ static int BackupAXYAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices,
                 break;
             }
 
-            /* Unable to do backup */
+            // Unable to do backup
             return 0;
 
         case BU_SP:
@@ -1925,36 +1925,36 @@ static int BackupAXYAt (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices,
                 break;
             }
 
-            /* Unable to do backup */
+            // Unable to do backup
             return 0;
 
         case BU_REG:
-            /* Fallthrough */
+            // Fallthrough
 
         default:
-            /* Unable to do backup */
+            // Unable to do backup
             return 0;
         }
     }
 
-    /* Adjust all indices at once */
+    // Adjust all indices at once
     AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
 
-    /* Move labels if it was an insertion before Idx */
+    // Move labels if it was an insertion before Idx
     if (!After) {
         CS_MoveLabels (S, E, CS_GetEntry (S, OldIdx));
     }
 
     SB_Done (&Arg);
 
-    /* Done */
+    // Done
     return 1;
 }
 
 
 
 int BackupABefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
-/* Backup the content of A Before the specified index Idx */
+// Backup the content of A Before the specified index Idx
 {
     return BackupAAt (S, B, Idx, Indices, 0);
 }
@@ -1962,7 +1962,7 @@ int BackupABefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 
 
 int BackupXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
-/* Backup the content of X before the specified index Idx */
+// Backup the content of X before the specified index Idx
 {
     return BackupXAt (S, B, Idx, Indices, 0);
 }
@@ -1970,7 +1970,7 @@ int BackupXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 
 
 int BackupYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
-/* Backup the content of Y before the specified index Idx */
+// Backup the content of Y before the specified index Idx
 {
     return BackupYAt (S, B, Idx, Indices, 0);
 }
@@ -1978,7 +1978,7 @@ int BackupYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 
 
 int BackupAXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
-/* Backup the content of AX before the specified index Idx */
+// Backup the content of AX before the specified index Idx
 {
     return BackupAXAt (S, B, Idx, Indices, 0);
 }
@@ -1996,7 +1996,7 @@ int BackupAXYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 
 
 int BackupAAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
-/* Backup the content of A after the specified index Idx */
+// Backup the content of A after the specified index Idx
 {
     return BackupAAt (S, B, Idx, Indices, 1);
 }
@@ -2004,7 +2004,7 @@ int BackupAAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 
 
 int BackupXAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
-/* Backup the content of X after the specified index Idx */
+// Backup the content of X after the specified index Idx
 {
     return BackupXAt (S, B, Idx, Indices, 1);
 }
@@ -2012,7 +2012,7 @@ int BackupXAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 
 
 int BackupYAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
-/* Backup the content of Y after the specified index Idx */
+// Backup the content of Y after the specified index Idx
 {
     return BackupYAt (S, B, Idx, Indices, 1);
 }
@@ -2020,7 +2020,7 @@ int BackupYAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 
 
 int BackupAXAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
-/* Backup the content of AX after the specified index Idx */
+// Backup the content of AX after the specified index Idx
 {
     return BackupAXAt (S, B, Idx, Indices, 1);
 }
@@ -2038,18 +2038,18 @@ int BackupAXYAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 
 
 int RestoreABefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
-/* Restore the content of Y before the specified index Idx */
+// Restore the content of Y before the specified index Idx
 {
     CodeEntry* E;
     CodeEntry* X;
     int OldIdx = Idx;
 
-    /* Get the entry at Idx */
+    // Get the entry at Idx
     E = CS_GetEntry (S, Idx);
 
     switch (B->Type & BU_TYPE_MASK) {
     case BU_IMM:
-        /* Just use the memorized value */
+        // Just use the memorized value
         X = NewCodeEntry (OP65_LDA, AM65_IMM, MakeHexArg (B->Imm & 0xFF), 0, E->LI);
         CS_InsertEntry (S, X, Idx++);
         break;
@@ -2081,36 +2081,36 @@ int RestoreABefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
             break;
         }
 
-        /* Unable to restore */
+        // Unable to restore
         return 0;
 
     default:
-        /* Unable to restore */
+        // Unable to restore
         return 0;
     }
 
-    /* Adjust all indices at once */
+    // Adjust all indices at once
     AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
 
-    /* Done */
+    // Done
     return 1;
 }
 
 
 
 int RestoreXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
-/* Restore the content of X before the specified index Idx */
+// Restore the content of X before the specified index Idx
 {
     CodeEntry* E;
     CodeEntry* X;
     int OldIdx = Idx;
 
-    /* Get the entry at Idx */
+    // Get the entry at Idx
     E = CS_GetEntry (S, Idx);
 
     switch (B->Type & BU_TYPE_MASK) {
     case BU_IMM:
-        /* Just use the memorized value */
+        // Just use the memorized value
         X = NewCodeEntry (OP65_LDX, AM65_IMM, MakeHexArg (B->Imm & 0xFF), 0, E->LI);
         CS_InsertEntry (S, X, Idx++);
         break;
@@ -2149,7 +2149,7 @@ int RestoreXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
             break;
         }
 
-        /* Unable to restore */
+        // Unable to restore
         return 0;
 
     case BU_SP:
@@ -2161,36 +2161,36 @@ int RestoreXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
             break;
         }
 
-        /* Unable to restore */
+        // Unable to restore
         return 0;
 
     default:
-        /* Unable to restore */
+        // Unable to restore
         return 0;
     }
 
-    /* Adjust all indices at once */
+    // Adjust all indices at once
     AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
 
-    /* Done */
+    // Done
     return 1;
 }
 
 
 
 int RestoreYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
-/* Restore the content of Y before the specified index Idx */
+// Restore the content of Y before the specified index Idx
 {
     CodeEntry* E;
     CodeEntry* X;
     int OldIdx = Idx;
 
-    /* Get the entry at Idx */
+    // Get the entry at Idx
     E = CS_GetEntry (S, Idx);
 
     switch (B->Type & BU_TYPE_MASK) {
     case BU_IMM:
-        /* Just use the memorized value */
+        // Just use the memorized value
         X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (B->Imm & 0xFF), 0, E->LI);
         CS_InsertEntry (S, X, Idx++);
         break;
@@ -2229,7 +2229,7 @@ int RestoreYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
             break;
         }
 
-        /* Unable to restore */
+        // Unable to restore
         return 0;
 
     case BU_SP:
@@ -2241,25 +2241,25 @@ int RestoreYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
             break;
         }
 
-        /* Unable to restore */
+        // Unable to restore
         return 0;
 
     default:
-        /* Unable to restore */
+        // Unable to restore
         return 0;
     }
 
-    /* Adjust all indices at once */
+    // Adjust all indices at once
     AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
 
-    /* Done */
+    // Done
     return 1;
 }
 
 
 
 int RestoreAXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
-/* Restore the content of AX before the specified index Idx */
+// Restore the content of AX before the specified index Idx
 {
     CodeEntry* E;
     CodeEntry* X;
@@ -2268,12 +2268,12 @@ int RestoreAXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 
     SB_Init (&Arg);
 
-    /* Get the entry at Idx */
+    // Get the entry at Idx
     E = CS_GetEntry (S, Idx);
 
     switch (B->Type & BU_TYPE_MASK) {
     case BU_REG:
-        /* Just use the memorized value */
+        // Just use the memorized value
         X = NewCodeEntry (OP65_LDA, AM65_IMM, MakeHexArg (B->Imm & 0xFF), 0, E->LI);
         CS_InsertEntry (S, X, Idx++);
         X = NewCodeEntry (OP65_LDX, AM65_IMM, MakeHexArg ((B->Imm >> 8) & 0xFF), 0, E->LI);
@@ -2302,7 +2302,7 @@ int RestoreAXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
             break;
         }
 
-        /* Unable to restore */
+        // Unable to restore
         return 0;
 
     case BU_SP:
@@ -2312,15 +2312,15 @@ int RestoreAXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
             break;
         }
 
-        /* Unable to restore */
+        // Unable to restore
         return 0;
 
     default:
-        /* Unable to restore */
+        // Unable to restore
         return 0;
     }
 
-    /* Adjust all indices at once */
+    // Adjust all indices at once
     AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
 
     SB_Done (&Arg);
@@ -2342,12 +2342,12 @@ int RestoreAXYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
 
     SB_Init (&Arg);
 
-    /* Get the entry at Idx */
+    // Get the entry at Idx
     E = CS_GetEntry (S, Idx);
 
     switch (B->Type & BU_TYPE_MASK) {
     case BU_IMM:
-        /* Just use memorized value */
+        // Just use memorized value
         X = NewCodeEntry (OP65_LDA, AM65_IMM, MakeHexArg (B->Imm & 0xFF), 0, E->LI);
         CS_InsertEntry (S, X, Idx++);
         X = NewCodeEntry (OP65_LDX, AM65_IMM, MakeHexArg ((B->Imm >> 8) & 0xFF), 0, E->LI);
@@ -2393,16 +2393,16 @@ int RestoreAXYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices)
         break;
 
     default:
-        /* Unable to restorep */
+        // Unable to restorep
         return 0;
     }
 
-    /* Adjust all indices at once */
+    // Adjust all indices at once
     AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
 
     SB_Done (&Arg);
 
-    /* Done */
+    // Done
     return 1;
 }
 
@@ -2424,10 +2424,10 @@ int BackupArgAfter (CodeSeg* S, BackupInfo* B, int Idx, const CodeEntry* E, Coll
     SB_Init (&SrcArg);
     SB_Init (&DstArg);
 
-    /* We only recognize opc with an arg for now, as well as a special case for ldaxysp */
+    // We only recognize opc with an arg for now, as well as a special case for ldaxysp
     if ((E->OPC != OP65_JSR || strcmp (E->Arg, "ldaxysp") == 0) &&
         E->AM != AM65_BRA) {
-        /* Get size of the arg */
+        // Get size of the arg
         if ((E->Info & OF_LBRA) != 0 || strcmp (E->Arg, "ldaxysp") == 0) {
             ArgSize = BU_B16;
         } else {
@@ -2435,21 +2435,21 @@ int BackupArgAfter (CodeSeg* S, BackupInfo* B, int Idx, const CodeEntry* E, Coll
         }
 
         if (E->AM == AM65_IMM && CE_HasNumArg (E)) {
-            /* Just memorize the value */
+            // Just memorize the value
             B->Type = BU_IMM | ArgSize;
             B->Imm = E->Num;
 
-            /* Adjust all indices at once */
+            // Adjust all indices at once
             AdjustEntryIndices (Indices, OldIdx + 1, Idx - OldIdx);
 
-            /* Done */
+            // Done
             return 1;
 
         }
 
         if (E->Size != 1 && E->AM != AM65_IMP) {
 
-            /* We only recognize opc with an arg for now */
+            // We only recognize opc with an arg for now
             FindAvailableBackupLoc (B, ArgSize);
             switch (B->Type & BU_TYPE_MASK) {
             case BU_ZP:
@@ -2537,14 +2537,14 @@ int BackupArgAfter (CodeSeg* S, BackupInfo* B, int Idx, const CodeEntry* E, Coll
                 break;
             }
 
-            /* Adjust all indices at once */
+            // Adjust all indices at once
             AdjustEntryIndices (Indices, OldIdx + 1, Idx - OldIdx);
 
-            /* Done */
+            // Done
             return 1;
         }
     } else if (E->OPC == OP65_JSR) {
-        /* For function calls we load their arguments instead */
+        // For function calls we load their arguments instead
         GetFuncInfo (E->Arg, &Use, &Chg);
         if ((Use & ~REG_AXY) == 0) {
             if (Use == REG_A) {
@@ -2554,19 +2554,19 @@ int BackupArgAfter (CodeSeg* S, BackupInfo* B, int Idx, const CodeEntry* E, Coll
                 ArgSize = BU_B16;
                 return BackupAXAfter (S, B, Idx, Indices);
             } else if (Use == REG_AXY) {
-                /* This is actually a 16-bit word plus a 8-bit byte */
+                // This is actually a 16-bit word plus a 8-bit byte
                 ArgSize = BU_B24;
                 return BackupAXYAfter (S, B, Idx, Indices);
             }
 
-            /* We don't recognize other usage patterns for now */
+            // We don't recognize other usage patterns for now
         }
     }
 
     SB_Done (&SrcArg);
     SB_Done (&DstArg);
 
-    /* Unable to do backup */
+    // Unable to do backup
     return 0;
 }
 
@@ -2576,13 +2576,13 @@ static int LoadAAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
 */
 {
     CodeEntry* E;
-    CodeEntry* O;       /* Old entry at Idx */
+    CodeEntry* O;       // Old entry at Idx
     CodeEntry* X;
     int Success = 0;
     int OldIdx;
     unsigned Use, Chg;
 
-    /* Adjust the insertion point if necessary */
+    // Adjust the insertion point if necessary
     if (After) {
         ++Idx;
     }
@@ -2593,12 +2593,12 @@ static int LoadAAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
 
     O = CS_GetEntry (S, OldIdx);
 
-    /* We only recognize opc with an arg for now, as well as a special case for ldaxysp */
+    // We only recognize opc with an arg for now, as well as a special case for ldaxysp
     if ((E->OPC != OP65_JSR || strcmp (E->Arg, "ldaxysp") == 0) &&
         E->AM != AM65_BRA && E->AM != AM65_IMP) {
         if (E->Size != 1 && E->AM != AM65_IMP) {
 
-            /* FIXME: The load flags only reflect the situation by the time it reaches the range end */
+            // FIXME: The load flags only reflect the situation by the time it reaches the range end
             if ((LRI->Flags & (LI_DIRECT | LI_CHECK_ARG | LI_CHECK_Y)) != 0) {
                 if ((LRI->Flags & LI_RELOAD_Y) != 0) {
                     if ((LRI->Flags & LI_CHECK_Y) == 0) {
@@ -2616,7 +2616,7 @@ static int LoadAAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
         }
     } else if (E->OPC == OP65_JSR) {
 
-        /* For other function calls we load their arguments instead */
+        // For other function calls we load their arguments instead
         GetFuncInfo (E->Arg, &Use, &Chg);
         if ((Use & ~REG_AXY) == 0) {
             if (Use == REG_X) {
@@ -2626,9 +2626,9 @@ static int LoadAAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
                 X = NewCodeEntry (OP65_TYA, AM65_IMP, 0, 0, E->LI);
                 CS_InsertEntry (S, X, Idx++);
             } else if (Use == REG_A) {
-                /* nothing to do */
+                // nothing to do
             } else {
-                /* We don't recognize other usage patterns for now */
+                // We don't recognize other usage patterns for now
                 return 0;
             }
 
@@ -2637,17 +2637,17 @@ static int LoadAAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
     }
 
     if (Success) {
-        /* Adjust all indices at once */
+        // Adjust all indices at once
         AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
 
-        /* Move labels if it was an insertion before Idx */
+        // Move labels if it was an insertion before Idx
         CS_MoveLabels (S, O, CS_GetEntry (S, OldIdx));
 
-        /* Done */
+        // Done
         return 1;
     }
 
-    /* Unable to load */
+    // Unable to load
     return 0;
 }
 
@@ -2659,13 +2659,13 @@ static int LoadXAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
 */
 {
     CodeEntry* E;
-    CodeEntry* O;       /* Old entry at Idx */
+    CodeEntry* O;       // Old entry at Idx
     CodeEntry* X;
     int Success = 0;
     int OldIdx;
     unsigned Use, Chg;
 
-    /* Adjust the insertion point if necessary */
+    // Adjust the insertion point if necessary
     if (After) {
         ++Idx;
     }
@@ -2676,12 +2676,12 @@ static int LoadXAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
 
     O = CS_GetEntry (S, OldIdx);
 
-    /* We only recognize opc with an arg for now, as well as a special case for ldaxysp */
+    // We only recognize opc with an arg for now, as well as a special case for ldaxysp
     if ((E->OPC != OP65_JSR || strcmp (E->Arg, "ldaxysp") == 0) &&
         E->AM != AM65_BRA && E->AM != AM65_IMP) {
         if (E->Size != 1 && E->AM != AM65_IMP) {
 
-            /* FIXME: The load flags only reflect the situation by the time it reaches the range end */
+            // FIXME: The load flags only reflect the situation by the time it reaches the range end
             if ((LRI->Flags & (LI_DIRECT | LI_CHECK_ARG | LI_CHECK_Y)) != 0) {
                 if ((LRI->Flags & LI_RELOAD_Y) != 0) {
                     if ((LRI->Flags & LI_CHECK_Y) == 0) {
@@ -2691,7 +2691,7 @@ static int LoadXAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
                     }
                     CS_InsertEntry (S, X, Idx++);
 
-                    /* ldx does support AM65_ZPY and AM65_ABSY */
+                    // ldx does support AM65_ZPY and AM65_ABSY
                     if (E->AM == AM65_ZPY || E->AM == AM65_ABSY) {
                         X = NewCodeEntry (OP65_LDX, E->AM, E->Arg, 0, E->LI);
                     } else {
@@ -2709,7 +2709,7 @@ static int LoadXAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
             }
         }
     } else if (E->OPC == OP65_JSR) {
-        /* For function calls we load their arguments instead */
+        // For function calls we load their arguments instead
         GetFuncInfo (E->Arg, &Use, &Chg);
         if ((Use & ~REG_AXY) == 0) {
             if (Use == REG_A) {
@@ -2725,9 +2725,9 @@ static int LoadXAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
                 X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, E->LI);
                 CS_InsertEntry (S, X, Idx++);
             } else if (Use == REG_X) {
-                /* nothing to do */
+                // nothing to do
             } else {
-                /* We don't recognize other usage patterns for now */
+                // We don't recognize other usage patterns for now
                 return 0;
             }
 
@@ -2736,17 +2736,17 @@ static int LoadXAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
     }
 
     if (Success) {
-        /* Adjust all indices at once */
+        // Adjust all indices at once
         AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
 
-        /* Move labels if it was an insertion before Idx */
+        // Move labels if it was an insertion before Idx
         CS_MoveLabels (S, O, CS_GetEntry (S, OldIdx));
 
-        /* Done */
+        // Done
         return 1;
     }
 
-    /* Unable to load */
+    // Unable to load
     return 0;
 }
 
@@ -2758,13 +2758,13 @@ static int LoadYAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
 */
 {
     CodeEntry* E;
-    CodeEntry* O;       /* Old entry at Idx */
+    CodeEntry* O;       // Old entry at Idx
     CodeEntry* X;
     int Success = 0;
     int OldIdx;
     unsigned Use, Chg;
 
-    /* Adjust the insertion point if necessary */
+    // Adjust the insertion point if necessary
     if (After) {
         ++Idx;
     }
@@ -2775,12 +2775,12 @@ static int LoadYAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
 
     O = CS_GetEntry (S, OldIdx);
 
-    /* We only recognize opc with an arg for now, as well as a special case for ldaxysp */
+    // We only recognize opc with an arg for now, as well as a special case for ldaxysp
     if ((E->OPC != OP65_JSR || strcmp (E->Arg, "ldaxysp") == 0) &&
         E->AM != AM65_BRA && E->AM != AM65_IMP) {
         if (E->Size != 1 && E->AM != AM65_IMP) {
 
-            /* FIXME: The load flags only reflect the situation by the time it reaches the range end */
+            // FIXME: The load flags only reflect the situation by the time it reaches the range end
             if ((LRI->Flags & (LI_DIRECT | LI_CHECK_ARG | LI_CHECK_Y)) != 0) {
                 if ((LRI->Flags & LI_RELOAD_Y) != 0) {
                     if ((LRI->Flags & LI_CHECK_Y) == 0) {
@@ -2802,7 +2802,7 @@ static int LoadYAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
             }
         }
     } else if (E->OPC == OP65_JSR) {
-        /* For function calls we load their arguments instead */
+        // For function calls we load their arguments instead
         GetFuncInfo (E->Arg, &Use, &Chg);
         if ((Use & ~REG_AXY) == 0) {
             if (Use == REG_A) {
@@ -2818,9 +2818,9 @@ static int LoadYAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
                 X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, E->LI);
                 CS_InsertEntry (S, X, Idx++);
             } else if (Use == REG_Y) {
-                /* nothing to do */
+                // nothing to do
             } else {
-                /* We don't recognize other usage patterns for now */
+                // We don't recognize other usage patterns for now
                 return 0;
             }
 
@@ -2829,24 +2829,24 @@ static int LoadYAt (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Ind
     }
 
     if (Success) {
-        /* Adjust all indices at once */
+        // Adjust all indices at once
         AdjustEntryIndices (Indices, OldIdx, Idx - OldIdx);
 
-        /* Move labels if it was an insertion before Idx */
+        // Move labels if it was an insertion before Idx
         CS_MoveLabels (S, O, CS_GetEntry (S, OldIdx));
 
-        /* Done */
+        // Done
         return 1;
     }
 
-    /* Unable to load */
+    // Unable to load
     return 0;
 }
 
 
 
 int LoadABefore (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
-/* Reload into A the same arg according to LoadRegInfo at Idx */
+// Reload into A the same arg according to LoadRegInfo at Idx
 {
     return LoadAAt (S, Idx, LRI, Indices, 0);
 }
@@ -2854,7 +2854,7 @@ int LoadABefore (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indice
 
 
 int LoadXBefore (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
-/* Reload into X the same arg according to LoadRegInfo at Idx */
+// Reload into X the same arg according to LoadRegInfo at Idx
 {
     return LoadXAt (S, Idx, LRI, Indices, 0);
 }
@@ -2862,7 +2862,7 @@ int LoadXBefore (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indice
 
 
 int LoadYBefore (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
-/* Reload into Y the same arg according to LoadRegInfo at Idx */
+// Reload into Y the same arg according to LoadRegInfo at Idx
 {
     return LoadYAt (S, Idx, LRI, Indices, 0);
 }
@@ -2870,7 +2870,7 @@ int LoadYBefore (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indice
 
 
 int LoadAAfter (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
-/* Reload into A the same arg according to LoadRegInfo after Idx */
+// Reload into A the same arg according to LoadRegInfo after Idx
 {
     return LoadAAt (S, Idx, LRI, Indices, 1);
 }
@@ -2878,7 +2878,7 @@ int LoadAAfter (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices
 
 
 int LoadXAfter (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
-/* Reload into X the same arg according to LoadRegInfo after Idx */
+// Reload into X the same arg according to LoadRegInfo after Idx
 {
     return LoadXAt (S, Idx, LRI, Indices, 1);
 }
@@ -2886,7 +2886,7 @@ int LoadXAfter (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices
 
 
 int LoadYAfter (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices)
-/* Reload into Y the same arg according to LoadRegInfo after Idx */
+// Reload into Y the same arg according to LoadRegInfo after Idx
 {
     return LoadYAt (S, Idx, LRI, Indices, 1);
 }
@@ -2927,7 +2927,7 @@ unsigned GetRegUsageInOpenRange (CodeSeg* S, int First, int Last, unsigned* Use,
 
     CHECK (Last <= (int)CollCount (&S->Entries));
 
-    /* Clear the output flags first */
+    // Clear the output flags first
     if (Use != 0) {
         *Use = 0;
     }
@@ -2943,7 +2943,7 @@ unsigned GetRegUsageInOpenRange (CodeSeg* S, int First, int Last, unsigned* Use,
         if (Chg != 0) {
             *Chg |= X->Chg;
         }
-        /* Used before changed */
+        // Used before changed
         U |= ~C & X->Use;
         C |= X->Chg;
     }
@@ -2965,22 +2965,22 @@ int IsArgSameInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E)
 
     CHECK (Last <= (int)CollCount (&S->Entries));
 
-    /* TODO: We'll currently give up finding the src of Y */
+    // TODO: We'll currently give up finding the src of Y
     ClearLoadRegInfo (&LRI);
     PrepairLoadRegInfoForArgCheck (S, &LRI, E);
 
-    /* TODO: We don't currently check for all cases */
+    // TODO: We don't currently check for all cases
     if ((LRI.Flags & (LI_DIRECT | LI_CHECK_ARG | LI_CHECK_Y | LI_RELOAD_Y)) == 0) {
-        /* Just bail out as if the src would change right away */
+        // Just bail out as if the src would change right away
         return 0;
     }
 
-    /* If there's no need to check */
+    // If there's no need to check
     if ((LRI.Flags & (LI_CHECK_ARG | LI_CHECK_Y | LI_RELOAD_Y)) == 0) {
         return 1;
     }
 
-    /* This always checks Y */
+    // This always checks Y
     if ((LRI.Flags & (LI_CHECK_Y | LI_RELOAD_Y)) != 0) {
         LRI.Flags |= LI_CHECK_Y;
         LRI.Flags &= ~LI_RELOAD_Y;
@@ -2994,7 +2994,7 @@ int IsArgSameInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E)
         }
     }
 
-    /* No change found */
+    // No change found
     return 1;
 }
 
@@ -3014,17 +3014,17 @@ int FindArgFirstChangeInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E
 
     CHECK (Last <= (int)CollCount (&S->Entries));
 
-    /* TODO: We'll currently give up finding the src of Y */
+    // TODO: We'll currently give up finding the src of Y
     ClearLoadRegInfo (&LRI);
     PrepairLoadRegInfoForArgCheck (S, &LRI, E);
 
-    /* TODO: We don't currently check for all cases */
+    // TODO: We don't currently check for all cases
     if ((LRI.Flags & (LI_DIRECT | LI_CHECK_ARG | LI_CHECK_Y)) == 0) {
-        /* Just bail out as if the src would change right away */
+        // Just bail out as if the src would change right away
         return First + 1;
     }
 
-    /* If there's no need to check */
+    // If there's no need to check
     if ((LRI.Flags & (LI_CHECK_ARG | LI_CHECK_Y)) == 0) {
         return Last;
     }
@@ -3036,7 +3036,7 @@ int FindArgFirstChangeInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E
         }
     }
 
-    /* Not found */
+    // Not found
     return Last;
 }
 
@@ -3056,25 +3056,25 @@ int FindArgLastUsageInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E, 
 
     CHECK (Last <= (int)CollCount (&S->Entries));
 
-    /* TODO: We'll currently give up finding the src of Y */
+    // TODO: We'll currently give up finding the src of Y
     ClearLoadRegInfo (&LRI);
     PrepairLoadRegInfoForArgCheck (S, &LRI, E);
 
-    /* Whether Y is to be reloaded */
+    // Whether Y is to be reloaded
     if (ReloadY) {
-        /* Always reload Y */
+        // Always reload Y
         if ((LRI.Flags & LI_CHECK_Y) != 0) {
             LRI.Flags |= LI_RELOAD_Y;
         }
     } else if ((LRI.Flags & LI_RELOAD_Y) != 0) {
-        /* Always check Y */
+        // Always check Y
         LRI.Flags |= LI_CHECK_Y;
         LRI.Flags &= ~LI_RELOAD_Y;
     }
 
-    /* TODO: We don't currently check for all cases */
+    // TODO: We don't currently check for all cases
     if ((LRI.Flags & (LI_DIRECT | LI_CHECK_ARG | LI_CHECK_Y | LI_RELOAD_Y)) == 0) {
-        /* Just bail out as if the src would change everywhere */
+        // Just bail out as if the src would change everywhere
         return First < Last ? Last - 1 : First;
     }
 
@@ -3095,7 +3095,7 @@ int FindArgLastUsageInOpenRange (CodeSeg* S, int First, int Last, CodeEntry* E, 
         }
     }
 
-    /* Result */
+    // Result
     return Found;
 }
 
@@ -3119,7 +3119,7 @@ int FindRegFirstChangeInOpenRange (CodeSeg* S, int First, int Last, unsigned wha
         }
     }
 
-    /* Not found */
+    // Not found
     return Last;
 }
 
@@ -3143,7 +3143,7 @@ int FindRegFirstUseInOpenRange (CodeSeg* S, int First, int Last, unsigned what)
         }
     }
 
-    /* Not found */
+    // Not found
     return Last;
 }
 

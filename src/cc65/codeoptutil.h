@@ -1,35 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                               codeoptutil.h                               */
-/*                                                                           */
-/*           Optimize operations that take operands via the stack            */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                               codeoptutil.h
+//
+//           Optimize operations that take operands via the stack
+//
+//
+//
+// (C) 2001      Ullrich von Bassewitz
+//               Wacholderweg 14
+//               D-70597 Stuttgart
+// EMail:        uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
@@ -38,118 +38,118 @@
 
 
 
-/* cc65 */
+// cc65
 #include "codeent.h"
 #include "codeseg.h"
 
 
 
-/*****************************************************************************/
-/*                            Load tracking data                             */
-/*****************************************************************************/
+//***************************************************************************
+//                            Load tracking data
+//***************************************************************************
 
 
 
-/* LoadRegInfo flags set by DirectOp */
+// LoadRegInfo flags set by DirectOp
 typedef enum {
     LI_NONE         = 0x00,
-    LI_DIRECT       = 0x01,         /* Direct op may be used */
-    LI_RELOAD_Y     = 0x02,         /* Reload index register Y */
-    LI_REMOVE       = 0x04,         /* Load may be removed */
-    LI_DONT_REMOVE  = 0x08,         /* Load may not be removed */
-    LI_CHECK_ARG    = 0x10,         /* Load src might be modified later */
-    LI_CHECK_Y      = 0x20,         /* Indexed load src might be modified later */
-    LI_SRC_USE      = 0x40,         /* src of Opc argument is possibly used */
-    LI_SRC_CHG      = 0x80,         /* src of Opc argument is possibly modified */
-    LI_Y_SRC_USE    = 0x0100,       /* src of Opc addressing Y is possibly used */
-    LI_Y_SRC_CHG    = 0x0200,       /* src of Opc addressing Y is possibly modified */
-    LI_Y_USE        = 0x0400,       /* Opc addressing Y is possibly used */
-    LI_Y_CHG        = 0x0800,       /* Opc addressing Y is possibly modified */
-    LI_USED_BY_A    = 0x1000,       /* Content used by RegA */
-    LI_USED_BY_X    = 0x2000,       /* Content used by RegX */
-    LI_USED_BY_Y    = 0x4000,       /* Content used by RegY */
-    LI_SP           = 0x8000,       /* Content on stack */
-    LI_LOAD_INSN    = 0x010000,     /* Is a load insn */
+    LI_DIRECT       = 0x01,         // Direct op may be used
+    LI_RELOAD_Y     = 0x02,         // Reload index register Y
+    LI_REMOVE       = 0x04,         // Load may be removed
+    LI_DONT_REMOVE  = 0x08,         // Load may not be removed
+    LI_CHECK_ARG    = 0x10,         // Load src might be modified later
+    LI_CHECK_Y      = 0x20,         // Indexed load src might be modified later
+    LI_SRC_USE      = 0x40,         // src of Opc argument is possibly used
+    LI_SRC_CHG      = 0x80,         // src of Opc argument is possibly modified
+    LI_Y_SRC_USE    = 0x0100,       // src of Opc addressing Y is possibly used
+    LI_Y_SRC_CHG    = 0x0200,       // src of Opc addressing Y is possibly modified
+    LI_Y_USE        = 0x0400,       // Opc addressing Y is possibly used
+    LI_Y_CHG        = 0x0800,       // Opc addressing Y is possibly modified
+    LI_USED_BY_A    = 0x1000,       // Content used by RegA
+    LI_USED_BY_X    = 0x2000,       // Content used by RegX
+    LI_USED_BY_Y    = 0x4000,       // Content used by RegY
+    LI_SP           = 0x8000,       // Content on stack
+    LI_LOAD_INSN    = 0x010000,     // Is a load insn
 } LI_FLAGS;
 
-/* Structure that tells us how to load the lhs values */
+// Structure that tells us how to load the lhs values
 typedef struct LoadRegInfo LoadRegInfo;
 struct LoadRegInfo {
-    LI_FLAGS        Flags;          /* Tells us how to load */
-    int             LoadIndex;      /* Index of load insn, -1 if invalid */
-    CodeEntry*      LoadEntry;      /* The actual entry, 0 if invalid */
-    int             LoadYIndex;     /* Index of Y-load insn, -1 if invalid  */
-    CodeEntry*      LoadYEntry;     /* The actual Y-load entry, 0 if invalid */
-    int             ChgIndex;       /* Index of last change */
-    CodeEntry*      ChgEntry;       /* The actual change entry */
-    int             Offs;           /* Stack offset if data is on stack */
+    LI_FLAGS        Flags;          // Tells us how to load
+    int             LoadIndex;      // Index of load insn, -1 if invalid
+    CodeEntry*      LoadEntry;      // The actual entry, 0 if invalid
+    int             LoadYIndex;     // Index of Y-load insn, -1 if invalid
+    CodeEntry*      LoadYEntry;     // The actual Y-load entry, 0 if invalid
+    int             ChgIndex;       // Index of last change
+    CodeEntry*      ChgEntry;       // The actual change entry
+    int             Offs;           // Stack offset if data is on stack
 };
 
-/* Now combined for both registers */
+// Now combined for both registers
 typedef struct LoadInfo LoadInfo;
 struct LoadInfo {
-    LoadRegInfo     A;              /* Info for A register */
-    LoadRegInfo     X;              /* Info for X register */
-    LoadRegInfo     Y;              /* Info for Y register */
+    LoadRegInfo     A;              // Info for A register
+    LoadRegInfo     X;              // Info for X register
+    LoadRegInfo     Y;              // Info for Y register
 };
 
-/* Structure forward decl */
+// Structure forward decl
 typedef struct StackOpData StackOpData;
 
-/* Structure that holds the needed data */
+// Structure that holds the needed data
 struct StackOpData {
-    CodeSeg*    Code;           /* Pointer to code segment */
-    unsigned    Flags;          /* Flags to remember things */
+    CodeSeg*    Code;           // Pointer to code segment
+    unsigned    Flags;          // Flags to remember things
 
-    /* Pointer to optimizer subfunction description */
+    // Pointer to optimizer subfunction description
     const void* OptFunc;
 
-    /* ZP register usage inside the sequence */
+    // ZP register usage inside the sequence
     unsigned    ZPUsage;
     unsigned    ZPChanged;
 
-    /* Freedom of registers inside the sequence */
-    unsigned    UsedRegs;       /* Registers used */
+    // Freedom of registers inside the sequence
+    unsigned    UsedRegs;       // Registers used
 
-    /* Whether the rhs is changed multiple times */
+    // Whether the rhs is changed multiple times
     int         RhsMultiChg;
 
-    /* Register load information for lhs, rhs and rv */
+    // Register load information for lhs, rhs and rv
     LoadInfo    Lhs;
     LoadInfo    Rhs;
     LoadInfo    Rv;
 
-    /* Several indices of insns in the code segment */
-    int         PushIndex;      /* Index of call to pushax in codeseg */
-    int         OpIndex;        /* Index of actual operation */
+    // Several indices of insns in the code segment
+    int         PushIndex;      // Index of call to pushax in codeseg
+    int         OpIndex;        // Index of actual operation
 
-    /* Pointers to insns in the code segment */
-    CodeEntry*  PrevEntry;      /* Entry before the call to pushax */
-    CodeEntry*  PushEntry;      /* Pointer to entry with call to pushax */
-    CodeEntry*  OpEntry;        /* Pointer to entry with op */
-    CodeEntry*  NextEntry;      /* Entry after the op */
+    // Pointers to insns in the code segment
+    CodeEntry*  PrevEntry;      // Entry before the call to pushax
+    CodeEntry*  PushEntry;      // Pointer to entry with call to pushax
+    CodeEntry*  OpEntry;        // Pointer to entry with op
+    CodeEntry*  NextEntry;      // Entry after the op
 
-    const char* ZPLo;           /* Lo byte of zero page loc to use */
-    const char* ZPHi;           /* Hi byte of zero page loc to use */
-    unsigned    IP;             /* Insertion point used by some routines */
+    const char* ZPLo;           // Lo byte of zero page loc to use
+    const char* ZPHi;           // Hi byte of zero page loc to use
+    unsigned    IP;             // Insertion point used by some routines
 };
 
 
 
-/*****************************************************************************/
-/*                            Load tracking code                             */
-/*****************************************************************************/
+//***************************************************************************
+//                            Load tracking code
+//***************************************************************************
 
 
 
 void ClearLoadRegInfo (LoadRegInfo* LRI);
-/* Clear a LoadRegInfo struct */
+// Clear a LoadRegInfo struct
 
 void CopyLoadRegInfo (LoadRegInfo* To, LoadRegInfo* From);
-/* Copy a LoadRegInfo struct */
+// Copy a LoadRegInfo struct
 
 void FinalizeLoadRegInfo (LoadRegInfo* LRI, CodeSeg* S);
-/* Prepare a LoadRegInfo struct for use */
+// Prepare a LoadRegInfo struct for use
 
 void AdjustLoadRegInfo (LoadRegInfo* LRI, int Index, int Change);
 /* Adjust a load register info struct after deleting or inserting an entry
@@ -157,28 +157,28 @@ void AdjustLoadRegInfo (LoadRegInfo* LRI, int Index, int Change);
 */
 
 void ClearLoadInfo (LoadInfo* LI);
-/* Clear a LoadInfo struct */
+// Clear a LoadInfo struct
 
 void CopyLoadInfo (LoadInfo* To, LoadInfo* From);
-/* Copy a LoadInfo struct */
+// Copy a LoadInfo struct
 
 void FinalizeLoadInfo (LoadInfo* LI, CodeSeg* S);
-/* Prepare a LoadInfo struct for use */
+// Prepare a LoadInfo struct for use
 
 void AdjustLoadInfo (LoadInfo* LI, int Index, int Change);
-/* Adjust a load info struct after deleting entry with a given index */
+// Adjust a load info struct after deleting entry with a given index
 
 RegInfo* GetLastChangedRegInfo (StackOpData* D, LoadRegInfo* Reg);
-/* Get RegInfo of the last insn entry that changed the reg */
+// Get RegInfo of the last insn entry that changed the reg
 
 void PrepairLoadRegInfoForArgCheck (CodeSeg* S, LoadRegInfo* LRI, CodeEntry* E);
-/* Set the load src flags and remember to check for load src change if necessary */
+// Set the load src flags and remember to check for load src change if necessary
 
 void SetIfOperandSrcAffected (LoadInfo* LLI, CodeEntry* E);
-/* Check and flag operand src that may be affected */
+// Check and flag operand src that may be affected
 
 void SetIfOperandLoadUnremovable (LoadInfo* LI, unsigned Used);
-/* Check and flag operand load that may be unremovable */
+// Check and flag operand load that may be unremovable
 
 unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I);
 /* Track loads for a code entry.
@@ -186,25 +186,25 @@ unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I);
 */
 
 void SetDontRemoveEntryFlag (LoadRegInfo* LRI);
-/* Flag the entry as non-removable according to register flags */
+// Flag the entry as non-removable according to register flags
 
 void ResetDontRemoveEntryFlag (LoadRegInfo* LRI);
-/* Unflag the entry as non-removable according to register flags */
+// Unflag the entry as non-removable according to register flags
 
 void SetDontRemoveEntryFlags (StackOpData* D);
-/* Flag the entries as non-removable according to register flags */
+// Flag the entries as non-removable according to register flags
 
 void ResetDontRemoveEntryFlags (StackOpData* D);
-/* Unflag the entries as non-removable according to register flags */
+// Unflag the entries as non-removable according to register flags
 
 void ResetStackOpData (StackOpData* Data);
-/* Reset the given data structure */
+// Reset the given data structure
 
 
 
-/*****************************************************************************/
-/*                                  Helpers                                  */
-/*****************************************************************************/
+//***************************************************************************
+//                                  Helpers
+//***************************************************************************
 
 
 
@@ -230,10 +230,10 @@ int IsRegVar (StackOpData* D);
 */
 
 void AddStoreLhsA (StackOpData* D);
-/* Add a store to zero page after the push insn */
+// Add a store to zero page after the push insn
 
 void AddStoreLhsX (StackOpData* D);
-/* Add a store to zero page after the push insn */
+// Add a store to zero page after the push insn
 
 void ReplacePushByStore (StackOpData* D);
 /* Replace the call to the push subroutine by a store into the zero page
@@ -255,11 +255,11 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult);
 */
 
 void RemoveRegLoads (StackOpData* D, LoadInfo* LI);
-/* Remove register load insns */
+// Remove register load insns
 
 
 void RemoveRemainders (StackOpData* D);
-/* Remove the code that is unnecessary after translation of the sequence */
+// Remove the code that is unnecessary after translation of the sequence
 
 int HarmlessCall (const CodeEntry* E, int PushedBytes);
 /* Check if this is a call to a harmless subroutine that will not interrupt
@@ -268,40 +268,40 @@ int HarmlessCall (const CodeEntry* E, int PushedBytes);
 
 
 
-/*****************************************************************************/
-/*                                  Helpers                                  */
-/*****************************************************************************/
+//***************************************************************************
+//                                  Helpers
+//***************************************************************************
 
 
 
-/* Backup location types */
-#define BU_UNKNOWN      0x00000000U   /* Unknown */
-#define BU_IMM          0x00000000U   /* Immediate */
-#define BU_REG          0x01000000U   /* In register */
-#define BU_ZP           0x02000000U   /* On ZP */
-#define BU_SP6502       0x04000000U   /* On 6502 stack */
-#define BU_SP           0x08000000U   /* On CC65 stack */
-#define BU_B8           0x00000000U   /* Size of 8-bit */
-#define BU_B16          0x10000000U   /* Size of 16-bit */
-#define BU_B24          0x20000000U   /* Size of 24-bit */
-#define BU_B32          0x30000000U   /* Size of 32-bit */
-#define BU_TYPE_MASK    0x0F000000U   /* Type mask */
-#define BU_SIZE_MASK    0xF0000000U   /* Size mask */
+// Backup location types
+#define BU_UNKNOWN      0x00000000U   // Unknown
+#define BU_IMM          0x00000000U   // Immediate
+#define BU_REG          0x01000000U   // In register
+#define BU_ZP           0x02000000U   // On ZP
+#define BU_SP6502       0x04000000U   // On 6502 stack
+#define BU_SP           0x08000000U   // On CC65 stack
+#define BU_B8           0x00000000U   // Size of 8-bit
+#define BU_B16          0x10000000U   // Size of 16-bit
+#define BU_B24          0x20000000U   // Size of 24-bit
+#define BU_B32          0x30000000U   // Size of 32-bit
+#define BU_TYPE_MASK    0x0F000000U   // Type mask
+#define BU_SIZE_MASK    0xF0000000U   // Size mask
 
 typedef struct {
-    unsigned Type;              /* Backup location type and size */
-    unsigned ZPUsage;           /* ZP unusable for backup */
+    unsigned Type;              // Backup location type and size
+    unsigned ZPUsage;           // ZP unusable for backup
     union {
-        unsigned        Where;  /* Backup location */
-        unsigned        Imm;    /* Backed-up value */
-        unsigned char*  Bytes;  /* Pointer to backed-up value */
+        unsigned        Where;  // Backup location
+        unsigned        Imm;    // Backed-up value
+        unsigned char*  Bytes;  // Pointer to backed-up value
     };
 } BackupInfo;
 
 
 
 const char* GetZPName (unsigned ZPLoc);
-/* Get the name strings of certain known ZP Regs */
+// Get the name strings of certain known ZP Regs
 
 unsigned FindAvailableBackupLoc (BackupInfo* B, unsigned Type);
 /* Find a ZP loc for storing the backup and fill in the info.
@@ -316,28 +316,28 @@ void AdjustEntryIndices (Collection* Indices, int Index, int Change);
 */
 
 void DelEntryIdx (CodeSeg* S, int Idx, Collection* Indices);
-/* Delete an entry and adjust Indices if necessary */
+// Delete an entry and adjust Indices if necessary
 
 void DelEntriesIdx (CodeSeg* S, int Idx, int Count, Collection* Indices);
-/* Delete entries and adjust Indices if necessary */
+// Delete entries and adjust Indices if necessary
 
 void RemoveFlaggedRegLoads (CodeSeg* S, LoadRegInfo* LRI, Collection* Indices);
-/* Remove flagged register load insns */
+// Remove flagged register load insns
 
 void RemoveFlaggedLoads (CodeSeg* S, LoadInfo* LI, Collection* Indices);
-/* Remove flagged load insns */
+// Remove flagged load insns
 
 int BackupABefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
-/* Backup the content of A before the specified index Idx */
+// Backup the content of A before the specified index Idx
 
 int BackupXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
-/* Backup the content of X before the specified index Idx */
+// Backup the content of X before the specified index Idx
 
 int BackupYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
-/* Backup the content of Y before the specified index Idx */
+// Backup the content of Y before the specified index Idx
 
 int BackupAXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
-/* Backup the content of AX before the specified index Idx */
+// Backup the content of AX before the specified index Idx
 
 int BackupAXYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
 /* Backup the content of AXY before the specified index Idx.
@@ -345,16 +345,16 @@ int BackupAXYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
 */
 
 int BackupAAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
-/* Backup the content of A after the specified index Idx */
+// Backup the content of A after the specified index Idx
 
 int BackupXAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
-/* Backup the content of X after the specified index Idx */
+// Backup the content of X after the specified index Idx
 
 int BackupYAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
-/* Backup the content of Y after the specified index Idx */
+// Backup the content of Y after the specified index Idx
 
 int BackupAXAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
-/* Backup the content of AX after the specified index Idx */
+// Backup the content of AX after the specified index Idx
 
 int BackupAXYAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
 /* Backup the content of AXY after the specified index Idx.
@@ -362,16 +362,16 @@ int BackupAXYAfter (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
 */
 
 int RestoreABefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
-/* Restore the content of Y before the specified index Idx */
+// Restore the content of Y before the specified index Idx
 
 int RestoreXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
-/* Restore the content of X before the specified index Idx */
+// Restore the content of X before the specified index Idx
 
 int RestoreYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
-/* Restore the content of Y before the specified index Idx */
+// Restore the content of Y before the specified index Idx
 
 int RestoreAXBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
-/* Restore the content of AX before the specified index Idx */
+// Restore the content of AX before the specified index Idx
 
 int RestoreAXYBefore (CodeSeg* S, BackupInfo* B, int Idx, Collection* Indices);
 /* Restore the content of AXY before the specified index Idx.
@@ -385,22 +385,22 @@ int BackupArgAfter (CodeSeg* S, BackupInfo* B, int Idx, const CodeEntry* E, Coll
 */
 
 int LoadABefore (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices);
-/* Reload into A the same arg according to LoadRegInfo at Idx */
+// Reload into A the same arg according to LoadRegInfo at Idx
 
 int LoadXBefore (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices);
-/* Reload into X the same arg according to LoadRegInfo at Idx */
+// Reload into X the same arg according to LoadRegInfo at Idx
 
 int LoadYBefore (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices);
-/* Reload into Y the same arg according to LoadRegInfo at Idx */
+// Reload into Y the same arg according to LoadRegInfo at Idx
 
 int LoadAAfter (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices);
-/* Reload into A the same arg according to LoadRegInfo after Idx */
+// Reload into A the same arg according to LoadRegInfo after Idx
 
 int LoadXAfter (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices);
-/* Reload into X the same arg according to LoadRegInfo after Idx */
+// Reload into X the same arg according to LoadRegInfo after Idx
 
 int LoadYAfter (CodeSeg* S, int Idx, const LoadRegInfo* LRI, Collection* Indices);
-/* Reload into Y the same arg according to LoadRegInfo after Idx */
+// Reload into Y the same arg according to LoadRegInfo after Idx
 
 unsigned GetRegAccessedInOpenRange (CodeSeg* S, int First, int Last);
 /* Get what ZPs, registers or processor states are used or changed in the range
@@ -464,6 +464,6 @@ int FindRegLastUseInOpenRange (CodeSeg* S, int First, int Last, unsigned what);
 ** Return the index of the found entry, or First if not found.
 */
 
-/* End of codeoptutil.h */
+// End of codeoptutil.h
 
 #endif

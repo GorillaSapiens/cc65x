@@ -1,44 +1,44 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                  span.c                                   */
-/*                                                                           */
-/*                      A span of data within a segment                      */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2003-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                  span.c
+//
+//                      A span of data within a segment
+//
+//
+//
+// (C) 2003-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
-/* common */
+// common
 #include "hashfunc.h"
 #include "hashtab.h"
 #include "xmalloc.h"
 
-/* ca65 */
+// ca65
 #include "global.h"
 #include "objfile.h"
 #include "segment.h"
@@ -47,17 +47,17 @@
 
 
 
-/*****************************************************************************/
-/*                                 Forwards                                  */
-/*****************************************************************************/
+//***************************************************************************
+//                                 Forwards
+//***************************************************************************
 
 
 
 static unsigned HT_GenHash (const void* Key);
-/* Generate the hash over a key. */
+// Generate the hash over a key.
 
 static const void* HT_GetKey (const void* Entry);
-/* Given a pointer to the user entry data, return a pointer to the key */
+// Given a pointer to the user entry data, return a pointer to the key
 
 static int HT_Compare (const void* Key1, const void* Key2);
 /* Compare two keys. The function must return a value less than zero if
@@ -67,44 +67,44 @@ static int HT_Compare (const void* Key1, const void* Key2);
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* Hash table functions */
+// Hash table functions
 static const HashFunctions HashFunc = {
     HT_GenHash,
     HT_GetKey,
     HT_Compare
 };
 
-/* Span hash table */
+// Span hash table
 static HashTable SpanTab = STATIC_HASHTABLE_INITIALIZER (1051, &HashFunc);
 
 
 
-/*****************************************************************************/
-/*                           Hash table functions                            */
-/*****************************************************************************/
+//***************************************************************************
+//                           Hash table functions
+//***************************************************************************
 
 
 
 static unsigned HT_GenHash (const void* Key)
-/* Generate the hash over a key. */
+// Generate the hash over a key.
 {
-    /* Key is a Span pointer */
+    // Key is a Span pointer
     const Span* S = Key;
 
-    /* Hash over a combination of segment number, start and end */
+    // Hash over a combination of segment number, start and end
     return HashInt ((S->Seg->Num << 28) ^ (S->Start << 14) ^ S->End);
 }
 
 
 
 static const void* HT_GetKey (const void* Entry)
-/* Given a pointer to the user entry data, return a pointer to the key */
+// Given a pointer to the user entry data, return a pointer to the key
 {
     return Entry;
 }
@@ -117,11 +117,11 @@ static int HT_Compare (const void* Key1, const void* Key2)
 ** than zero if Key1 is greater then Key2.
 */
 {
-    /* Convert both parameters to Span pointers */
+    // Convert both parameters to Span pointers
     const Span* S1 = Key1;
     const Span* S2 = Key2;
 
-    /* Compare segment number, then start and end */
+    // Compare segment number, then start and end
     int Res = (int)S2->Seg->Num - (int)S1->Seg->Num;
     if (Res == 0) {
         Res = (int)S2->Start - (int)S1->Start;
@@ -130,15 +130,15 @@ static int HT_Compare (const void* Key1, const void* Key2)
         }
     }
 
-    /* Done */
+    // Done
     return Res;
 }
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
@@ -147,10 +147,10 @@ static Span* NewSpan (Segment* Seg, unsigned long Start, unsigned long End)
 ** current PC of the segment.
 */
 {
-    /* Allocate memory */
+    // Allocate memory
     Span* S = xmalloc (sizeof (Span));
 
-    /* Initialize the struct */
+    // Initialize the struct
     InitHashNode (&S->Node);
     S->Id       = ~0U;
     S->Seg      = Seg;
@@ -158,14 +158,14 @@ static Span* NewSpan (Segment* Seg, unsigned long Start, unsigned long End)
     S->End      = End;
     S->Type     = EMPTY_STRING_ID;
 
-    /* Return the new struct */
+    // Return the new struct
     return S;
 }
 
 
 
 static void FreeSpan (Span* S)
-/* Free a span */
+// Free a span
 {
     xfree (S);
 }
@@ -183,17 +183,17 @@ static Span* MergeSpan (Span* S)
     */
     Span* E = HT_Find (&SpanTab, S);
     if (E) {
-        /* If S has a type and E not, move the type */
+        // If S has a type and E not, move the type
         if (S->Type != EMPTY_STRING_ID) {
             CHECK (E->Type == EMPTY_STRING_ID);
             E->Type = S->Type;
         }
 
-        /* Free S and return E */
+        // Free S and return E
         FreeSpan (S);
         return E;
     } else {
-        /* Assign the id, insert S, then return it */
+        // Assign the id, insert S, then return it
         S->Id = HT_GetCount (&SpanTab);
         HT_Insert (&SpanTab, S);
         return S;
@@ -203,9 +203,9 @@ static Span* MergeSpan (Span* S)
 
 
 void SetSpanType (Span* S, const StrBuf* Type)
-/* Set the generic type of the span to Type */
+// Set the generic type of the span to Type
 {
-    /* Ignore the call if we won't generate debug infos */
+    // Ignore the call if we won't generate debug infos
     if (DbgSyms) {
         S->Type = GetStrBufId (Type);
     }
@@ -214,7 +214,7 @@ void SetSpanType (Span* S, const StrBuf* Type)
 
 
 Span* OpenSpan (void)
-/* Open a span for the active segment and return it. */
+// Open a span for the active segment and return it.
 {
     return NewSpan (ActiveSeg, ActiveSeg->PC, ActiveSeg->PC);
 }
@@ -227,13 +227,13 @@ Span* CloseSpan (Span* S)
 ** replaced if a duplicate exists.
 */
 {
-    /* Set the end offset */
+    // Set the end offset
     if (S->Start == S->Seg->PC) {
-        /* Span is empty */
+        // Span is empty
         FreeSpan (S);
         return 0;
     } else {
-        /* Span is not empty */
+        // Span is not empty
         S->End = S->Seg->PC;
 
         /* Check if we have such a span already. If so use the existing
@@ -254,17 +254,17 @@ void OpenSpanList (Collection* Spans)
 {
     unsigned I;
 
-    /* Grow the Spans collection as necessary */
+    // Grow the Spans collection as necessary
     CollGrow (Spans, CollCount (&SegmentList));
 
-    /* Add the currently active segment */
+    // Add the currently active segment
     CollAppend (Spans, NewSpan (ActiveSeg, ActiveSeg->PC, ActiveSeg->PC));
 
-    /* Walk through the segment list and add all other segments */
+    // Walk through the segment list and add all other segments
     for (I = 0; I < CollCount (&SegmentList); ++I) {
         Segment* Seg = CollAtUnchecked (&SegmentList, I);
 
-        /* Be sure to skip the active segment, since it was already added */
+        // Be sure to skip the active segment, since it was already added
         if (Seg != ActiveSeg) {
             CollAppend (Spans, NewSpan (Seg, Seg->PC, Seg->PC));
         }
@@ -280,59 +280,59 @@ void CloseSpanList (Collection* Spans)
 {
     unsigned I, J;
 
-    /* Have new segments been added while the span list was open? */
+    // Have new segments been added while the span list was open?
     for (I = CollCount (Spans); I < CollCount (&SegmentList); ++I) {
 
-        /* Add new spans if not empty */
+        // Add new spans if not empty
         Segment* S = CollAtUnchecked (&SegmentList, I);
         if (S->PC == 0) {
-            /* Segment is empty */
+            // Segment is empty
             continue;
         }
         CollAppend (Spans, NewSpan (S, 0, S->PC));
     }
 
-    /* Walk over the spans, close open, remove empty ones */
+    // Walk over the spans, close open, remove empty ones
     for (I = 0, J = 0; I < CollCount (Spans); ++I) {
 
-        /* Get the next span */
+        // Get the next span
         Span* S = CollAtUnchecked (Spans, I);
 
-        /* Set the end offset */
+        // Set the end offset
         if (S->Start == S->Seg->PC) {
-            /* Span is empty */
+            // Span is empty
             FreeSpan (S);
         } else {
-            /* Span is not empty */
+            // Span is not empty
             S->End = S->Seg->PC;
 
-            /* Merge duplicate spans, then insert it at the new position */
+            // Merge duplicate spans, then insert it at the new position
             CollReplace (Spans, MergeSpan (S), J++);
         }
     }
 
-    /* New Count is now in J */
+    // New Count is now in J
     Spans->Count = J;
 }
 
 
 
 void WriteSpanList (const Collection* Spans)
-/* Write a list of spans to the output file */
+// Write a list of spans to the output file
 {
     unsigned I;
 
-    /* We only write spans if debug info is enabled */
+    // We only write spans if debug info is enabled
     if (DbgSyms == 0) {
-        /* Number of spans is zero */
+        // Number of spans is zero
         ObjWriteVar (0);
     } else {
-        /* Write the number of spans */
+        // Write the number of spans
         ObjWriteVar (CollCount (Spans));
 
-        /* Write the spans */
+        // Write the spans
         for (I = 0; I < CollCount (Spans); ++I) {
-            /* Write the id of the next span */
+            // Write the id of the next span
             ObjWriteVar (((const Span*)CollConstAt (Spans, I))->Id);
         }
     }
@@ -341,46 +341,46 @@ void WriteSpanList (const Collection* Spans)
 
 
 static int CollectSpans (void* Entry, void* Data)
-/* Collect all spans in a collection sorted by id */
+// Collect all spans in a collection sorted by id
 {
-    /* Cast the pointers to real objects */
+    // Cast the pointers to real objects
     Span* S       = Entry;
     Collection* C = Data;
 
-    /* Place the entry into the collection */
+    // Place the entry into the collection
     CollReplaceExpand (C, S, S->Id);
 
-    /* Keep the span */
+    // Keep the span
     return 0;
 }
 
 
 
 void WriteSpans (void)
-/* Write all spans to the object file */
+// Write all spans to the object file
 {
-    /* Tell the object file module that we're about to start the spans */
+    // Tell the object file module that we're about to start the spans
     ObjStartSpans ();
 
-    /* We will write scopes only if debug symbols are requested */
+    // We will write scopes only if debug symbols are requested
     if (DbgSyms) {
 
         unsigned I;
 
-        /* We must first collect all items in a collection sorted by id */
+        // We must first collect all items in a collection sorted by id
         Collection SpanList = STATIC_COLLECTION_INITIALIZER;
         CollGrow (&SpanList, HT_GetCount (&SpanTab));
 
-        /* Walk over the hash table and fill the span list */
+        // Walk over the hash table and fill the span list
         HT_Walk (&SpanTab, CollectSpans, &SpanList);
 
-        /* Write the span count to the file */
+        // Write the span count to the file
         ObjWriteVar (CollCount (&SpanList));
 
-        /* Write all spans */
+        // Write all spans
         for (I = 0; I < CollCount (&SpanList); ++I) {
 
-            /* Get the span and check it */
+            // Get the span and check it
             const Span* S = CollAtUnchecked (&SpanList, I);
             CHECK (S->End > S->Start);
 
@@ -394,16 +394,16 @@ void WriteSpans (void)
             ObjWriteVar (S->Type);
         }
 
-        /* Free the collection with the spans */
+        // Free the collection with the spans
         DoneCollection (&SpanList);
 
     } else {
 
-        /* No debug info requested */
+        // No debug info requested
         ObjWriteVar (0);
 
     }
 
-    /* Done writing the spans */
+    // Done writing the spans
     ObjEndSpans ();
 }

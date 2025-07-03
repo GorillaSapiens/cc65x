@@ -1,39 +1,39 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                   cpu.c                                   */
-/*                                                                           */
-/*                            CPU specifications                             */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2003-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                   cpu.c
+//
+//                            CPU specifications
+//
+//
+//
+// (C) 2003-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
-/* common */
+// common
 #include "addrsize.h"
 #include "check.h"
 #include "cpu.h"
@@ -41,31 +41,31 @@
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* CPU used */
+// CPU used
 cpu_t CPU = CPU_UNKNOWN;
 
-/* Table with target names */
+// Table with target names
 const char* CPUNames[CPU_COUNT] = {
     "none",
     "6502",
     "6502X",
     "6502DTV",
-    "65SC02",   /* the original CMOS instruction set */
-    "65C02",    /* CMOS with Rockwell extensions */
+    "65SC02",   // the original CMOS instruction set
+    "65C02",    // CMOS with Rockwell extensions
     "65816",
     "sweet16",
     "huc6280",
     "m740",
     "4510",
     "45GS02",
-    "W65C02",   /* CMOS with WDC extensions */
-    "65CE02",   /* CMOS with CSG extensions */
+    "W65C02",   // CMOS with WDC extensions
+    "65CE02",   // CMOS with CSG extensions
 };
 
 /* Tables with CPU instruction sets
@@ -78,12 +78,12 @@ const unsigned CPUIsets[CPU_COUNT] = {
     CPU_ISET_6502DTV | CPU_ISET_6502,
     CPU_ISET_65SC02  | CPU_ISET_6502,
     CPU_ISET_65C02   | CPU_ISET_6502 | CPU_ISET_65SC02,
-    /* 65816 has wai/stp and NO bit manipulation */
+    // 65816 has wai/stp and NO bit manipulation
     CPU_ISET_65816   | CPU_ISET_6502 | CPU_ISET_65SC02,
     CPU_ISET_SWEET16,
     CPU_ISET_HUC6280 | CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02,
     CPU_ISET_M740    | CPU_ISET_6502,
-    /* 4510 does NOT have indirect-zp (without z), so we can not use 65SC02 */
+    // 4510 does NOT have indirect-zp (without z), so we can not use 65SC02
     CPU_ISET_4510    | CPU_ISET_6502                   | CPU_ISET_65C02 | CPU_ISET_65CE02,
     CPU_ISET_45GS02  | CPU_ISET_6502                   | CPU_ISET_65C02 | CPU_ISET_65CE02 | CPU_ISET_4510,
     CPU_ISET_W65C02  | CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02,
@@ -92,39 +92,39 @@ const unsigned CPUIsets[CPU_COUNT] = {
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 int ValidAddrSizeForCPU (unsigned char AddrSize)
-/* Check if the given address size is valid for the current CPU */
+// Check if the given address size is valid for the current CPU
 {
     switch (AddrSize) {
         case ADDR_SIZE_DEFAULT:
-            /* Always supported */
+            // Always supported
             return 1;
 
         case ADDR_SIZE_ZP:
-            /* Not supported by Sweet16 */
+            // Not supported by Sweet16
             return (CPU != CPU_SWEET16);
 
         case ADDR_SIZE_ABS:
-            /* Always supported */
+            // Always supported
             return 1;
 
         case ADDR_SIZE_FAR:
-            /* Supported by "none" and 65816 */
+            // Supported by "none" and 65816
             return (CPU == CPU_NONE || CPU == CPU_65816);
 
         case ADDR_SIZE_LONG:
-            /* "none" supports all sizes */
+            // "none" supports all sizes
             return (CPU == CPU_NONE);
 
         default:
             FAIL ("Invalid address size");
-            /* NOTREACHED */
+            // NOTREACHED
             return 0;
     }
 }
@@ -138,13 +138,13 @@ cpu_t FindCPU (const char* Name)
 {
     unsigned I;
 
-    /* Check all CPU names */
+    // Check all CPU names
     for (I = 0; I < CPU_COUNT; ++I) {
         if (StrCaseCmp (CPUNames [I], Name) == 0) {
             return (cpu_t)I;
         }
     }
 
-    /* Not found */
+    // Not found
     return CPU_UNKNOWN;
 }

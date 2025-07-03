@@ -1,35 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 strbuf.h                                  */
-/*                                                                           */
-/*                       Variable sized string buffers                       */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2009, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                 strbuf.h
+//
+//                       Variable sized string buffers
+//
+//
+//
+// (C) 2001-2009, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
@@ -41,57 +41,57 @@
 #include <stdarg.h>
 #include <string.h>
 
-/* common */
+// common
 #include "attrib.h"
 #include "check.h"
 #include "inline.h"
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
-/* We want to track whether a character is "raw" or not. */
-/* "raw" characters should NOT be translated when translating a string. */
-/* We do this by keeping a second array parallel to "Buf" called "Cooked". */
-/* Think of "cooked" as the inverse of "raw". */
-/* If Cooked[n] is 0, then the character is raw and should not be translated. */
-/* This was done to keep LIT_STR_BUFFER sane. */
+// We want to track whether a character is "raw" or not.
+// "raw" characters should NOT be translated when translating a string.
+// We do this by keeping a second array parallel to "Buf" called "Cooked".
+// Think of "cooked" as the inverse of "raw".
+// If Cooked[n] is 0, then the character is raw and should not be translated.
+// This was done to keep LIT_STR_BUFFER sane.
 
 typedef struct StrBuf StrBuf;
 struct StrBuf {
-    char*       Buf;                    /* Pointer to buffer */
-    char*       Cooked;                 /* Pointer to cooked buffer */
-    unsigned    Len;                    /* Length of the string */
-    unsigned    Index;                  /* Used for reading (Get and friends) */
-    unsigned    Allocated;              /* Size of allocated memory */
+    char*       Buf;                    // Pointer to buffer
+    char*       Cooked;                 // Pointer to cooked buffer
+    unsigned    Len;                    // Length of the string
+    unsigned    Index;                  // Used for reading (Get and friends)
+    unsigned    Allocated;              // Size of allocated memory
 };
 
-/* An empty string buf */
+// An empty string buf
 extern const StrBuf EmptyStrBuf;
 
-/* Initializer for static string bufs */
+// Initializer for static string bufs
 #define STATIC_STRBUF_INITIALIZER       { 0, 0, 0, 0, 0 }
 
-/* Initializer for auto string bufs */
+// Initializer for auto string bufs
 #define AUTO_STRBUF_INITIALIZER         { 0, 0, 0, 0, 0 }
 
-/* Initialize with a string literal (beware: evaluates str twice!) */
+// Initialize with a string literal (beware: evaluates str twice!)
 #define LIT_STRBUF_INITIALIZER(str)     { (char*)str, (char *)str, sizeof(str)-1, 0, 0 }
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 #if defined(HAVE_INLINE)
 INLINE StrBuf* SB_Init (StrBuf* B)
-/* Initialize a string buffer */
+// Initialize a string buffer
 {
     *B = EmptyStrBuf;
     return B;
@@ -108,13 +108,13 @@ StrBuf* SB_InitFromString (StrBuf* B, const char* S);
 */
 
 void SB_Done (StrBuf* B);
-/* Free the data of a string buffer (but not the struct itself) */
+// Free the data of a string buffer (but not the struct itself)
 
 StrBuf* NewStrBuf (void);
-/* Allocate, initialize and return a new StrBuf */
+// Allocate, initialize and return a new StrBuf
 
 void FreeStrBuf (StrBuf* B);
-/* Free a string buffer */
+// Free a string buffer
 
 void SB_Realloc (StrBuf* B, unsigned NewSize);
 /* Reallocate the string buffer space, make sure at least NewSize bytes are
@@ -123,7 +123,7 @@ void SB_Realloc (StrBuf* B, unsigned NewSize);
 
 #if defined(HAVE_INLINE)
 INLINE unsigned SB_GetLen (const StrBuf* B)
-/* Return the length of the buffer contents */
+// Return the length of the buffer contents
 {
     return B->Len;
 }
@@ -133,7 +133,7 @@ INLINE unsigned SB_GetLen (const StrBuf* B)
 
 #if defined(HAVE_INLINE)
 INLINE unsigned SB_GetIndex (const StrBuf* B)
-/* Return the user index of the string buffer */
+// Return the user index of the string buffer
 {
     return B->Index;
 }
@@ -143,7 +143,7 @@ INLINE unsigned SB_GetIndex (const StrBuf* B)
 
 #if defined(HAVE_INLINE)
 INLINE void SB_SetIndex (StrBuf* B, unsigned Index)
-/* Set the user index of the string buffer */
+// Set the user index of the string buffer
 {
     B->Index = Index;
 }
@@ -153,7 +153,7 @@ INLINE void SB_SetIndex (StrBuf* B, unsigned Index)
 
 #if defined(HAVE_INLINE)
 INLINE const char* SB_GetConstBuf (const StrBuf* B)
-/* Return a buffer pointer */
+// Return a buffer pointer
 {
     return B->Buf;
 }
@@ -163,7 +163,7 @@ INLINE const char* SB_GetConstBuf (const StrBuf* B)
 
 #if defined(HAVE_INLINE)
 INLINE char* SB_GetBuf (StrBuf* B)
-/* Return a buffer pointer */
+// Return a buffer pointer
 {
     return B->Buf;
 }
@@ -173,7 +173,7 @@ INLINE char* SB_GetBuf (StrBuf* B)
 
 #if defined(HAVE_INLINE)
 INLINE char* SB_GetCooked (StrBuf* B)
-/* Return a cooked pointer */
+// Return a cooked pointer
 {
     return B->Cooked;
 }
@@ -183,19 +183,19 @@ INLINE char* SB_GetCooked (StrBuf* B)
 
 #if defined(HAVE_INLINE)
 INLINE char SB_At (const StrBuf* B, unsigned Index)
-/* Get a character from the buffer */
+// Get a character from the buffer
 {
     PRECONDITION (Index < B->Len);
     return B->Buf[Index];
 }
 #else
 char SB_At (const StrBuf* B, unsigned Index);
-/* Get a character from the buffer */
+// Get a character from the buffer
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE char SB_AtUnchecked (const StrBuf* B, unsigned Index)
-/* Get a character from the buffer */
+// Get a character from the buffer
 {
     return B->Buf[Index];
 }
@@ -205,7 +205,7 @@ INLINE char SB_AtUnchecked (const StrBuf* B, unsigned Index)
 
 #if defined(HAVE_INLINE)
 INLINE int SB_IsEmpty (const StrBuf* B)
-/* Return true if the string buffer is empty */
+// Return true if the string buffer is empty
 {
     return (B->Len == 0);
 }
@@ -215,7 +215,7 @@ INLINE int SB_IsEmpty (const StrBuf* B)
 
 #if defined(HAVE_INLINE)
 INLINE int SB_NotEmpty (const StrBuf* B)
-/* Return true if the string buffer is not empty */
+// Return true if the string buffer is not empty
 {
     return (B->Len > 0);
 }
@@ -225,7 +225,7 @@ INLINE int SB_NotEmpty (const StrBuf* B)
 
 #if defined(HAVE_INLINE)
 INLINE void SB_Clear (StrBuf* B)
-/* Clear the string buffer (make it empty) */
+// Clear the string buffer (make it empty)
 {
     B->Len = B->Index = 0;
 }
@@ -235,7 +235,7 @@ INLINE void SB_Clear (StrBuf* B)
 
 #if defined(HAVE_INLINE)
 INLINE void SB_Reset (StrBuf* B)
-/* Reset the string buffer index to zero */
+// Reset the string buffer index to zero
 {
     B->Index = 0;
 }
@@ -293,7 +293,7 @@ INLINE char SB_LookAtLast (const StrBuf* B)
 
 #if defined(HAVE_INLINE)
 INLINE void SB_Skip (StrBuf* B)
-/* Skip the next character in the string buffer if this is possible. */
+// Skip the next character in the string buffer if this is possible.
 {
     if (B->Index < B->Len) {
         ++B->Index;
@@ -305,7 +305,7 @@ INLINE void SB_Skip (StrBuf* B)
 
 #if defined(HAVE_INLINE)
 INLINE void SB_SkipMultiple (StrBuf* B, unsigned Count)
-/* Skip a number of characters in the string buffer if this is possible. */
+// Skip a number of characters in the string buffer if this is possible.
 {
     if ((B->Index += Count) > B->Len) {
         B->Index = B->Len;
@@ -317,7 +317,7 @@ INLINE void SB_SkipMultiple (StrBuf* B, unsigned Count)
 #endif
 
 void SB_Drop (StrBuf* B, unsigned Count);
-/* Drop characters from the end of the string. */
+// Drop characters from the end of the string.
 
 void SB_Terminate (StrBuf* B);
 /* Zero terminate the given string buffer. NOTE: The terminating zero is not
@@ -325,57 +325,57 @@ void SB_Terminate (StrBuf* B);
 */
 
 void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size);
-/* Copy Buf to Target, discarding the old contents of Target */
+// Copy Buf to Target, discarding the old contents of Target
 
 void SB_CopyBufCooked (StrBuf* Target, const char* Buf, const char *Cooked, unsigned Size);
-/* Copy Buf and Cooked to Target, discarding the old contents of Target */
+// Copy Buf and Cooked to Target, discarding the old contents of Target
 
 #if defined(HAVE_INLINE)
 INLINE void SB_CopyStr (StrBuf* Target, const char* S)
-/* Copy S to Target, discarding the old contents of Target */
+// Copy S to Target, discarding the old contents of Target
 {
     SB_CopyBuf (Target, S, strlen (S));
 }
 #else
 void SB_CopyStr (StrBuf* Target, const char* S);
-/* Copy S to Target, discarding the old contents of Target */
+// Copy S to Target, discarding the old contents of Target
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE void SB_Copy (StrBuf* Target, const StrBuf* Source)
-/* Copy Source to Target, discarding the old contents of Target */
+// Copy Source to Target, discarding the old contents of Target
 {
     SB_CopyBufCooked (Target, Source->Buf, Source->Cooked, Source->Len);
     Target->Index = Source->Index;
 }
 #else
 void SB_Copy (StrBuf* Target, const StrBuf* Source);
-/* Copy Source to Target, discarding the old contents of Target */
+// Copy Source to Target, discarding the old contents of Target
 #endif
 
 void SB_AppendChar (StrBuf* B, int C);
-/* Append a character to a string buffer */
+// Append a character to a string buffer
 
 void SB_AppendCharCooked (StrBuf* B, int C, int Cooked);
-/* Append a character to a string buffer, raw if Cooked == 0 */
+// Append a character to a string buffer, raw if Cooked == 0
 
 void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size);
-/* Append a character buffer to the end of the string buffer */
+// Append a character buffer to the end of the string buffer
 
 #if defined(HAVE_INLINE)
 INLINE void SB_AppendStr (StrBuf* B, const char* S)
-/* Append a string to the end of the string buffer */
+// Append a string to the end of the string buffer
 {
     SB_AppendBuf (B, S, strlen (S));
 }
 #else
 void SB_AppendStr (StrBuf* B, const char* S);
-/* Append a string to the end of the string buffer */
+// Append a string to the end of the string buffer
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE void SB_Append (StrBuf* Target, const StrBuf* Source)
-/* Append the contents of Source to Target */
+// Append the contents of Source to Target
 {
     unsigned NewLen = Target->Len + Source->Len;
     if (NewLen > Target->Allocated) {
@@ -387,7 +387,7 @@ INLINE void SB_Append (StrBuf* Target, const StrBuf* Source)
 }
 #else
 void SB_Append (StrBuf* Target, const StrBuf* Source);
-/* Append the contents of Source to Target */
+// Append the contents of Source to Target
 #endif
 
 #if defined(HAVE_INLINE)
@@ -420,16 +420,16 @@ void SB_Move (StrBuf* Target, StrBuf* Source);
 */
 
 void SB_ToLower (StrBuf* S);
-/* Convert all characters in S to lower case */
+// Convert all characters in S to lower case
 
 void SB_ToUpper (StrBuf* S);
-/* Convert all characters in S to upper case */
+// Convert all characters in S to upper case
 
 int SB_Compare (const StrBuf* S1, const StrBuf* S2);
-/* Do a lexical compare of S1 and S2. See strcmp for result codes. */
+// Do a lexical compare of S1 and S2. See strcmp for result codes.
 
 int SB_CompareStr (const StrBuf* S1, const char* S2);
-/* Do a lexical compare of S1 and S2. See strcmp for result codes. */
+// Do a lexical compare of S1 and S2. See strcmp for result codes.
 
 void SB_VPrintf (StrBuf* S, const char* Format, va_list ap) attribute ((format (printf, 2, 0)));
 /* printf function with S as target. The function is safe, which means that
@@ -447,6 +447,6 @@ void SB_Printf (StrBuf* S, const char* Format, ...) attribute ((format (printf, 
 
 
 
-/* End of strbuf.h */
+// End of strbuf.h
 
 #endif

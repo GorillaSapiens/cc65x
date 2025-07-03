@@ -1,66 +1,66 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                coptshift.c                                */
-/*                                                                           */
-/*                              Optimize shifts                              */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                coptshift.c
+//
+//                              Optimize shifts
+//
+//
+//
+// (C) 2001-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
-/* common */
+// common
 #include "chartype.h"
 
-/* cc65 */
+// cc65
 #include "codeent.h"
 #include "codeinfo.h"
 #include "coptshift.h"
 
 
 
-/*****************************************************************************/
-/*                                     Data                                  */
-/*****************************************************************************/
+//***************************************************************************
+//                                     Data
+//***************************************************************************
 
 
 
-/* Shift types. Shift type is in the first byte, shift count in the second */
+// Shift types. Shift type is in the first byte, shift count in the second
 enum {
     SHIFT_NONE          = 0x0000,
 
-    /* Masks */
+    // Masks
     SHIFT_MASK_COUNT    = 0x00FF,
     SHIFT_MASK_DIR      = 0x0F00,
-    SHIFT_MASK_MODE     = 0xF000,       /* Arithmetic or logical */
+    SHIFT_MASK_MODE     = 0xF000,       // Arithmetic or logical
     SHIFT_MASK_TYPE     = SHIFT_MASK_DIR | SHIFT_MASK_MODE,
 
-    /* Shift counts */
-    SHIFT_COUNT_Y       = 0x0000,       /* Count is in Y register */
+    // Shift counts
+    SHIFT_COUNT_Y       = 0x0000,       // Count is in Y register
     SHIFT_COUNT_1       = 0x0001,
     SHIFT_COUNT_2       = 0x0002,
     SHIFT_COUNT_3       = 0x0003,
@@ -69,21 +69,21 @@ enum {
     SHIFT_COUNT_6       = 0x0006,
     SHIFT_COUNT_7       = 0x0007,
 
-    /* Shift directions */
+    // Shift directions
     SHIFT_DIR_LEFT      = 0x0100,
     SHIFT_DIR_RIGHT     = 0x0200,
 
-    /* Shift modes */
+    // Shift modes
     SHIFT_MODE_ARITH    = 0x1000,
     SHIFT_MODE_LOGICAL  = 0x2000,
 
-    /* Shift types */
+    // Shift types
     SHIFT_TYPE_ASL      = SHIFT_DIR_LEFT  | SHIFT_MODE_ARITH,
     SHIFT_TYPE_ASR      = SHIFT_DIR_RIGHT | SHIFT_MODE_ARITH,
     SHIFT_TYPE_LSL      = SHIFT_DIR_LEFT  | SHIFT_MODE_LOGICAL,
     SHIFT_TYPE_LSR      = SHIFT_DIR_RIGHT | SHIFT_MODE_LOGICAL,
 
-    /* Complete specs */
+    // Complete specs
     SHIFT_ASL_Y         = SHIFT_TYPE_ASL | SHIFT_COUNT_Y,
     SHIFT_ASR_Y         = SHIFT_TYPE_ASR | SHIFT_COUNT_Y,
     SHIFT_LSL_Y         = SHIFT_TYPE_LSL | SHIFT_COUNT_Y,
@@ -127,7 +127,7 @@ enum {
 
 
 
-/* Macros to extract values from a shift type */
+// Macros to extract values from a shift type
 #define SHIFT_COUNT(S)          ((S) & SHIFT_MASK_COUNT)
 #define SHIFT_DIR(S)            ((S) & SHIFT_MASK_DIR)
 #define SHIFT_MODE(S)           ((S) & SHIFT_MASK_MODE)
@@ -135,14 +135,14 @@ enum {
 
 
 
-/*****************************************************************************/
-/*                              Helper routines                              */
-/*****************************************************************************/
+//***************************************************************************
+//                              Helper routines
+//***************************************************************************
 
 
 
 static unsigned GetShift (const char* Name)
-/* Determine the shift from the name of the subroutine */
+// Determine the shift from the name of the subroutine
 {
     unsigned Type;
 
@@ -155,11 +155,11 @@ static unsigned GetShift (const char* Name)
     } else if (strncmp (Name, "shrax", 5) == 0) {
         Type = SHIFT_TYPE_LSR;
     } else {
-        /* Nothing we know */
+        // Nothing we know
         return SHIFT_NONE;
     }
 
-    /* Get the count */
+    // Get the count
     switch (Name[5]) {
         case 'y':       Type |= SHIFT_COUNT_Y;  break;
         case '1':       Type |= SHIFT_COUNT_1;  break;
@@ -172,7 +172,7 @@ static unsigned GetShift (const char* Name)
         default:        return SHIFT_NONE;
     }
 
-    /* Make sure nothing follows */
+    // Make sure nothing follows
     if (Name[6] == '\0') {
         return Type;
     } else {
@@ -182,9 +182,9 @@ static unsigned GetShift (const char* Name)
 
 
 
-/*****************************************************************************/
-/*                              Optimize shifts                              */
-/*****************************************************************************/
+//***************************************************************************
+//                              Optimize shifts
+//***************************************************************************
 
 
 
@@ -202,7 +202,7 @@ unsigned OptShift1 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Walk over the entries */
+    // Walk over the entries
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
@@ -211,10 +211,10 @@ unsigned OptShift1 (CodeSeg* S)
         CodeEntry* X;
         CodeLabel* L;
 
-        /* Get next entry */
+        // Get next entry
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check for the sequence */
+        // Check for the sequence
         if (E->OPC == OP65_JSR                          &&
             (Shift = GetShift (E->Arg)) != SHIFT_NONE   &&
             SHIFT_DIR (Shift) == SHIFT_DIR_LEFT) {
@@ -239,25 +239,25 @@ unsigned OptShift1 (CodeSeg* S)
                     **      ror     a
                     */
 
-                    /* asl a */
+                    // asl a
                     X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, E->LI);
                     CS_InsertEntry (S, X, I+1);
                     L = CS_GenLabel (S, X);
 
-                    /* dey */
+                    // dey
                     X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, E->LI);
                     CS_InsertEntry (S, X, I+2);
 
-                    /* bpl L1 */
+                    // bpl L1
                     X = NewCodeEntry (OP65_BPL, AM65_BRA, L->Name, L, E->LI);
                     CS_InsertEntry (S, X, I+3);
 
-                    /* ror a */
+                    // ror a
                     X = NewCodeEntry (OP65_ROR, AM65_ACC, "a", 0, E->LI);
                     CS_InsertEntry (S, X, I+4);
 
                 } else {
-                    /* Insert shift insns */
+                    // Insert shift insns
                     while (Count--) {
                         X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, E->LI);
                         CS_InsertEntry (S, X, I+1);
@@ -268,40 +268,40 @@ unsigned OptShift1 (CodeSeg* S)
                        Count == 1                       &&
                        (N = CS_GetNextEntry (S, I)) != 0) {
 
-                /* asl a */
+                // asl a
                 X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, E->LI);
                 CS_InsertEntry (S, X, I+1);
 
-                /* bcc L1 */
+                // bcc L1
                 L = CS_GenLabel (S, N);
                 X = NewCodeEntry (OP65_BCC, AM65_BRA, L->Name, L, E->LI);
                 CS_InsertEntry (S, X, I+2);
 
-                /* inx */
+                // inx
                 X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, E->LI);
                 CS_InsertEntry (S, X, I+3);
 
             } else {
 
-                /* We won't handle this one */
+                // We won't handle this one
                 goto NextEntry;
 
             }
 
-            /* Delete the call to shlax */
+            // Delete the call to shlax
             CS_DelEntry (S, I);
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
         }
 
 NextEntry:
-        /* Next entry */
+        // Next entry
         ++I;
 
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }
 
@@ -330,17 +330,17 @@ unsigned OptShift2 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I = 0;
 
-    /* Walk over the entries */
+    // Walk over the entries
     while (I < CS_GetEntryCount (S)) {
         unsigned Shift;
         unsigned Count, Count2;
         unsigned K;
         CodeEntry* L[4];
 
-        /* Get next entry */
+        // Get next entry
         L[0] = CS_GetEntry (S, I);
 
-        /* Check for the sequence */
+        // Check for the sequence
         if ((L[0]->OPC == OP65_BPL  ||
              L[0]->OPC == OP65_BCC  ||
              L[0]->OPC == OP65_JPL  ||
@@ -358,7 +358,7 @@ unsigned OptShift2 (CodeSeg* S)
                 SHIFT_TYPE (Shift = GetShift (L[3]->Arg)) == SHIFT_TYPE_ASR     &&
                 (Count2 = SHIFT_COUNT (Shift)) > 0) {
 
-                /* Found a second jsr asraxN */
+                // Found a second jsr asraxN
                 Count += Count2;
                 K = 4;
             } else {
@@ -370,30 +370,30 @@ unsigned OptShift2 (CodeSeg* S)
                 CodeEntry* X;
                 unsigned J = I+K;
 
-                /* Generate the replacement sequence */
+                // Generate the replacement sequence
                 do {
-                    /* cmp #$80 */
+                    // cmp #$80
                     X = NewCodeEntry (OP65_CMP, AM65_IMM, "$80", 0, L[2]->LI);
                     CS_InsertEntry (S, X, J++);
 
-                    /* ror a */
+                    // ror a
                     X = NewCodeEntry (OP65_ROR, AM65_ACC, "a", 0, L[2]->LI);
                     CS_InsertEntry (S, X, J++);
                 } while (--Count);
 
-                /* Remove the bpl/dex/jsr */
+                // Remove the bpl/dex/jsr
                 CS_DelEntries (S, I, K);
 
-                /* Remember, we had changes */
+                // Remember, we had changes
                 ++Changes;
             }
         }
 
-        /* Next entry */
+        // Next entry
         ++I;
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }
 
@@ -420,7 +420,7 @@ unsigned OptShift3 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Walk over the entries */
+    // Walk over the entries
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
@@ -428,10 +428,10 @@ unsigned OptShift3 (CodeSeg* S)
         unsigned   Count;
         CodeEntry* L[3];
 
-        /* Get next entry */
+        // Get next entry
         L[0] = CS_GetEntry (S, I);
 
-        /* Check for the sequence */
+        // Check for the sequence
         if ((L[0]->OPC == OP65_BCC || L[0]->OPC == OP65_JCC)    &&
             L[0]->JumpTo != 0                                   &&
             L[0]->RI->In.RegX == 0                              &&
@@ -444,7 +444,7 @@ unsigned OptShift3 (CodeSeg* S)
             SHIFT_DIR (Shift) == SHIFT_DIR_RIGHT                &&
             (Count = SHIFT_COUNT (Shift)) > 0) {
 
-            /* Add the replacement insn instead */
+            // Add the replacement insn instead
             CodeEntry* X = NewCodeEntry (OP65_ROR, AM65_ACC, "a", 0, L[2]->LI);
             CS_InsertEntry (S, X, I+3);
             while (--Count) {
@@ -452,20 +452,20 @@ unsigned OptShift3 (CodeSeg* S)
                 CS_InsertEntry (S, X, I+4);
             }
 
-            /* Remove the bcc/inx/jsr */
+            // Remove the bcc/inx/jsr
             CS_DelEntries (S, I, 3);
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
 
         }
 
-        /* Next entry */
+        // Next entry
         ++I;
 
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }
 
@@ -479,17 +479,17 @@ unsigned OptShift4 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Walk over the entries */
+    // Walk over the entries
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
         unsigned Shift;
         unsigned Count;
 
-        /* Get next entry */
+        // Get next entry
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check for the sequence */
+        // Check for the sequence
         if (E->OPC == OP65_JSR                          &&
             (Shift = GetShift (E->Arg)) != SHIFT_NONE   &&
             SHIFT_DIR (Shift) == SHIFT_DIR_RIGHT        &&
@@ -497,14 +497,14 @@ unsigned OptShift4 (CodeSeg* S)
 
             CodeEntry* X;
 
-            /* Shift count may be in Y */
+            // Shift count may be in Y
             Count = SHIFT_COUNT (Shift);
             if (Count == SHIFT_COUNT_Y) {
 
                 CodeLabel* L;
 
                 if (S->CodeSizeFactor < 200) {
-                    /* Not acceptable */
+                    // Not acceptable
                     goto NextEntry;
                 }
 
@@ -521,25 +521,25 @@ unsigned OptShift4 (CodeSeg* S)
                 ** above transformation is safe.
                 */
 
-                /* lsr a */
+                // lsr a
                 X = NewCodeEntry (OP65_LSR, AM65_ACC, "a", 0, E->LI);
                 CS_InsertEntry (S, X, I+1);
                 L = CS_GenLabel (S, X);
 
-                /* dey */
+                // dey
                 X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, E->LI);
                 CS_InsertEntry (S, X, I+2);
 
-                /* bpl L1 */
+                // bpl L1
                 X = NewCodeEntry (OP65_BPL, AM65_BRA, L->Name, L, E->LI);
                 CS_InsertEntry (S, X, I+3);
 
-                /* rol a */
+                // rol a
                 X = NewCodeEntry (OP65_ROL, AM65_ACC, "a", 0, E->LI);
                 CS_InsertEntry (S, X, I+4);
 
             } else {
-                /* Insert shift insns */
+                // Insert shift insns
                 while (Count--) {
                     X = NewCodeEntry (OP65_LSR, AM65_ACC, "a", 0, E->LI);
                     CS_InsertEntry (S, X, I+1);
@@ -547,21 +547,21 @@ unsigned OptShift4 (CodeSeg* S)
 
             }
 
-            /* Delete the call to shrax */
+            // Delete the call to shrax
             CS_DelEntry (S, I);
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
 
         }
 
 NextEntry:
-        /* Next entry */
+        // Next entry
         ++I;
 
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }
 
@@ -590,17 +590,17 @@ unsigned OptShift5 (CodeSeg* S)
 {
     unsigned Changes = 0;
 
-    /* Walk over the entries */
+    // Walk over the entries
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
         unsigned ShiftType;
         CodeEntry* L[5];
 
-        /* Get next entry */
+        // Get next entry
         L[0] = CS_GetEntry (S, I);
 
-        /* Check for the sequence */
+        // Check for the sequence
         if (L[0]->OPC == OP65_LDA                               &&
             (L[0]->AM == AM65_ABS || L[0]->AM == AM65_ZP)       &&
             CS_GetEntries (S, L+1, I+1, 4)                      &&
@@ -618,7 +618,7 @@ unsigned OptShift5 (CodeSeg* S)
 
             CodeEntry* X;
 
-            /* Handle the four shift types differently */
+            // Handle the four shift types differently
             switch (ShiftType) {
 
                 case SHIFT_ASR_1:
@@ -657,7 +657,7 @@ unsigned OptShift5 (CodeSeg* S)
 
                 case SHIFT_LSL_1:
                 case SHIFT_ASL_1:
-                    /* These two are identical */
+                    // These two are identical
                     X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, L[2]->LI);
                     CS_InsertEntry (S, X, I+1);
                     X = NewCodeEntry (OP65_STA, L[3]->AM, L[3]->Arg, 0, L[3]->LI);
@@ -673,28 +673,28 @@ unsigned OptShift5 (CodeSeg* S)
 
             }
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
 
         }
 
-        /* Next entry */
+        // Next entry
         ++I;
 
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }
 
 
 
 unsigned OptShift6 (CodeSeg* S)
-/* Inline the shift subroutines. */
+// Inline the shift subroutines.
 {
     unsigned Changes = 0;
 
-    /* Walk over the entries */
+    // Walk over the entries
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
@@ -703,10 +703,10 @@ unsigned OptShift6 (CodeSeg* S)
         CodeEntry* X;
         unsigned   IP;
 
-        /* Get next entry */
+        // Get next entry
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check for a call to one of the shift routine */
+        // Check for a call to one of the shift routine
         if (E->OPC == OP65_JSR                          &&
             (Shift = GetShift (E->Arg)) != SHIFT_NONE   &&
             SHIFT_DIR (Shift) == SHIFT_DIR_LEFT         &&
@@ -729,45 +729,45 @@ unsigned OptShift6 (CodeSeg* S)
             if (Count > 1 || S->CodeSizeFactor > 200) {
                 unsigned Size = 4 + 3 * Count;
                 if ((Size * 100 / 3) > S->CodeSizeFactor) {
-                    /* Not acceptable */
+                    // Not acceptable
                     goto NextEntry;
                 }
             }
 
-            /* Inline the code. Insertion point is behind the subroutine call */
+            // Inline the code. Insertion point is behind the subroutine call
             IP = (I + 1);
 
-            /* stx tmp1 */
+            // stx tmp1
             X = NewCodeEntry (OP65_STX, AM65_ZP, "tmp1", 0, E->LI);
             CS_InsertEntry (S, X, IP++);
 
             while (Count--) {
-                /* asl a */
+                // asl a
                 X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, E->LI);
                 CS_InsertEntry (S, X, IP++);
 
-                /* rol tmp1 */
+                // rol tmp1
                 X = NewCodeEntry (OP65_ROL, AM65_ZP, "tmp1", 0, E->LI);
                 CS_InsertEntry (S, X, IP++);
             }
 
-            /* ldx tmp1 */
+            // ldx tmp1
             X = NewCodeEntry (OP65_LDX, AM65_ZP, "tmp1", 0, E->LI);
             CS_InsertEntry (S, X, IP++);
 
-            /* Remove the subroutine call */
+            // Remove the subroutine call
             CS_DelEntry (S, I);
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
         }
 
 NextEntry:
-        /* Next entry */
+        // Next entry
         ++I;
 
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }

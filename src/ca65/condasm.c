@@ -1,39 +1,39 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 condasm.c                                 */
-/*                                                                           */
-/*                   Conditional assembly support for ca65                   */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                 condasm.c
+//
+//                   Conditional assembly support for ca65
+//
+//
+//
+// (C) 2000-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
-/* ca65 */
+// ca65
 #include "error.h"
 #include "expr.h"
 #include "instr.h"
@@ -45,51 +45,51 @@
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* Maximum count of nested .ifs */
+// Maximum count of nested .ifs
 #define MAX_IFS         256
 
-/* Set of bitmapped flags for the if descriptor */
+// Set of bitmapped flags for the if descriptor
 enum {
-    ifNone      = 0x0000,               /* No flag */
-    ifCond      = 0x0001,               /* IF condition was true */
-    ifParentCond= 0x0002,               /* IF condition of parent */
-    ifElse      = 0x0004,               /* We had a .ELSE branch */
-    ifNeedTerm  = 0x0008,               /* Need .ENDIF termination */
+    ifNone      = 0x0000,               // No flag
+    ifCond      = 0x0001,               // IF condition was true
+    ifParentCond= 0x0002,               // IF condition of parent
+    ifElse      = 0x0004,               // We had a .ELSE branch
+    ifNeedTerm  = 0x0008,               // Need .ENDIF termination
 };
 
-/* The overall .IF condition */
+// The overall .IF condition
 int IfCond      = 1;
 
 
 
-/*****************************************************************************/
-/*                               struct IfDesc                               */
-/*****************************************************************************/
+//***************************************************************************
+//                               struct IfDesc
+//***************************************************************************
 
 
 
-/* One .IF descriptor */
+// One .IF descriptor
 typedef struct IfDesc IfDesc;
 struct IfDesc {
-    unsigned    Flags;          /* Bitmapped flags, see above */
-    Collection  LineInfos;      /* File position of the .IF */
-    const char* Name;           /* Name of the directive */
+    unsigned    Flags;          // Bitmapped flags, see above
+    Collection  LineInfos;      // File position of the .IF
+    const char* Name;           // Name of the directive
 };
 
-/* The .IF stack */
+// The .IF stack
 static IfDesc IfStack [MAX_IFS];
 static unsigned IfCount = 0;
 
 
 
 static IfDesc* GetCurrentIf (void)
-/* Return the current .IF descriptor */
+// Return the current .IF descriptor
 {
     if (IfCount == 0) {
         return 0;
@@ -101,7 +101,7 @@ static IfDesc* GetCurrentIf (void)
 
 
 static int GetOverallIfCond (void)
-/* Get the overall condition based on all conditions on the stack. */
+// Get the overall condition based on all conditions on the stack.
 {
     /* Since the last entry contains the overall condition of the parent, we
     ** must check it in combination of the current condition. If there is no
@@ -114,7 +114,7 @@ static int GetOverallIfCond (void)
 
 
 static void CalcOverallIfCond (void)
-/* Calculate the overall condition, based on all conditions on the stack. */
+// Calculate the overall condition, based on all conditions on the stack.
 {
     IfCond = GetOverallIfCond ();
 }
@@ -122,7 +122,7 @@ static void CalcOverallIfCond (void)
 
 
 static void SetIfCond (IfDesc* ID, int C)
-/* Set the .IF condition */
+// Set the .IF condition
 {
     if (C) {
         ID->Flags |= ifCond;
@@ -134,23 +134,23 @@ static void SetIfCond (IfDesc* ID, int C)
 
 
 static int ElseClause (IfDesc* ID, const char* Directive)
-/* Enter an .ELSE clause. Return true if this was ok, zero on errors. */
+// Enter an .ELSE clause. Return true if this was ok, zero on errors.
 {
-    /* Check if we have an open .IF - otherwise .ELSE is not allowed */
+    // Check if we have an open .IF - otherwise .ELSE is not allowed
     if (ID == 0) {
         Error ("Unexpected %s", Directive);
         return 0;
     }
 
-    /* Check for a duplicate else, then remember that we had one */
+    // Check for a duplicate else, then remember that we had one
     if (ID->Flags & ifElse) {
-        /* We already had a .ELSE ! */
+        // We already had a .ELSE !
         Error ("Duplicate .ELSE");
         return 0;
     }
     ID->Flags |= ifElse;
 
-    /* Condition is inverted now */
+    // Condition is inverted now
     ID->Flags ^= ifCond;
     return 1;
 }
@@ -158,39 +158,39 @@ static int ElseClause (IfDesc* ID, const char* Directive)
 
 
 static IfDesc* AllocIf (const char* Directive, int NeedTerm)
-/* Alloc a new element from the .IF stack */
+// Alloc a new element from the .IF stack
 {
     IfDesc* ID;
 
-    /* Check for stack overflow */
+    // Check for stack overflow
     if (IfCount >= MAX_IFS) {
         Fatal ("Too many nested .IFs");
     }
 
-    /* Get the next element */
+    // Get the next element
     ID = &IfStack[IfCount];
 
-    /* Initialize elements */
+    // Initialize elements
     ID->Flags = NeedTerm? ifNeedTerm : ifNone;
     if (GetOverallIfCond ()) {
-        /* The parents .IF condition is true */
+        // The parents .IF condition is true
         ID->Flags |= ifParentCond;
     }
     ID->LineInfos = EmptyCollection;
     GetFullLineInfo (&ID->LineInfos);
     ID->Name = Directive;
 
-    /* One more slot allocated */
+    // One more slot allocated
     ++IfCount;
 
-    /* Return the result */
+    // Return the result
     return ID;
 }
 
 
 
 static void FreeIf (void)
-/* Free all .IF descriptors until we reach one with the NeedTerm bit set */
+// Free all .IF descriptors until we reach one with the NeedTerm bit set
 {
     int Done;
     do {
@@ -209,14 +209,14 @@ static void FreeIf (void)
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 void DoConditionals (void)
-/* Catch all for conditional directives */
+// Catch all for conditional directives
 {
     IfDesc* D;
 
@@ -227,35 +227,35 @@ void DoConditionals (void)
             case TOK_ELSE:
                 D = GetCurrentIf ();
 
-                /* Allow an .ELSE */
+                // Allow an .ELSE
                 if (ElseClause (D, ".ELSE")) {
-                    /* Remember the data for the .ELSE */
+                    // Remember the data for the .ELSE
                     if (D) {
                         ReleaseFullLineInfo (&D->LineInfos);
                         GetFullLineInfo (&D->LineInfos);
                         D->Name = ".ELSE";
                     }
 
-                    /* Calculate the new overall condition */
+                    // Calculate the new overall condition
                     CalcOverallIfCond ();
 
-                    /* Skip .ELSE */
+                    // Skip .ELSE
                     NextTok ();
                     ExpectSep ();
                 } else {
-                    /* Problem with .ELSE, ignore remainder of line */
+                    // Problem with .ELSE, ignore remainder of line
                     SkipUntilSep ();
                 }
                 break;
 
             case TOK_ELSEIF:
                 D = GetCurrentIf ();
-                /* Handle as if there was an .ELSE first */
+                // Handle as if there was an .ELSE first
                 if (ElseClause (D, ".ELSEIF")) {
-                    /* Calculate the new overall if condition */
+                    // Calculate the new overall if condition
                     CalcOverallIfCond ();
 
-                    /* Allocate and prepare a new descriptor */
+                    // Allocate and prepare a new descriptor
                     D = AllocIf (".ELSEIF", 0);
                     NextTok ();
 
@@ -268,16 +268,16 @@ void DoConditionals (void)
                         ExpectSep ();
                     }
 
-                    /* Get the new overall condition */
+                    // Get the new overall condition
                     CalcOverallIfCond ();
                 } else {
-                    /* Problem with .ELSEIF, ignore remainder of line */
+                    // Problem with .ELSEIF, ignore remainder of line
                     SkipUntilSep ();
                 }
                 break;
 
             case TOK_ENDIF:
-                /* We're done with this .IF.. - remove the descriptor(s) */
+                // We're done with this .IF.. - remove the descriptor(s)
                 FreeIf ();
 
                 /* Be sure not to read the next token until the .IF stack
@@ -286,7 +286,7 @@ void DoConditionals (void)
                 NextTok ();
                 ExpectSep ();
 
-                /* Get the new overall condition */
+                // Get the new overall condition
                 CalcOverallIfCond ();
                 break;
 
@@ -526,7 +526,7 @@ void DoConditionals (void)
                 break;
 
             default:
-                /* Skip tokens */
+                // Skip tokens
                 NextTok ();
 
         }
@@ -591,29 +591,29 @@ void CheckOpenIfs (void)
         */
         IfDesc* D = GetCurrentIf ();
         if (D == 0) {
-            /* There are no open .IFs */
+            // There are no open .IFs
             break;
         }
 
         LI = CollConstAt (&D->LineInfos, 0);
         if (GetSourcePos (LI)->Name != CurTok.Pos.Name) {
-            /* The .if is from another file, bail out */
+            // The .if is from another file, bail out
             break;
         }
 
-        /* Start of .if is in the file we're about to leave */
+        // Start of .if is in the file we're about to leave
         LIError (&D->LineInfos, "Conditional assembly branch was never closed");
         FreeIf ();
     }
 
-    /* Calculate the new overall .IF condition */
+    // Calculate the new overall .IF condition
     CalcOverallIfCond ();
 }
 
 
 
 unsigned GetIfStack (void)
-/* Get the current .IF stack pointer */
+// Get the current .IF stack pointer
 {
     return IfCount;
 }
@@ -621,12 +621,12 @@ unsigned GetIfStack (void)
 
 
 void CleanupIfStack (unsigned SP)
-/* Cleanup the .IF stack, remove anything above the given stack pointer */
+// Cleanup the .IF stack, remove anything above the given stack pointer
 {
     while (IfCount > SP) {
         FreeIf ();
     }
 
-    /* Calculate the new overall .IF condition */
+    // Calculate the new overall .IF condition
     CalcOverallIfCond ();
 }

@@ -1,43 +1,43 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                fileinfo.c                                 */
-/*                                                                           */
-/*                        Source file info structure                         */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                fileinfo.c
+//
+//                        Source file info structure
+//
+//
+//
+// (C) 2001-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
-/* common */
+// common
 #include "coll.h"
 #include "xmalloc.h"
 
-/* ld65 */
+// ld65
 #include "fileio.h"
 #include "fileinfo.h"
 #include "objdata.h"
@@ -45,20 +45,20 @@
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* A list of all file infos without duplicates */
+// A list of all file infos without duplicates
 static Collection FileInfos = STATIC_COLLECTION_INITIALIZER;
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
@@ -69,19 +69,19 @@ static int FindFileInfo (unsigned Name, unsigned* Index)
 ** Index contains the insert position for FileName.
 */
 {
-    /* Do a binary search */
+    // Do a binary search
     int Lo = 0;
     int Hi = (int) CollCount (&FileInfos) - 1;
     int Found = 0;
     while (Lo <= Hi) {
 
-        /* Mid of range */
+        // Mid of range
         int Cur = (Lo + Hi) / 2;
 
-        /* Get item */
+        // Get item
         FileInfo* CurItem = CollAt (&FileInfos, Cur);
 
-        /* Found? */
+        // Found?
         if (CurItem->Name < Name) {
             Lo = Cur + 1;
         } else {
@@ -95,7 +95,7 @@ static int FindFileInfo (unsigned Name, unsigned* Index)
         }
     }
 
-    /* Pass back the index. This is also the insert position */
+    // Pass back the index. This is also the insert position
     *Index = Lo;
     return Found;
 }
@@ -103,47 +103,47 @@ static int FindFileInfo (unsigned Name, unsigned* Index)
 
 
 static FileInfo* NewFileInfo (unsigned Name, unsigned long MTime, unsigned long Size)
-/* Allocate and initialize a new FileInfo struct and return it */
+// Allocate and initialize a new FileInfo struct and return it
 {
-    /* Allocate memory */
+    // Allocate memory
     FileInfo* FI = xmalloc (sizeof (FileInfo));
 
-    /* Initialize stuff */
+    // Initialize stuff
     FI->Id      = ~0U;
     FI->Name    = Name;
     FI->MTime   = MTime;
     FI->Size    = Size;
     FI->Modules = EmptyCollection;
 
-    /* Return the new struct */
+    // Return the new struct
     return FI;
 }
 
 
 
 static void FreeFileInfo (FileInfo* FI)
-/* Free a file info structure */
+// Free a file info structure
 {
-    /* Free the collection */
+    // Free the collection
     DoneCollection (&FI->Modules);
 
-    /* Free memory for the structure */
+    // Free memory for the structure
     xfree (FI);
 }
 
 
 
 FileInfo* ReadFileInfo (FILE* F, ObjData* O)
-/* Read a file info from a file and return it */
+// Read a file info from a file and return it
 {
     FileInfo* FI;
 
-    /* Read the fields from the file */
+    // Read the fields from the file
     unsigned      Name  = MakeGlobalStringId (O, ReadVar (F));
     unsigned long MTime = Read32 (F);
     unsigned long Size  = ReadVar (F);
 
-    /* Search for the first entry with this name */
+    // Search for the first entry with this name
     unsigned Index;
     if (FindFileInfo (Name, &Index)) {
 
@@ -155,31 +155,31 @@ FileInfo* ReadFileInfo (FILE* F, ObjData* O)
         FI = CollAt (&FileInfos, Index);
         while (1) {
 
-            /* Check size and modification time stamp */
+            // Check size and modification time stamp
             if (FI->Size == Size && FI->MTime == MTime) {
-                /* Remember that the modules uses this file info, then return it */
+                // Remember that the modules uses this file info, then return it
                 CollAppend (&FI->Modules, O);
                 return FI;
             }
 
-            /* Check the next one */
+            // Check the next one
             if (++Index >= CollCount (&FileInfos)) {
-                /* Nothing left */
+                // Nothing left
                 break;
             }
             FI = CollAt (&FileInfos, Index);
 
-            /* Done if the name differs */
+            // Done if the name differs
             if (FI->Name != Name) {
                 break;
             }
         }
     }
 
-    /* Not found. Allocate a new FileInfo structure */
+    // Not found. Allocate a new FileInfo structure
     FI = NewFileInfo (Name, MTime, Size);
 
-    /* Remember that this module uses the file info */
+    // Remember that this module uses the file info
     CollAppend (&FI->Modules, O);
 
     /* Insert the file info in our global list. Index points to the insert
@@ -187,14 +187,14 @@ FileInfo* ReadFileInfo (FILE* F, ObjData* O)
     */
     CollInsert (&FileInfos, FI, Index);
 
-    /* Return the new struct */
+    // Return the new struct
     return FI;
 }
 
 
 
 unsigned FileInfoCount (void)
-/* Return the total number of file infos */
+// Return the total number of file infos
 {
     return CollCount (&FileInfos);
 }
@@ -202,17 +202,17 @@ unsigned FileInfoCount (void)
 
 
 void AssignFileInfoIds (void)
-/* Remove unused file infos and assign the ids to the remaining ones */
+// Remove unused file infos and assign the ids to the remaining ones
 {
     unsigned I, J;
 
-    /* Print all file infos */
+    // Print all file infos
     for (I = 0, J = 0; I < CollCount (&FileInfos); ++I) {
 
-        /* Get the next file info */
+        // Get the next file info
         FileInfo* FI = CollAtUnchecked (&FileInfos, I);
 
-        /* If it's unused, free it, otherwise assign the id and keep it */
+        // If it's unused, free it, otherwise assign the id and keep it
         if (CollCount (&FI->Modules) == 0) {
             FreeFileInfo (FI);
         } else {
@@ -221,35 +221,35 @@ void AssignFileInfoIds (void)
         }
     }
 
-    /* The new count is now in J */
+    // The new count is now in J
     FileInfos.Count = J;
 }
 
 
 
 void PrintDbgFileInfo (FILE* F)
-/* Output the file info to a debug info file */
+// Output the file info to a debug info file
 {
     unsigned I, J;
 
-    /* Print all file infos */
+    // Print all file infos
     for (I = 0; I < CollCount (&FileInfos); ++I) {
 
-        /* Get the file info */
+        // Get the file info
         const FileInfo* FI = CollAtUnchecked (&FileInfos, I);
 
-        /* Base info */
+        // Base info
         fprintf (F,
                  "file\tid=%u,name=\"%s\",size=%lu,mtime=0x%08lX,mod=",
                  FI->Id, GetString (FI->Name), FI->Size, FI->MTime);
 
-        /* Modules that use the file */
+        // Modules that use the file
         for (J = 0; J < CollCount (&FI->Modules); ++J) {
 
-            /* Get the module */
+            // Get the module
             const ObjData* O = CollConstAt (&FI->Modules, J);
 
-            /* Output its id */
+            // Output its id
             if (J > 0) {
                 fprintf (F, "+%u", O->Id);
             } else {
@@ -257,7 +257,7 @@ void PrintDbgFileInfo (FILE* F)
             }
         }
 
-        /* Terminate the output line */
+        // Terminate the output line
         fputc ('\n', F);
     }
 }

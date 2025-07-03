@@ -1,54 +1,54 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 reginfo.c                                 */
-/*                                                                           */
-/*                        6502 register tracking info                        */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2003 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                 reginfo.c
+//
+//                        6502 register tracking info
+//
+//
+//
+// (C) 2001-2003 Ullrich von Bassewitz
+//               Roemerstrasse 52
+//               D-70794 Filderstadt
+// EMail:        uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
-/* common */
+// common
 #include "xmalloc.h"
 
-/* cc65 */
+// cc65
 #include "reginfo.h"
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 void RC_Invalidate (RegContents* C)
-/* Invalidate all registers */
+// Invalidate all registers
 {
     C->RegA   = UNKNOWN_REGVAL;
     C->RegX   = UNKNOWN_REGVAL;
@@ -63,7 +63,7 @@ void RC_Invalidate (RegContents* C)
 
 
 void RC_InvalidateZP (RegContents* C)
-/* Invalidate all ZP registers */
+// Invalidate all ZP registers
 {
     C->SRegLo = UNKNOWN_REGVAL;
     C->SRegHi = UNKNOWN_REGVAL;
@@ -75,7 +75,7 @@ void RC_InvalidateZP (RegContents* C)
 
 
 void RC_InvalidatePS (RegContents* C)
-/* Invalidate processor status */
+// Invalidate processor status
 {
     C->PFlags = UNKNOWN_PFVAL_ALL;
     C->ZNRegs = ZNREG_NONE;
@@ -84,7 +84,7 @@ void RC_InvalidatePS (RegContents* C)
 
 
 static void RC_Dump1 (FILE* F, const char* Desc, short Val)
-/* Dump one register value */
+// Dump one register value
 {
     if (RegValIsKnown (Val)) {
         fprintf (F, "%s=$%02X ", Desc, Val);
@@ -96,7 +96,7 @@ static void RC_Dump1 (FILE* F, const char* Desc, short Val)
 
 
 void RC_Dump (FILE* F, const RegContents* RC)
-/* Dump the contents of the given RegContents struct */
+// Dump the contents of the given RegContents struct
 {
     RC_Dump1 (F, "A", RC->RegA);
     RC_Dump1 (F, "X", RC->RegX);
@@ -155,10 +155,10 @@ RegInfo* NewRegInfo (const RegContents* RC)
 ** registers. If the pointer is NULL, all registers are set to unknown.
 */
 {
-    /* Allocate memory */
+    // Allocate memory
     RegInfo* RI = xmalloc (sizeof (RegInfo));
 
-    /* Initialize the registers */
+    // Initialize the registers
     if (RC) {
         RI->In   = *RC;
         RI->Out  = *RC;
@@ -172,14 +172,14 @@ RegInfo* NewRegInfo (const RegContents* RC)
         RC_InvalidatePS (&RI->Out2);
     }
 
-    /* Return the new struct */
+    // Return the new struct
     return RI;
 }
 
 
 
 void FreeRegInfo (RegInfo* RI)
-/* Free a RegInfo struct */
+// Free a RegInfo struct
 {
     xfree (RI);
 }
@@ -187,7 +187,7 @@ void FreeRegInfo (RegInfo* RI)
 
 
 void DumpRegInfo (const char* Desc, const RegInfo* RI)
-/* Dump the register info for debugging */
+// Dump the register info for debugging
 {
     fprintf (stdout, "%s:\n", Desc);
     fprintf (stdout, "In:  ");

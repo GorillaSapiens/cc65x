@@ -1,32 +1,32 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 trace.c                                   */
-/*                                                                           */
-/*             Instruction tracing functionality sim65 6502 simulator        */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2025, Sidney Cadot                                                    */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                 trace.c
+//
+//             Instruction tracing functionality sim65 6502 simulator
+//
+//
+//
+// (C) 2025, Sidney Cadot
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,13 +38,13 @@
 #include "trace.h"
 #include "peripherals.h"
 
-/* Current Trace Mode. Tracing is off by default, and needs to be explicitly enabled. */
+// Current Trace Mode. Tracing is off by default, and needs to be explicitly enabled.
 uint8_t TraceMode = TRACE_DISABLED;
 
-/* CC65 stack pointer */
+// CC65 stack pointer
 uint8_t StackPointerZPageAddress;
 
-/* 6502, 65C02 addressing modes. */
+// 6502, 65C02 addressing modes.
 typedef enum {
     ILLEGAL,
     IMPLIED,
@@ -65,15 +65,15 @@ typedef enum {
     ABS_X_IND
 } AddressingMode;
 
-/* Info for a specific opcode and addressing mode, for a specific CPU type. */
+// Info for a specific opcode and addressing mode, for a specific CPU type.
 typedef struct {
     const char * mnemonic;
     AddressingMode adrmode;
 } InstructionInfo;
 
-/* Information for standard 6502 opcodes. */
+// Information for standard 6502 opcodes.
 static InstructionInfo II_6502[256] = {
-    { "brk"  , IMPLIED     }, /* 0x00 to 0x0f */
+    { "brk"  , IMPLIED     }, // 0x00 to 0x0f
     { "ora"  , ZP_X_IND    },
     { "???"  , ILLEGAL     },
     { "???"  , ILLEGAL     },
@@ -90,7 +90,7 @@ static InstructionInfo II_6502[256] = {
     { "asl"  , ABS         },
     { "???"  , ILLEGAL     },
 
-    { "bpl"  , REL         }, /* 0x10 to 0x1f */
+    { "bpl"  , REL         }, // 0x10 to 0x1f
     { "ora"  , ZP_IND_Y    },
     { "???"  , ILLEGAL     },
     { "???"  , ILLEGAL     },
@@ -107,7 +107,7 @@ static InstructionInfo II_6502[256] = {
     { "asl"  , ABS_X       },
     { "???"  , ILLEGAL     },
 
-    { "jsr"  , ABS         }, /* 0x20 to 0x2f */
+    { "jsr"  , ABS         }, // 0x20 to 0x2f
     { "and"  , ZP_X_IND    },
     { "???"  , ILLEGAL     },
     { "???"  , ILLEGAL     },
@@ -124,7 +124,7 @@ static InstructionInfo II_6502[256] = {
     { "rol"  , ABS         },
     { "???"  , ILLEGAL     },
 
-    { "bmi"  , REL         }, /* 0x30 to 0x3f */
+    { "bmi"  , REL         }, // 0x30 to 0x3f
     { "and"  , ZP_IND_Y    },
     { "???"  , ILLEGAL     },
     { "???"  , ILLEGAL     },
@@ -141,7 +141,7 @@ static InstructionInfo II_6502[256] = {
     { "rol"  , ABS_X       },
     { "???"  , ILLEGAL     },
 
-    { "rti"  , IMPLIED     }, /* 0x40 to 0x4f */
+    { "rti"  , IMPLIED     }, // 0x40 to 0x4f
     { "eor"  , ZP_X_IND    },
     { "???"  , ILLEGAL     },
     { "???"  , ILLEGAL     },
@@ -158,7 +158,7 @@ static InstructionInfo II_6502[256] = {
     { "lsr"  , ABS         },
     { "???"  , ILLEGAL     },
 
-    { "bvc"  , REL         }, /* 0x50 to 0x5f */
+    { "bvc"  , REL         }, // 0x50 to 0x5f
     { "eor"  , ZP_IND_Y    },
     { "???"  , ILLEGAL     },
     { "???"  , ILLEGAL     },
@@ -175,7 +175,7 @@ static InstructionInfo II_6502[256] = {
     { "lsr"  , ABS_X       },
     { "???"  , ILLEGAL     },
 
-    { "rts"  , IMPLIED     }, /* 0x60 to 0x6f */
+    { "rts"  , IMPLIED     }, // 0x60 to 0x6f
     { "adc"  , ZP_X_IND    },
     { "???"  , ILLEGAL     },
     { "???"  , ILLEGAL     },
@@ -192,7 +192,7 @@ static InstructionInfo II_6502[256] = {
     { "ror"  , ABS         },
     { "???"  , ILLEGAL     },
 
-    { "bvs"  , REL         }, /* 0x70 to 0x7f */
+    { "bvs"  , REL         }, // 0x70 to 0x7f
     { "adc"  , ZP_IND_Y    },
     { "???"  , ILLEGAL     },
     { "???"  , ILLEGAL     },
@@ -209,7 +209,7 @@ static InstructionInfo II_6502[256] = {
     { "ror"  , ABS_X       },
     { "???"  , ILLEGAL     },
 
-    { "???"  , ILLEGAL     }, /* 0x80 to 0x8f */
+    { "???"  , ILLEGAL     }, // 0x80 to 0x8f
     { "sta"  , ZP_X_IND    },
     { "???"  , ILLEGAL     },
     { "???"  , ILLEGAL     },
@@ -226,7 +226,7 @@ static InstructionInfo II_6502[256] = {
     { "stx"  , ABS         },
     { "???"  , ILLEGAL     },
 
-    { "bcc"  , REL         }, /* 0x90 to 0x9f */
+    { "bcc"  , REL         }, // 0x90 to 0x9f
     { "sta"  , ZP_IND_Y    },
     { "???"  , ILLEGAL     },
     { "???"  , ILLEGAL     },
@@ -243,7 +243,7 @@ static InstructionInfo II_6502[256] = {
     { "???"  , ILLEGAL     },
     { "???"  , ILLEGAL     },
 
-    { "ldy"  , IMMEDIATE   }, /* 0xa0 to 0xaf */
+    { "ldy"  , IMMEDIATE   }, // 0xa0 to 0xaf
     { "lda"  , ZP_X_IND    },
     { "ldx"  , IMMEDIATE   },
     { "???"  , ILLEGAL     },
@@ -260,7 +260,7 @@ static InstructionInfo II_6502[256] = {
     { "ldx"  , ABS         },
     { "???"  , ILLEGAL     },
 
-    { "bcs"  , REL         }, /* 0xb0 to 0xbf */
+    { "bcs"  , REL         }, // 0xb0 to 0xbf
     { "lda"  , ZP_IND_Y    },
     { "???"  , ILLEGAL     },
     { "???"  , ILLEGAL     },
@@ -277,7 +277,7 @@ static InstructionInfo II_6502[256] = {
     { "ldx"  , ABS_Y       },
     { "???"  , ILLEGAL     },
 
-    { "cpy"  , IMMEDIATE   }, /* 0xc0 to 0xcf */
+    { "cpy"  , IMMEDIATE   }, // 0xc0 to 0xcf
     { "cmp"  , ZP_X_IND    },
     { "???"  , ILLEGAL     },
     { "???"  , ILLEGAL     },
@@ -294,7 +294,7 @@ static InstructionInfo II_6502[256] = {
     { "dec"  , ABS         },
     { "???"  , ILLEGAL     },
 
-    { "bne"  , REL         }, /* 0xd0 to 0xdf */
+    { "bne"  , REL         }, // 0xd0 to 0xdf
     { "cmp"  , ZP_IND_Y    },
     { "???"  , ILLEGAL     },
     { "???"  , ILLEGAL     },
@@ -311,7 +311,7 @@ static InstructionInfo II_6502[256] = {
     { "dec"  , ABS_X       },
     { "???"  , ILLEGAL     },
 
-    { "cpx"  , IMMEDIATE   }, /* 0xe0 to 0xef */
+    { "cpx"  , IMMEDIATE   }, // 0xe0 to 0xef
     { "sbc"  , ZP_X_IND    },
     { "???"  , ILLEGAL     },
     { "???"  , ILLEGAL     },
@@ -328,7 +328,7 @@ static InstructionInfo II_6502[256] = {
     { "inc"  , ABS         },
     { "???"  , ILLEGAL     },
 
-    { "beq"  , REL         }, /* 0xf0 to 0xff */
+    { "beq"  , REL         }, // 0xf0 to 0xff
     { "sbc"  , ZP_IND_Y    },
     { "???"  , ILLEGAL     },
     { "???"  , ILLEGAL     },
@@ -346,9 +346,9 @@ static InstructionInfo II_6502[256] = {
     { "???"  , ILLEGAL     }
 };
 
-/* Information for 65C02 opcodes. */
+// Information for 65C02 opcodes.
 static InstructionInfo II_65C02[256] = {
-    { "brk"  , IMPLIED     }, /* 0x00 to 0x0f */
+    { "brk"  , IMPLIED     }, // 0x00 to 0x0f
     { "ora"  , ZP_X_IND    },
     { "nop"  , IMMEDIATE   },
     { "nop"  , IMPLIED     },
@@ -365,7 +365,7 @@ static InstructionInfo II_65C02[256] = {
     { "asl"  , ABS         },
     { "bbr0" , ZP_REL      },
 
-    { "bpl"  , REL         }, /* 0x10 to 0x1f */
+    { "bpl"  , REL         }, // 0x10 to 0x1f
     { "ora"  , ZP_IND_Y    },
     { "ora"  , ZP_IND      },
     { "nop"  , IMPLIED     },
@@ -382,7 +382,7 @@ static InstructionInfo II_65C02[256] = {
     { "asl"  , ABS_X       },
     { "bbr1" , ZP_REL      },
 
-    { "jsr"  , ABS         }, /* 0x20 to 0x2f */
+    { "jsr"  , ABS         }, // 0x20 to 0x2f
     { "and"  , ZP_X_IND    },
     { "nop"  , IMMEDIATE   },
     { "nop"  , IMPLIED     },
@@ -399,7 +399,7 @@ static InstructionInfo II_65C02[256] = {
     { "rol"  , ABS         },
     { "bbr2" , ZP_REL      },
 
-    { "bmi"  , REL         }, /* 0x30 to 0x3f */
+    { "bmi"  , REL         }, // 0x30 to 0x3f
     { "and"  , ZP_IND_Y    },
     { "and"  , ZP_IND      },
     { "nop"  , IMPLIED     },
@@ -416,7 +416,7 @@ static InstructionInfo II_65C02[256] = {
     { "rol"  , ABS_X       },
     { "bbr3" , ZP_REL      },
 
-    { "rti"  , IMPLIED     }, /* 0x40 to 0x4f */
+    { "rti"  , IMPLIED     }, // 0x40 to 0x4f
     { "eor"  , ZP_X_IND    },
     { "nop"  , IMMEDIATE   },
     { "nop"  , ILLEGAL     },
@@ -433,7 +433,7 @@ static InstructionInfo II_65C02[256] = {
     { "lsr"  , ABS         },
     { "bbr4" , ZP_REL      },
 
-    { "bvc"  , REL         }, /* 0x50 to 0x5f */
+    { "bvc"  , REL         }, // 0x50 to 0x5f
     { "eor"  , ZP_IND_Y    },
     { "eor"  , ZP_IND      },
     { "nop"  , IMPLIED     },
@@ -450,7 +450,7 @@ static InstructionInfo II_65C02[256] = {
     { "lsr"  , ABS_X       },
     { "bbr5" , ZP_REL      },
 
-    { "rts"  , IMPLIED     }, /* 0x60 to 0x6f */
+    { "rts"  , IMPLIED     }, // 0x60 to 0x6f
     { "adc"  , ZP_X_IND    },
     { "nop"  , IMMEDIATE   },
     { "nop"  , IMPLIED     },
@@ -467,7 +467,7 @@ static InstructionInfo II_65C02[256] = {
     { "ror"  , ABS         },
     { "bbr6" , ZP_REL      },
 
-    { "bvs"  , REL         }, /* 0x70 to 0x7f */
+    { "bvs"  , REL         }, // 0x70 to 0x7f
     { "adc"  , ZP_IND_Y    },
     { "adc"  , ZP_IND      },
     { "nop"  , IMPLIED     },
@@ -484,7 +484,7 @@ static InstructionInfo II_65C02[256] = {
     { "ror"  , ABS_X       },
     { "bbr7" , ZP_REL      },
 
-    { "bra"  , REL         }, /* 0x80 to 0x8f */
+    { "bra"  , REL         }, // 0x80 to 0x8f
     { "sta"  , ZP_X_IND    },
     { "nop"  , IMMEDIATE   },
     { "nop"  , IMPLIED     },
@@ -501,7 +501,7 @@ static InstructionInfo II_65C02[256] = {
     { "stx"  , ABS         },
     { "bbs0" , ZP_REL      },
 
-    { "bcc"  , REL         }, /* 0x90 to 0x9f */
+    { "bcc"  , REL         }, // 0x90 to 0x9f
     { "sta"  , ZP_IND_Y    },
     { "sta"  , ZP_IND      },
     { "nop"  , IMPLIED     },
@@ -518,7 +518,7 @@ static InstructionInfo II_65C02[256] = {
     { "stz"  , ABS_X       },
     { "bbs1" , ZP_REL      },
 
-    { "ldy"  , IMMEDIATE   }, /* 0xa0 to 0xaf */
+    { "ldy"  , IMMEDIATE   }, // 0xa0 to 0xaf
     { "lda"  , ZP_X_IND    },
     { "ldx"  , IMMEDIATE   },
     { "nop"  , IMPLIED     },
@@ -535,7 +535,7 @@ static InstructionInfo II_65C02[256] = {
     { "ldx"  , ABS         },
     { "bbs2" , ZP_REL      },
 
-    { "bcs"  , REL         }, /* 0xb0 to 0xbf */
+    { "bcs"  , REL         }, // 0xb0 to 0xbf
     { "lda"  , ZP_IND_Y    },
     { "lda"  , ZP_IND      },
     { "nop"  , IMPLIED     },
@@ -552,7 +552,7 @@ static InstructionInfo II_65C02[256] = {
     { "ldx"  , ABS_Y       },
     { "bbs3" , ZP_REL      },
 
-    { "cpy"  , IMMEDIATE   }, /* 0xc0 to 0xcf */
+    { "cpy"  , IMMEDIATE   }, // 0xc0 to 0xcf
     { "cmp"  , ZP_X_IND    },
     { "nop"  , IMMEDIATE   },
     { "nop"  , IMPLIED     },
@@ -569,7 +569,7 @@ static InstructionInfo II_65C02[256] = {
     { "dec"  , ABS         },
     { "bbs4" , ZP_REL      },
 
-    { "bne"  , REL         }, /* 0xd0 to 0xdf */
+    { "bne"  , REL         }, // 0xd0 to 0xdf
     { "cmp"  , ZP_IND_Y    },
     { "cmp"  , ZP_IND      },
     { "nop"  , IMPLIED     },
@@ -586,7 +586,7 @@ static InstructionInfo II_65C02[256] = {
     { "dec"  , ABS_X       },
     { "bbs5" , ZP_REL      },
 
-    { "cpx"  , IMMEDIATE   }, /* 0xe0 to 0xef */
+    { "cpx"  , IMMEDIATE   }, // 0xe0 to 0xef
     { "sbc"  , ZP_X_IND    },
     { "nop"  , IMMEDIATE   },
     { "nop"  , IMPLIED     },
@@ -603,7 +603,7 @@ static InstructionInfo II_65C02[256] = {
     { "inc"  , ABS         },
     { "bbs6" , ZP_REL      },
 
-    { "beq"  , REL         }, /* 0xf0 to 0xff */
+    { "beq"  , REL         }, // 0xf0 to 0xff
     { "sbc"  , ZP_IND_Y    },
     { "sbc"  , ZP_IND      },
     { "nop"  , IMPLIED     },
@@ -621,9 +621,9 @@ static InstructionInfo II_65C02[256] = {
     { "bbs7" , ZP_REL      }
 };
 
-/* Information for 6502X (6502 with undocumented instructions) opcodes. */
+// Information for 6502X (6502 with undocumented instructions) opcodes.
 static InstructionInfo II_6502X[256] = {
-    { "brk"  , IMPLIED     }, /* 0x00 to 0x0f */
+    { "brk"  , IMPLIED     }, // 0x00 to 0x0f
     { "ora"  , ZP_X_IND    },
     { "jam"  , IMPLIED     },
     { "slo"  , ZP_X_IND    },
@@ -640,7 +640,7 @@ static InstructionInfo II_6502X[256] = {
     { "asl"  , ABS         },
     { "slo"  , ABS         },
 
-    { "bpl"  , REL         }, /* 0x10 to 0x1f */
+    { "bpl"  , REL         }, // 0x10 to 0x1f
     { "ora"  , ZP_IND_Y    },
     { "jam"  , IMPLIED     },
     { "slo"  , ZP_IND_Y    },
@@ -657,7 +657,7 @@ static InstructionInfo II_6502X[256] = {
     { "asl"  , ABS_X       },
     { "slo"  , ABS_X       },
 
-    { "jsr"  , ABS         }, /* 0x20 to 0x2f */
+    { "jsr"  , ABS         }, // 0x20 to 0x2f
     { "and"  , ZP_X_IND    },
     { "jam"  , IMPLIED     },
     { "rla"  , ZP_X_IND    },
@@ -674,7 +674,7 @@ static InstructionInfo II_6502X[256] = {
     { "rol"  , ABS         },
     { "rla"  , ABS         },
 
-    { "bmi"  , REL         }, /* 0x30 to 0x3f */
+    { "bmi"  , REL         }, // 0x30 to 0x3f
     { "and"  , ZP_IND_Y    },
     { "jam"  , IMPLIED     },
     { "rla"  , ZP_IND_Y    },
@@ -691,7 +691,7 @@ static InstructionInfo II_6502X[256] = {
     { "rol"  , ABS_X       },
     { "rla"  , ABS_X       },
 
-    { "rti"  , IMPLIED     }, /* 0x40 to 0x4f */
+    { "rti"  , IMPLIED     }, // 0x40 to 0x4f
     { "eor"  , ZP_X_IND    },
     { "jam"  , IMPLIED     },
     { "sre"  , ZP_X_IND    },
@@ -708,7 +708,7 @@ static InstructionInfo II_6502X[256] = {
     { "lsr"  , ABS         },
     { "sre"  , ABS         },
 
-    { "bvc"  , REL         }, /* 0x50 to 0x5f */
+    { "bvc"  , REL         }, // 0x50 to 0x5f
     { "eor"  , ZP_IND_Y    },
     { "jam"  , IMPLIED     },
     { "sre"  , ZP_IND_Y    },
@@ -725,7 +725,7 @@ static InstructionInfo II_6502X[256] = {
     { "lsr"  , ABS_X       },
     { "sre"  , ABS_X       },
 
-    { "rts"  , IMPLIED     }, /* 0x60 to 0x6f */
+    { "rts"  , IMPLIED     }, // 0x60 to 0x6f
     { "adc"  , ZP_X_IND    },
     { "jam"  , IMPLIED     },
     { "rra"  , ZP_X_IND    },
@@ -742,7 +742,7 @@ static InstructionInfo II_6502X[256] = {
     { "ror"  , ABS         },
     { "rra"  , ABS         },
 
-    { "bvs"  , REL         }, /* 0x70 to 0x7f */
+    { "bvs"  , REL         }, // 0x70 to 0x7f
     { "adc"  , ZP_IND_Y    },
     { "jam"  , IMPLIED     },
     { "sre"  , ZP_IND_Y    },
@@ -759,7 +759,7 @@ static InstructionInfo II_6502X[256] = {
     { "ror"  , ABS_X       },
     { "rra"  , ABS_X       },
 
-    { "nop"  , IMMEDIATE   }, /* 0x80 to 0x8f */
+    { "nop"  , IMMEDIATE   }, // 0x80 to 0x8f
     { "sta"  , ZP_X_IND    },
     { "nop"  , IMMEDIATE   },
     { "sax"  , ZP_X_IND    },
@@ -776,7 +776,7 @@ static InstructionInfo II_6502X[256] = {
     { "stx"  , ABS         },
     { "sax"  , ABS         },
 
-    { "bcc"  , REL         }, /* 0x90 to 0x9f */
+    { "bcc"  , REL         }, // 0x90 to 0x9f
     { "sta"  , ZP_IND_Y    },
     { "jam"  , IMPLIED     },
     { "sha"  , ZP_IND_Y    },
@@ -793,7 +793,7 @@ static InstructionInfo II_6502X[256] = {
     { "shx"  , ABS_Y       },
     { "sha"  , ABS_Y       },
 
-    { "ldy"  , IMMEDIATE   }, /* 0xa0 to 0xaf */
+    { "ldy"  , IMMEDIATE   }, // 0xa0 to 0xaf
     { "lda"  , ZP_X_IND    },
     { "ldx"  , IMMEDIATE   },
     { "lax"  , ZP_X_IND    },
@@ -810,7 +810,7 @@ static InstructionInfo II_6502X[256] = {
     { "ldx"  , ABS         },
     { "lax"  , ABS         },
 
-    { "bcs"  , REL         }, /* 0xb0 to 0xbf */
+    { "bcs"  , REL         }, // 0xb0 to 0xbf
     { "lda"  , ZP_IND_Y    },
     { "jam"  , IMPLIED     },
     { "lax"  , ZP_IND_Y    },
@@ -827,7 +827,7 @@ static InstructionInfo II_6502X[256] = {
     { "ldx"  , ABS_Y       },
     { "lax"  , ABS_Y       },
 
-    { "cpy"  , IMMEDIATE   }, /* 0xc0 to 0xcf */
+    { "cpy"  , IMMEDIATE   }, // 0xc0 to 0xcf
     { "cmp"  , ZP_X_IND    },
     { "nop"  , IMMEDIATE   },
     { "dcp"  , ZP_X_IND    },
@@ -844,7 +844,7 @@ static InstructionInfo II_6502X[256] = {
     { "dec"  , ABS         },
     { "dcp"  , ABS         },
 
-    { "bne"  , REL         }, /* 0xd0 to 0xdf */
+    { "bne"  , REL         }, // 0xd0 to 0xdf
     { "cmp"  , ZP_IND_Y    },
     { "jam"  , IMPLIED     },
     { "dcp"  , ZP_IND_Y    },
@@ -861,7 +861,7 @@ static InstructionInfo II_6502X[256] = {
     { "dec"  , ABS_X       },
     { "dcp"  , ABS_X       },
 
-    { "cpx"  , IMMEDIATE   }, /* 0xe0 to 0xef */
+    { "cpx"  , IMMEDIATE   }, // 0xe0 to 0xef
     { "sbc"  , ZP_X_IND    },
     { "nop"  , IMMEDIATE   },
     { "isc"  , ZP_X_IND    },
@@ -878,7 +878,7 @@ static InstructionInfo II_6502X[256] = {
     { "inc"  , ABS         },
     { "isc"  , ABS         },
 
-    { "beq"  , REL         }, /* 0xf0 to 0xff */
+    { "beq"  , REL         }, // 0xf0 to 0xff
     { "sbc"  , ZP_IND_Y    },
     { "jam"  , IMPLIED     },
     { "isc"  , ZP_IND_Y    },
@@ -899,7 +899,7 @@ static InstructionInfo II_6502X[256] = {
 static InstructionInfo * II[3] = { II_6502, II_65C02, II_6502X };
 
 static unsigned GetInstructionLength (uint8_t opcode)
-/* Get the number of bytes in the full instruction. Depends on the addressing mode. */
+// Get the number of bytes in the full instruction. Depends on the addressing mode.
 {
     switch (II[CPU][opcode].adrmode) {
         case ILLEGAL:
@@ -924,18 +924,18 @@ static unsigned GetInstructionLength (uint8_t opcode)
             return 3;
     }
 
-    /* We should never get here. */
+    // We should never get here.
     return -1;
 }
 
 
 
 static char * PrintAssemblyInstruction (char * ptr)
-/* Print assembly instruction: mnemonic and addres-mode specific operand(s). */
+// Print assembly instruction: mnemonic and addres-mode specific operand(s).
 {
     uint8_t opcode;
 
-    /* Print the instruction starting at the current program counter. */
+    // Print the instruction starting at the current program counter.
 
     opcode = MemReadByte (Regs.PC);
 
@@ -1007,7 +1007,7 @@ static void PrintTraceInstructionOrInterrupt (const char * InterruptType)
     if (TraceMode & TRACE_FIELD_INSTR_COUNTER) {
 
         if (traceline_ptr != traceline) {
-            /* Print field separator. */
+            // Print field separator.
             traceline_ptr += sprintf (traceline_ptr, "  ");
         }
 
@@ -1017,7 +1017,7 @@ static void PrintTraceInstructionOrInterrupt (const char * InterruptType)
     if (TraceMode & TRACE_FIELD_CLOCK_COUNTER) {
 
         if (traceline_ptr != traceline) {
-            /* Print field separator. */
+            // Print field separator.
             traceline_ptr += sprintf (traceline_ptr, "  ");
         }
 
@@ -1027,7 +1027,7 @@ static void PrintTraceInstructionOrInterrupt (const char * InterruptType)
     if (TraceMode & TRACE_FIELD_PC) {
 
         if (traceline_ptr != traceline) {
-            /* Print field separator. */
+            // Print field separator.
             traceline_ptr += sprintf (traceline_ptr, "  ");
         }
 
@@ -1037,22 +1037,22 @@ static void PrintTraceInstructionOrInterrupt (const char * InterruptType)
     if (TraceMode & TRACE_FIELD_INSTR_BYTES) {
 
         if (traceline_ptr != traceline) {
-            /* Print field separator. */
+            // Print field separator.
             traceline_ptr += sprintf (traceline_ptr, "  ");
         }
 
         if (InterruptType == NULL)
         {
-            /* Get the opcode */
+            // Get the opcode
             opcode = MemReadByte (Regs.PC);
 
-            /* How many bytes are in the full instruction? 1, 2 or 3. */
+            // How many bytes are in the full instruction? 1, 2 or 3.
             num_bytes = GetInstructionLength (opcode);
         } else {
-            num_bytes = 0; /* Consider interrupts as instructions that are inserted into the instruction stream. */
+            num_bytes = 0; // Consider interrupts as instructions that are inserted into the instruction stream.
         }
 
-        /* Print 0 to 3 bytes for the interrupt/instruction. */
+        // Print 0 to 3 bytes for the interrupt/instruction.
         for (k = 0; k < 3; ++k) {
             if (k != 0) {
                 *traceline_ptr++ = ' ';
@@ -1068,7 +1068,7 @@ static void PrintTraceInstructionOrInterrupt (const char * InterruptType)
     if (TraceMode & TRACE_FIELD_INSTR_ASSEMBLY) {
 
         if (traceline_ptr != traceline) {
-            /* Print field separator. */
+            // Print field separator.
             traceline_ptr += sprintf (traceline_ptr, "  ");
         }
 
@@ -1077,11 +1077,11 @@ static void PrintTraceInstructionOrInterrupt (const char * InterruptType)
         if (InterruptType == NULL) {
             traceline_ptr = PrintAssemblyInstruction (traceline_ptr);
         } else {
-            /* Print interrupt message. */
+            // Print interrupt message.
             traceline_ptr += sprintf (traceline_ptr, "*** %s ***", InterruptType);
         }
 
-        /* Fill out the field to 16 characters */
+        // Fill out the field to 16 characters
         num_bytes = (unsigned)(traceline_ptr - save_ptr);
         if (num_bytes < 16) {
             traceline_ptr += sprintf (traceline_ptr, "%*s", 16 - num_bytes, "");
@@ -1091,7 +1091,7 @@ static void PrintTraceInstructionOrInterrupt (const char * InterruptType)
     if (TraceMode & TRACE_FIELD_CPU_REGISTERS) {
 
         if (traceline_ptr != traceline) {
-            /* Print field separator. */
+            // Print field separator.
             traceline_ptr += sprintf (traceline_ptr, "  ");
         }
 
@@ -1113,7 +1113,7 @@ static void PrintTraceInstructionOrInterrupt (const char * InterruptType)
     if (TraceMode & TRACE_FIELD_CC65_SP) {
 
         if (traceline_ptr != traceline) {
-            /* Print field separator. */
+            // Print field separator.
             traceline_ptr += sprintf (traceline_ptr, "  ");
         }
 

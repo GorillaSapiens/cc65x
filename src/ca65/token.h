@@ -1,35 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                  token.h                                  */
-/*                                                                           */
-/*                  Token list for the ca65 macro assembler                  */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2007-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                  token.h
+//
+//                  Token list for the ca65 macro assembler
+//
+//
+//
+// (C) 2007-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
@@ -38,89 +38,89 @@
 
 
 
-/* common */
+// common
 #include "filepos.h"
 #include "inline.h"
 #include "strbuf.h"
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* Tokens */
+// Tokens
 typedef enum token_t {
-    TOK_NONE,           /* Start value, invalid */
-    TOK_EOF,            /* End of input file */
-    TOK_SEP,            /* Separator (usually newline) */
-    TOK_IDENT,          /* An identifier */
-    TOK_LOCAL_IDENT,    /* A cheap local identifier */
+    TOK_NONE,           // Start value, invalid
+    TOK_EOF,            // End of input file
+    TOK_SEP,            // Separator (usually newline)
+    TOK_IDENT,          // An identifier
+    TOK_LOCAL_IDENT,    // A cheap local identifier
 
-    TOK_INTCON,         /* Integer constant */
-    TOK_CHARCON,        /* Character constant */
-    TOK_STRCON,         /* String constant */
+    TOK_INTCON,         // Integer constant
+    TOK_CHARCON,        // Character constant
+    TOK_STRCON,         // String constant
 
-    TOK_A,              /* A)ccumulator */
-    TOK_X,              /* X register */
-    TOK_Y,              /* Y register */
-    TOK_Z,              /* Z register */
-    TOK_S,              /* S register */
-    TOK_Q,              /* Q pseudo register */
-    TOK_REG,            /* Sweet16 R.. register (in sweet16 mode) */
+    TOK_A,              // A)ccumulator
+    TOK_X,              // X register
+    TOK_Y,              // Y register
+    TOK_Z,              // Z register
+    TOK_S,              // S register
+    TOK_Q,              // Q pseudo register
+    TOK_REG,            // Sweet16 R.. register (in sweet16 mode)
 
-    TOK_ASSIGN,         /* := */
-    TOK_ULABEL,         /* An unnamed label */
+    TOK_ASSIGN,         // :=
+    TOK_ULABEL,         // An unnamed label
 
-    TOK_EQ,             /* = */
-    TOK_NE,             /* <> */
-    TOK_LT,             /* < */
-    TOK_GT,             /* > */
-    TOK_LE,             /* <= */
-    TOK_GE,             /* >= */
+    TOK_EQ,             // =
+    TOK_NE,             // <>
+    TOK_LT,             // <
+    TOK_GT,             // >
+    TOK_LE,             // <=
+    TOK_GE,             // >=
 
-    TOK_BOOLAND,        /* .and */
-    TOK_BOOLOR,         /* .or */
-    TOK_BOOLXOR,        /* .xor */
-    TOK_BOOLNOT,        /* .not */
+    TOK_BOOLAND,        // .and
+    TOK_BOOLOR,         // .or
+    TOK_BOOLXOR,        // .xor
+    TOK_BOOLNOT,        // .not
 
-    TOK_PLUS,           /* + */
-    TOK_MINUS,          /* - */
-    TOK_MUL,            /* * */
-    TOK_STAR = TOK_MUL, /* Alias */
-    TOK_DIV,            /* / */
-    TOK_MOD,            /* ! */
-    TOK_OR,             /* | */
-    TOK_XOR,            /* ^ */
-    TOK_AND,            /* & */
-    TOK_SHL,            /* << */
-    TOK_SHR,            /* >> */
-    TOK_NOT,            /* ~ */
+    TOK_PLUS,           // +
+    TOK_MINUS,          // -
+    TOK_MUL,            // *
+    TOK_STAR = TOK_MUL, // Alias
+    TOK_DIV,            // /
+    TOK_MOD,            // !
+    TOK_OR,             // |
+    TOK_XOR,            // ^
+    TOK_AND,            // &
+    TOK_SHL,            // <<
+    TOK_SHR,            // >>
+    TOK_NOT,            // ~
 
-    TOK_PC,             /* $ if enabled */
-    TOK_NAMESPACE,      /* :: */
-    TOK_DOT,            /* . */
-    TOK_COMMA,          /* , */
-    TOK_HASH,           /* # */
-    TOK_COLON,          /* : */
-    TOK_LPAREN,         /* ( */
-    TOK_RPAREN,         /* ) */
-    TOK_LBRACK,         /* [ */
-    TOK_RBRACK,         /* ] */
-    TOK_LCURLY,         /* { */
-    TOK_RCURLY,         /* } */
-    TOK_AT,             /* @ - in Sweet16 mode */
+    TOK_PC,             // $ if enabled
+    TOK_NAMESPACE,      // ::
+    TOK_DOT,            // .
+    TOK_COMMA,          // ,
+    TOK_HASH,           // #
+    TOK_COLON,          // :
+    TOK_LPAREN,         // (
+    TOK_RPAREN,         // )
+    TOK_LBRACK,         // [
+    TOK_RBRACK,         // ]
+    TOK_LCURLY,         // {
+    TOK_RCURLY,         // }
+    TOK_AT,             // @ - in Sweet16 mode
 
-    TOK_OVERRIDE_ZP,    /* z: */
-    TOK_OVERRIDE_ABS,   /* a: */
-    TOK_OVERRIDE_FAR,   /* f: */
+    TOK_OVERRIDE_ZP,    // z:
+    TOK_OVERRIDE_ABS,   // a:
+    TOK_OVERRIDE_FAR,   // f:
 
-    TOK_MACPARAM,       /* Macro parameter, not generated by scanner */
-    TOK_REPCOUNTER,     /* Repeat counter, not generated by scanner */
+    TOK_MACPARAM,       // Macro parameter, not generated by scanner
+    TOK_REPCOUNTER,     // Repeat counter, not generated by scanner
 
-    /* The next ones are tokens for the pseudo instructions. Keep together! */
+    // The next ones are tokens for the pseudo instructions. Keep together!
     TOK_FIRSTPSEUDO,
     TOK_A16             = TOK_FIRSTPSEUDO,
     TOK_A8,
@@ -285,22 +285,22 @@ typedef enum token_t {
     TOK_ZEROPAGE,
     TOK_LASTPSEUDO      = TOK_ZEROPAGE,
 
-    TOK_COUNT           /* Count of tokens */
+    TOK_COUNT           // Count of tokens
 } token_t;
 
 
 
-/* Complete token including attributes and flags */
+// Complete token including attributes and flags
 typedef struct Token Token;
 struct Token {
-    token_t     Tok;            /* The actual token value */
-    int         WS;             /* Flag for "whitespace before token" */
-    long        IVal;           /* Integer attribute value */
-    StrBuf      SVal;           /* String attribute value */
-    FilePos     Pos;            /* Position from which token was read */
+    token_t     Tok;            // The actual token value
+    int         WS;             // Flag for "whitespace before token"
+    long        IVal;           // Integer attribute value
+    StrBuf      SVal;           // String attribute value
+    FilePos     Pos;            // Position from which token was read
 };
 
-/* Initializer value for a token */
+// Initializer value for a token
 #define STATIC_TOKEN_INITIALIZER {      \
     TOK_NONE,                           \
     0,                                  \
@@ -311,21 +311,21 @@ struct Token {
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 int TokHasSVal (token_t Tok);
-/* Return true if the given token has an attached SVal */
+// Return true if the given token has an attached SVal
 
 int TokHasIVal (token_t Tok);
-/* Return true if the given token has an attached IVal */
+// Return true if the given token has an attached IVal
 
 #if defined(HAVE_INLINE)
 INLINE int TokIsSep (enum token_t T)
-/* Return true if this is a separator token */
+// Return true if this is a separator token
 {
     return (T == TOK_SEP || T == TOK_EOF);
 }
@@ -340,6 +340,6 @@ void CopyToken (Token* Dst, const Token* Src);
 
 
 
-/* End of token.h */
+// End of token.h
 
 #endif

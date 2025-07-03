@@ -1,39 +1,39 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                               searchpath.h                                */
-/*                                                                           */
-/*                         Handling of search paths                          */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2013, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                               searchpath.h
+//
+//                         Handling of search paths
+//
+//
+//
+// (C) 2000-2013, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
-/* Exports facilities to search files in a list of directories. */
+// Exports facilities to search files in a list of directories.
 
 
 
@@ -42,28 +42,28 @@
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* A search path is a pointer to the list */
+// A search path is a pointer to the list
 typedef struct Collection SearchPaths;
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 SearchPaths* NewSearchPath (void);
-/* Create a new, empty search path list */
+// Create a new, empty search path list
 
 void AddSearchPath (SearchPaths* P, const char* NewPath);
-/* Add a new search path to the end of an existing list */
+// Add a new search path to the end of an existing list
 
 void AddSearchPathFromEnv (SearchPaths* P, const char* EnvVar);
 /* Add a search path from an environment variable to the end of an existing
@@ -87,7 +87,7 @@ int PushSearchPath (SearchPaths* P, const char* NewPath);
 */
 
 void PopSearchPath (SearchPaths* P);
-/* Remove a search path from the head of an existing search path list */
+// Remove a search path from the head of an existing search path list
 
 char* GetSearchPath (SearchPaths* P, unsigned Index);
 /* Return the search path at the given index, if the index is valid, return an
@@ -101,6 +101,6 @@ char* SearchFile (const SearchPaths* P, const char* File);
 
 
 
-/* End of searchpath.h */
+// End of searchpath.h
 
 #endif

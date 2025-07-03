@@ -1,35 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                  input.c                                  */
-/*                                                                           */
-/*                            Input file handling                            */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                  input.c
+//
+//                            Input file handling
+//
+//
+//
+// (C) 2000-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
@@ -37,7 +37,7 @@
 #include <string.h>
 #include <errno.h>
 
-/* common */
+// common
 #include "check.h"
 #include "coll.h"
 #include "debugflag.h"
@@ -47,7 +47,7 @@
 #include "strbuf.h"
 #include "xmalloc.h"
 
-/* cc65 */
+// cc65
 #include "codegen.h"
 #include "error.h"
 #include "global.h"
@@ -59,69 +59,69 @@
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* The current input line */
+// The current input line
 StrBuf* Line;
 
-/* The input line to reuse as the next line */
+// The input line to reuse as the next line
 static StrBuf* CurReusedLine;
 
-/* Current and next input character */
+// Current and next input character
 char CurC  = '\0';
 char NextC = '\0';
 
-/* Maximum count of nested includes */
+// Maximum count of nested includes
 #define MAX_INC_NESTING         16
 
-/* Struct that describes an active input file */
+// Struct that describes an active input file
 typedef struct AFile AFile;
 struct AFile {
-    unsigned    LineNum;        /* Actual line number for this file */
-    FILE*       F;              /* Input file stream */
-    IFile*      Input;          /* Points to corresponding IFile */
-    int         SearchPath;     /* True if we've added a path for this file */
-    unsigned    LineOffs;       /* Offset to presumed line number for this file */
-    char*       PName;          /* Presumed name of the file */
-    PPIfStack   IfStack;        /* PP #if stack */
-    int         MissingNL;      /* Last input line was missing a newline */
+    unsigned    LineNum;        // Actual line number for this file
+    FILE*       F;              // Input file stream
+    IFile*      Input;          // Points to corresponding IFile
+    int         SearchPath;     // True if we've added a path for this file
+    unsigned    LineOffs;       // Offset to presumed line number for this file
+    char*       PName;          // Presumed name of the file
+    PPIfStack   IfStack;        // PP #if stack
+    int         MissingNL;      // Last input line was missing a newline
 };
 
-/* List of all input files */
+// List of all input files
 static Collection IFiles = STATIC_COLLECTION_INITIALIZER;
 
-/* List of all active files */
+// List of all active files
 static Collection AFiles = STATIC_COLLECTION_INITIALIZER;
 
-/* Input stack used when preprocessing */
+// Input stack used when preprocessing
 static Collection* CurrentInputStack;
 
-/* Counter for the __COUNTER__ macro */
+// Counter for the __COUNTER__ macro
 static unsigned MainFileCounter;
 LineInfo* PrevDiagnosticLI;
 
 
 
-/*****************************************************************************/
-/*                               struct IFile                                */
-/*****************************************************************************/
+//***************************************************************************
+//                               struct IFile
+//***************************************************************************
 
 
 
 static IFile* NewIFile (const char* Name, InputType Type)
-/* Create and return a new IFile */
+// Create and return a new IFile
 {
-    /* Get the length of the name */
+    // Get the length of the name
     unsigned Len = strlen (Name);
 
-    /* Allocate a IFile structure */
+    // Allocate a IFile structure
     IFile* IF = (IFile*) xmalloc (sizeof (IFile) + Len);
 
-    /* Initialize the fields */
+    // Initialize the fields
     IF->Index   = CollCount (&IFiles) + 1;
     IF->Usage   = 0;
     IF->Size    = 0;
@@ -131,18 +131,18 @@ static IFile* NewIFile (const char* Name, InputType Type)
     SB_Init (&IF->GuardMacro);
     memcpy (IF->Name, Name, Len+1);
 
-    /* Insert the new structure into the IFile collection */
+    // Insert the new structure into the IFile collection
     CollAppend (&IFiles, IF);
 
-    /* Return the new struct */
+    // Return the new struct
     return IF;
 }
 
 
 
-/*****************************************************************************/
-/*                               struct AFile                                */
-/*****************************************************************************/
+//***************************************************************************
+//                               struct AFile
+//***************************************************************************
 
 
 
@@ -153,10 +153,10 @@ static AFile* NewAFile (IFile* IF, FILE* F)
 {
     StrBuf Path = AUTO_STRBUF_INITIALIZER;
 
-    /* Allocate a AFile structure */
+    // Allocate a AFile structure
     AFile* AF = (AFile*) xmalloc (sizeof (AFile));
 
-    /* Initialize the fields */
+    // Initialize the fields
     AF->LineNum   = 0;
     AF->F         = F;
     AF->Input     = IF;
@@ -181,17 +181,17 @@ static AFile* NewAFile (IFile* IF, FILE* F)
         */
         struct stat Buf;
         if (FileStat (IF->Name, &Buf) != 0) {
-            /* Error */
+            // Error
             Fatal ("Cannot stat '%s': %s", IF->Name, strerror (errno));
         }
         IF->Size  = (unsigned long) Buf.st_size;
         IF->MTime = (unsigned long) Buf.st_mtime;
 
-        /* Set the debug data */
+        // Set the debug data
         g_fileinfo (IF->Name, IF->Size, IF->MTime);
     }
 
-    /* Insert the new structure into the AFile collection */
+    // Insert the new structure into the AFile collection
     CollAppend (&AFiles, AF);
 
     /* Get the path of this file and add it as an extra search path.
@@ -203,14 +203,14 @@ static AFile* NewAFile (IFile* IF, FILE* F)
     AF->SearchPath = PushSearchPath (UsrIncSearchPath, SB_GetConstBuf (&Path));
     SB_Done (&Path);
 
-    /* Return the new struct */
+    // Return the new struct
     return AF;
 }
 
 
 
 static void FreeAFile (AFile* AF)
-/* Free an AFile structure */
+// Free an AFile structure
 {
     if (AF->PName != 0) {
         xfree (AF->PName);
@@ -220,9 +220,9 @@ static void FreeAFile (AFile* AF)
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
@@ -234,47 +234,47 @@ static IFile* FindFile (const char* Name)
 {
     unsigned I;
     for (I = 0; I < CollCount (&IFiles); ++I) {
-        /* Get the file struct */
+        // Get the file struct
         IFile* IF = (IFile*) CollAt (&IFiles, I);
-        /* Check the name */
+        // Check the name
         if (strcmp (Name, IF->Name) == 0) {
-            /* Found, return the struct */
+            // Found, return the struct
             return IF;
         }
     }
 
-    /* Not found */
+    // Not found
     return 0;
 }
 
 
 
 void OpenMainFile (const char* Name)
-/* Open the main file. Will call Fatal() in case of failures. */
+// Open the main file. Will call Fatal() in case of failures.
 {
     AFile* MainFile;
 
 
-    /* Setup a new IFile structure for the main file */
+    // Setup a new IFile structure for the main file
     IFile* IF = NewIFile (Name, IT_MAIN);
 
-    /* Open the file for reading */
+    // Open the file for reading
     FILE* F = fopen (Name, "r");
     if (F == 0) {
-        /* Cannot open */
+        // Cannot open
         Fatal ("Cannot open input file '%s': %s", Name, strerror (errno));
     }
 
-    /* Allocate a new AFile structure for the file */
+    // Allocate a new AFile structure for the file
     MainFile = NewAFile (IF, F);
 
-    /* Use this file with PP */
+    // Use this file with PP
     SetPPIfStack (&MainFile->IfStack);
 
-    /* Begin PP for this file */
+    // Begin PP for this file
     PreprocessBegin (IF);
 
-    /* Allocate the input line buffer */
+    // Allocate the input line buffer
     Line = NewStrBuf ();
 
     /* Update the line infos, so we have a valid line info even at start of
@@ -282,27 +282,27 @@ void OpenMainFile (const char* Name)
     */
     UpdateCurrentLineInfo (Line);
 
-    /* Initialize the __COUNTER__ counter */
+    // Initialize the __COUNTER__ counter
     MainFileCounter = 0;
 }
 
 
 
 void OpenIncludeFile (const char* Name, InputType IT)
-/* Open an include file and insert it into the tables. */
+// Open an include file and insert it into the tables.
 {
     char*  N;
     FILE*  F;
     IFile* IF;
     AFile* AF;
 
-    /* Check for the maximum include nesting */
+    // Check for the maximum include nesting
     if (CollCount (&AFiles) > MAX_INC_NESTING) {
         PPError ("Include nesting too deep");
         return;
     }
 
-    /* Search for the file */
+    // Search for the file
     N = SearchFile ((IT == IT_SYSINC)? SysIncSearchPath : UsrIncSearchPath, Name);
     if (N == 0) {
         PPError ("Include file '%s' not found", Name);
@@ -327,27 +327,27 @@ void OpenIncludeFile (const char* Name, InputType IT)
         return;
     }
 
-    /* We don't need N any longer, since we may now use IF->Name */
+    // We don't need N any longer, since we may now use IF->Name
     xfree (N);
 
-    /* Open the file */
+    // Open the file
     F = fopen (IF->Name, "r");
     if (F == 0) {
-        /* Error opening the file */
+        // Error opening the file
         PPError ("Cannot open include file '%s': %s", IF->Name, strerror (errno));
         return;
     }
 
-    /* Debugging output */
+    // Debugging output
     Print (stdout, 1, "Opened include file '%s'\n", IF->Name);
 
-    /* Allocate a new AFile structure */
+    // Allocate a new AFile structure
     AF = NewAFile (IF, F);
 
-    /* Use this file with PP */
+    // Use this file with PP
     SetPPIfStack (&AF->IfStack);
 
-    /* Begin PP for this file */
+    // Begin PP for this file
     PreprocessBegin (IF);
 }
 
@@ -370,21 +370,21 @@ void CloseIncludeFile (void)
     */
     AFile* NextInput = (CollCount (&AFiles) > 0)? CollLast (&AFiles) : Input;
 
-    /* End preprocessing for the current input file */
+    // End preprocessing for the current input file
     PreprocessEnd (NextInput->Input);
 
-    /* Close the current input file (we're just reading so no error check) */
+    // Close the current input file (we're just reading so no error check)
     fclose (Input->F);
 
-    /* If we had added an extra search path for this AFile, remove it */
+    // If we had added an extra search path for this AFile, remove it
     if (Input->SearchPath) {
         PopSearchPath (UsrIncSearchPath);
     }
 
-    /* Delete the active file structure */
+    // Delete the active file structure
     FreeAFile (Input);
 
-    /* If we've switched files, use the if stack from the previous file */
+    // If we've switched files, use the if stack from the previous file
     if (Input != NextInput) {
         SetPPIfStack (&NextInput->IfStack);
     }
@@ -398,16 +398,16 @@ static void GetInputChar (void)
 ** are read by this function.
 */
 {
-    /* Get the next-next character from the line */
+    // Get the next-next character from the line
     if (SB_GetIndex (Line) + 1 < SB_GetLen (Line)) {
-        /* CurC and NextC come from this fragment */
+        // CurC and NextC come from this fragment
         CurC  = SB_AtUnchecked (Line, SB_GetIndex (Line));
         NextC = SB_AtUnchecked (Line, SB_GetIndex (Line) + 1);
     } else {
-        /* NextC is '\0' by default */
+        // NextC is '\0' by default
         NextC = '\0';
 
-        /* Get CurC from the line */
+        // Get CurC from the line
         CurC = SB_LookAt (Line, SB_GetIndex (Line));
     }
 
@@ -421,10 +421,10 @@ void NextChar (void)
 ** reached, both are set to NUL, no more lines are read by this function.
 */
 {
-    /* Skip the last character read */
+    // Skip the last character read
     SB_Skip (Line);
 
-    /* Read the next one */
+    // Read the next one
     GetInputChar ();
 }
 
@@ -444,7 +444,7 @@ Collection* UseInputStack (Collection* InputStack)
 
 
 void PushLine (StrBuf* L)
-/* Save the current input line and use a new one */
+// Save the current input line and use a new one
 {
     PRECONDITION (CurrentInputStack != 0);
     CollAppend (CurrentInputStack, Line);
@@ -455,7 +455,7 @@ void PushLine (StrBuf* L)
 
 
 void ReuseInputLine (void)
-/* Save and reuse the current line as the next line */
+// Save and reuse the current line as the next line
 {
     CurReusedLine = Line;
 }
@@ -463,9 +463,9 @@ void ReuseInputLine (void)
 
 
 void ClearLine (void)
-/* Clear the current input line */
+// Clear the current input line
 {
-    /* Clear the contents of Line */
+    // Clear the contents of Line
     SB_Clear (Line);
     CurC    = '\0';
     NextC   = '\0';
@@ -495,26 +495,26 @@ int NextLine (void)
     int         C;
     AFile*      Input;
 
-    /* Overwrite the next input line with the pushed line if there is one */
+    // Overwrite the next input line with the pushed line if there is one
     if (CurReusedLine != 0) {
-        /* Use data move to resolve the issue that Line may be impersistent */
+        // Use data move to resolve the issue that Line may be impersistent
         if (Line != CurReusedLine) {
             SB_Move (Line, CurReusedLine);
         }
-        /* Continue with this Line */
+        // Continue with this Line
         InitLine (Line);
         CurReusedLine = 0;
 
         return 1;
     }
 
-    /* If there are pushed input lines, read from them */
+    // If there are pushed input lines, read from them
     if (CurrentInputStack != 0 && CollCount (CurrentInputStack) > 0) {
         /* Drop all pushed fragments that have no data left until one can be
         ** used as input.
         */
         do {
-            /* Use data move to resolve the issue that Line may be impersistent */
+            // Use data move to resolve the issue that Line may be impersistent
             if (Line != CollLast (CurrentInputStack)) {
                 SB_Move (Line, CollPop (CurrentInputStack));
             } else {
@@ -526,50 +526,50 @@ int NextLine (void)
         if (SB_GetIndex (Line) < SB_GetLen (Line)) {
             InitLine (Line);
 
-            /* Successive */
+            // Successive
             return 1;
         }
     }
 
-    /* Otherwise, clear the current line */
+    // Otherwise, clear the current line
     ClearLine ();
 
-    /* Must have an input file when going on */
+    // Must have an input file when going on
     if (CollCount (&AFiles) == 0) {
         return 0;
     }
 
-    /* Get the current input file */
+    // Get the current input file
     Input = CollLast (&AFiles);
 
-    /* Read characters until we have one complete line */
+    // Read characters until we have one complete line
     while (1) {
 
-        /* Read the next character */
+        // Read the next character
         C = fgetc (Input->F);
 
-        /* Check for EOF */
+        // Check for EOF
         if (C == EOF) {
 
             if (!Input->MissingNL || SB_NotEmpty (Line)) {
 
-                /* Accept files without a newline at the end */
+                // Accept files without a newline at the end
                 ++Input->LineNum;
 
-                /* Assume no new line */
+                // Assume no new line
                 Input->MissingNL = 1;
 
             }
             break;
         }
 
-        /* Assume no new line */
+        // Assume no new line
         Input->MissingNL = 1;
 
-        /* Check for end of line */
+        // Check for end of line
         if (C == '\n') {
 
-            /* We got a new line */
+            // We got a new line
             ++Input->LineNum;
 
             /* If the \n is preceeded by a \r, remove the \r, so we can read
@@ -591,24 +591,24 @@ int NextLine (void)
                 ContinueLine ();
             }
 
-        } else if (C != '\0') {         /* Ignore embedded NULs */
+        } else if (C != '\0') {         // Ignore embedded NULs
 
-            /* Just some character, add it to the line */
+            // Just some character, add it to the line
             SB_AppendChar (Line, C);
 
         }
     }
 
-    /* Add a termination character to the string buffer */
+    // Add a termination character to the string buffer
     SB_Terminate (Line);
 
-    /* Initialize the current and next characters. */
+    // Initialize the current and next characters.
     InitLine (Line);
 
-    /* Create line information for this line */
+    // Create line information for this line
     UpdateCurrentLineInfo (Line);
 
-    /* Done */
+    // Done
     return C != EOF || SB_NotEmpty (Line);
 }
 
@@ -628,19 +628,19 @@ int PreprocessNextLine (void)
             return 0;
         }
 
-        /* Leave the current file */
+        // Leave the current file
         CloseIncludeFile ();
     }
 
-    /* Do preprocess anyways */
+    // Do preprocess anyways
     Preprocess ();
 
-    /* Write it to the output file if in preprocess-only mode */
+    // Write it to the output file if in preprocess-only mode
     if (PreprocessOnly) {
         WriteOutput ("%.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
 
-    /* Done */
+    // Done
     return 1;
 }
 
@@ -651,10 +651,10 @@ static LineInfoFile* NewLineInfoFile (const AFile* AF)
     const char* Name = AF->PName == 0 ? AF->Input->Name : AF->PName;
     unsigned    Len  = strlen (Name);
 
-    /* Allocate memory for the file info and the file name */
+    // Allocate memory for the file info and the file name
     LineInfoFile* LIF = xmalloc (sizeof (LineInfoFile) + Len);
 
-    /* Copy info */
+    // Copy info
     LIF->InputFile = AF->Input;
     LIF->LineNum   = AF->LineNum + AF->LineOffs;
     memcpy (LIF->Name, Name, Len + 1);
@@ -665,13 +665,13 @@ static LineInfoFile* NewLineInfoFile (const AFile* AF)
 
 
 void GetFileInclusionInfo (struct LineInfo* LI)
-/* Get info about source file inclusion for LineInfo struct */
+// Get info about source file inclusion for LineInfo struct
 {
     unsigned        FileCount = CollCount (&AFiles);
 
     CHECK (FileCount > 0);
 
-    /* Get the correct index */
+    // Get the correct index
     --FileCount;
 
     if (LI->IncFiles != 0) {
@@ -683,23 +683,23 @@ void GetFileInclusionInfo (struct LineInfo* LI)
         xfree (LI->File);
     }
 
-    /* Copy info from the AFile */
+    // Copy info from the AFile
     LI->File = NewLineInfoFile (CollAtUnchecked (&AFiles, FileCount));
 
-    /* Remember the actual line number */
+    // Remember the actual line number
     LI->ActualLineNum = ((AFile*)CollAtUnchecked (&AFiles, FileCount))->LineNum;
 
     if (FileCount > 0) {
-        /* The file is included from another */
+        // The file is included from another
 
-        /* Always use a new collection */
+        // Always use a new collection
         LI->IncFiles = NewCollection ();
 
         while (FileCount-- > 0) {
-            /* Copy info from the AFile */
+            // Copy info from the AFile
             LineInfoFile* LIF = NewLineInfoFile (CollAtUnchecked (&AFiles, FileCount));
 
-            /* Add this file */
+            // Add this file
             CollAppend (LI->IncFiles, LIF);
         }
     }
@@ -708,7 +708,7 @@ void GetFileInclusionInfo (struct LineInfo* LI)
 
 
 void FreeFileInclusionInfo (struct LineInfo* LI)
-/* Free info about source file inclusion for LineInfo struct */
+// Free info about source file inclusion for LineInfo struct
 {
     if (LI->File != 0) {
         xfree (LI->File);
@@ -728,7 +728,7 @@ void FreeFileInclusionInfo (struct LineInfo* LI)
 
 
 static int IsDifferentLineInfoFile (const LineInfoFile* Lhs, const LineInfoFile* Rhs)
-/* Return true if the two files are different */
+// Return true if the two files are different
 {
     /* If the input files are the same but their presumed names are different,
     ** we still consider the files same.
@@ -739,7 +739,7 @@ static int IsDifferentLineInfoFile (const LineInfoFile* Lhs, const LineInfoFile*
 
 
 int HasFileInclusionChanged (const struct LineInfo* LI)
-/* Return true if file inclusion has changed from last time */
+// Return true if file inclusion has changed from last time
 {
     if (LI->File != 0) {
         LineInfo* PrevLI = GetPrevCheckedLI ();
@@ -761,7 +761,7 @@ int HasFileInclusionChanged (const struct LineInfo* LI)
             }
 
             for (I = 0; I < CollCount (LI->IncFiles); ++I) {
-                /* If this refers to a different file, then the inclusion has changed */
+                // If this refers to a different file, then the inclusion has changed
                 if (IsDifferentLineInfoFile (CollAtUnchecked (LI->IncFiles, I),
                                              CollAtUnchecked (PrevLI->IncFiles, I))) {
                     return 1;
@@ -770,14 +770,14 @@ int HasFileInclusionChanged (const struct LineInfo* LI)
         }
     }
 
-    /* Unchanged */
+    // Unchanged
     return 0;
 }
 
 
 
 const char* GetInputFileName (const struct IFile* IF)
-/* Return the name of the file from an IFile struct */
+// Return the name of the file from an IFile struct
 {
     return IF->Name;
 }
@@ -785,14 +785,14 @@ const char* GetInputFileName (const struct IFile* IF)
 
 
 const char* GetCurrentFileName (void)
-/* Return the name of the current input file */
+// Return the name of the current input file
 {
     unsigned AFileCount = CollCount (&AFiles);
     if (AFileCount > 0) {
         const AFile* AF = CollLast (&AFiles);
         return AF->PName == 0 ? AF->Input->Name : AF->PName;
     } else {
-        /* No open file */
+        // No open file
         return "(outside file scope)";
     }
 }
@@ -800,14 +800,14 @@ const char* GetCurrentFileName (void)
 
 
 unsigned GetCurrentLineNum (void)
-/* Return the line number in the current input file */
+// Return the line number in the current input file
 {
     unsigned AFileCount = CollCount (&AFiles);
     if (AFileCount > 0) {
         const AFile* AF = CollLast (&AFiles);
         return AF->LineNum + AF->LineOffs;
     } else {
-        /* No open file */
+        // No open file
         return 0;
     }
 }
@@ -815,7 +815,7 @@ unsigned GetCurrentLineNum (void)
 
 
 void SetCurrentLineNum (unsigned LineNum)
-/* Set the presumed line number in the current input file */
+// Set the presumed line number in the current input file
 {
     unsigned AFileCount = CollCount (&AFiles);
     if (AFileCount > 0) {
@@ -827,7 +827,7 @@ void SetCurrentLineNum (unsigned LineNum)
 
 
 void SetCurrentFileName (const char* Name)
-/* Set the presumed name of the current input file */
+// Set the presumed name of the current input file
 {
     unsigned AFileCount = CollCount (&AFiles);
     if (AFileCount > 0) {
@@ -844,7 +844,7 @@ void SetCurrentFileName (const char* Name)
 
 
 unsigned GetCurrentCounter (void)
-/* Return the counter number in the current input file */
+// Return the counter number in the current input file
 {
     return MainFileCounter++;
 }
@@ -852,11 +852,11 @@ unsigned GetCurrentCounter (void)
 
 
 static void WriteEscaped (FILE* F, const char* Name)
-/* Write a file name to a dependency file escaping spaces */
+// Write a file name to a dependency file escaping spaces
 {
     while (*Name) {
         if (*Name == ' ') {
-            /* Escape spaces */
+            // Escape spaces
             fputc ('\\', F);
         }
         fputc (*Name, F);
@@ -867,28 +867,28 @@ static void WriteEscaped (FILE* F, const char* Name)
 
 
 static void WriteDep (FILE* F, InputType Types)
-/* Helper function. Writes all file names that match Types to the output */
+// Helper function. Writes all file names that match Types to the output
 {
     unsigned I;
 
-    /* Loop over all files */
+    // Loop over all files
     unsigned FileCount = CollCount (&IFiles);
     for (I = 0; I < FileCount; ++I) {
 
-        /* Get the next input file */
+        // Get the next input file
         const IFile* IF = (const IFile*) CollAt (&IFiles, I);
 
-        /* Ignore it if it is not of the correct type */
+        // Ignore it if it is not of the correct type
         if ((IF->Type & Types) == 0) {
             continue;
         }
 
-        /* If this is not the first file, add a space */
+        // If this is not the first file, add a space
         if (I > 0) {
             fputc (' ', F);
         }
 
-        /* Print the dependency escaping spaces */
+        // Print the dependency escaping spaces
         WriteEscaped (F, IF->Name);
     }
 }
@@ -900,7 +900,7 @@ static void CreateDepFile (const char* Name, InputType Types)
 ** all files with the given types there.
 */
 {
-    /* Open the file */
+    // Open the file
     FILE* F = fopen (Name, "w");
     if (F == 0) {
         Fatal ("Cannot open dependency file '%s': %s", Name, strerror (errno));
@@ -916,15 +916,15 @@ static void CreateDepFile (const char* Name, InputType Types)
     }
     fputs (":\t", F);
 
-    /* Write out the dependencies for the output file */
+    // Write out the dependencies for the output file
     WriteDep (F, Types);
     fputs ("\n\n", F);
 
-    /* Write out a phony dependency for the included files */
+    // Write out a phony dependency for the included files
     WriteDep (F, Types);
     fputs (":\n\n", F);
 
-    /* Close the file, check for errors */
+    // Close the file, check for errors
     if (fclose (F) != 0) {
         remove (Name);
         Fatal ("Cannot write to dependeny file (disk full?)");
@@ -934,7 +934,7 @@ static void CreateDepFile (const char* Name, InputType Types)
 
 
 void CreateDependencies (void)
-/* Create dependency files requested by the user */
+// Create dependency files requested by the user
 {
     if (SB_NotEmpty (&DepName)) {
         CreateDepFile (SB_GetConstBuf (&DepName),

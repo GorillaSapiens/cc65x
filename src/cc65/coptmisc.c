@@ -1,45 +1,45 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                codemisc.c                                 */
-/*                                                                           */
-/*                   Miscellaneous optimization operations                   */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                codemisc.c
+//
+//                   Miscellaneous optimization operations
+//
+//
+//
+// (C) 2001-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
 #include <stdlib.h>
 
-/* common */
+// common
 #include "chartype.h"
 #include "xsprintf.h"
 
-/* cc65 */
+// cc65
 #include "codeent.h"
 #include "codeinfo.h"
 #include "coptmisc.h"
@@ -48,9 +48,9 @@
 
 
 
-/*****************************************************************************/
-/*                            Decouple operations                            */
-/*****************************************************************************/
+//***************************************************************************
+//                            Decouple operations
+//***************************************************************************
 
 
 
@@ -75,20 +75,20 @@ unsigned OptDecouple (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Walk over the entries */
+    // Walk over the entries
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
         const char* Arg;
 
-        /* Get next entry and it's input register values */
+        // Get next entry and it's input register values
         CodeEntry* E = CS_GetEntry (S, I);
         const RegContents* In = &E->RI->In;
 
-        /* Assume we have no replacement */
+        // Assume we have no replacement
         CodeEntry* X = 0;
 
-        /* Check the instruction */
+        // Check the instruction
         switch (E->OPC) {
 
             case OP65_DEA:
@@ -255,24 +255,24 @@ unsigned OptDecouple (CodeSeg* S)
                 break;
 
             default:
-                /* Avoid gcc warnings */
+                // Avoid gcc warnings
                 break;
 
         }
 
-        /* Insert the replacement if we have one */
+        // Insert the replacement if we have one
         if (X) {
             CS_InsertEntry (S, X, I+1);
             CS_DelEntry (S, I);
             ++Changes;
         }
 
-        /* Next entry */
+        // Next entry
         ++I;
 
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }
 
@@ -293,34 +293,34 @@ unsigned OptIndLoads1 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Walk over the entries */
+    // Walk over the entries
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-        /* Get next entry */
+        // Get next entry
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check if it's what we're looking for */
+        // Check if it's what we're looking for
         if (E->OPC == OP65_LDA          &&
             E->AM == AM65_ZP_INDY       &&
             E->RI->In.RegY == 0         &&
             E->RI->In.RegX == 0) {
 
-            /* Replace by the same insn with other addressing mode */
+            // Replace by the same insn with other addressing mode
             CodeEntry* X = NewCodeEntry (E->OPC, AM65_ZPX_IND, E->Arg, 0, E->LI);
             CS_InsertEntry (S, X, I+1);
 
-            /* Remove the old insn */
+            // Remove the old insn
             CS_DelEntry (S, I);
             ++Changes;
         }
 
-        /* Next entry */
+        // Next entry
         ++I;
 
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }
 
@@ -341,42 +341,42 @@ unsigned OptIndLoads2 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Walk over the entries */
+    // Walk over the entries
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-        /* Get next entry */
+        // Get next entry
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check if it's what we're looking for */
+        // Check if it's what we're looking for
         if (E->OPC == OP65_LDA          &&
             E->AM == AM65_ZPX_IND       &&
             E->RI->In.RegY == 0         &&
             E->RI->In.RegX == 0) {
 
-            /* Replace by the same insn with other addressing mode */
+            // Replace by the same insn with other addressing mode
             CodeEntry* X = NewCodeEntry (E->OPC, AM65_ZP_INDY, E->Arg, 0, E->LI);
             CS_InsertEntry (S, X, I+1);
 
-            /* Remove the old insn */
+            // Remove the old insn
             CS_DelEntry (S, I);
             ++Changes;
         }
 
-        /* Next entry */
+        // Next entry
         ++I;
 
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }
 
 
 
-/*****************************************************************************/
-/*                        Optimize stack pointer ops                         */
-/*****************************************************************************/
+//***************************************************************************
+//                        Optimize stack pointer ops
+//***************************************************************************
 
 
 
@@ -394,7 +394,7 @@ static unsigned IsDecSP (const CodeEntry* E)
         return E->RI->In.RegY;
     }
 
-    /* If we come here, it's not a decsp op */
+    // If we come here, it's not a decsp op
     return 0;
 }
 
@@ -408,7 +408,7 @@ unsigned OptStackPtrOps (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Walk over the entries */
+    // Walk over the entries
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
@@ -416,10 +416,10 @@ unsigned OptStackPtrOps (CodeSeg* S)
         unsigned Dec2;
         const CodeEntry* N;
 
-        /* Get the next entry */
+        // Get the next entry
         const CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check for decspn or subysp */
+        // Check for decspn or subysp
         if (E->OPC == OP65_JSR                          &&
             (Dec1 = IsDecSP (E)) > 0                    &&
             (N = CS_GetNextEntry (S, I)) != 0           &&
@@ -430,14 +430,14 @@ unsigned OptStackPtrOps (CodeSeg* S)
             CodeEntry* X;
             char Buf[20];
 
-            /* We can combine the two */
+            // We can combine the two
             if (Dec1 <= 8) {
-                /* Insert a call to decsp */
+                // Insert a call to decsp
                 xsprintf (Buf, sizeof (Buf), "decsp%u", Dec1);
                 X = NewCodeEntry (OP65_JSR, AM65_ABS, Buf, 0, N->LI);
                 CS_InsertEntry (S, X, I+2);
             } else {
-                /* Insert a call to subysp */
+                // Insert a call to subysp
                 const char* Arg = MakeHexArg (Dec1);
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, N->LI);
                 CS_InsertEntry (S, X, I+2);
@@ -445,36 +445,36 @@ unsigned OptStackPtrOps (CodeSeg* S)
                 CS_InsertEntry (S, X, I+3);
             }
 
-            /* Delete the old code */
+            // Delete the old code
             CS_DelEntries (S, I, 2);
 
-            /* Regenerate register info */
+            // Regenerate register info
             CS_GenRegInfo (S);
 
-            /* Remember we had changes */
+            // Remember we had changes
             ++Changes;
 
         } else {
 
-            /* Next entry */
+            // Next entry
             ++I;
         }
 
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }
 
 
 
 unsigned OptGotoSPAdj (CodeSeg* S)
-/* Optimize SP adjustment for forward 'goto' */
+// Optimize SP adjustment for forward 'goto'
 {
     unsigned Changes = 0;
     unsigned I;
 
-    /* Walk over the entries */
+    // Walk over the entries
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
@@ -482,10 +482,10 @@ unsigned OptGotoSPAdj (CodeSeg* S)
         unsigned short adjustment;
         const char* Arg;
 
-        /* Get next entry */
+        // Get next entry
         L[0] = CS_GetEntry (S, I);
 
-        /* Check for the sequence generated by g_lateadjustSP */
+        // Check for the sequence generated by g_lateadjustSP
         if (L[0]->OPC == OP65_PHA            &&
             CS_GetEntries (S, L+1, I+1, 9)   &&
             L[1]->OPC == OP65_LDA            &&
@@ -499,22 +499,22 @@ unsigned OptGotoSPAdj (CodeSeg* S)
             adjustment = FindSPAdjustment (L[1]->Arg);
 
             if (adjustment == 0) {
-                /* No SP adjustment needed, remove the whole sequence */
+                // No SP adjustment needed, remove the whole sequence
                 CS_DelEntries (S, I, 9);
             }
             else if (adjustment >= 65536 - 8) {
-                /* If adjustment is in range [-8, 0) we use decsp* calls */
+                // If adjustment is in range [-8, 0) we use decsp* calls
                 char Buf[20];
                 adjustment = 65536 - adjustment;
                 xsprintf (Buf, sizeof (Buf), "decsp%u", adjustment);
                 X = NewCodeEntry (OP65_JSR, AM65_ABS, Buf, 0, L[1]->LI);
                 CS_InsertEntry (S, X, I + 9);
 
-                /* Delete the old code */
+                // Delete the old code
                 CS_DelEntries (S, I, 9);
             }
             else if (adjustment >= 65536 - 255) {
-                /* For range [-255, -8) we have ldy #, jsr subysp */
+                // For range [-255, -8) we have ldy #, jsr subysp
                 adjustment = 65536 - adjustment;
                 Arg = MakeHexArg (adjustment);
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[1]->LI);
@@ -522,7 +522,7 @@ unsigned OptGotoSPAdj (CodeSeg* S)
                 X = NewCodeEntry (OP65_JSR, AM65_ABS, "subysp", 0, L[1]->LI);
                 CS_InsertEntry (S, X, I + 10);
 
-                /* Delete the old code */
+                // Delete the old code
                 CS_DelEntries (S, I, 9);
             }
             else if (adjustment > 255) {
@@ -536,98 +536,98 @@ unsigned OptGotoSPAdj (CodeSeg* S)
                 X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, L[5]->LI);
                 CS_InsertEntry (S, X, I + 6);
 
-                /* Delete the old code */
+                // Delete the old code
                 CS_DelEntry (S, I + 2);
                 CS_DelEntry (S, I + 6);
             }
             else if (adjustment > 8) {
-                /* For range (8, 255] we have ldy #, jsr addysp */
+                // For range (8, 255] we have ldy #, jsr addysp
                 Arg = MakeHexArg (adjustment & 0xff);
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[1]->LI);
                 CS_InsertEntry (S, X, I + 9);
                 X = NewCodeEntry (OP65_JSR, AM65_ABS, "addysp", 0, L[1]->LI);
                 CS_InsertEntry (S, X, I + 10);
 
-                /* Delete the old code */
+                // Delete the old code
                 CS_DelEntries (S, I, 9);
             }
             else {
-                /* If adjustment is in range (0, 8] we use incsp* calls */
+                // If adjustment is in range (0, 8] we use incsp* calls
                 char Buf[20];
                 xsprintf (Buf, sizeof (Buf), "incsp%u", adjustment);
                 X = NewCodeEntry (OP65_JSR, AM65_ABS, Buf, 0, L[1]->LI);
                 CS_InsertEntry (S, X, I + 9);
 
-                /* Delete the old code */
+                // Delete the old code
                 CS_DelEntries (S, I, 9);
             }
-            /* Regenerate register info */
+            // Regenerate register info
             CS_GenRegInfo (S);
 
-            /* Remember we had changes */
+            // Remember we had changes
             Changes++;
 
         } else {
 
-            /* Next entry */
+            // Next entry
             ++I;
         }
 
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }
 
 
 
-/*****************************************************************************/
-/*                       Optimize stack load/store ops                       */
-/*****************************************************************************/
+//***************************************************************************
+//                       Optimize stack load/store ops
+//***************************************************************************
 
 
 
 unsigned OptLoadStore2 (CodeSeg* S)
-/* Remove 16 bit stack loads followed by a store into the same location. */
+// Remove 16 bit stack loads followed by a store into the same location.
 {
     unsigned Changes = 0;
 
-    /* Walk over the entries */
+    // Walk over the entries
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
         CodeEntry* N;
 
-        /* Get next entry */
+        // Get next entry
         CodeEntry* E = CS_GetEntry (S, I);
 
         /* Check if this is a 16 bit load followed by a store into the same
         ** address.
         */
-        if (CE_IsCallTo (E, "ldaxysp")          &&  /* Stack load ... */
-            RegValIsKnown (E->RI->In.RegY)      &&  /* ... with known offs */
-            (N = CS_GetNextEntry (S, I)) != 0   &&  /* Next insn ... */
-            !CE_HasLabel (N)                    &&  /* ... without label ... */
-            N->OPC == OP65_LDY                  &&  /* ... is LDY */
-            CE_IsKnownImm (N, E->RI->In.RegY-1) &&  /* Same offset as load */
-            (N = CS_GetNextEntry (S, I+1)) != 0 &&  /* Next insn ... */
-            !CE_HasLabel (N)                    &&  /* ... without label ... */
-            CE_IsCallTo (N, "staxysp")) {           /* ... is store */
+        if (CE_IsCallTo (E, "ldaxysp")          &&  // Stack load ...
+            RegValIsKnown (E->RI->In.RegY)      &&  // ... with known offs
+            (N = CS_GetNextEntry (S, I)) != 0   &&  // Next insn ...
+            !CE_HasLabel (N)                    &&  // ... without label ...
+            N->OPC == OP65_LDY                  &&  // ... is LDY
+            CE_IsKnownImm (N, E->RI->In.RegY-1) &&  // Same offset as load
+            (N = CS_GetNextEntry (S, I+1)) != 0 &&  // Next insn ...
+            !CE_HasLabel (N)                    &&  // ... without label ...
+            CE_IsCallTo (N, "staxysp")) {           // ... is store
 
             /* Found - remove it. Leave the load in place. If it's unused, it
             ** will get removed by later steps.
             */
             CS_DelEntries (S, I+1, 2);
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
         }
 
-        /* Next entry */
+        // Next entry
         ++I;
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }
 
@@ -641,71 +641,71 @@ unsigned OptLoad1 (CodeSeg* S)
     unsigned I;
     unsigned Changes = 0;
 
-    /* Walk over the entries */
+    // Walk over the entries
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
         CodeEntry* E;
 
-        /* Get next entry */
+        // Get next entry
         E = CS_GetEntry (S, I);
 
-        /* Check for the sequence */
+        // Check for the sequence
         if (CE_IsCallTo (E, "ldaxysp")          &&
             RegValIsKnown (E->RI->In.RegY)      &&
             !RegXUsed (S, I+1)) {
 
             CodeEntry* X;
 
-            /* Reload the Y register */
+            // Reload the Y register
             const char* Arg = MakeHexArg (E->RI->In.RegY - 1);
             X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
             CS_InsertEntry (S, X, I+1);
 
-            /* Load from stack */
+            // Load from stack
             X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, E->LI);
             CS_InsertEntry (S, X, I+2);
 
-            /* Now remove the call to the subroutine */
+            // Now remove the call to the subroutine
             CS_DelEntry (S, I);
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
 
         }
 
-        /* Next entry */
+        // Next entry
         ++I;
 
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }
 
 
 
 unsigned OptLoad2 (CodeSeg* S)
-/* Replace calls to ldaxysp by inline code */
+// Replace calls to ldaxysp by inline code
 {
     unsigned I;
     unsigned Changes = 0;
 
-    /* Walk over the entries */
+    // Walk over the entries
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
         CodeEntry* L[3];
 
-        /* Get next entry */
+        // Get next entry
         L[0] = CS_GetEntry (S, I);
 
-        /* Check for the sequence */
+        // Check for the sequence
         if (CE_IsCallTo (L[0], "ldaxysp")) {
 
             CodeEntry* X;
 
-            /* Followed by sta abs/stx abs? */
+            // Followed by sta abs/stx abs?
             if (CS_GetEntries (S, L+1, I+1, 2)                  &&
                 L[1]->OPC == OP65_STA                           &&
                 L[2]->OPC == OP65_STX                           &&
@@ -719,64 +719,64 @@ unsigned OptLoad2 (CodeSeg* S)
                 ** later
                 */
 
-                /* lda (c_sp),y */
+                // lda (c_sp),y
                 X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+3);
 
-                /* sta abs */
+                // sta abs
                 X = NewCodeEntry (OP65_STA, L[2]->AM, L[2]->Arg, 0, L[2]->LI);
                 CS_InsertEntry (S, X, I+4);
 
-                /* dey */
+                // dey
                 X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+5);
 
-                /* lda (c_sp),y */
+                // lda (c_sp),y
                 X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+6);
 
-                /* sta abs */
+                // sta abs
                 X = NewCodeEntry (OP65_STA, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
                 CS_InsertEntry (S, X, I+7);
 
-                /* Now remove the call to the subroutine and the sta/stx */
+                // Now remove the call to the subroutine and the sta/stx
                 CS_DelEntries (S, I, 3);
 
             } else {
 
-                /* Standard replacement */
+                // Standard replacement
 
-                /* lda (c_sp),y */
+                // lda (c_sp),y
                 X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+1);
 
-                /* tax */
+                // tax
                 X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+2);
 
-                /* dey */
+                // dey
                 X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+3);
 
-                /* lda (c_sp),y */
+                // lda (c_sp),y
                 X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+4);
 
-                /* Now remove the call to the subroutine */
+                // Now remove the call to the subroutine
                 CS_DelEntry (S, I);
 
             }
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
 
         }
 
-        /* Next entry */
+        // Next entry
         ++I;
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }
 
@@ -789,17 +789,17 @@ unsigned OptBinOps1 (CodeSeg* S)
 {
     unsigned Changes = 0;
 
-    /* Walk over the entries */
+    // Walk over the entries
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-        /* Get next entry */
+        // Get next entry
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Get a pointer to the input registers of the insn */
+        // Get a pointer to the input registers of the insn
         const RegContents* In  = &E->RI->In;
 
-        /* Check for AND/EOR/ORA and a known value in A */
+        // Check for AND/EOR/ORA and a known value in A
         int Delete = 0;
         CodeEntry* X = 0;
         switch (E->OPC) {
@@ -940,12 +940,12 @@ unsigned OptBinOps1 (CodeSeg* S)
             ++Changes;
         }
 
-        /* Next entry */
+        // Next entry
         ++I;
 
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }
 
@@ -958,26 +958,26 @@ unsigned OptBinOps2 (CodeSeg* S)
 {
     unsigned Changes = 0;
 
-    /* Walk over the entries */
+    // Walk over the entries
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
         CodeEntry* N;
 
-        /* Get next entry */
+        // Get next entry
         CodeEntry* E = CS_GetEntry (S, I);
 
         /* Check if this is an 8 bit load followed by a bit operation with the
         ** same memory cell.
         */
         if (E->OPC == OP65_LDA                  &&
-            (N = CS_GetNextEntry (S, I)) != 0   &&  /* Next insn ... */
-            !CE_HasLabel (N)                    &&  /* ... without label ... */
-            (N->OPC == OP65_AND ||                  /* ... is AND/EOR/ORA ... */
+            (N = CS_GetNextEntry (S, I)) != 0   &&  // Next insn ...
+            !CE_HasLabel (N)                    &&  // ... without label ...
+            (N->OPC == OP65_AND ||                  // ... is AND/EOR/ORA ...
              N->OPC == OP65_EOR ||
              N->OPC == OP65_ORA)                &&
-            E->AM == N->AM                      && /* ... with same addr mode ... */
-            strcmp (E->Arg, N->Arg) == 0) {        /* ... and same argument */
+            E->AM == N->AM                      && // ... with same addr mode ...
+            strcmp (E->Arg, N->Arg) == 0) {        // ... and same argument
 
             /* For an EOR, the result is zero. For the other instructions, the
             ** result doesn't change so they can be removed.
@@ -993,14 +993,14 @@ unsigned OptBinOps2 (CodeSeg* S)
                 CS_DelEntry (S, I+1);
             }
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
         }
 
-        /* Next entry */
+        // Next entry
         ++I;
     }
 
-    /* Return the number of changes made */
+    // Return the number of changes made
     return Changes;
 }

@@ -1,42 +1,42 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                segments.c                                 */
-/*                                                                           */
-/*                   Segment handling for the ld65 linker                    */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                segments.c
+//
+//                   Segment handling for the ld65 linker
+//
+//
+//
+// (C) 1998-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
 #include <stdlib.h>
 #include <string.h>
 
-/* common */
+// common
 #include "addrsize.h"
 #include "alignment.h"
 #include "check.h"
@@ -49,7 +49,7 @@
 #include "symdefs.h"
 #include "xmalloc.h"
 
-/* ld65 */
+// ld65
 #include "error.h"
 #include "expr.h"
 #include "fileio.h"
@@ -61,37 +61,37 @@
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* Hash table */
+// Hash table
 #define HASHTAB_MASK    0x3FU
 #define HASHTAB_SIZE    (HASHTAB_MASK + 1)
 static Segment*         HashTab[HASHTAB_SIZE];
 
-/* List of all segments */
+// List of all segments
 static Collection       SegmentList = STATIC_COLLECTION_INITIALIZER;
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
-/* Create a new segment and initialize it */
+// Create a new segment and initialize it
 {
     unsigned Hash;
 
-    /* Allocate memory */
+    // Allocate memory
     Segment* S = xmalloc (sizeof (Segment));
 
-    /* Initialize the fields */
+    // Initialize the fields
     S->Name        = Name;
     S->Next        = 0;
     S->Flags       = SEG_FLAG_NONE;
@@ -107,16 +107,16 @@ static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
     S->ReadOnly    = 0;
     S->Dumped      = 0;
 
-    /* Insert the segment into the segment list and assign the segment id */
+    // Insert the segment into the segment list and assign the segment id
     S->Id = CollCount (&SegmentList);
     CollAppend (&SegmentList, S);
 
-    /* Insert the segment into the segment hash list */
+    // Insert the segment into the segment hash list
     Hash = (S->Name & HASHTAB_MASK);
     S->Next = HashTab[Hash];
     HashTab[Hash] = S;
 
-    /* Return the new entry */
+    // Return the new entry
     return S;
 }
 
@@ -128,19 +128,19 @@ Segment* GetSegment (unsigned Name, unsigned char AddrSize, const char* ObjName)
 ** message and may be NULL if the segment is linker generated.
 */
 {
-    /* Try to locate the segment in the table */
+    // Try to locate the segment in the table
     Segment* S = SegFind (Name);
 
     /* If we don't have that segment already, allocate it using the type of
     ** the first section.
     */
     if (S == 0) {
-        /* Create a new segment */
+        // Create a new segment
         S = NewSegment (Name, AddrSize);
     } else {
-        /* Check if the existing segment has the requested address size */
+        // Check if the existing segment has the requested address size
         if (S->AddrSize != AddrSize) {
-            /* Allow an empty object name */
+            // Allow an empty object name
             if (ObjName == 0) {
                 ObjName = "[linker generated]";
             }
@@ -149,19 +149,19 @@ Segment* GetSegment (unsigned Name, unsigned char AddrSize, const char* ObjName)
         }
     }
 
-    /* Return the segment */
+    // Return the segment
     return S;
 }
 
 
 
 Section* NewSection (Segment* Seg, unsigned long Alignment, unsigned char AddrSize)
-/* Create a new section for the given segment */
+// Create a new section for the given segment
 {
-    /* Allocate memory */
+    // Allocate memory
     Section* S = xmalloc (sizeof (Section));
 
-    /* Initialize the data */
+    // Initialize the data
     S->Next     = 0;
     S->Seg      = Seg;
     S->Obj      = 0;
@@ -171,24 +171,24 @@ Section* NewSection (Segment* Seg, unsigned long Alignment, unsigned char AddrSi
     S->Alignment= Alignment;
     S->AddrSize = AddrSize;
 
-    /* Calculate the alignment bytes needed for the section */
+    // Calculate the alignment bytes needed for the section
     S->Fill = AlignCount (Seg->Size, S->Alignment);
 
-    /* Adjust the segment size and set the section offset */
+    // Adjust the segment size and set the section offset
     Seg->Size  += S->Fill;
-    S->Offs     = Seg->Size;    /* Current size is offset */
+    S->Offs     = Seg->Size;    // Current size is offset
 
-    /* Insert the section into the segment */
+    // Insert the section into the segment
     CollAppend (&Seg->Sections, S);
 
-    /* Return the struct */
+    // Return the struct
     return S;
 }
 
 
 
 Section* ReadSection (FILE* F, ObjData* O)
-/* Read a section from a file */
+// Read a section from a file
 {
     unsigned      Name;
     unsigned      Size;
@@ -198,31 +198,31 @@ Section* ReadSection (FILE* F, ObjData* O)
     Segment*      S;
     Section*      Sec;
 
-    /* Read the segment data */
-    (void) Read32 (F);          /* File size of data */
-    Name      = MakeGlobalStringId (O, ReadVar (F));    /* Segment name */
-                ReadVar (F);    /* Segment flags (currently unused) */
-    Size      = ReadVar (F);    /* Size of data */
-    Alignment = ReadVar (F);    /* Alignment */
-    Type      = Read8 (F);      /* Segment type */
-    FragCount = ReadVar (F);    /* Number of fragments */
+    // Read the segment data
+    (void) Read32 (F);          // File size of data
+    Name      = MakeGlobalStringId (O, ReadVar (F));    // Segment name
+                ReadVar (F);    // Segment flags (currently unused)
+    Size      = ReadVar (F);    // Size of data
+    Alignment = ReadVar (F);    // Alignment
+    Type      = Read8 (F);      // Segment type
+    FragCount = ReadVar (F);    // Number of fragments
 
 
-    /* Print some data */
+    // Print some data
     Print (stdout, 2,
            "Module '%s': Found segment '%s', size = %u, alignment = %lu, type = %u\n",
            GetObjFileName (O), GetString (Name), Size, Alignment, Type);
 
-    /* Get the segment for this section */
+    // Get the segment for this section
     S = GetSegment (Name, Type, GetObjFileName (O));
 
-    /* Allocate the section we will return later */
+    // Allocate the section we will return later
     Sec = NewSection (S, Alignment, Type);
 
-    /* Remember the object file this section was from */
+    // Remember the object file this section was from
     Sec->Obj = O;
 
-    /* Set up the combined segment alignment */
+    // Set up the combined segment alignment
     if (Sec->Alignment > 1) {
         Alignment = LeastCommonMultiple (S->Alignment, Sec->Alignment);
         if (Alignment > MAX_ALIGNMENT) {
@@ -238,19 +238,19 @@ Section* ReadSection (FILE* F, ObjData* O)
         S->Alignment = Alignment;
     }
 
-    /* Start reading fragments from the file and insert them into the section . */
+    // Start reading fragments from the file and insert them into the section .
     while (FragCount--) {
 
         Fragment* Frag;
 
-        /* Read the fragment type */
+        // Read the fragment type
         unsigned char Type = Read8 (F);
 
-        /* Extract the check mask from the type */
+        // Extract the check mask from the type
         unsigned char Bytes = Type & FRAG_BYTEMASK;
         Type &= FRAG_TYPEMASK;
 
-        /* Handle the different fragment types */
+        // Handle the different fragment types
         switch (Type) {
 
             case FRAG_LITERAL:
@@ -265,42 +265,42 @@ Section* ReadSection (FILE* F, ObjData* O)
                 break;
 
             case FRAG_FILL:
-                /* Will allocate memory, but we don't care... */
+                // Will allocate memory, but we don't care...
                 Frag = NewFragment (Type, ReadVar (F), Sec);
                 break;
 
             default:
                 Error ("Unknown fragment type in module '%s', segment '%s': %02X",
                        GetObjFileName (O), GetString (S->Name), Type);
-                /* NOTREACHED */
+                // NOTREACHED
                 return 0;
         }
 
-        /* Read the line infos into the list of the fragment */
+        // Read the line infos into the list of the fragment
         ReadLineInfoList (F, O, &Frag->LineInfos);
 
-        /* Remember the module we had this fragment from */
+        // Remember the module we had this fragment from
         Frag->Obj = O;
     }
 
-    /* Return the section */
+    // Return the section
     return Sec;
 }
 
 
 
 Segment* SegFind (unsigned Name)
-/* Return the given segment or NULL if not found. */
+// Return the given segment or NULL if not found.
 {
     Segment* S = HashTab[Name & HASHTAB_MASK];
     while (S) {
         if (Name == S->Name) {
-            /* Found */
+            // Found
             break;
         }
         S = S->Next;
     }
-    /* Not found */
+    // Not found
     return S;
 }
 
@@ -311,14 +311,14 @@ int IsBSSType (Segment* S)
 ** contain non-zero data.
 */
 {
-    /* Loop over all sections */
+    // Loop over all sections
     unsigned I;
     for (I = 0; I < CollCount (&S->Sections); ++I) {
 
-        /* Get the next section */
+        // Get the next section
         Section* Sec = CollAtUnchecked (&S->Sections, I);
 
-        /* Loop over all fragments */
+        // Loop over all fragments
         Fragment* F = Sec->FragRoot;
         while (F) {
             if (F->Type == FRAG_LITERAL) {
@@ -343,7 +343,7 @@ int IsBSSType (Segment* S)
 
 
 void SegDump (void)
-/* Dump the segments and it's contents */
+// Dump the segments and it's contents
 {
     unsigned I, J;
     unsigned long Count;
@@ -419,29 +419,29 @@ unsigned SegWriteConstExpr (FILE* F, ExprNode* E, int Signed, unsigned Size)
     };
 
 
-    /* Get the expression value */
+    // Get the expression value
     long Val = GetExprVal (E);
 
-    /* Check the size */
+    // Check the size
     CHECK (Size >= 1 && Size <= 4);
 
-    /* Check for a range error */
+    // Check for a range error
     if (Signed) {
         if (Val > S_Hi[Size-1] || Val < S_Lo[Size-1]) {
-            /* Range error */
+            // Range error
             return SEG_EXPR_RANGE_ERROR;
         }
     } else {
         if (((unsigned long)Val) > U_Hi[Size-1]) {
-            /* Range error */
+            // Range error
             return SEG_EXPR_RANGE_ERROR;
         }
     }
 
-    /* Write the value to the file */
+    // Write the value to the file
     WriteVal (F, Val, Size);
 
-    /* Success */
+    // Success
     return SEG_EXPR_OK;
 }
 
@@ -457,18 +457,18 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
     unsigned long Offs = 0;
 
 
-    /* Remember the output file and offset for the segment */
+    // Remember the output file and offset for the segment
     S->OutputName = TgtName;
     S->OutputOffs = (unsigned long) ftell (Tgt);
 
-    /* Loop over all sections in this segment */
+    // Loop over all sections in this segment
     for (I = 0; I < CollCount (&S->Sections); ++I) {
 
         Section*        Sec = CollAtUnchecked (&S->Sections, I);
         Fragment*       Frag;
         unsigned char   FillVal;
 
-        /* Output were this section is from */
+        // Output were this section is from
         Print (stdout, 2, "      Section from \"%s\"\n", GetObjFileName (Sec->Obj));
 
         /* If we have fill bytes, write them now. Beware: If this is the
@@ -481,11 +481,11 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
         WriteMult (Tgt, FillVal, Sec->Fill);
         Offs += Sec->Fill;
 
-        /* Loop over all fragments in this section */
+        // Loop over all fragments in this section
         Frag = Sec->FragRoot;
         while (Frag) {
 
-            /* Output fragment data */
+            // Output fragment data
             switch (Frag->Type) {
 
                 case FRAG_LITERAL:
@@ -495,7 +495,7 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
                 case FRAG_EXPR:
                 case FRAG_SEXPR:
                     Sign = (Frag->Type == FRAG_SEXPR);
-                    /* Call the users function and evaluate the result */
+                    // Call the users function and evaluate the result
                     switch (F (Frag->Expr, Sign, Frag->Size, Offs, Data)) {
 
                         case SEG_EXPR_OK:
@@ -532,12 +532,12 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
                     Internal ("Invalid fragment type: %02X", Frag->Type);
             }
 
-            /* Update the offset */
+            // Update the offset
             Print (stdout, 2, "        Fragment with 0x%x bytes\n",
                    Frag->Size);
             Offs += Frag->Size;
 
-            /* Next fragment */
+            // Next fragment
             Frag = Frag->Next;
         }
     }
@@ -546,7 +546,7 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
 
 
 unsigned SegmentCount (void)
-/* Return the total number of segments */
+// Return the total number of segments
 {
     return CollCount (&SegmentList);
 }
@@ -554,19 +554,19 @@ unsigned SegmentCount (void)
 
 
 static int CmpSegStart (const void* K1, const void* K2)
-/* Compare function for qsort */
+// Compare function for qsort
 {
-    /* Get the real segment pointers */
+    // Get the real segment pointers
     const Segment* S1 = *(const Segment**)K1;
     const Segment* S2 = *(const Segment**)K2;
 
-    /* Compare the start addresses */
+    // Compare the start addresses
     if (S1->PC > S2->PC) {
         return 1;
     } else if (S1->PC < S2->PC) {
         return -1;
     } else {
-        /* Sort segments with equal starts by name */
+        // Sort segments with equal starts by name
         return strcmp (GetString (S1->Name), GetString (S2->Name));
     }
 }
@@ -574,37 +574,37 @@ static int CmpSegStart (const void* K1, const void* K2)
 
 
 void PrintSegmentMap (FILE* F)
-/* Print a segment map to the given file */
+// Print a segment map to the given file
 {
 
-    /* Allocate memory for the segment pool */
+    // Allocate memory for the segment pool
     Segment** SegPool = xmalloc (CollCount (&SegmentList) * sizeof (Segment*));
 
-    /* Copy the segment pointers */
+    // Copy the segment pointers
     unsigned I;
     for (I = 0; I < CollCount (&SegmentList); ++I) {
         SegPool[I] = CollAtUnchecked (&SegmentList, I);
     }
 
-    /* Sort the array by increasing start addresses */
+    // Sort the array by increasing start addresses
     qsort (SegPool, CollCount (&SegmentList), sizeof (Segment*), CmpSegStart);
 
-    /* Print a header */
+    // Print a header
     fprintf (F, "Name                   Start     End    Size  Align\n"
                 "----------------------------------------------------\n");
 
-    /* Print the segments */
+    // Print the segments
     for (I = 0; I < CollCount (&SegmentList); ++I) {
 
-        /* Get a pointer to the segment */
+        // Get a pointer to the segment
         Segment* S = SegPool[I];
 
-        /* Print empty segments only if explicitly requested */
+        // Print empty segments only if explicitly requested
         if (VerboseMap || S->Size > 0) {
-            /* Print the segment data */
+            // Print the segment data
             long End = S->PC + S->Size;
             if (S->Size > 0) {
-                /* Point to last element addressed */
+                // Point to last element addressed
                 --End;
             }
             fprintf (F, "%-20s  %06lX  %06lX  %06lX  %05lX\n",
@@ -612,23 +612,23 @@ void PrintSegmentMap (FILE* F)
         }
     }
 
-    /* Free the segment pool */
+    // Free the segment pool
     xfree (SegPool);
 }
 
 
 
 void PrintDbgSegments (FILE* F)
-/* Output the segments to the debug file */
+// Output the segments to the debug file
 {
-    /* Walk over all segments */
+    // Walk over all segments
     unsigned I;
     for (I = 0; I < CollCount (&SegmentList); ++I) {
 
-        /* Get the next segment */
+        // Get the next segment
         const Segment* S = CollAtUnchecked (&SegmentList, I);
 
-        /* Print the segment data */
+        // Print the segment data
         fprintf (F,
                  "seg\tid=%u,name=\"%s\",start=0x%06lX,size=0x%04lX,addrsize=%s,type=%s",
                  S->Id, GetString (S->Name), S->PC, S->Size,
@@ -659,10 +659,10 @@ void CheckSegments (void)
     unsigned I;
     for (I = 0; I < CollCount (&SegmentList); ++I) {
 
-        /* Get the next segment */
+        // Get the next segment
         const Segment* S = CollAtUnchecked (&SegmentList, I);
 
-        /* Check it */
+        // Check it
         if (S->Size > 0 && S->Dumped == 0) {
             Error ("Missing memory area assignment for segment '%s'",
                    GetString (S->Name));

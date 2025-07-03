@@ -1,41 +1,41 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 dbginfo.c                                 */
-/*                                                                           */
-/*                         Handle the .dbg commands                          */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                 dbginfo.c
+//
+//                         Handle the .dbg commands
+//
+//
+//
+// (C) 2000-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
 #include <string.h>
 
-/* common */
+// common
 #include "chartype.h"
 #include "coll.h"
 #include "filepos.h"
@@ -43,7 +43,7 @@
 #include "scopedefs.h"
 #include "strbuf.h"
 
-/* ca65 */
+// ca65
 #include "dbginfo.h"
 #include "error.h"
 #include "expr.h"
@@ -57,47 +57,47 @@
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* Structure used for a high level language function or symbol */
+// Structure used for a high level language function or symbol
 typedef struct HLLDbgSym HLLDbgSym;
 struct HLLDbgSym {
-    unsigned            Flags;          /* See above */
-    unsigned            Name;           /* String id of name */
-    unsigned            AsmName;        /* String id of asm symbol name */
-    SymEntry*           Sym;            /* The assembler symbol */
-    int                 Offs;           /* Offset if any */
-    unsigned            Type;           /* String id of type */
-    SymTable*           Scope;          /* Parent scope */
-    unsigned            FuncId;         /* Id of hll function if any */
-    FilePos             Pos;            /* Position of statement */
+    unsigned            Flags;          // See above
+    unsigned            Name;           // String id of name
+    unsigned            AsmName;        // String id of asm symbol name
+    SymEntry*           Sym;            // The assembler symbol
+    int                 Offs;           // Offset if any
+    unsigned            Type;           // String id of type
+    SymTable*           Scope;          // Parent scope
+    unsigned            FuncId;         // Id of hll function if any
+    FilePos             Pos;            // Position of statement
 };
 
-/* The current line info */
+// The current line info
 static LineInfo* CurLineInfo = 0;
 
-/* List of high level language debug symbols */
+// List of high level language debug symbols
 static Collection HLLDbgSyms = STATIC_COLLECTION_INITIALIZER;
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 static HLLDbgSym* NewHLLDbgSym (unsigned Flags, unsigned Name, unsigned Type)
-/* Allocate and return a new HLLDbgSym structure */
+// Allocate and return a new HLLDbgSym structure
 {
-    /* Allocate memory */
+    // Allocate memory
     HLLDbgSym* S = xmalloc (sizeof (*S));
 
-    /* Initialize the fields as necessary */
+    // Initialize the fields as necessary
     S->Flags    = Flags;
     S->Name     = Name;
     S->AsmName  = EMPTY_STRING_ID;
@@ -108,14 +108,14 @@ static HLLDbgSym* NewHLLDbgSym (unsigned Flags, unsigned Name, unsigned Type)
     S->FuncId   = ~0U;
     S->Pos      = CurTok.Pos;
 
-    /* Return the result */
+    // Return the result
     return S;
 }
 
 
 
 static unsigned HexValue (char C)
-/* Convert the ascii representation of a hex nibble into the hex nibble */
+// Convert the ascii representation of a hex nibble into the hex nibble
 {
     if (isdigit (C)) {
         return C - '0';
@@ -138,14 +138,14 @@ static int ValidateType (StrBuf* Type)
     char*           B;
 
 
-    /* The length must not be zero and divideable by two */
+    // The length must not be zero and divideable by two
     unsigned Length = SB_GetLen (Type);
     if (Length < 2 || (Length & 0x01) != 0) {
         ErrorSkip ("Type value has invalid length");
         return -1;
     }
 
-    /* The string must consist completely of hex digit chars */
+    // The string must consist completely of hex digit chars
     A = SB_GetConstBuf (Type);
     for (I = 0; I < Length; ++I) {
         if (!IsXDigit (A[I])) {
@@ -154,32 +154,32 @@ static int ValidateType (StrBuf* Type)
         }
     }
 
-    /* Convert the type to binary */
+    // Convert the type to binary
     B = SB_GetBuf (Type);
     while (A < SB_GetConstBuf (Type) + Length) {
-        /* Since we know, there are only hex digits, there can't be any errors */
+        // Since we know, there are only hex digits, there can't be any errors
         *B++ = (HexValue (A[0]) << 4) | HexValue (A[1]);
         A += 2;
     }
     Type->Len = (Length /= 2);
 
-    /* Allocate the type and return it */
+    // Allocate the type and return it
     return GetStrBufId (Type);
 }
 
 
 
 void DbgInfoFile (void)
-/* Parse and handle FILE subcommand of the .dbg pseudo instruction */
+// Parse and handle FILE subcommand of the .dbg pseudo instruction
 {
     StrBuf Name = STATIC_STRBUF_INITIALIZER;
     unsigned long Size;
     unsigned long MTime;
 
-    /* Parameters are separated by a comma */
+    // Parameters are separated by a comma
     ConsumeComma ();
 
-    /* Name */
+    // Name
     if (CurTok.Tok != TOK_STRCON) {
         ErrorSkip ("String constant expected");
         return;
@@ -187,29 +187,29 @@ void DbgInfoFile (void)
     SB_Copy (&Name, &CurTok.SVal);
     NextTok ();
 
-    /* Comma expected */
+    // Comma expected
     ConsumeComma ();
 
-    /* Size */
+    // Size
     Size = ConstExpression ();
 
-    /* Comma expected */
+    // Comma expected
     ConsumeComma ();
 
-    /* MTime */
+    // MTime
     MTime = ConstExpression ();
 
-    /* Insert the file into the table */
+    // Insert the file into the table
     AddFile (&Name, FT_DBGINFO, Size, MTime);
 
-    /* Free memory used for Name */
+    // Free memory used for Name
     SB_Done (&Name);
 }
 
 
 
 void DbgInfoFunc (void)
-/* Parse and handle func subcommand of the .dbg pseudo instruction */
+// Parse and handle func subcommand of the .dbg pseudo instruction
 {
     static const char* const StorageKeys[] = {
         "EXTERN",
@@ -223,10 +223,10 @@ void DbgInfoFunc (void)
     HLLDbgSym*  S;
 
 
-    /* Parameters are separated by a comma */
+    // Parameters are separated by a comma
     ConsumeComma ();
 
-    /* Name */
+    // Name
     if (CurTok.Tok != TOK_STRCON) {
         ErrorSkip ("String constant expected");
         return;
@@ -234,10 +234,10 @@ void DbgInfoFunc (void)
     Name = GetStrBufId (&CurTok.SVal);
     NextTok ();
 
-    /* Comma expected */
+    // Comma expected
     ConsumeComma ();
 
-    /* Type */
+    // Type
     if (CurTok.Tok != TOK_STRCON) {
         ErrorSkip ("String constant expected");
         return;
@@ -248,10 +248,10 @@ void DbgInfoFunc (void)
     }
     NextTok ();
 
-    /* Comma expected */
+    // Comma expected
     ConsumeComma ();
 
-    /* The storage class follows */
+    // The storage class follows
     if (CurTok.Tok != TOK_IDENT) {
         ErrorSkip ("Storage class specifier expected");
         return;
@@ -263,10 +263,10 @@ void DbgInfoFunc (void)
     }
     NextTok ();
 
-    /* Comma expected */
+    // Comma expected
     ConsumeComma ();
 
-    /* Assembler name follows */
+    // Assembler name follows
     if (CurTok.Tok != TOK_STRCON) {
         ErrorSkip ("String constant expected");
         return;
@@ -274,7 +274,7 @@ void DbgInfoFunc (void)
     AsmName = GetStrBufId (&CurTok.SVal);
     NextTok ();
 
-    /* There may only be one function per scope */
+    // There may only be one function per scope
     if (CurrentScope == RootScope) {
         ErrorSkip ("Functions may not be used in the root scope");
         return;
@@ -289,7 +289,7 @@ void DbgInfoFunc (void)
         return;
     }
 
-    /* Add the function */
+    // Add the function
     S = NewHLLDbgSym (Flags, Name, Type);
     S->Sym = CurrentScope->Label;
     CurrentScope->Label->HLLSym = S;
@@ -299,12 +299,12 @@ void DbgInfoFunc (void)
 
 
 void DbgInfoLine (void)
-/* Parse and handle LINE subcommand of the .dbg pseudo instruction */
+// Parse and handle LINE subcommand of the .dbg pseudo instruction
 {
     long Line;
     FilePos Pos = STATIC_FILEPOS_INITIALIZER;
 
-    /* Any new line info terminates the last one */
+    // Any new line info terminates the last one
     if (CurLineInfo) {
         EndLine (CurLineInfo);
         CurLineInfo = 0;
@@ -317,25 +317,25 @@ void DbgInfoLine (void)
         return;
     }
 
-    /* Parameters are separated by a comma */
+    // Parameters are separated by a comma
     ConsumeComma ();
 
-    /* The name of the file follows */
+    // The name of the file follows
     if (CurTok.Tok != TOK_STRCON) {
         ErrorSkip ("String constant expected");
         return;
     }
 
-    /* Get the index in the file table for the name */
+    // Get the index in the file table for the name
     Pos.Name = GetFileIndex (&CurTok.SVal);
 
-    /* Skip the name */
+    // Skip the name
     NextTok ();
 
-    /* Comma expected */
+    // Comma expected
     ConsumeComma ();
 
-    /* Line number */
+    // Line number
     Line = ConstExpression ();
     if (Line < 0) {
         ErrorSkip ("Line number is out of valid range");
@@ -343,14 +343,14 @@ void DbgInfoLine (void)
     }
     Pos.Line = Line;
 
-    /* Generate a new external line info */
+    // Generate a new external line info
     CurLineInfo = StartLine (&Pos, LI_TYPE_EXT, 0);
 }
 
 
 
 void DbgInfoSym (void)
-/* Parse and handle SYM subcommand of the .dbg pseudo instruction */
+// Parse and handle SYM subcommand of the .dbg pseudo instruction
 {
     static const char* const StorageKeys[] = {
         "AUTO",
@@ -367,10 +367,10 @@ void DbgInfoSym (void)
     HLLDbgSym*  S;
 
 
-    /* Parameters are separated by a comma */
+    // Parameters are separated by a comma
     ConsumeComma ();
 
-    /* Name */
+    // Name
     if (CurTok.Tok != TOK_STRCON) {
         ErrorSkip ("String constant expected");
         return;
@@ -378,10 +378,10 @@ void DbgInfoSym (void)
     Name = GetStrBufId (&CurTok.SVal);
     NextTok ();
 
-    /* Comma expected */
+    // Comma expected
     ConsumeComma ();
 
-    /* Type */
+    // Type
     if (CurTok.Tok != TOK_STRCON) {
         ErrorSkip ("String constant expected");
         return;
@@ -392,10 +392,10 @@ void DbgInfoSym (void)
     }
     NextTok ();
 
-    /* Comma expected */
+    // Comma expected
     ConsumeComma ();
 
-    /* The storage class follows */
+    // The storage class follows
     if (CurTok.Tok != TOK_IDENT) {
         ErrorSkip ("Storage class specifier expected");
         return;
@@ -408,16 +408,16 @@ void DbgInfoSym (void)
         default:  ErrorSkip ("Storage class specifier expected");   return;
     }
 
-    /* Skip the storage class token and the following comma */
+    // Skip the storage class token and the following comma
     NextTok ();
     ConsumeComma ();
 
-    /* The next tokens depend on the storage class */
+    // The next tokens depend on the storage class
     if (Flags == HLL_SC_AUTO) {
-        /* Auto: Stack offset follows */
+        // Auto: Stack offset follows
         Offs = ConstExpression ();
     } else {
-        /* Register, extern or static: Assembler name follows */
+        // Register, extern or static: Assembler name follows
         if (CurTok.Tok != TOK_STRCON) {
             ErrorSkip ("String constant expected");
             return;
@@ -425,14 +425,14 @@ void DbgInfoSym (void)
         AsmName = GetStrBufId (&CurTok.SVal);
         NextTok ();
 
-        /* For register, an offset follows */
+        // For register, an offset follows
         if (Flags == HLL_SC_REG) {
             ConsumeComma ();
             Offs = ConstExpression ();
         }
     }
 
-    /* Add the function */
+    // Add the function
     S = NewHLLDbgSym (Flags | HLL_TYPE_SYM, Name, Type);
     S->AsmName = AsmName;
     S->Offs    = Offs;
@@ -442,7 +442,7 @@ void DbgInfoSym (void)
 
 
 void DbgInfoCheck (void)
-/* Do checks on all hll debug info symbols when assembly is complete */
+// Do checks on all hll debug info symbols when assembly is complete
 {
     /* When parsing the debug statements for HLL symbols, we have already
     ** tagged the functions to their asm counterparts. This wasn't done for
@@ -452,7 +452,7 @@ void DbgInfoCheck (void)
     unsigned I;
     for (I = 0; I < CollCount (&HLLDbgSyms); ++I) {
 
-        /* Get the next symbol */
+        // Get the next symbol
         HLLDbgSym* S = CollAtUnchecked (&HLLDbgSyms, I);
 
         /* Ignore functions and auto symbols, because the later live on the
@@ -462,16 +462,16 @@ void DbgInfoCheck (void)
             continue;
         }
 
-        /* Safety */
+        // Safety
         CHECK (S->Sym == 0 && S->Scope != 0);
 
-        /* Search for the symbol name */
+        // Search for the symbol name
         S->Sym = SymFindAny (S->Scope, GetStrBuf (S->AsmName));
         if (S->Sym == 0) {
             PError (&S->Pos, "Assembler symbol '%s' not found",
                     GetString (S->AsmName));
         } else {
-            /* Set the backlink */
+            // Set the backlink
             S->Sym->HLLSym = S;
         }
 
@@ -481,23 +481,23 @@ void DbgInfoCheck (void)
 
 
 void WriteHLLDbgSyms (void)
-/* Write a list of all high level language symbols to the object file. */
+// Write a list of all high level language symbols to the object file.
 {
     unsigned I;
 
-    /* Only if debug info is enabled */
+    // Only if debug info is enabled
     if (DbgSyms) {
 
-        /* Write the symbol count to the list */
+        // Write the symbol count to the list
         ObjWriteVar (CollCount (&HLLDbgSyms));
 
-        /* Walk through list and write all symbols to the file. */
+        // Walk through list and write all symbols to the file.
         for (I = 0; I < CollCount (&HLLDbgSyms); ++I) {
 
-            /* Get the next symbol */
+            // Get the next symbol
             HLLDbgSym* S = CollAtUnchecked (&HLLDbgSyms, I);
 
-            /* Get the type of the symbol */
+            // Get the type of the symbol
             unsigned SC = HLL_GET_SC (S->Flags);
 
             /* Remember if the symbol has debug info attached
@@ -507,7 +507,7 @@ void WriteHLLDbgSyms (void)
                 S->Flags |= HLL_DATA_SYM;
             }
 
-            /* Write the symbol data */
+            // Write the symbol data
             ObjWriteVar (S->Flags);
             ObjWriteVar (S->Name);
             if (HLL_HAS_SYM (S->Flags)) {
@@ -522,7 +522,7 @@ void WriteHLLDbgSyms (void)
 
     } else {
 
-        /* Write a count of zero */
+        // Write a count of zero
         ObjWriteVar (0);
 
     }

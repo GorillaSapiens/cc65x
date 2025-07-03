@@ -1,35 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 coptind.h                                 */
-/*                                                                           */
-/*              Environment independent low level optimizations              */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2009, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                 coptind.h
+//
+//              Environment independent low level optimizations
+//
+//
+//
+// (C) 2001-2009, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
@@ -38,14 +38,14 @@
 
 
 
-/* cc65 */
+// cc65
 #include "codeseg.h"
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
@@ -55,25 +55,25 @@ unsigned OptUnusedLoads (CodeSeg* S);
 */
 
 unsigned OptUnusedStores (CodeSeg* S);
-/* Remove stores into zero page registers that aren't used later */
+// Remove stores into zero page registers that aren't used later
 
 unsigned OptLoad3 (CodeSeg* S);
-/* Remove repeated loads from one and the same memory location */
+// Remove repeated loads from one and the same memory location
 
 unsigned OptDupLoads (CodeSeg* S);
-/* Remove loads of registers where the value loaded is already in the register. */
+// Remove loads of registers where the value loaded is already in the register.
 
 unsigned OptStoreLoad (CodeSeg* S);
-/* Remove a store followed by a load from the same location. */
+// Remove a store followed by a load from the same location.
 
 unsigned OptLoadStore1 (CodeSeg* S);
-/* Remove an 8 bit load followed by a store into the same location. */
+// Remove an 8 bit load followed by a store into the same location.
 
 unsigned OptLoadStoreLoad (CodeSeg* S);
-/* Remove a load, store followed by a reload of the same location. */
+// Remove a load, store followed by a reload of the same location.
 
 unsigned OptTransfers1 (CodeSeg* S);
-/* Remove transfers from one register to another and back */
+// Remove transfers from one register to another and back
 
 unsigned OptTransfers2 (CodeSeg* S);
 /* Replace loads followed by a register transfer by a load with the second
@@ -91,13 +91,13 @@ unsigned OptTransfers4 (CodeSeg* S);
 */
 
 unsigned OptPushPop1 (CodeSeg* S);
-/* Remove a PHA/PLA sequence were A not used later */
+// Remove a PHA/PLA sequence were A not used later
 
 unsigned OptPushPop2 (CodeSeg* S);
-/* Remove a PHP/PLP sequence were no processor flags changed inside */
+// Remove a PHP/PLP sequence were no processor flags changed inside
 
 unsigned OptPushPop3 (CodeSeg* S);
-/* Remove a pha/pla sequence where the contents of A are known */
+// Remove a pha/pla sequence where the contents of A are known
 
 unsigned OptPrecalc (CodeSeg* S);
 /* Replace immediate operations with the accu where the current contents are
@@ -136,6 +136,6 @@ unsigned OptSignExtended (CodeSeg* S);
 
 
 
-/* End of coptind.h */
+// End of coptind.h
 
 #endif

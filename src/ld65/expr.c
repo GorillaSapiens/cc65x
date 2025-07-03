@@ -1,44 +1,44 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                  expr.c                                   */
-/*                                                                           */
-/*                 Expression evaluation for the ld65 linker                 */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                  expr.c
+//
+//                 Expression evaluation for the ld65 linker
+//
+//
+//
+// (C) 1998-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
-/* common */
+// common
 #include "check.h"
 #include "exprdefs.h"
 #include "xmalloc.h"
 
-/* ld65 */
+// ld65
 #include "global.h"
 #include "error.h"
 #include "fileio.h"
@@ -48,16 +48,16 @@
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 ExprNode* NewExprNode (ObjData* O, unsigned char Op)
-/* Create a new expression node */
+// Create a new expression node
 {
-    /* Allocate fresh memory */
+    // Allocate fresh memory
     ExprNode* N = xmalloc (sizeof (ExprNode));
     N->Op       = Op;
     N->Left     = 0;
@@ -71,16 +71,16 @@ ExprNode* NewExprNode (ObjData* O, unsigned char Op)
 
 
 static void FreeExprNode (ExprNode* E)
-/* Free a node */
+// Free a node
 {
-    /* Free the memory */
+    // Free the memory
     xfree (E);
 }
 
 
 
 void FreeExpr (ExprNode* Root)
-/* Free the expression, Root is pointing to. */
+// Free the expression, Root is pointing to.
 {
     if (Root) {
         FreeExpr (Root->Left);
@@ -108,7 +108,7 @@ int IsConstExpr (ExprNode* Root)
                 return 1;
 
             case EXPR_SYMBOL:
-                /* Get the referenced export */
+                // Get the referenced export
                 E = GetExprExport (Root);
                 /* If this export has a mark set, we've already encountered it.
                 ** This means that the export is used to define it's own value,
@@ -133,17 +133,17 @@ int IsConstExpr (ExprNode* Root)
                 return M != 0 && (M->Flags & MF_PLACED) != 0 && !M->Relocatable;
 
             case EXPR_SEGMENT:
-                /* A segment is const if it is not relocatable and placed */
+                // A segment is const if it is not relocatable and placed
                 M = Root->V.Seg->MemArea;
                 return M != 0 && (M->Flags & MF_PLACED) != 0 && !M->Relocatable;
 
             case EXPR_MEMAREA:
-                /* A memory area is const if it is not relocatable and placed */
+                // A memory area is const if it is not relocatable and placed
                 return !Root->V.Mem->Relocatable &&
                        (Root->V.Mem->Flags & MF_PLACED);
 
             default:
-                /* Anything else is not const */
+                // Anything else is not const
                 return 0;
 
         }
@@ -152,11 +152,11 @@ int IsConstExpr (ExprNode* Root)
 
         SegExprDesc D;
 
-        /* Special handling for the BANK pseudo function */
+        // Special handling for the BANK pseudo function
         switch (Root->Op) {
 
             case EXPR_BANK:
-                /* Get segment references for the expression */
+                // Get segment references for the expression
                 GetSegExprVal (Root->Left, &D);
 
                 /* The expression is const if the expression contains exactly
@@ -170,46 +170,46 @@ int IsConstExpr (ExprNode* Root)
                         IsConstExpr (D.Seg->MemArea->BankExpr));
 
             default:
-                /* All others handled normal */
+                // All others handled normal
                 return IsConstExpr (Root->Left);
 
         }
 
     } else {
 
-        /* We must handle shortcut boolean expressions here */
+        // We must handle shortcut boolean expressions here
         switch (Root->Op) {
 
             case EXPR_BOOLAND:
                 if (IsConstExpr (Root->Left)) {
-                    /* lhs is const, if it is zero, don't eval right */
+                    // lhs is const, if it is zero, don't eval right
                     if (GetExprVal (Root->Left) == 0) {
                         return 1;
                     } else {
                         return IsConstExpr (Root->Right);
                     }
                 } else {
-                    /* lhs not const --> tree not const */
+                    // lhs not const --> tree not const
                     return 0;
                 }
                 break;
 
             case EXPR_BOOLOR:
                 if (IsConstExpr (Root->Left)) {
-                    /* lhs is const, if it is not zero, don't eval right */
+                    // lhs is const, if it is not zero, don't eval right
                     if (GetExprVal (Root->Left) != 0) {
                         return 1;
                     } else {
                         return IsConstExpr (Root->Right);
                     }
                 } else {
-                    /* lhs not const --> tree not const */
+                    // lhs not const --> tree not const
                     return 0;
                 }
                 break;
 
             default:
-                /* All others are handled normal */
+                // All others are handled normal
                 return IsConstExpr (Root->Left) && IsConstExpr (Root->Right);
         }
     }
@@ -218,9 +218,9 @@ int IsConstExpr (ExprNode* Root)
 
 
 Import* GetExprImport (ExprNode* Expr)
-/* Get the import data structure for a symbol expression node */
+// Get the import data structure for a symbol expression node
 {
-    /* Check that this is really a symbol */
+    // Check that this is really a symbol
     PRECONDITION (Expr->Op == EXPR_SYMBOL);
 
     /* If we have an object file, get the import from it, otherwise
@@ -228,7 +228,7 @@ Import* GetExprImport (ExprNode* Expr)
     ** import pointer.
     */
     if (Expr->Obj) {
-        /* Return the Import */
+        // Return the Import
         return GetObjImport (Expr->Obj, Expr->V.ImpNum);
     } else {
         return Expr->V.Imp;
@@ -238,21 +238,21 @@ Import* GetExprImport (ExprNode* Expr)
 
 
 Export* GetExprExport (ExprNode* Expr)
-/* Get the exported symbol for a symbol expression node */
+// Get the exported symbol for a symbol expression node
 {
-    /* Check that this is really a symbol */
+    // Check that this is really a symbol
     PRECONDITION (Expr->Op == EXPR_SYMBOL);
 
-    /* Return the export for an import*/
+    // Return the export for an import
     return GetExprImport (Expr)->Exp;
 }
 
 
 
 Section* GetExprSection (ExprNode* Expr)
-/* Get the segment for a section expression node */
+// Get the segment for a section expression node
 {
-    /* Check that this is really a section node */
+    // Check that this is really a section node
     PRECONDITION (Expr->Op == EXPR_SECTION);
 
     /* If we have an object file, get the section from it, otherwise
@@ -260,7 +260,7 @@ Section* GetExprSection (ExprNode* Expr)
     ** section pointer.
     */
     if (Expr->Obj) {
-        /* Return the export */
+        // Return the export
         return CollAt (&Expr->Obj->Sections, Expr->V.SecNum);
     } else {
         return Expr->V.Sec;
@@ -270,7 +270,7 @@ Section* GetExprSection (ExprNode* Expr)
 
 
 long GetExprVal (ExprNode* Expr)
-/* Get the value of a constant expression */
+// Get the value of a constant expression
 {
     long        Right;
     long        Left;
@@ -285,7 +285,7 @@ long GetExprVal (ExprNode* Expr)
             return Expr->V.IVal;
 
         case EXPR_SYMBOL:
-            /* Get the referenced export */
+            // Get the referenced export
             E = GetExprExport (Expr);
             /* If this export has a mark set, we've already encountered it.
             ** This means that the export is used to define it's own value,
@@ -444,12 +444,12 @@ long GetExprVal (ExprNode* Expr)
             return GetExprVal (Expr->Left) & 0xFFFFFFFF;
 
         case EXPR_NEARADDR:
-            /* Assembler was expected to validate this truncation. */
+            // Assembler was expected to validate this truncation.
             return GetExprVal (Expr->Left) & 0xFFFF;
 
         default:
             Internal ("Unknown expression Op type: %u", Expr->Op);
-            /* NOTREACHED */
+            // NOTREACHED
             return 0;
     }
 }
@@ -474,7 +474,7 @@ static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
             break;
 
         case EXPR_SYMBOL:
-            /* Get the referenced export */
+            // Get the referenced export
             E = GetExprExport (Expr);
             /* If this export has a mark set, we've already encountered it.
             ** This means that the export is used to define it's own value,
@@ -491,26 +491,26 @@ static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
 
         case EXPR_SECTION:
             if (D->Seg) {
-                /* We cannot handle more than one segment reference in o65 */
+                // We cannot handle more than one segment reference in o65
                 D->TooComplex = 1;
             } else {
-                /* Get the section from the expression */
+                // Get the section from the expression
                 Section* S = GetExprSection (Expr);
-                /* Remember the segment reference */
+                // Remember the segment reference
                 D->Seg = S->Seg;
-                /* Add the offset of the section to the constant value */
+                // Add the offset of the section to the constant value
                 D->Val += Sign * (S->Offs + D->Seg->PC);
             }
             break;
 
         case EXPR_SEGMENT:
             if (D->Seg) {
-                /* We cannot handle more than one segment reference in o65 */
+                // We cannot handle more than one segment reference in o65
                 D->TooComplex = 1;
             } else {
-                /* Remember the segment reference */
+                // Remember the segment reference
                 D->Seg = Expr->V.Seg;
-                /* Add the offset of the segment to the constant value */
+                // Add the offset of the segment to the constant value
                 D->Val += (Sign * D->Seg->PC);
             }
             break;
@@ -526,7 +526,7 @@ static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
             break;
 
         default:
-            /* Expression contains illegal operators */
+            // Expression contains illegal operators
             D->TooComplex = 1;
             break;
 
@@ -541,19 +541,19 @@ void GetSegExprVal (ExprNode* Expr, SegExprDesc* D)
 ** set D->TooComplex to true. The function will initialize D.
 */
 {
-    /* Initialize the given structure */
+    // Initialize the given structure
     D->Val        = 0;
     D->TooComplex = 0;
     D->Seg        = 0;
 
-    /* Call our recursive calculation routine */
+    // Call our recursive calculation routine
     GetSegExprValInternal (Expr, D, 1);
 }
 
 
 
 ExprNode* LiteralExpr (long Val, ObjData* O)
-/* Return an expression tree that encodes the given literal value */
+// Return an expression tree that encodes the given literal value
 {
     ExprNode* Expr = NewExprNode (O, EXPR_LITERAL);
     Expr->V.IVal = Val;
@@ -563,7 +563,7 @@ ExprNode* LiteralExpr (long Val, ObjData* O)
 
 
 ExprNode* MemoryExpr (MemoryArea* Mem, long Offs, ObjData* O)
-/* Return an expression tree that encodes an offset into a memory area */
+// Return an expression tree that encodes an offset into a memory area
 {
     ExprNode* Root;
 
@@ -584,7 +584,7 @@ ExprNode* MemoryExpr (MemoryArea* Mem, long Offs, ObjData* O)
 
 
 ExprNode* SegmentExpr (Segment* Seg, long Offs, ObjData* O)
-/* Return an expression tree that encodes an offset into a segment */
+// Return an expression tree that encodes an offset into a segment
 {
     ExprNode* Root;
 
@@ -605,7 +605,7 @@ ExprNode* SegmentExpr (Segment* Seg, long Offs, ObjData* O)
 
 
 ExprNode* SectionExpr (Section* Sec, long Offs, ObjData* O)
-/* Return an expression tree that encodes an offset into a section */
+// Return an expression tree that encodes an offset into a section
 {
     ExprNode* Root;
 
@@ -626,20 +626,20 @@ ExprNode* SectionExpr (Section* Sec, long Offs, ObjData* O)
 
 
 ExprNode* ReadExpr (FILE* F, ObjData* O)
-/* Read an expression from the given file */
+// Read an expression from the given file
 {
     ExprNode* Expr;
 
-    /* Read the node tag and handle NULL nodes */
+    // Read the node tag and handle NULL nodes
     unsigned char Op = Read8 (F);
     if (Op == EXPR_NULL) {
         return 0;
     }
 
-    /* Create a new node */
+    // Create a new node
     Expr = NewExprNode (O, Op);
 
-    /* Check the tag and handle the different expression types */
+    // Check the tag and handle the different expression types
     if (EXPR_IS_LEAF (Op)) {
         switch (Op) {
 
@@ -648,12 +648,12 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
                 break;
 
             case EXPR_SYMBOL:
-                /* Read the import number */
+                // Read the import number
                 Expr->V.ImpNum = ReadVar (F);
                 break;
 
             case EXPR_SECTION:
-                /* Read the section number */
+                // Read the section number
                 Expr->V.SecNum = ReadVar (F);
                 break;
 
@@ -664,22 +664,22 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
 
     } else {
 
-        /* Not a leaf node */
+        // Not a leaf node
         Expr->Left = ReadExpr (F, O);
         Expr->Right = ReadExpr (F, O);
 
     }
 
-    /* Return the tree */
+    // Return the tree
     return Expr;
 }
 
 
 
 int EqualExpr (ExprNode* E1, ExprNode* E2)
-/* Check if two expressions are identical. */
+// Check if two expressions are identical.
 {
-    /* If one pointer is NULL, both must be NULL */
+    // If one pointer is NULL, both must be NULL
     if ((E1 == 0) ^ (E2 == 0)) {
         return 0;
     }
@@ -687,36 +687,36 @@ int EqualExpr (ExprNode* E1, ExprNode* E2)
         return 1;
     }
 
-    /* Both pointers not NULL, check OP */
+    // Both pointers not NULL, check OP
     if (E1->Op != E2->Op) {
         return 0;
     }
 
-    /* OPs are identical, check data for leafs, or subtrees */
+    // OPs are identical, check data for leafs, or subtrees
     switch (E1->Op) {
 
         case EXPR_LITERAL:
-            /* Value must be identical */
+            // Value must be identical
             return (E1->V.IVal == E2->V.IVal);
 
         case EXPR_SYMBOL:
-            /* Import must be identical */
+            // Import must be identical
             return (GetExprImport (E1) == GetExprImport (E2));
 
         case EXPR_SECTION:
-            /* Section must be identical */
+            // Section must be identical
             return (GetExprSection (E1) == GetExprSection (E2));
 
         case EXPR_SEGMENT:
-            /* Segment must be identical */
+            // Segment must be identical
             return (E1->V.Seg == E2->V.Seg);
 
         case EXPR_MEMAREA:
-            /* Memory area must be identical */
+            // Memory area must be identical
             return (E1->V.Mem == E2->V.Mem);
 
         default:
-            /* Not a leaf node */
+            // Not a leaf node
             return EqualExpr (E1->Left, E2->Left) && EqualExpr (E1->Right, E2->Right);
     }
 

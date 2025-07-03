@@ -1,46 +1,46 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 stdfunc.c                                 */
-/*                                                                           */
-/*         Handle inlining of known functions for the cc65 compiler          */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2010 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                 stdfunc.c
+//
+//         Handle inlining of known functions for the cc65 compiler
+//
+//
+//
+// (C) 1998-2010 Ullrich von Bassewitz
+//               Roemerstrasse 52
+//               D-70794 Filderstadt
+// EMail:        uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
 #include <stdlib.h>
 #include <string.h>
 
-/* common */
+// common
 #include "attrib.h"
 #include "check.h"
 
-/* cc65 */
+// cc65
 #include "asmcode.h"
 #include "asmlabel.h"
 #include "codegen.h"
@@ -58,9 +58,9 @@
 
 
 
-/*****************************************************************************/
-/*                             Function forwards                             */
-/*****************************************************************************/
+//***************************************************************************
+//                             Function forwards
+//***************************************************************************
 
 
 
@@ -72,9 +72,9 @@ static void StdFunc_strlen (FuncDesc*, ExprDesc*);
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
@@ -85,37 +85,37 @@ static struct StdFuncDesc {
     const char*         Name;
     void                (*Handler) (FuncDesc*, ExprDesc*);
 } StdFuncs[] = {
-/* BEGIN SORTED.SH */
+// BEGIN SORTED.SH
     {   "memcpy",       StdFunc_memcpy          },
     {   "memset",       StdFunc_memset          },
     {   "strcmp",       StdFunc_strcmp          },
     {   "strcpy",       StdFunc_strcpy          },
     {   "strlen",       StdFunc_strlen          },
-/* END SORTED.SH */
+// END SORTED.SH
 };
 #define FUNC_COUNT      (sizeof (StdFuncs) / sizeof (StdFuncs[0]))
 
 typedef struct ArgDesc ArgDesc;
 struct ArgDesc {
-    const Type* ArgType;        /* Required argument type */
-    ExprDesc    Expr;           /* Argument expression */
-    const Type* Type;           /* The original type before conversion */
-    CodeMark    Load;           /* Start of argument load code */
-    CodeMark    Push;           /* Start of argument push code */
-    CodeMark    End;            /* End of the code for calculation+push */
-    unsigned    Flags;          /* Code generation flags */
+    const Type* ArgType;        // Required argument type
+    ExprDesc    Expr;           // Argument expression
+    const Type* Type;           // The original type before conversion
+    CodeMark    Load;           // Start of argument load code
+    CodeMark    Push;           // Start of argument push code
+    CodeMark    End;            // End of the code for calculation+push
+    unsigned    Flags;          // Code generation flags
 };
 
 
 
-/*****************************************************************************/
-/*                             Helper functions                              */
-/*****************************************************************************/
+//***************************************************************************
+//                             Helper functions
+//***************************************************************************
 
 
 
 static int CmpFunc (const void* Key, const void* Elem)
-/* Compare function for bsearch */
+// Compare function for bsearch
 {
     return strcmp ((const char*) Key, ((const struct StdFuncDesc*) Elem)->Name);
 }
@@ -132,7 +132,7 @@ static long ArrayElementCount (const ArgDesc* Arg)
     if (IsTypeArray (Arg->Type)) {
         Count = GetElementCount (Arg->Type);
         if (Count == FLEXIBLE) {
-            /* Treat as unknown */
+            // Treat as unknown
             Count = UNSPECIFIED;
         }
     } else {
@@ -148,47 +148,47 @@ static void ParseArg (ArgDesc* Arg, const Type* Type, ExprDesc* Expr)
 ** Arg valid.
 */
 {
-    /* We have a prototype, so chars may be pushed as chars */
+    // We have a prototype, so chars may be pushed as chars
     Arg->Flags = CF_FORCECHAR;
 
-    /* Remember the required argument type */
+    // Remember the required argument type
     Arg->ArgType = Type;
 
-    /* Init expression */
+    // Init expression
     ED_Init (&Arg->Expr);
     Arg->Expr.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
-    /* Read the expression we're going to pass to the function */
+    // Read the expression we're going to pass to the function
     MarkedExprWithCheck (hie1, &Arg->Expr);
 
-    /* Remember the actual argument type */
+    // Remember the actual argument type
     Arg->Type = Arg->Expr.Type;
 
-    /* Convert this expression to the expected type */
+    // Convert this expression to the expected type
     TypeConversion (&Arg->Expr, Type);
 
-    /* Remember the following code position */
+    // Remember the following code position
     GetCodePos (&Arg->Load);
 
     /* If the value is a constant, set the flag, otherwise load it into the
     ** primary register.
     */
     if (ED_IsConstAbsInt (&Arg->Expr) && ED_CodeRangeIsEmpty (&Arg->Expr)) {
-        /* Remember that we have a constant value */
+        // Remember that we have a constant value
         Arg->Flags |= CF_CONST;
     } else {
-        /* Load into the primary */
+        // Load into the primary
         LoadExpr (CF_NONE, &Arg->Expr);
     }
 
-    /* Remember the following code position */
+    // Remember the following code position
     GetCodePos (&Arg->Push);
     GetCodePos (&Arg->End);
 
-    /* Use the type of the argument for the push */
+    // Use the type of the argument for the push
     Arg->Flags |= CG_TypeOf (Arg->Expr.Type);
 
-    /* Propagate from subexpressions */
+    // Propagate from subexpressions
     Expr->Flags |= Arg->Expr.Flags & E_MASK_VIRAL;
 }
 
@@ -207,16 +207,16 @@ void AddCmpCodeIfSizeNot256 (const char* Code, long Size)
 
 
 
-/*****************************************************************************/
-/*                                  memcpy                                   */
-/*****************************************************************************/
+//***************************************************************************
+//                                  memcpy
+//***************************************************************************
 
 
 
 static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
-/* Handle the memcpy function */
+// Handle the memcpy function
 {
-    /* Argument types: (void*, const void*, size_t) */
+    // Argument types: (void*, const void*, size_t)
     static const Type* Arg1Type = type_void_p;
     static const Type* Arg2Type = type_c_void_p;
     static const Type* Arg3Type = type_size_t;
@@ -226,14 +226,14 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     unsigned Label;
     int      Offs;
 
-    /* Argument #1 */
+    // Argument #1
     ParseArg (&Arg1, Arg1Type, Expr);
     g_push (Arg1.Flags, Arg1.Expr.IVal);
     GetCodePos (&Arg1.End);
     ParamSize += SizeOf (Arg1Type);
     ConsumeComma ();
 
-    /* Argument #2 */
+    // Argument #2
     ParseArg (&Arg2, Arg2Type, Expr);
     g_push (Arg2.Flags, Arg2.Expr.IVal);
     GetCodePos (&Arg2.End);
@@ -250,15 +250,15 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         LoadExpr (CF_NONE, &Arg3.Expr);
     }
 
-    /* We still need to append deferred inc/dec before calling into the function */
+    // We still need to append deferred inc/dec before calling into the function
     DoDeferred (SQP_KEEP_EAX, &Arg3.Expr);
 
-    /* Emit the actual function call. This will also cleanup the stack. */
+    // Emit the actual function call. This will also cleanup the stack.
     g_call (CF_FIXARGC, Func_memcpy, ParamSize);
 
     if (ED_IsConstAbsInt (&Arg3.Expr) && Arg3.Expr.IVal == 0) {
 
-        /* memcpy has been called with a count argument of zero */
+        // memcpy has been called with a count argument of zero
         Warning ("Call to memcpy has no effect");
 
         /* Remove all of the generated code but the load of the first
@@ -266,10 +266,10 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         */
         RemoveCode (&Arg1.Push);
 
-        /* Set the function result to the first argument */
+        // Set the function result to the first argument
         *Expr = Arg1.Expr;
 
-        /* Bail out, no need for further improvements */
+        // Bail out, no need for further improvements
         goto ExitPoint;
     }
 
@@ -287,13 +287,13 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             int Reg1 = ED_IsZPInd (&Arg1.Expr);
             int Reg2 = ED_IsZPInd (&Arg2.Expr);
 
-            /* Drop the generated code */
+            // Drop the generated code
             RemoveCode (&Arg1.Expr.Start);
 
-            /* We need a label */
+            // We need a label
             Label = GetLocalLabel ();
 
-            /* Generate memcpy code */
+            // Generate memcpy code
             if (Arg3.Expr.IVal <= 129) {
 
                 AddCodeLine ("ldy #$%02X", (unsigned char) (Arg3.Expr.IVal-1));
@@ -336,7 +336,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             */
             *Expr = Arg1.Expr;
 
-            /* Bail out, no need for further processing */
+            // Bail out, no need for further processing
             goto ExitPoint;
         }
 
@@ -355,16 +355,16 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             int AllowOneIndex = !ED_IsLocZP (&Arg2.Expr) &&
                                 !(ED_IsLocNone (&Arg2.Expr) && Arg2.Expr.IVal < 256);
 
-            /* Calculate the real stack offset */
+            // Calculate the real stack offset
             Offs = ED_GetStackOffs (&Arg1.Expr, 0);
 
-            /* Drop the generated code */
+            // Drop the generated code
             RemoveCode (&Arg1.Expr.Start);
 
-            /* We need a label */
+            // We need a label
             Label = GetLocalLabel ();
 
-            /* Generate memcpy code */
+            // Generate memcpy code
             if (Arg3.Expr.IVal <= 129 && !AllowOneIndex) {
 
                 if (Offs == 0) {
@@ -414,7 +414,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             */
             *Expr = Arg1.Expr;
 
-            /* Bail out, no need for further processing */
+            // Bail out, no need for further processing
             goto ExitPoint;
         }
 
@@ -433,16 +433,16 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             int AllowOneIndex = !ED_IsLocZP (&Arg1.Expr) &&
                                 !(ED_IsLocNone (&Arg1.Expr) && Arg1.Expr.IVal < 256);
 
-            /* Calculate the real stack offset */
+            // Calculate the real stack offset
             Offs = ED_GetStackOffs (&Arg2.Expr, 0);
 
-            /* Drop the generated code */
+            // Drop the generated code
             RemoveCode (&Arg1.Expr.Start);
 
-            /* We need a label */
+            // We need a label
             Label = GetLocalLabel ();
 
-            /* Generate memcpy code */
+            // Generate memcpy code
             if (Arg3.Expr.IVal <= 129 && !AllowOneIndex) {
 
                 if (Offs == 0) {
@@ -492,7 +492,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             */
             *Expr = Arg1.Expr;
 
-            /* Bail out, no need for further processing */
+            // Bail out, no need for further processing
             goto ExitPoint;
         }
 
@@ -500,13 +500,13 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             ED_IsStackAddr (&Arg2.Expr) &&
             (Offs = ED_GetStackOffs (&Arg2.Expr, 0)) == 0) {
 
-            /* Drop the generated code but leave the load of the first argument*/
+            // Drop the generated code but leave the load of the first argument
             RemoveCode (&Arg1.Push);
 
-            /* We need a label */
+            // We need a label
             Label = GetLocalLabel ();
 
-            /* Generate memcpy code */
+            // Generate memcpy code
             AddCodeLine ("sta ptr1");
             AddCodeLine ("stx ptr1+1");
             if (Arg3.Expr.IVal <= 129) {
@@ -526,49 +526,49 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 AddCodeLine ("bne %s", LocalLabelName (Label));
             }
 
-            /* Reload result - X hasn't changed by the code above */
+            // Reload result - X hasn't changed by the code above
             AddCodeLine ("lda ptr1");
 
-            /* The function result is an rvalue in the primary register */
+            // The function result is an rvalue in the primary register
             ED_FinalizeRValLoad (Expr);
             Expr->Type = GetFuncReturnType (Expr->Type);
 
-            /* Bail out, no need for further processing */
+            // Bail out, no need for further processing
             goto ExitPoint;
         }
     }
 
-    /* The function result is an rvalue in the primary register */
+    // The function result is an rvalue in the primary register
     ED_FinalizeRValLoad (Expr);
     Expr->Type = GetFuncReturnType (Expr->Type);
 
 ExitPoint:
-    /* We expect the closing brace */
+    // We expect the closing brace
     ConsumeRParen ();
 }
 
 
 
-/*****************************************************************************/
-/*                                  memset                                   */
-/*****************************************************************************/
+//***************************************************************************
+//                                  memset
+//***************************************************************************
 
 
 
 static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
-/* Handle the memset function */
+// Handle the memset function
 {
-    /* Argument types: (void*, int, size_t) */
+    // Argument types: (void*, int, size_t)
     static const Type* Arg1Type = type_void_p;
     static const Type* Arg2Type = type_int;
     static const Type* Arg3Type = type_size_t;
 
     ArgDesc  Arg1, Arg2, Arg3;
-    int      MemSet    = 1;             /* Use real memset if true */
+    int      MemSet    = 1;             // Use real memset if true
     unsigned ParamSize = 0;
     unsigned Label;
 
-    /* Argument #1 */
+    // Argument #1
     ParseArg (&Arg1, Arg1Type, Expr);
     g_push (Arg1.Flags, Arg1.Expr.IVal);
     GetCodePos (&Arg1.End);
@@ -580,10 +580,10 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     */
     ParseArg (&Arg2, Arg2Type, Expr);
     if ((Arg2.Flags & CF_CONST) != 0 && Arg2.Expr.IVal == 0) {
-        /* Don't call memset, call bzero instead */
+        // Don't call memset, call bzero instead
         MemSet = 0;
     } else {
-        /* Push the argument */
+        // Push the argument
         g_push (Arg2.Flags, Arg2.Expr.IVal);
         GetCodePos (&Arg2.End);
         ParamSize += SizeOf (Arg2Type);
@@ -600,15 +600,15 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         LoadExpr (CF_NONE, &Arg3.Expr);
     }
 
-    /* We still need to append deferred inc/dec before calling into the function */
+    // We still need to append deferred inc/dec before calling into the function
     DoDeferred (SQP_KEEP_EAX, &Arg3.Expr);
 
-    /* Emit the actual function call. This will also cleanup the stack. */
+    // Emit the actual function call. This will also cleanup the stack.
     g_call (CF_FIXARGC, MemSet? Func_memset : Func___bzero, ParamSize);
 
     if (ED_IsConstAbsInt (&Arg3.Expr) && Arg3.Expr.IVal == 0) {
 
-        /* memset has been called with a count argument of zero */
+        // memset has been called with a count argument of zero
         Warning ("Call to memset has no effect");
 
         /* Remove all of the generated code but the load of the first
@@ -616,10 +616,10 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         */
         RemoveCode (&Arg1.Push);
 
-        /* Set the function result to the first argument */
+        // Set the function result to the first argument
         *Expr = Arg1.Expr;
 
-        /* Bail out, no need for further improvements */
+        // Bail out, no need for further improvements
         goto ExitPoint;
     }
 
@@ -640,13 +640,13 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
             int Reg = ED_IsZPInd (&Arg1.Expr);
 
-            /* Drop the generated code */
+            // Drop the generated code
             RemoveCode (&Arg1.Expr.Start);
 
-            /* We need a label */
+            // We need a label
             Label = GetLocalLabel ();
 
-            /* Generate memset code */
+            // Generate memset code
             if (Arg3.Expr.IVal <= 129) {
 
                 AddCodeLine ("ldy #$%02X", (unsigned char) (Arg3.Expr.IVal-1));
@@ -681,7 +681,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             */
             *Expr = Arg1.Expr;
 
-            /* Bail out, no need for further processing */
+            // Bail out, no need for further processing
             goto ExitPoint;
         }
 
@@ -690,16 +690,16 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             ED_IsStackAddr (&Arg1.Expr) &&
             ED_GetStackOffs (&Arg1.Expr, Arg3.Expr.IVal) < 256) {
 
-            /* Calculate the real stack offset */
+            // Calculate the real stack offset
             int Offs = ED_GetStackOffs (&Arg1.Expr, 0);
 
-            /* Drop the generated code */
+            // Drop the generated code
             RemoveCode (&Arg1.Expr.Start);
 
-            /* We need a label */
+            // We need a label
             Label = GetLocalLabel ();
 
-            /* Generate memset code */
+            // Generate memset code
             AddCodeLine ("ldy #$%02X", (unsigned char) Offs);
             AddCodeLine ("lda #$%02X", (unsigned char) Arg2.Expr.IVal);
             g_defcodelabel (Label);
@@ -713,7 +713,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             */
             *Expr = Arg1.Expr;
 
-            /* Bail out, no need for further processing */
+            // Bail out, no need for further processing
             goto ExitPoint;
         }
 
@@ -726,10 +726,10 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             */
             RemoveCode (&Arg1.Push);
 
-            /* We need a label */
+            // We need a label
             Label = GetLocalLabel ();
 
-            /* Generate code */
+            // Generate code
             AddCodeLine ("sta ptr1");
             AddCodeLine ("stx ptr1+1");
             if (Arg3.Expr.IVal <= 129) {
@@ -754,36 +754,36 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             */
             AddCodeLine ("lda ptr1");
 
-            /* The function result is an rvalue in the primary register */
+            // The function result is an rvalue in the primary register
             ED_FinalizeRValLoad (Expr);
             Expr->Type = GetFuncReturnType (Expr->Type);
 
-            /* Bail out, no need for further processing */
+            // Bail out, no need for further processing
             goto ExitPoint;
         }
     }
 
-    /* The function result is an rvalue in the primary register */
+    // The function result is an rvalue in the primary register
     ED_FinalizeRValLoad (Expr);
     Expr->Type = GetFuncReturnType (Expr->Type);
 
 ExitPoint:
-    /* We expect the closing brace */
+    // We expect the closing brace
     ConsumeRParen ();
 }
 
 
 
-/*****************************************************************************/
-/*                                  strcmp                                   */
-/*****************************************************************************/
+//***************************************************************************
+//                                  strcmp
+//***************************************************************************
 
 
 
 static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
-/* Handle the strcmp function */
+// Handle the strcmp function
 {
-    /* Argument types: (const char*, const char*) */
+    // Argument types: (const char*, const char*)
     static const Type* Arg1Type = type_c_char_p;
     static const Type* Arg2Type = type_c_char_p;
 
@@ -794,13 +794,13 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     int      IsArray;
     int      Offs;
 
-    /* Argument #1 */
+    // Argument #1
     ParseArg (&Arg1, Arg1Type, Expr);
     g_push (Arg1.Flags, Arg1.Expr.IVal);
     ParamSize += SizeOf (Arg1Type);
     ConsumeComma ();
 
-    /* Argument #2. */
+    // Argument #2.
     ParseArg (&Arg2, Arg2Type, Expr);
 
     /* Since strcmp is a fastcall function, we must load the
@@ -812,10 +812,10 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         LoadExpr (CF_NONE, &Arg2.Expr);
     }
 
-    /* We still need to append deferred inc/dec before calling into the function */
+    // We still need to append deferred inc/dec before calling into the function
     DoDeferred (SQP_KEEP_EAX, &Arg2.Expr);
 
-    /* Emit the actual function call. This will also cleanup the stack. */
+    // Emit the actual function call. This will also cleanup the stack.
     g_call (CF_FIXARGC, Func_strcmp, ParamSize);
 
     /* Get the element counts of the arguments. Then get the larger of the
@@ -842,7 +842,7 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             */
             RemoveCode (&Arg1.Push);
 
-            /* We don't need the literal any longer */
+            // We don't need the literal any longer
             ReleaseLiteral (Arg2.Expr.V.LVal);
 
             /* We do now have Arg1 in the primary. Load the first character from
@@ -851,18 +851,18 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             IsArray = IsTypeArray (Arg1.Type) && ED_IsAddrExpr (&Arg1.Expr);
             if (IsArray && ED_IsLocStack (&Arg1.Expr) &&
                 (Offs = ED_GetStackOffs (&Arg1.Expr, 0) < 256)) {
-                /* Drop the generated code */
+                // Drop the generated code
                 RemoveCode (&Arg1.Load);
 
-                /* Generate code */
+                // Generate code
                 AddCodeLine ("ldy #$%02X", Offs);
                 AddCodeLine ("ldx #$00");
                 AddCodeLine ("lda (c_sp),y");
             } else if (IsArray && ED_IsLocConst (&Arg1.Expr)) {
-                /* Drop the generated code */
+                // Drop the generated code
                 RemoveCode (&Arg1.Load);
 
-                /* Generate code */
+                // Generate code
                 AddCodeLine ("ldx #$00");
                 AddCodeLine ("lda %s", ED_GetLabelName (&Arg1.Expr, 0));
             } else {
@@ -871,7 +871,7 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 */
                 RemoveCode (&Arg1.Push);
 
-                /* Fetch the first char */
+                // Fetch the first char
                 g_getind (CF_CHAR | CF_UNSIGNED, 0);
             }
 
@@ -880,7 +880,7 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                    (ED_IsConstAddr (&Arg1.Expr) || ED_IsZPInd (&Arg1.Expr)) &&
                    (IS_Get (&EagerlyInlineFuncs) || (ECount1 > 0 && ECount1 < 256))) {
 
-            unsigned    Entry, Loop, Fin;   /* Labels */
+            unsigned    Entry, Loop, Fin;   // Labels
             const char* Load;
             const char* Compare;
 
@@ -895,15 +895,15 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 Compare = "cmp %s,y";
             }
 
-            /* Drop the generated code */
+            // Drop the generated code
             RemoveCode (&Arg1.Expr.Start);
 
-            /* We need labels */
+            // We need labels
             Entry = GetLocalLabel ();
             Loop  = GetLocalLabel ();
             Fin   = GetLocalLabel ();
 
-            /* Generate strcmp code */
+            // Generate strcmp code
             AddCodeLine ("ldy #$00");
             AddCodeLine ("beq %s", LocalLabelName (Entry));
             g_defcodelabel (Loop);
@@ -923,7 +923,7 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                    (ED_IsConstAddr (&Arg2.Expr) || ED_IsZPInd (&Arg2.Expr)) &&
                    (IS_Get (&EagerlyInlineFuncs) || (ECount1 > 0 && ECount1 < 256))) {
 
-            unsigned    Entry, Loop, Fin;   /* Labels */
+            unsigned    Entry, Loop, Fin;   // Labels
             const char* Compare;
 
             if (ED_IsZPInd (&Arg2.Expr)) {
@@ -932,19 +932,19 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 Compare = "cmp %s,y";
             }
 
-            /* Drop the generated code */
+            // Drop the generated code
             RemoveCode (&Arg1.Push);
 
-            /* We need labels */
+            // We need labels
             Entry = GetLocalLabel ();
             Loop  = GetLocalLabel ();
             Fin   = GetLocalLabel ();
 
-            /* Store Arg1 into ptr1 */
+            // Store Arg1 into ptr1
             AddCodeLine ("sta ptr1");
             AddCodeLine ("stx ptr1+1");
 
-            /* Generate strcmp code */
+            // Generate strcmp code
             AddCodeLine ("ldy #$00");
             AddCodeLine ("beq %s", LocalLabelName (Entry));
             g_defcodelabel (Loop);
@@ -962,26 +962,26 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         }
     }
 
-    /* The function result is an rvalue in the primary register */
+    // The function result is an rvalue in the primary register
     ED_FinalizeRValLoad (Expr);
     Expr->Type = GetFuncReturnType (Expr->Type);
 
-    /* We expect the closing brace */
+    // We expect the closing brace
     ConsumeRParen ();
 }
 
 
 
-/*****************************************************************************/
-/*                                  strcpy                                   */
-/*****************************************************************************/
+//***************************************************************************
+//                                  strcpy
+//***************************************************************************
 
 
 
 static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
-/* Handle the strcpy function */
+// Handle the strcpy function
 {
-    /* Argument types: (char*, const char*) */
+    // Argument types: (char*, const char*)
     static const Type* Arg1Type = type_char_p;
     static const Type* Arg2Type = type_c_char_p;
 
@@ -990,7 +990,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     long     ECount;
     unsigned L1;
 
-    /* Argument #1 */
+    // Argument #1
     ParseArg (&Arg1, Arg1Type, Expr);
     g_push (Arg1.Flags, Arg1.Expr.IVal);
     GetCodePos (&Arg1.End);
@@ -1007,13 +1007,13 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         LoadExpr (CF_NONE, &Arg2.Expr);
     }
 
-    /* We still need to append deferred inc/dec before calling into the function */
+    // We still need to append deferred inc/dec before calling into the function
     DoDeferred (SQP_KEEP_EAX, &Arg2.Expr);
 
-    /* Emit the actual function call. This will also cleanup the stack. */
+    // Emit the actual function call. This will also cleanup the stack.
     g_call (CF_FIXARGC, Func_strcpy, ParamSize);
 
-    /* Get the element count of argument 1 if it is an array */
+    // Get the element count of argument 1 if it is an array
     ECount = ArrayElementCount (&Arg1);
 
     if (IS_Get (&InlineStdFuncs)) {
@@ -1041,13 +1041,13 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 Store = "sta %s,y";
             }
 
-            /* Drop the generated code */
+            // Drop the generated code
             RemoveCode (&Arg1.Expr.Start);
 
-            /* We need labels */
+            // We need labels
             L1 = GetLocalLabel ();
 
-            /* Generate strcpy code */
+            // Generate strcpy code
             AddCodeLine ("ldy #$FF");
             g_defcodelabel (L1);
             AddCodeLine ("iny");
@@ -1055,10 +1055,10 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine (Store, ED_GetLabelName (&Arg1.Expr, 0));
             AddCodeLine ("bne %s", LocalLabelName (L1));
 
-            /* strcpy returns argument #1 */
+            // strcpy returns argument #1
             *Expr = Arg1.Expr;
 
-            /* Bail out, no need for further processing */
+            // Bail out, no need for further processing
             goto ExitPoint;
         }
 
@@ -1076,16 +1076,16 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             int AllowOneIndex = !ED_IsLocZP (&Arg1.Expr) &&
                                 !(ED_IsLocNone (&Arg1.Expr) && Arg1.Expr.IVal < 256);
 
-            /* Calculate the real stack offset */
+            // Calculate the real stack offset
             int Offs = ED_GetStackOffs (&Arg2.Expr, 0);
 
-            /* Drop the generated code */
+            // Drop the generated code
             RemoveCode (&Arg1.Expr.Start);
 
-            /* We need labels */
+            // We need labels
             L1 = GetLocalLabel ();
 
-            /* Generate strcpy code */
+            // Generate strcpy code
             AddCodeLine ("ldy #$%02X", (unsigned char) (Offs - 1));
             if (Offs == 0 || AllowOneIndex) {
                 g_defcodelabel (L1);
@@ -1102,10 +1102,10 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             }
             AddCodeLine ("bne %s", LocalLabelName (L1));
 
-            /* strcpy returns argument #1 */
+            // strcpy returns argument #1
             *Expr = Arg1.Expr;
 
-            /* Bail out, no need for further processing */
+            // Bail out, no need for further processing
             goto ExitPoint;
         }
 
@@ -1123,16 +1123,16 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             int AllowOneIndex = !ED_IsLocZP (&Arg2.Expr) &&
                                 !(ED_IsLocNone (&Arg2.Expr) && Arg2.Expr.IVal < 256);
 
-            /* Calculate the real stack offset */
+            // Calculate the real stack offset
             int Offs = ED_GetStackOffs (&Arg1.Expr, 0);
 
-            /* Drop the generated code */
+            // Drop the generated code
             RemoveCode (&Arg1.Expr.Start);
 
-            /* We need labels */
+            // We need labels
             L1 = GetLocalLabel ();
 
-            /* Generate strcpy code */
+            // Generate strcpy code
             AddCodeLine ("ldy #$%02X", (unsigned char) (Offs - 1));
             if (Offs == 0 || AllowOneIndex) {
                 g_defcodelabel (L1);
@@ -1149,33 +1149,33 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             }
             AddCodeLine ("bne %s", LocalLabelName (L1));
 
-            /* strcpy returns argument #1 */
+            // strcpy returns argument #1
             *Expr = Arg1.Expr;
 
-            /* Bail out, no need for further processing */
+            // Bail out, no need for further processing
             goto ExitPoint;
         }
     }
 
-    /* The function result is an rvalue in the primary register */
+    // The function result is an rvalue in the primary register
     ED_FinalizeRValLoad (Expr);
     Expr->Type = GetFuncReturnType (Expr->Type);
 
 ExitPoint:
-    /* We expect the closing brace */
+    // We expect the closing brace
     ConsumeRParen ();
 }
 
 
 
-/*****************************************************************************/
-/*                                  strlen                                   */
-/*****************************************************************************/
+//***************************************************************************
+//                                  strlen
+//***************************************************************************
 
 
 
 static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
-/* Handle the strlen function */
+// Handle the strlen function
 {
     static const Type* ArgType = type_c_char_p;
     ExprDesc    Arg;
@@ -1188,10 +1188,10 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     ED_Init (&Arg);
     Arg.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
-    /* Evaluate the parameter */
+    // Evaluate the parameter
     hie1 (&Arg);
 
-    /* We still need to append deferred inc/dec before calling into the function */
+    // We still need to append deferred inc/dec before calling into the function
     DoDeferred (SQP_KEEP_EAX, &Arg);
 
     /* Check if the argument is an array. If so, remember the element count.
@@ -1201,7 +1201,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     if (IsArray) {
         ECount = GetElementCount (Arg.Type);
         if (ECount == FLEXIBLE) {
-            /* Treat as unknown */
+            // Treat as unknown
             ECount = UNSPECIFIED;
         }
         IsPtr = 0;
@@ -1216,7 +1216,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     */
     IsByteIndex = (ECount != UNSPECIFIED && ECount < 256);
 
-    /* Do type conversion */
+    // Do type conversion
     TypeConversion (&Arg, ArgType);
 
     if (IS_Get (&Optimize)) {
@@ -1232,13 +1232,13 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             */
             size_t Len = strnlen (GetLiteralStr (Arg.V.LVal), GetLiteralSize (Arg.V.LVal) - 1);
 
-            /* Constant string literal */
+            // Constant string literal
             ED_MakeConstAbs (Expr, Len, type_size_t);
 
-            /* We don't need the literal any longer */
+            // We don't need the literal any longer
             ReleaseLiteral (Arg.V.LVal);
 
-            /* Bail out, no need for further improvements */
+            // Bail out, no need for further improvements
             goto ExitPoint;
         }
     }
@@ -1252,7 +1252,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         if (ED_IsLocConst (&Arg) && IsArray &&
             (IS_Get (&EagerlyInlineFuncs) || IsByteIndex)) {
 
-            /* Generate the strlen code */
+            // Generate the strlen code
             L = GetLocalLabel ();
             AddCodeLine ("ldy #$FF");
             g_defcodelabel (L);
@@ -1261,11 +1261,11 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("bne %s", LocalLabelName (L));
             AddCodeLine ("tya");
 
-            /* The function result is an rvalue in the primary register */
+            // The function result is an rvalue in the primary register
             ED_FinalizeRValLoad (Expr);
             Expr->Type = type_size_t;
 
-            /* Bail out, no need for further processing */
+            // Bail out, no need for further processing
             goto ExitPoint;
         }
 
@@ -1275,10 +1275,10 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         if (ED_IsLocStack (&Arg) && IsArray && IsByteIndex &&
             ED_GetStackOffs (&Arg, ECount) < 256) {
 
-            /* Calculate the true stack offset */
+            // Calculate the true stack offset
             int Offs = ED_GetStackOffs (&Arg, 0);
 
-            /* Generate the strlen code */
+            // Generate the strlen code
             L = GetLocalLabel ();
             AddCodeLine ("ldx #$FF");
             AddCodeLine ("ldy #$%02X", (unsigned char) (Offs-1));
@@ -1290,11 +1290,11 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("txa");
             AddCodeLine ("ldx #$00");
 
-            /* The function result is an rvalue in the primary register */
+            // The function result is an rvalue in the primary register
             ED_FinalizeRValLoad (Expr);
             Expr->Type = type_size_t;
 
-            /* Bail out, no need for further processing */
+            // Bail out, no need for further processing
             goto ExitPoint;
         }
 
@@ -1305,7 +1305,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         if (ED_IsZPInd (&Arg) && IsPtr &&
             IS_Get (&EagerlyInlineFuncs)) {
 
-            /* Generate the strlen code */
+            // Generate the strlen code
             L = GetLocalLabel ();
             AddCodeLine ("ldy #$FF");
             g_defcodelabel (L);
@@ -1315,11 +1315,11 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("tax");
             AddCodeLine ("tya");
 
-            /* The function result is an rvalue in the primary register */
+            // The function result is an rvalue in the primary register
             ED_FinalizeRValLoad (Expr);
             Expr->Type = type_size_t;
 
-            /* Bail out, no need for further processing */
+            // Bail out, no need for further processing
             goto ExitPoint;
         }
 
@@ -1329,10 +1329,10 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         */
         if (IS_Get (&CodeSizeFactor) > 400 && IS_Get (&EagerlyInlineFuncs)) {
 
-            /* Load the expression into the primary */
+            // Load the expression into the primary
             LoadExpr (CF_NONE, &Arg);
 
-            /* Inline the function */
+            // Inline the function
             L = GetLocalLabel ();
             AddCodeLine ("sta ptr1");
             AddCodeLine ("stx ptr1+1");
@@ -1344,38 +1344,38 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("tax");
             AddCodeLine ("tya");
 
-            /* The function result is an rvalue in the primary register */
+            // The function result is an rvalue in the primary register
             ED_FinalizeRValLoad (Expr);
             Expr->Type = type_size_t;
 
-            /* Bail out, no need for further processing */
+            // Bail out, no need for further processing
             goto ExitPoint;
         }
     }
 
-    /* Load the expression into the primary */
+    // Load the expression into the primary
     LoadExpr (CF_NONE, &Arg);
 
-    /* Call the strlen function */
+    // Call the strlen function
     AddCodeLine ("jsr _%s", Func_strlen);
 
-    /* The function result is an rvalue in the primary register */
+    // The function result is an rvalue in the primary register
     ED_FinalizeRValLoad (Expr);
     Expr->Type = type_size_t;
 
 ExitPoint:
-    /* We expect the closing brace */
+    // We expect the closing brace
     ConsumeRParen ();
 
-    /* Propagate from subexpressions */
+    // Propagate from subexpressions
     Expr->Flags |= Arg.Flags & E_MASK_VIRAL;
 }
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
@@ -1384,11 +1384,11 @@ int FindStdFunc (const char* Name)
 ** called in a special way. If so, return the index, otherwise return -1.
 */
 {
-    /* Look into the table for known names */
+    // Look into the table for known names
     struct StdFuncDesc* D =
         bsearch (Name, StdFuncs, FUNC_COUNT, sizeof (StdFuncs[0]), CmpFunc);
 
-    /* Return the function index or -1 */
+    // Return the function index or -1
     if (D == 0) {
         return -1;
     } else {
@@ -1399,17 +1399,17 @@ int FindStdFunc (const char* Name)
 
 
 void HandleStdFunc (int Index, FuncDesc* F, ExprDesc* lval)
-/* Generate code for a known standard function. */
+// Generate code for a known standard function.
 {
     struct StdFuncDesc* D;
 
-    /* Get a pointer to the table entry */
+    // Get a pointer to the table entry
     CHECK (Index >= 0 && Index < (int)FUNC_COUNT);
     D = StdFuncs + Index;
 
-    /* Call the handler function */
+    // Call the handler function
     D->Handler (F, lval);
 
-    /* We assume all function calls had side effects */
+    // We assume all function calls had side effects
     lval->Flags |= E_SIDE_EFFECTS;
 }

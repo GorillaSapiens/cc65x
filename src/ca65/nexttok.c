@@ -1,47 +1,47 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 nexttok.c                                 */
-/*                                                                           */
-/*              Get next token and handle token level functions              */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                 nexttok.c
+//
+//              Get next token and handle token level functions
+//
+//
+//
+// (C) 2000-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
 #include <stdio.h>
 #include <string.h>
 
-/* common */
+// common
 #include "chartype.h"
 #include "check.h"
 #include "strbuf.h"
 
-/* ca65 */
+// ca65
 #include "condasm.h"
 #include "error.h"
 #include "expr.h"
@@ -52,19 +52,19 @@
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-static unsigned RawMode = 0;            /* Raw token mode flag/counter */
+static unsigned RawMode = 0;            // Raw token mode flag/counter
 
 
 
-/*****************************************************************************/
-/*                              Error handling                               */
-/*****************************************************************************/
+//***************************************************************************
+//                              Error handling
+//***************************************************************************
 
 
 
@@ -85,9 +85,9 @@ static int LookAtStrCon (void)
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
@@ -99,78 +99,78 @@ static TokList* CollectTokens (unsigned Start, unsigned Count)
 */
 {
 
-    /* Create the token list */
+    // Create the token list
     TokList* List = NewTokList ();
 
-    /* Determine if the list is enclosed in curly braces. */
+    // Determine if the list is enclosed in curly braces.
     token_t Term = GetTokListTerm (TOK_RPAREN);
 
-    /* Read the token list */
+    // Read the token list
     unsigned Current = 0;
     while (CurTok.Tok != Term) {
 
-        /* Check for end of line or end of input */
+        // Check for end of line or end of input
         if (TokIsSep (CurTok.Tok)) {
             Error ("Unexpected end of line");
             return List;
         }
 
-        /* Collect tokens in the given range */
+        // Collect tokens in the given range
         if (Current >= Start && Current < Start+Count) {
-            /* Add the current token to the list */
+            // Add the current token to the list
             AddCurTok (List);
         }
 
-        /* Get the next token */
+        // Get the next token
         ++Current;
         NextTok ();
     }
 
-    /* Eat the terminator token */
+    // Eat the terminator token
     NextTok ();
 
-    /* If the list was enclosed in curly braces, we do expect now a right paren */
+    // If the list was enclosed in curly braces, we do expect now a right paren
     if (Term == TOK_RCURLY) {
         ConsumeRParen ();
     }
 
-    /* Return the list of collected tokens */
+    // Return the list of collected tokens
     return List;
 }
 
 
 
 static void FuncConcat (void)
-/* Handle the .CONCAT function */
+// Handle the .CONCAT function
 {
     StrBuf      Buf = STATIC_STRBUF_INITIALIZER;
 
-    /* Skip it */
+    // Skip it
     NextTok ();
 
-    /* Left paren expected */
+    // Left paren expected
     ConsumeLParen ();
 
-    /* Concatenate any number of strings */
+    // Concatenate any number of strings
     while (1) {
 
-        /* Next token must be a string */
+        // Next token must be a string
         if (!LookAtStrCon ()) {
             SB_Done (&Buf);
             return;
         }
 
-        /* Append the string */
+        // Append the string
         SB_Append (&Buf, &CurTok.SVal);
 
-        /* Skip the string token */
+        // Skip the string token
         NextTok ();
 
-        /* Comma means another argument */
+        // Comma means another argument
         if (CurTok.Tok == TOK_COMMA) {
             NextTok ();
         } else {
-            /* Done */
+            // Done
             break;
         }
     }
@@ -186,14 +186,14 @@ static void FuncConcat (void)
         SB_Terminate (&CurTok.SVal);
     }
 
-    /* Free the string buffer */
+    // Free the string buffer
     SB_Done (&Buf);
 }
 
 
 
 static void NoIdent (void)
-/* Print an error message and skip the remainder of the line */
+// Print an error message and skip the remainder of the line
 {
     Error ("Argument of .IDENT is not a valid identifier");
     SkipUntilSep ();
@@ -202,19 +202,19 @@ static void NoIdent (void)
 
 
 static void FuncIdent (void)
-/* Handle the .IDENT function */
+// Handle the .IDENT function
 {
     StrBuf    Buf = STATIC_STRBUF_INITIALIZER;
     token_t   Id;
     unsigned  I;
 
-    /* Skip it */
+    // Skip it
     NextTok ();
 
-    /* Left paren expected */
+    // Left paren expected
     ConsumeLParen ();
 
-    /* The function expects a string argument */
+    // The function expects a string argument
     if (!LookAtStrCon ()) {
         return;
     }
@@ -224,7 +224,7 @@ static void FuncIdent (void)
     */
     SB_Reset (&CurTok.SVal);
 
-    /* Check for a cheap local symbol */
+    // Check for a cheap local symbol
     if (SB_Peek (&CurTok.SVal) == LocalStart) {
         SB_Skip (&CurTok.SVal);
         Id = TOK_LOCAL_IDENT;
@@ -232,7 +232,7 @@ static void FuncIdent (void)
         Id = TOK_IDENT;
     }
 
-    /* Next character must be a valid identifier start */
+    // Next character must be a valid identifier start
     if (!IsIdStart (SB_Get (&CurTok.SVal))) {
         NoIdent ();
         return;
@@ -260,32 +260,32 @@ static void FuncIdent (void)
         SB_Terminate (&CurTok.SVal);
     }
 
-    /* Free buffer memory */
+    // Free buffer memory
     SB_Done (&Buf);
 }
 
 
 
 static void FuncLeft (void)
-/* Handle the .LEFT function */
+// Handle the .LEFT function
 {
     long        Count;
     TokList*    List;
 
-    /* Skip it */
+    // Skip it
     NextTok ();
 
-    /* Left paren expected */
+    // Left paren expected
     ConsumeLParen ();
 
-    /* Count argument. Correct negative counts to zero. */
+    // Count argument. Correct negative counts to zero.
     Count = ConstExpression ();
     if (Count < 0) {
         Count = 0;
     }
     ConsumeComma ();
 
-    /* Read the token list */
+    // Read the token list
     List = CollectTokens (0, (unsigned) Count);
 
     /* Since we want to insert the list before the now current token, we have
@@ -297,26 +297,26 @@ static void FuncLeft (void)
     */
     AddCurTok (List);
 
-    /* Insert it into the scanner feed */
+    // Insert it into the scanner feed
     PushTokList (List, ".LEFT");
 
-    /* Skip the current token */
+    // Skip the current token
     NextTok ();
 }
 
 
 
 static void FuncMid (void)
-/* Handle the .MID function */
+// Handle the .MID function
 {
     long        Start;
     long        Count;
     TokList*    List;
 
-    /* Skip it */
+    // Skip it
     NextTok ();
 
-    /* Left paren expected */
+    // Left paren expected
     ConsumeLParen ();
 
     /* Start argument. Since the start argument can get negative with
@@ -337,7 +337,7 @@ static void FuncMid (void)
     }
     ConsumeComma ();
 
-    /* Read the token list */
+    // Read the token list
     List = CollectTokens ((unsigned) Start, (unsigned) Count);
 
     /* Since we want to insert the list before the now current token, we have
@@ -349,49 +349,49 @@ static void FuncMid (void)
     */
     AddCurTok (List);
 
-    /* Insert it into the scanner feed */
+    // Insert it into the scanner feed
     PushTokList (List, ".MID");
 
-    /* Skip the current token */
+    // Skip the current token
     NextTok ();
 }
 
 
 
 static void FuncRight (void)
-/* Handle the .RIGHT function */
+// Handle the .RIGHT function
 {
     long        Count;
     TokList*    List;
 
-    /* Skip it */
+    // Skip it
     NextTok ();
 
-    /* Left paren expected */
+    // Left paren expected
     ConsumeLParen ();
 
-    /* Count argument. Correct negative counts to zero. */
+    // Count argument. Correct negative counts to zero.
     Count = ConstExpression ();
     if (Count < 0) {
         Count = 0;
     }
     ConsumeComma ();
 
-    /* Read the complete token list */
+    // Read the complete token list
     List = CollectTokens (0, 9999);
 
-    /* Delete tokens from the list until Count tokens are remaining */
+    // Delete tokens from the list until Count tokens are remaining
     while (List->Count > (unsigned) Count) {
-        /* Get the first node */
+        // Get the first node
         TokNode* T = List->Root;
 
-        /* Remove it from the list */
+        // Remove it from the list
         List->Root = List->Root->Next;
 
-        /* Free the node */
+        // Free the node
         FreeTokNode (T);
 
-        /* Corrent the token counter */
+        // Corrent the token counter
         List->Count--;
     }
 
@@ -404,17 +404,17 @@ static void FuncRight (void)
     */
     AddCurTok (List);
 
-    /* Insert it into the scanner feed */
+    // Insert it into the scanner feed
     PushTokList (List, ".RIGHT");
 
-    /* Skip the current token */
+    // Skip the current token
     NextTok ();
 }
 
 
 
 static void InvalidFormatString (void)
-/* Print an error message and skip the remainder of the line */
+// Print an error message and skip the remainder of the line
 {
     Error ("Invalid format string");
     SkipUntilSep ();
@@ -423,48 +423,48 @@ static void InvalidFormatString (void)
 
 
 static void FuncSPrintF (void)
-/* Handle the .SPRINTF function */
+// Handle the .SPRINTF function
 {
-    StrBuf      Format = STATIC_STRBUF_INITIALIZER; /* User supplied format */
-    StrBuf      R = STATIC_STRBUF_INITIALIZER;      /* Result string */
-    StrBuf      F1 = STATIC_STRBUF_INITIALIZER;     /* One format spec from F */
-    StrBuf      R1 = STATIC_STRBUF_INITIALIZER;     /* One result */
+    StrBuf      Format = STATIC_STRBUF_INITIALIZER; // User supplied format
+    StrBuf      R = STATIC_STRBUF_INITIALIZER;      // Result string
+    StrBuf      F1 = STATIC_STRBUF_INITIALIZER;     // One format spec from F
+    StrBuf      R1 = STATIC_STRBUF_INITIALIZER;     // One result
     char        C;
     int         Done;
-    long        IVal;                               /* Integer value */
+    long        IVal;                               // Integer value
 
 
 
-    /* Skip the .SPRINTF token */
+    // Skip the .SPRINTF token
     NextTok ();
 
-    /* Left paren expected */
+    // Left paren expected
     ConsumeLParen ();
 
-    /* First argument is a format string. Remember and skip it */
+    // First argument is a format string. Remember and skip it
     if (!LookAtStrCon ()) {
         return;
     }
     SB_Copy (&Format, &CurTok.SVal);
     NextTok ();
 
-    /* Walk over the format string, generating the function result in R */
+    // Walk over the format string, generating the function result in R
     while (1) {
 
-        /* Get the next char from the format string and check for EOS */
+        // Get the next char from the format string and check for EOS
         if (SB_Peek (&Format) == '\0') {
             break;
         }
 
-        /* Check for a format specifier */
+        // Check for a format specifier
         if (SB_Peek (&Format) != '%') {
-            /* No format specifier, just copy */
+            // No format specifier, just copy
             SB_AppendChar (&R, SB_Get (&Format));
             continue;
         }
         SB_Skip (&Format);
         if (SB_Peek (&Format) == '%') {
-            /* %% */
+            // %%
             SB_AppendChar (&R, '%');
             SB_Skip (&Format);
             continue;
@@ -486,25 +486,25 @@ static void FuncSPrintF (void)
         SB_Clear (&F1);
         SB_AppendChar (&F1, '%');
 
-        /* Check for flags */
+        // Check for flags
         Done = 0;
         while ((C = SB_Peek (&Format)) != '\0' && !Done) {
             switch (C) {
-                case '-': /* FALLTHROUGH */
-                case '+': /* FALLTHROUGH */
-                case ' ': /* FALLTHROUGH */
-                case '#': /* FALLTHROUGH */
+                case '-': // FALLTHROUGH
+                case '+': // FALLTHROUGH
+                case ' ': // FALLTHROUGH
+                case '#': // FALLTHROUGH
                 case '0': SB_AppendChar (&F1, SB_Get (&Format));  break;
                 default:  Done = 1;                               break;
             }
         }
 
-        /* We do only support a numerical width field */
+        // We do only support a numerical width field
         while (IsDigit (SB_Peek (&Format))) {
             SB_AppendChar (&F1, SB_Get (&Format));
         }
 
-        /* Precision - only positive numerical fields supported */
+        // Precision - only positive numerical fields supported
         if (SB_Peek (&Format) == '.') {
             SB_AppendChar (&F1, SB_Get (&Format));
             while (IsDigit (SB_Peek (&Format))) {
@@ -512,7 +512,7 @@ static void FuncSPrintF (void)
             }
         }
 
-        /* Length modifiers aren't supported, so read the conversion specs */
+        // Length modifiers aren't supported, so read the conversion specs
         switch (SB_Peek (&Format)) {
 
             case 'd':
@@ -528,48 +528,48 @@ static void FuncSPrintF (void)
                 SB_AppendChar (&F1, SB_Get (&Format));
                 SB_Terminate (&F1);
 
-                /* The argument must be a constant expression */
+                // The argument must be a constant expression
                 IVal = ConstExpression ();
 
-                /* Format this argument according to the spec */
+                // Format this argument according to the spec
                 SB_Printf (&R1, SB_GetConstBuf (&F1), IVal);
 
-                /* Append the formatted argument to the result */
+                // Append the formatted argument to the result
                 SB_Append (&R, &R1);
 
                 break;
 
             case 's':
-                /* Add the format spec and terminate the format */
+                // Add the format spec and terminate the format
                 SB_AppendChar (&F1, SB_Get (&Format));
                 SB_Terminate (&F1);
 
-                /* The argument must be a string constant */
+                // The argument must be a string constant
                 if (!LookAtStrCon ()) {
-                    /* Make it one */
+                    // Make it one
                     SB_CopyStr (&CurTok.SVal, "**undefined**");
                 }
 
-                /* Format this argument according to the spec */
+                // Format this argument according to the spec
                 SB_Printf (&R1, SB_GetConstBuf (&F1), SB_GetConstBuf (&CurTok.SVal));
 
-                /* Skip the string constant */
+                // Skip the string constant
                 NextTok ();
 
-                /* Append the formatted argument to the result */
+                // Append the formatted argument to the result
                 SB_Append (&R, &R1);
 
                 break;
 
             case 'c':
-                /* Add the format spec and terminate the format */
+                // Add the format spec and terminate the format
                 SB_AppendChar (&F1, SB_Get (&Format));
                 SB_Terminate (&F1);
 
-                /* The argument must be a constant expression */
+                // The argument must be a constant expression
                 IVal = ConstExpression ();
 
-                /* Check for a valid character range */
+                // Check for a valid character range
                 if (IVal <= 0 || IVal > 255) {
                     Error ("Char argument out of range");
                     IVal = ' ';
@@ -580,7 +580,7 @@ static void FuncSPrintF (void)
                 */
                 SB_Printf (&R1, SB_GetConstBuf (&F1), (int) IVal);
 
-                /* Append the formatted argument to the result */
+                // Append the formatted argument to the result
                 SB_Append (&R, &R1);
 
                 break;
@@ -593,7 +593,7 @@ static void FuncSPrintF (void)
 
     }
 
-    /* Terminate the result string */
+    // Terminate the result string
     SB_Terminate (&R);
 
     /* We expect a closing parenthesis, but will not skip it but replace it
@@ -608,7 +608,7 @@ static void FuncSPrintF (void)
     }
 
 
-    /* Delete the string buffers */
+    // Delete the string buffers
     SB_Done (&Format);
     SB_Done (&R);
     SB_Done (&F1);
@@ -618,19 +618,19 @@ static void FuncSPrintF (void)
 
 
 static void FuncString (void)
-/* Handle the .STRING function */
+// Handle the .STRING function
 {
     StrBuf Buf = STATIC_STRBUF_INITIALIZER;
 
-    /* Skip it */
+    // Skip it
     NextTok ();
 
-    /* Left paren expected */
+    // Left paren expected
     ConsumeLParen ();
 
-    /* Accept identifiers or numeric expressions */
+    // Accept identifiers or numeric expressions
     if (CurTok.Tok == TOK_LOCAL_IDENT) {
-        /* Save the identifier, then skip it */
+        // Save the identifier, then skip it
         SB_Copy (&Buf, &CurTok.SVal);
         NextTok ();
     } else if (CurTok.Tok == TOK_NAMESPACE || CurTok.Tok == TOK_IDENT) {
@@ -651,7 +651,7 @@ static void FuncString (void)
                  (NameSpace == 0 && CurTok.Tok == TOK_NAMESPACE));
 
     } else {
-        /* Numeric expression */
+        // Numeric expression
         long Val = ConstExpression ();
         SB_Printf (&Buf, "%ld", Val);
     }
@@ -667,16 +667,16 @@ static void FuncString (void)
         SB_Terminate (&CurTok.SVal);
     }
 
-    /* Free string memory */
+    // Free string memory
     SB_Done (&Buf);
 }
 
 
 
 void NextTok (void)
-/* Get next token and handle token level functions */
+// Get next token and handle token level functions
 {
-    /* Get the next raw token */
+    // Get the next raw token
     NextRawTok ();
 
     /* In raw mode, or when output is suppressed via conditional assembly,
@@ -684,7 +684,7 @@ void NextTok (void)
     */
     if (RawMode == 0 && IfCond) {
 
-        /* Execute token handling functions */
+        // Execute token handling functions
         switch (CurTok.Tok) {
 
             case TOK_CONCAT:
@@ -716,7 +716,7 @@ void NextTok (void)
                 break;
 
             default:
-                /* Quiet down gcc */
+                // Quiet down gcc
                 break;
 
         }
@@ -726,7 +726,7 @@ void NextTok (void)
 
 
 void Consume (token_t Expected, const char* ErrMsg)
-/* Consume Expected, print an error if we don't find it */
+// Consume Expected, print an error if we don't find it
 {
     if (CurTok.Tok == Expected) {
         NextTok ();
@@ -738,12 +738,12 @@ void Consume (token_t Expected, const char* ErrMsg)
 
 
 void ConsumeSep (void)
-/* Consume a separator token */
+// Consume a separator token
 {
-    /* We expect a separator token */
+    // We expect a separator token
     ExpectSep ();
 
-    /* If we are at end of line, skip it */
+    // If we are at end of line, skip it
     if (CurTok.Tok == TOK_SEP) {
         NextTok ();
     }
@@ -752,7 +752,7 @@ void ConsumeSep (void)
 
 
 void ConsumeLParen (void)
-/* Consume a left paren */
+// Consume a left paren
 {
     Consume (TOK_LPAREN, "'(' expected");
 }
@@ -760,7 +760,7 @@ void ConsumeLParen (void)
 
 
 void ConsumeRParen (void)
-/* Consume a right paren */
+// Consume a right paren
 {
     Consume (TOK_RPAREN, "')' expected");
 }
@@ -768,7 +768,7 @@ void ConsumeRParen (void)
 
 
 void ConsumeComma (void)
-/* Consume a comma */
+// Consume a comma
 {
     Consume (TOK_COMMA, "',' expected");
 }
@@ -776,7 +776,7 @@ void ConsumeComma (void)
 
 
 void SkipUntilSep (void)
-/* Skip tokens until we reach a line separator or end of file */
+// Skip tokens until we reach a line separator or end of file
 {
     while (!TokIsSep (CurTok.Tok)) {
         NextTok ();
@@ -811,7 +811,7 @@ void EnterRawTokenMode (void)
 
 
 void LeaveRawTokenMode (void)
-/* Leave raw token mode. */
+// Leave raw token mode.
 {
     PRECONDITION (RawMode > 0);
     --RawMode;

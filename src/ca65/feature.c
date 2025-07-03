@@ -1,53 +1,53 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 feature.c                                 */
-/*                                                                           */
-/*                  Subroutines for the emulation features                   */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2013, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                 feature.c
+//
+//                  Subroutines for the emulation features
+//
+//
+//
+// (C) 2000-2013, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
 #include <string.h>
 
-/* ca65 */
+// ca65
 #include "global.h"
 #include "feature.h"
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* Names of the features */
+// Names of the features
 static const char* const FeatureKeys[FEAT_COUNT] = {
     "dollar_is_pc",
     "labels_without_colons",
@@ -72,9 +72,9 @@ static const char* const FeatureKeys[FEAT_COUNT] = {
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
@@ -85,15 +85,15 @@ feature_t FindFeature (const StrBuf* Key)
 {
     feature_t F;
 
-    /* This is not time critical, so do a linear search */
+    // This is not time critical, so do a linear search
     for (F = (feature_t) 0; F < FEAT_COUNT; ++F) {
         if (SB_CompareStr (Key, FeatureKeys[F]) == 0) {
-            /* Found, index is enum value */
+            // Found, index is enum value
             return F;
         }
     }
 
-    /* Not found */
+    // Not found
     return FEAT_UNKNOWN;
 }
 
@@ -103,7 +103,7 @@ void SetFeature (feature_t Feature, unsigned char On)
 /* Set the corresponding feature flag if Feature is valid.
 */
 {
-    /* Set the flags */
+    // Set the flags
     switch (Feature) {
         case FEAT_DOLLAR_IS_PC:               DollarIsPC        = On;    break;
         case FEAT_LABELS_WITHOUT_COLONS:      NoColonLabels     = On;    break;

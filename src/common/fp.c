@@ -1,35 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                   fp.c                                    */
-/*                                                                           */
-/*                          Floating point support                           */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2008      Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                   fp.c
+//
+//                          Floating point support
+//
+//
+//
+// (C) 2008      Ullrich von Bassewitz
+//               Roemerstrasse 52
+//               D-70794 Filderstadt
+// EMail:        uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
@@ -47,31 +47,31 @@
 #include <string.h>
 #include <stdint.h>
 
-/* common */
+// common
 #include "fp.h"
 #include "xmalloc.h"
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
 #define F_SIZE  sizeof(float)
-#define D_SIZE  sizeof(float)           /* NOT double! */
+#define D_SIZE  sizeof(float)           // NOT double!
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 size_t FP_F_Size (void)
-/* Return the size of the data type float */
+// Return the size of the data type float
 {
     return F_SIZE;
 }
@@ -79,7 +79,7 @@ size_t FP_F_Size (void)
 
 
 unsigned char* FP_F_Data (Float Val)
-/* Return the raw data of a float in a malloc'ed buffer. Free after use. */
+// Return the raw data of a float in a malloc'ed buffer. Free after use.
 {
     return memcpy (xmalloc (F_SIZE), &Val.V, F_SIZE);
 }
@@ -87,7 +87,7 @@ unsigned char* FP_F_Data (Float Val)
 
 
 Float FP_F_Make (float Val)
-/* Make a floating point variable from a float value */
+// Make a floating point variable from a float value
 {
     Float D;
     D.V = Val;
@@ -97,7 +97,7 @@ Float FP_F_Make (float Val)
 
 
 Float FP_F_FromInt (long Val)
-/* Convert an integer into a floating point variable */
+// Convert an integer into a floating point variable
 {
     Float D;
     D.V = (float) Val;
@@ -107,7 +107,7 @@ Float FP_F_FromInt (long Val)
 
 
 float FP_F_ToFloat (Float Val)
-/* Convert a Float into a native float */
+// Convert a Float into a native float
 {
     return Val.V;
 }
@@ -115,7 +115,7 @@ float FP_F_ToFloat (Float Val)
 
 
 Float FP_F_Add (Float Left, Float Right)
-/* Add two floats */
+// Add two floats
 {
     Float D;
     D.V = Left.V + Right.V;
@@ -125,7 +125,7 @@ Float FP_F_Add (Float Left, Float Right)
 
 
 Float FP_F_Sub (Float Left, Float Right)
-/* Subtract two floats */
+// Subtract two floats
 {
     Float D;
     D.V = Left.V - Right.V;
@@ -135,7 +135,7 @@ Float FP_F_Sub (Float Left, Float Right)
 
 
 Float FP_F_Mul (Float Left, Float Right)
-/* Multiply two floats */
+// Multiply two floats
 {
     Float D;
     D.V = Left.V * Right.V;
@@ -145,7 +145,7 @@ Float FP_F_Mul (Float Left, Float Right)
 
 
 Float FP_F_Div (Float Left, Float Right)
-/* Divide two floats */
+// Divide two floats
 {
     Float D;
     D.V = Left.V / Right.V;
@@ -155,7 +155,7 @@ Float FP_F_Div (Float Left, Float Right)
 
 
 size_t FP_D_Size (void)
-/* Return the size of the data type double */
+// Return the size of the data type double
 {
     return D_SIZE;
 }
@@ -163,7 +163,7 @@ size_t FP_D_Size (void)
 
 
 unsigned char* FP_D_Data (Double Val)
-/* Return the raw data of a double in a malloc'ed buffer. Free after use. */
+// Return the raw data of a double in a malloc'ed buffer. Free after use.
 {
     float F = (float) Val.V;
     return memcpy (xmalloc (F_SIZE), &F, F_SIZE);
@@ -172,7 +172,7 @@ unsigned char* FP_D_Data (Double Val)
 
 
 Double FP_D_Make (double Val)
-/* Make a floating point variable from a float value */
+// Make a floating point variable from a float value
 {
     Double D;
     D.V = Val;
@@ -183,7 +183,7 @@ Double FP_D_Make (double Val)
 
 
 Double FP_D_FromInt (long Val)
-/* Convert an integer into a floating point variable */
+// Convert an integer into a floating point variable
 {
     Double D;
     D.V = Val;
@@ -191,13 +191,13 @@ Double FP_D_FromInt (long Val)
 }
 
 long FP_D_ToLong (Double Val)
-/* Convert a floating point variable into a long */
+// Convert a floating point variable into a long
 {
     return (long)Val.V;
 }
 
 double FP_D_ToFloat (Double Val)
-/* Convert a Double into a native double */
+// Convert a Double into a native double
 {
     return Val.V;
 }
@@ -205,7 +205,7 @@ double FP_D_ToFloat (Double Val)
 
 
 Double FP_D_Add (Double Left, Double Right)
-/* Add two floats */
+// Add two floats
 {
     Double D;
     D.V = Left.V + Right.V;
@@ -215,7 +215,7 @@ Double FP_D_Add (Double Left, Double Right)
 
 
 Double FP_D_Sub (Double Left, Double Right)
-/* Subtract two floats */
+// Subtract two floats
 {
     Double D;
     D.V = Left.V - Right.V;
@@ -225,7 +225,7 @@ Double FP_D_Sub (Double Left, Double Right)
 
 
 Double FP_D_Mul (Double Left, Double Right)
-/* Multiply two floats */
+// Multiply two floats
 {
     Double D;
     D.V = Left.V * Right.V;
@@ -235,7 +235,7 @@ Double FP_D_Mul (Double Left, Double Right)
 
 
 Double FP_D_Div (Double Left, Double Right)
-/* Divide two floats */
+// Divide two floats
 {
     Double D;
     D.V = Left.V / Right.V;
@@ -244,10 +244,10 @@ Double FP_D_Div (Double Left, Double Right)
 
 #if defined(_MSC_VER)
 #pragma warning( push )
-#pragma warning( disable : 4244 )   /* conversion from double to float */
+#pragma warning( disable : 4244 )   // conversion from double to float
 #endif
 uint32_t FP_D_As32bitRaw(Double Val)
-/* converts double into 32bit (float) and then returns its raw content as a 32bit int */
+// converts double into 32bit (float) and then returns its raw content as a 32bit int
 {
     static float f;
     uint32_t *lptr;

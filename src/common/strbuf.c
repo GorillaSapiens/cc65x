@@ -1,42 +1,42 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 strbuf.c                                  */
-/*                                                                           */
-/*                       Variable sized string buffers                       */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                 strbuf.c
+//
+//                       Variable sized string buffers
+//
+//
+//
+// (C) 2001-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
 #include <string.h>
 #include <ctype.h>
 
-/* common */
+// common
 #include "chartype.h"
 #include "strbuf.h"
 #include "va_copy.h"
@@ -45,26 +45,26 @@
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* An empty string buf */
+// An empty string buf
 const StrBuf EmptyStrBuf = STATIC_STRBUF_INITIALIZER;
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 #if !defined(HAVE_INLINE)
 StrBuf* SB_Init (StrBuf* B)
-/* Initialize a string buffer */
+// Initialize a string buffer
 {
     *B = EmptyStrBuf;
     return B;
@@ -89,7 +89,7 @@ StrBuf* SB_InitFromString (StrBuf* B, const char* S)
 
 
 void SB_Done (StrBuf* B)
-/* Free the data of a string buffer (but not the struct itself) */
+// Free the data of a string buffer (but not the struct itself)
 {
     if (B->Allocated) {
         xfree (B->Buf);
@@ -100,24 +100,24 @@ void SB_Done (StrBuf* B)
 
 
 StrBuf* NewStrBuf (void)
-/* Allocate, initialize and return a new StrBuf */
+// Allocate, initialize and return a new StrBuf
 {
-    /* Allocate a new string buffer */
+    // Allocate a new string buffer
     StrBuf* B = xmalloc (sizeof (StrBuf));
 
-    /* Initialize the struct... */
+    // Initialize the struct...
     SB_Init (B);
 
-    /* ...and return it */
+    // ...and return it
     return B;
 }
 
 
 
 void FreeStrBuf (StrBuf* B)
-/* Free a string buffer */
+// Free a string buffer
 {
-    /* Allow NULL pointers */
+    // Allow NULL pointers
     if (B) {
         SB_Done (B);
         xfree (B);
@@ -131,13 +131,13 @@ void SB_Realloc (StrBuf* B, unsigned NewSize)
 ** available.
 */
 {
-    /* Get the current size, use a minimum of 8 bytes */
+    // Get the current size, use a minimum of 8 bytes
     unsigned NewAllocated = B->Allocated;
     if (NewAllocated == 0) {
         NewAllocated = 8;
     }
 
-    /* Round up to the next power of two */
+    // Round up to the next power of two
     while (NewAllocated < NewSize) {
         NewAllocated *= 2;
     }
@@ -147,16 +147,16 @@ void SB_Realloc (StrBuf* B, unsigned NewSize)
     ** on the heap.
     */
     if (B->Allocated) {
-        /* Just reallocate the block */
+        // Just reallocate the block
         B->Buf    = xrealloc (B->Buf, NewAllocated);
         B->Cooked = xrealloc (B->Cooked, NewAllocated);
     } else {
-        /* Allocate a new block and copy */
+        // Allocate a new block and copy
         B->Buf    = memcpy (xmalloc (NewAllocated), B->Buf, B->Len);
         B->Cooked = memcpy (xmalloc (NewAllocated), B->Cooked, B->Len);
     }
 
-    /* Remember the new block size */
+    // Remember the new block size
     B->Allocated = NewAllocated;
 }
 
@@ -168,28 +168,28 @@ static void SB_CheapRealloc (StrBuf* B, unsigned NewSize)
 ** buffer and may be used if the old contents are overwritten later.
 */
 {
-    /* Get the current size, use a minimum of 8 bytes */
+    // Get the current size, use a minimum of 8 bytes
     unsigned NewAllocated = B->Allocated;
     if (NewAllocated == 0) {
         NewAllocated = 8;
     }
 
-    /* Round up to the next power of two */
+    // Round up to the next power of two
     while (NewAllocated < NewSize) {
         NewAllocated *= 2;
     }
 
-    /* Free the old buffer if there is one */
+    // Free the old buffer if there is one
     if (B->Allocated) {
         xfree (B->Buf);
         xfree (B->Cooked);
     }
 
-    /* Allocate a fresh block */
+    // Allocate a fresh block
     B->Buf    = xmalloc (NewAllocated);
     B->Cooked = xmalloc (NewAllocated);
 
-    /* Remember the new block size */
+    // Remember the new block size
     B->Allocated = NewAllocated;
 }
 
@@ -197,7 +197,7 @@ static void SB_CheapRealloc (StrBuf* B, unsigned NewSize)
 
 #if !defined(HAVE_INLINE)
 char SB_At (const StrBuf* B, unsigned Index)
-/* Get a character from the buffer */
+// Get a character from the buffer
 {
     PRECONDITION (Index < B->Len);
     return B->Buf[Index];
@@ -207,7 +207,7 @@ char SB_At (const StrBuf* B, unsigned Index)
 
 
 void SB_Drop (StrBuf* B, unsigned Count)
-/* Drop characters from the end of the string. */
+// Drop characters from the end of the string.
 {
     PRECONDITION (Count <= B->Len);
     B->Len -= Count;
@@ -234,14 +234,14 @@ void SB_Terminate (StrBuf* B)
 
 
 void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size)
-/* Copy Buf to Target, discarding the old contents of Target */
+// Copy Buf to Target, discarding the old contents of Target
 {
     if (Size) {
         if (Target->Allocated < Size) {
             SB_CheapRealloc (Target, Size);
         }
         memcpy (Target->Buf, Buf, Size);
-        memcpy (Target->Cooked, Buf, Size); /* nothing raw */
+        memcpy (Target->Cooked, Buf, Size); // nothing raw
     }
     Target->Len = Size;
 }
@@ -249,7 +249,7 @@ void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size)
 
 
 void SB_CopyBufCooked (StrBuf* Target, const char* Buf, const char* Cooked, unsigned Size)
-/* Copy Buf and Cooked to Target, discarding the old contents of Target */
+// Copy Buf and Cooked to Target, discarding the old contents of Target
 {
     if (Size) {
         if (Target->Allocated < Size) {
@@ -265,7 +265,7 @@ void SB_CopyBufCooked (StrBuf* Target, const char* Buf, const char* Cooked, unsi
 
 #if !defined(HAVE_INLINE)
 void SB_CopyStr (StrBuf* Target, const char* S)
-/* Copy S to Target, discarding the old contents of Target */
+// Copy S to Target, discarding the old contents of Target
 {
     SB_CopyBuf (Target, S, strlen (S));
 }
@@ -275,7 +275,7 @@ void SB_CopyStr (StrBuf* Target, const char* S)
 
 #if !defined(HAVE_INLINE)
 void SB_Copy (StrBuf* Target, const StrBuf* Source)
-/* Copy Source to Target, discarding the old contents of Target */
+// Copy Source to Target, discarding the old contents of Target
 {
     SB_CopyBufCooked (Target, Source->Buf, Source->Cooked, Source->Len);
     Target->Index = Source->Index;
@@ -285,7 +285,7 @@ void SB_Copy (StrBuf* Target, const StrBuf* Source)
 
 
 void SB_AppendChar (StrBuf* B, int C)
-/* Append a character to a string buffer */
+// Append a character to a string buffer
 {
     unsigned NewLen = B->Len + 1;
     if (NewLen > B->Allocated) {
@@ -299,7 +299,7 @@ void SB_AppendChar (StrBuf* B, int C)
 
 
 void SB_AppendCharCooked (StrBuf* B, int C, int Cooked)
-/* Append a character to a string buffer */
+// Append a character to a string buffer
 {
     unsigned NewLen = B->Len + 1;
     if (NewLen > B->Allocated) {
@@ -313,7 +313,7 @@ void SB_AppendCharCooked (StrBuf* B, int C, int Cooked)
 
 
 void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size)
-/* Append a character buffer to the end of the string buffer */
+// Append a character buffer to the end of the string buffer
 {
     unsigned NewLen = B->Len + Size;
     if (NewLen > B->Allocated) {
@@ -328,7 +328,7 @@ void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size)
 
 #if !defined(HAVE_INLINE)
 void SB_AppendStr (StrBuf* B, const char* S)
-/* Append a string to the end of the string buffer */
+// Append a string to the end of the string buffer
 {
     SB_AppendBuf (B, S, strlen (S));
 }
@@ -338,7 +338,7 @@ void SB_AppendStr (StrBuf* B, const char* S)
 
 #if !defined(HAVE_INLINE)
 void SB_Append (StrBuf* Target, const StrBuf* Source)
-/* Append the contents of Source to Target */
+// Append the contents of Source to Target
 {
     unsigned NewLen = Target->Len + Source->Len;
     if (NewLen > Target->Allocated) {
@@ -373,9 +373,9 @@ void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Le
 ** bytes.
 */
 {
-    /* Calculate the length of the resulting buffer */
+    // Calculate the length of the resulting buffer
     if (Start >= Source->Len) {
-        /* Target will be empty */
+        // Target will be empty
         SB_Clear (Target);
         return;
     }
@@ -383,12 +383,12 @@ void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Le
         Len = Source->Len - Start;
     }
 
-    /* Make sure we have enough room in the target string buffer */
+    // Make sure we have enough room in the target string buffer
     if (Len > Target->Allocated) {
         SB_Realloc (Target, Len);
     }
 
-    /* Copy the slice */
+    // Copy the slice
     memcpy (Target->Buf, Source->Buf + Start, Len);
     Target->Len = Len;
 }
@@ -400,22 +400,22 @@ void SB_Move (StrBuf* Target, StrBuf* Source)
 ** contents of Target, and Source will be empty after the call.
 */
 {
-    /* Free the target string */
+    // Free the target string
     if (Target->Allocated) {
         xfree (Target->Buf);
     }
 
-    /* Move all data from Source to Target */
+    // Move all data from Source to Target
     *Target = *Source;
 
-    /* Clear Source */
+    // Clear Source
     SB_Init (Source);
 }
 
 
 
 void SB_ToLower (StrBuf* S)
-/* Convert all characters in S to lower case */
+// Convert all characters in S to lower case
 {
     unsigned I;
     char* B = S->Buf;
@@ -429,7 +429,7 @@ void SB_ToLower (StrBuf* S)
 
 
 void SB_ToUpper (StrBuf* S)
-/* Convert all characters in S to upper case */
+// Convert all characters in S to upper case
 {
     unsigned I;
     char* B = S->Buf;
@@ -443,19 +443,19 @@ void SB_ToUpper (StrBuf* S)
 
 
 int SB_Compare (const StrBuf* S1, const StrBuf* S2)
-/* Do a lexical compare of S1 and S2. See strcmp for result codes. */
+// Do a lexical compare of S1 and S2. See strcmp for result codes.
 {
     int Result;
     if (S1->Len < S2->Len) {
         Result = memcmp (S1->Buf, S2->Buf, S1->Len);
         if (Result == 0) {
-            /* S1 considered lesser because it's shorter */
+            // S1 considered lesser because it's shorter
             Result = -1;
         }
     } else if (S1->Len > S2->Len) {
         Result = memcmp (S1->Buf, S2->Buf, S2->Len);
         if (Result == 0) {
-            /* S2 considered lesser because it's shorter */
+            // S2 considered lesser because it's shorter
             Result = 1;
         }
     } else {
@@ -467,20 +467,20 @@ int SB_Compare (const StrBuf* S1, const StrBuf* S2)
 
 
 int SB_CompareStr (const StrBuf* S1, const char* S2)
-/* Do a lexical compare of S1 and S2. See strcmp for result codes. */
+// Do a lexical compare of S1 and S2. See strcmp for result codes.
 {
     int Result;
     unsigned S2Len = strlen (S2);
     if (S1->Len < S2Len) {
         Result = memcmp (S1->Buf, S2, S1->Len);
         if (Result == 0) {
-            /* S1 considered lesser because it's shorter */
+            // S1 considered lesser because it's shorter
             Result = -1;
         }
     } else if (S1->Len > S2Len) {
         Result = memcmp (S1->Buf, S2, S2Len);
         if (Result == 0) {
-            /* S2 considered lesser because it's shorter */
+            // S2 considered lesser because it's shorter
             Result = 1;
         }
     } else {
@@ -509,17 +509,17 @@ void SB_VPrintf (StrBuf* S, const char* Format, va_list ap)
     SizeNeeded = xvsnprintf (S->Buf, S->Allocated, Format, tmp);
     va_end (tmp);
 
-    /* Check the result, the xvsnprintf function should not fail */
+    // Check the result, the xvsnprintf function should not fail
     CHECK (SizeNeeded >= 0);
 
-    /* Check if we must reallocate */
+    // Check if we must reallocate
     if ((unsigned) SizeNeeded >= S->Allocated) {
-        /* Must retry. Use CheapRealloc to avoid copying */
-        SB_CheapRealloc (S, SizeNeeded + 1);    /* Account for '\0' */
+        // Must retry. Use CheapRealloc to avoid copying
+        SB_CheapRealloc (S, SizeNeeded + 1);    // Account for '\0'
         (void) xvsnprintf (S->Buf, S->Allocated, Format, ap);
     }
 
-    /* Update string buffer variables */
+    // Update string buffer variables
     S->Len = SizeNeeded;
     S->Index = 0;
 }

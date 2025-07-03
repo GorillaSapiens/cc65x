@@ -11,49 +11,49 @@
 
 
 
-/* cc65 */
+// cc65
 #include "datatype.h"
 #include "exprdesc.h"
 
 
 
-/*****************************************************************************/
-/*                                   data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   data
+//***************************************************************************
 
 
 
-/* Generator attributes */
-#define GEN_NOPUSH      0x01        /* Don't push lhs */
-#define GEN_COMM        0x02        /* Operator is commutative */
-#define GEN_NOFUNC      0x04        /* Not allowed for function pointers */
+// Generator attributes
+#define GEN_NOPUSH      0x01        // Don't push lhs
+#define GEN_COMM        0x02        // Operator is commutative
+#define GEN_NOFUNC      0x04        // Not allowed for function pointers
 
-/* Map a generator function and its attributes to a token */
+// Map a generator function and its attributes to a token
 typedef struct GenDesc {
-    long        Tok;                /* Token to map to */
-    unsigned    Flags;              /* Flags for generator function */
-    void        (*Func) (unsigned, unsigned long);  /* Generator func */
+    long        Tok;                // Token to map to
+    unsigned    Flags;              // Flags for generator function
+    void        (*Func) (unsigned, unsigned long);  // Generator func
 } GenDesc;
 
 
 
-/*****************************************************************************/
-/*                                   code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   code
+//***************************************************************************
 
 
 
 unsigned CG_AddrModeFlags (const ExprDesc* Expr);
-/* Return the addressing mode flags for the given expression */
+// Return the addressing mode flags for the given expression
 
 unsigned CG_TypeOf (const Type* T);
-/* Get the code generator base type of the object */
+// Get the code generator base type of the object
 
 unsigned CG_CallFlags (const Type* T);
-/* Get the code generator flags for calling the function */
+// Get the code generator flags for calling the function
 
 void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr);
-/* Call an expression function with checks. */
+// Call an expression function with checks.
 
 void MarkedExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr);
 /* Call an expression function with checks and record start and end of the
@@ -61,7 +61,7 @@ void MarkedExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr);
 */
 
 void LimitExprValue (ExprDesc* Expr, int WarnOverflow);
-/* Limit the constant value of the expression to the range of its type */
+// Limit the constant value of the expression to the range of its type
 
 void PushAddr (const ExprDesc* Expr);
 /* If the expression contains an address that was somehow evaluated,
@@ -71,13 +71,13 @@ void PushAddr (const ExprDesc* Expr);
 */
 
 void InitDeferredOps (void);
-/* Init the collection for storing deferred ops */
+// Init the collection for storing deferred ops
 
 void DoneDeferredOps (void);
-/* Deinit the collection for storing deferred ops */
+// Deinit the collection for storing deferred ops
 
 int GetDeferredOpCount (void);
-/* Return how many deferred operations are still waiting in the queque */
+// Return how many deferred operations are still waiting in the queque
 
 void CheckDeferredOpAllDone (void);
 /* Check if all deferred operations are done at sequence points.
@@ -85,7 +85,7 @@ void CheckDeferredOpAllDone (void);
 */
 
 void DoDeferred (unsigned Flags, ExprDesc* Expr);
-/* Do deferred operations such as post-inc/dec at sequence points */
+// Do deferred operations such as post-inc/dec at sequence points
 
 void Store (ExprDesc* Expr, const Type* StoreType);
 /* Store the primary register into the location denoted by lval. If StoreType
@@ -120,19 +120,19 @@ ExprDesc NoCodeConstAbsIntExpr (void (*Func) (ExprDesc*));
 */
 
 void hie10 (ExprDesc* lval);
-/* Handle ++, --, !, unary - etc. */
+// Handle ++, --, !, unary - etc.
 
 void hie8 (ExprDesc* Expr);
-/* Process + and - binary operators. */
+// Process + and - binary operators.
 
 void hie1 (ExprDesc* lval);
-/* Parse first level of expression hierarchy. */
+// Parse first level of expression hierarchy.
 
 void hie0 (ExprDesc* Expr);
-/* Parse comma operator. */
+// Parse comma operator.
 
 
 
-/* End of expr.h */
+// End of expr.h
 
 #endif

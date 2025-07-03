@@ -1,35 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 objfile.c                                 */
-/*                                                                           */
-/*         Object file writing routines for the ca65 macroassembler          */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                 objfile.c
+//
+//         Object file writing routines for the ca65 macroassembler
+//
+//
+//
+// (C) 1998-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
@@ -38,63 +38,63 @@
 #include <string.h>
 #include <errno.h>
 
-/* common */
+// common
 #include "fname.h"
 #include "objdefs.h"
 
-/* ca65 */
+// ca65
 #include "global.h"
 #include "error.h"
 #include "objfile.h"
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* File descriptor */
+// File descriptor
 static FILE* F = 0;
 
-/* Default extension */
+// Default extension
 #define OBJ_EXT ".o"
 
-/* Header structure */
+// Header structure
 static ObjHeader Header = {
-    OBJ_MAGIC,          /* 32: Magic number */
-    OBJ_VERSION,        /* 16: Version number */
-    0,                  /* 16: flags */
-    0,                  /* 32: Offset to option table */
-    0,                  /* 32: Size of options */
-    0,                  /* 32: Offset to file table */
-    0,                  /* 32: Size of files */
-    0,                  /* 32: Offset to segment table */
-    0,                  /* 32: Size of segment table */
-    0,                  /* 32: Offset to import list */
-    0,                  /* 32: Size of import list */
-    0,                  /* 32: Offset to export list */
-    0,                  /* 32: Size of export list */
-    0,                  /* 32: Offset to list of debug symbols */
-    0,                  /* 32: Size of debug symbols */
-    0,                  /* 32: Offset to list of line infos */
-    0,                  /* 32: Size of line infos */
-    0,                  /* 32: Offset to string pool */
-    0,                  /* 32: Size of string pool */
-    0,                  /* 32: Offset to assertion table */
-    0,                  /* 32: Size of assertion table */
-    0,                  /* 32: Offset into scope table */
-    0,                  /* 32: Size of scope table */
-    0,                  /* 32: Offset into span table */
-    0,                  /* 32: Size of span table */
+    OBJ_MAGIC,          // 32: Magic number
+    OBJ_VERSION,        // 16: Version number
+    0,                  // 16: flags
+    0,                  // 32: Offset to option table
+    0,                  // 32: Size of options
+    0,                  // 32: Offset to file table
+    0,                  // 32: Size of files
+    0,                  // 32: Offset to segment table
+    0,                  // 32: Size of segment table
+    0,                  // 32: Offset to import list
+    0,                  // 32: Size of import list
+    0,                  // 32: Offset to export list
+    0,                  // 32: Size of export list
+    0,                  // 32: Offset to list of debug symbols
+    0,                  // 32: Size of debug symbols
+    0,                  // 32: Offset to list of line infos
+    0,                  // 32: Size of line infos
+    0,                  // 32: Offset to string pool
+    0,                  // 32: Size of string pool
+    0,                  // 32: Offset to assertion table
+    0,                  // 32: Size of assertion table
+    0,                  // 32: Offset into scope table
+    0,                  // 32: Size of scope table
+    0,                  // 32: Offset into span table
+    0,                  // 32: Size of span table
 };
 
 
 
-/*****************************************************************************/
-/*                         Internally used functions                         */
-/*****************************************************************************/
+//***************************************************************************
+//                         Internally used functions
+//***************************************************************************
 
 
 
@@ -103,23 +103,23 @@ static void ObjWriteError (void)
 ** print a fatal error.
 */
 {
-    /* Remember the error */
+    // Remember the error
     int Error = errno;
 
-    /* Force a close of the file, ignoring errors */
+    // Force a close of the file, ignoring errors
     fclose (F);
 
-    /* Try to remove the file, also ignoring errors */
+    // Try to remove the file, also ignoring errors
     remove (OutFile);
 
-    /* Now abort with a fatal error */
+    // Now abort with a fatal error
     Fatal ("Cannot write to output file '%s': %s", OutFile, strerror (Error));
 }
 
 
 
 static void ObjWriteHeader (void)
-/* Write the object file header to the current file position */
+// Write the object file header to the current file position
 {
     ObjWrite32 (Header.Magic);
     ObjWrite16 (Header.Version);
@@ -150,16 +150,16 @@ static void ObjWriteHeader (void)
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 void ObjOpen (void)
-/* Open the object file for writing, write a dummy header */
+// Open the object file for writing, write a dummy header
 {
-    /* Do we have a name for the output file? */
+    // Do we have a name for the output file?
     if (OutFile == 0) {
         /* We don't have an output name explicitly given, construct one from
         ** the name of the input file.
@@ -167,35 +167,35 @@ void ObjOpen (void)
         OutFile = MakeFilename (InFile, OBJ_EXT);
     }
 
-    /* Create the output file */
+    // Create the output file
     F = fopen (OutFile, "w+b");
     if (F == 0) {
         Fatal ("Cannot open output file '%s': %s", OutFile, strerror (errno));
     }
 
-    /* Write a dummy header */
+    // Write a dummy header
     ObjWriteHeader ();
 }
 
 
 
 void ObjClose (void)
-/* Write an update header and close the object file. */
+// Write an update header and close the object file.
 {
-    /* Go back to the beginning */
+    // Go back to the beginning
     if (fseek (F, 0, SEEK_SET) != 0) {
         ObjWriteError ();
     }
 
-    /* If we have debug infos, set the flag in the header */
+    // If we have debug infos, set the flag in the header
     if (DbgSyms) {
         Header.Flags |= OBJ_FLAGS_DBGINFO;
     }
 
-    /* Write the updated header */
+    // Write the updated header
     ObjWriteHeader ();
 
-    /* Close the file */
+    // Close the file
     if (fclose (F) != 0) {
         ObjWriteError ();
     }
@@ -204,7 +204,7 @@ void ObjClose (void)
 
 
 unsigned long ObjGetFilePos (void)
-/* Get the current file position */
+// Get the current file position
 {
     long Pos = ftell (F);
     if (Pos < 0) {
@@ -216,7 +216,7 @@ unsigned long ObjGetFilePos (void)
 
 
 void ObjSetFilePos (unsigned long Pos)
-/* Set the file position */
+// Set the file position
 {
     if (fseek (F, Pos, SEEK_SET) != 0) {
         ObjWriteError ();
@@ -226,7 +226,7 @@ void ObjSetFilePos (unsigned long Pos)
 
 
 void ObjWrite8 (unsigned V)
-/* Write an 8 bit value to the file */
+// Write an 8 bit value to the file
 {
     if (putc (V, F) == EOF) {
         ObjWriteError ();
@@ -236,7 +236,7 @@ void ObjWrite8 (unsigned V)
 
 
 void ObjWrite16 (unsigned V)
-/* Write a 16 bit value to the file */
+// Write a 16 bit value to the file
 {
     ObjWrite8 (V);
     ObjWrite8 (V >> 8);
@@ -245,7 +245,7 @@ void ObjWrite16 (unsigned V)
 
 
 void ObjWrite24 (unsigned long V)
-/* Write a 24 bit value to the file */
+// Write a 24 bit value to the file
 {
     ObjWrite8 (V);
     ObjWrite8 (V >> 8);
@@ -255,7 +255,7 @@ void ObjWrite24 (unsigned long V)
 
 
 void ObjWrite32 (unsigned long V)
-/* Write a 32 bit value to the file */
+// Write a 32 bit value to the file
 {
     ObjWrite8 (V);
     ObjWrite8 (V >> 8);
@@ -266,7 +266,7 @@ void ObjWrite32 (unsigned long V)
 
 
 void ObjWriteVar (unsigned long V)
-/* Write a variable sized value to the file in special encoding */
+// Write a variable sized value to the file in special encoding
 {
     /* We will write the value to the file in 7 bit chunks. If the 8th bit
     ** is clear, we're done, if it is set, another chunk follows. This will
@@ -286,7 +286,7 @@ void ObjWriteVar (unsigned long V)
 
 
 void ObjWriteStr (const char* S)
-/* Write a string to the object file */
+// Write a string to the object file
 {
     unsigned Len = strlen (S);
 
@@ -301,7 +301,7 @@ void ObjWriteStr (const char* S)
 
 
 void ObjWriteBuf (const StrBuf* S)
-/* Write a string to the object file */
+// Write a string to the object file
 {
     /* Write the string with the length preceeded (this is easier for
     ** the reading routine than the C format since the length is known in
@@ -314,7 +314,7 @@ void ObjWriteBuf (const StrBuf* S)
 
 
 void ObjWriteData (const void* Data, unsigned Size)
-/* Write literal data to the file */
+// Write literal data to the file
 {
     if (fwrite (Data, 1, Size, F) != Size) {
         ObjWriteError ();
@@ -324,13 +324,13 @@ void ObjWriteData (const void* Data, unsigned Size)
 
 
 void ObjWritePos (const FilePos* Pos)
-/* Write a file position to the object file */
+// Write a file position to the object file
 {
-    /* Write the data entries */
+    // Write the data entries
     ObjWriteVar (Pos->Line);
     ObjWriteVar (Pos->Col);
     if (Pos->Name == 0) {
-        /* Position is outside file scope, use the main file instead */
+        // Position is outside file scope, use the main file instead
         ObjWriteVar (0);
     } else {
         ObjWriteVar (Pos->Name - 1);
@@ -340,7 +340,7 @@ void ObjWritePos (const FilePos* Pos)
 
 
 void ObjStartOptions (void)
-/* Mark the start of the option section */
+// Mark the start of the option section
 {
     Header.OptionOffs = ftell (F);
 }
@@ -348,7 +348,7 @@ void ObjStartOptions (void)
 
 
 void ObjEndOptions (void)
-/* Mark the end of the option section */
+// Mark the end of the option section
 {
     Header.OptionSize = ftell (F) - Header.OptionOffs;
 }
@@ -356,7 +356,7 @@ void ObjEndOptions (void)
 
 
 void ObjStartFiles (void)
-/* Mark the start of the files section */
+// Mark the start of the files section
 {
     Header.FileOffs = ftell (F);
 }
@@ -364,7 +364,7 @@ void ObjStartFiles (void)
 
 
 void ObjEndFiles (void)
-/* Mark the end of the files section */
+// Mark the end of the files section
 {
     Header.FileSize = ftell (F) - Header.FileOffs;
 }
@@ -372,7 +372,7 @@ void ObjEndFiles (void)
 
 
 void ObjStartSegments (void)
-/* Mark the start of the segment section */
+// Mark the start of the segment section
 {
     Header.SegOffs = ftell (F);
 }
@@ -380,7 +380,7 @@ void ObjStartSegments (void)
 
 
 void ObjEndSegments (void)
-/* Mark the end of the segment section */
+// Mark the end of the segment section
 {
     Header.SegSize = ftell (F) - Header.SegOffs;
 }
@@ -388,7 +388,7 @@ void ObjEndSegments (void)
 
 
 void ObjStartImports (void)
-/* Mark the start of the import section */
+// Mark the start of the import section
 {
     Header.ImportOffs = ftell (F);
 }
@@ -396,7 +396,7 @@ void ObjStartImports (void)
 
 
 void ObjEndImports (void)
-/* Mark the end of the import section */
+// Mark the end of the import section
 {
     Header.ImportSize = ftell (F) - Header.ImportOffs;
 }
@@ -404,7 +404,7 @@ void ObjEndImports (void)
 
 
 void ObjStartExports (void)
-/* Mark the start of the export section */
+// Mark the start of the export section
 {
     Header.ExportOffs = ftell (F);
 }
@@ -412,7 +412,7 @@ void ObjStartExports (void)
 
 
 void ObjEndExports (void)
-/* Mark the end of the export section */
+// Mark the end of the export section
 {
     Header.ExportSize = ftell (F) - Header.ExportOffs;
 }
@@ -420,7 +420,7 @@ void ObjEndExports (void)
 
 
 void ObjStartDbgSyms (void)
-/* Mark the start of the debug symbol section */
+// Mark the start of the debug symbol section
 {
     Header.DbgSymOffs = ftell (F);
 }
@@ -428,7 +428,7 @@ void ObjStartDbgSyms (void)
 
 
 void ObjEndDbgSyms (void)
-/* Mark the end of the debug symbol section */
+// Mark the end of the debug symbol section
 {
     Header.DbgSymSize = ftell (F) - Header.DbgSymOffs;
 }
@@ -436,7 +436,7 @@ void ObjEndDbgSyms (void)
 
 
 void ObjStartLineInfos (void)
-/* Mark the start of the line info section */
+// Mark the start of the line info section
 {
     Header.LineInfoOffs = ftell (F);
 }
@@ -444,7 +444,7 @@ void ObjStartLineInfos (void)
 
 
 void ObjEndLineInfos (void)
-/* Mark the end of the line info section */
+// Mark the end of the line info section
 {
     Header.LineInfoSize = ftell (F) - Header.LineInfoOffs;
 }
@@ -452,7 +452,7 @@ void ObjEndLineInfos (void)
 
 
 void ObjStartStrPool (void)
-/* Mark the start of the string pool section */
+// Mark the start of the string pool section
 {
     Header.StrPoolOffs = ftell (F);
 }
@@ -460,7 +460,7 @@ void ObjStartStrPool (void)
 
 
 void ObjEndStrPool (void)
-/* Mark the end of the string pool section */
+// Mark the end of the string pool section
 {
     Header.StrPoolSize = ftell (F) - Header.StrPoolOffs;
 }
@@ -468,7 +468,7 @@ void ObjEndStrPool (void)
 
 
 void ObjStartAssertions (void)
-/* Mark the start of the assertion table */
+// Mark the start of the assertion table
 {
     Header.AssertOffs = ftell (F);
 }
@@ -476,7 +476,7 @@ void ObjStartAssertions (void)
 
 
 void ObjEndAssertions (void)
-/* Mark the end of the assertion table */
+// Mark the end of the assertion table
 {
     Header.AssertSize = ftell (F) - Header.AssertOffs;
 }
@@ -484,7 +484,7 @@ void ObjEndAssertions (void)
 
 
 void ObjStartScopes (void)
-/* Mark the start of the scope table */
+// Mark the start of the scope table
 {
     Header.ScopeOffs = ftell (F);
 }
@@ -492,7 +492,7 @@ void ObjStartScopes (void)
 
 
 void ObjEndScopes (void)
-/* Mark the end of the scope table */
+// Mark the end of the scope table
 {
     Header.ScopeSize = ftell (F) - Header.ScopeOffs;
 }
@@ -500,7 +500,7 @@ void ObjEndScopes (void)
 
 
 void ObjStartSpans (void)
-/* Mark the start of the span table */
+// Mark the start of the span table
 {
     Header.SpanOffs = ftell (F);
 }
@@ -508,7 +508,7 @@ void ObjStartSpans (void)
 
 
 void ObjEndSpans (void)
-/* Mark the end of the span table */
+// Mark the end of the span table
 {
     Header.SpanSize = ftell (F) - Header.SpanOffs;
 }

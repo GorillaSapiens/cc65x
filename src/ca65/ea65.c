@@ -1,39 +1,39 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                  ea65.c                                   */
-/*                                                                           */
-/*        65XX effective address parsing for the ca65 macroassembler         */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                  ea65.c
+//
+//        65XX effective address parsing for the ca65 macroassembler
+//
+//
+//
+// (C) 1998-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
-/* ca65 */
+// ca65
 #include "ea.h"
 #include "ea65.h"
 #include "error.h"
@@ -44,21 +44,21 @@
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 void GetEA (EffAddr* A)
-/* Parse an effective address, return the result in A */
+// Parse an effective address, return the result in A
 {
     unsigned long Restrictions;
     token_t IndirectEnter;
     token_t IndirectLeave;
     const char* IndirectExpect;
 
-    /* Choose syntax for indirection */
+    // Choose syntax for indirection
     if (BracketAsIndirect) {
         IndirectEnter = TOK_LBRACK;
         IndirectLeave = TOK_RBRACK;
@@ -69,12 +69,12 @@ void GetEA (EffAddr* A)
         IndirectExpect = "')' expected";
     }
 
-    /* Clear the output struct */
+    // Clear the output struct
     A->AddrModeSet = 0;
     A->Expr = 0;
     A->Flags = 0;
 
-    /* Handle an addressing size override */
+    // Handle an addressing size override
     switch (CurTok.Tok) {
         case TOK_OVERRIDE_ZP:
             Restrictions = AM65_DIR | AM65_DIR_X | AM65_DIR_Y;
@@ -93,11 +93,11 @@ void GetEA (EffAddr* A)
             break;
 
         default:
-            Restrictions = ~0UL;        /* None */
+            Restrictions = ~0UL;        // None
             break;
     }
 
-    /* Parse the effective address */
+    // Parse the effective address
     if (TokIsSep (CurTok.Tok)) {
 
         A->AddrModeSet = AM65_IMPLICIT;
@@ -107,7 +107,7 @@ void GetEA (EffAddr* A)
 
     } else if (CurTok.Tok == TOK_HASH) {
 
-        /* #val */
+        // #val
         NextTok ();
         A->Expr  = Expression ();
         A->AddrModeSet = AM65_ALL_IMM;
@@ -124,21 +124,21 @@ void GetEA (EffAddr* A)
 
     } else if (CurTok.Tok == IndirectEnter) {
 
-        /* One of the indirect modes */
+        // One of the indirect modes
         NextTok ();
         A->Expr = Expression ();
 
         if (CurTok.Tok == TOK_COMMA) {
 
-            /* (expr,X) or (rel,S),y */
+            // (expr,X) or (rel,S),y
             NextTok ();
             if (CurTok.Tok == TOK_X) {
-                /* (adr,x) */
+                // (adr,x)
                 NextTok ();
                 A->AddrModeSet = AM65_ABS_X_IND | AM65_DIR_X_IND;
                 Consume (IndirectLeave, IndirectExpect);
             } else if (CurTok.Tok == TOK_S) {
-                /* (rel,s),y */
+                // (rel,s),y
                 NextTok ();
                 A->AddrModeSet = AM65_STACK_REL_IND_Y;
                 Consume (IndirectLeave, IndirectExpect);
@@ -150,14 +150,14 @@ void GetEA (EffAddr* A)
 
         } else {
 
-            /* (adr), (adr),y or (adr),z */
+            // (adr), (adr),y or (adr),z
             Consume (IndirectLeave, IndirectExpect);
             if (CurTok.Tok == TOK_COMMA) {
-                /* (adr),y */
+                // (adr),y
                 NextTok ();
                 switch (CurTok.Tok) {
                 case TOK_Z:
-                    /* only set by scanner.c if in 4510-mode */
+                    // only set by scanner.c if in 4510-mode
                     NextTok ();
                     A->AddrModeSet = AM65_DIR_IND;
                     break;
@@ -167,7 +167,7 @@ void GetEA (EffAddr* A)
                     break;
                 }
             } else {
-                /* (adr) */
+                // (adr)
                 switch (CPU) {
                     case CPU_4510:
                         A->AddrModeSet = AM65_ABS_IND;
@@ -186,13 +186,13 @@ void GetEA (EffAddr* A)
 
     } else if (CurTok.Tok == TOK_LBRACK) {
 
-        /* Never executed if BracketAsIndirect feature is enabled. */
-        /* [dir] or [dir],y */
+        // Never executed if BracketAsIndirect feature is enabled.
+        // [dir] or [dir],y
         NextTok ();
         A->Expr = Expression ();
         Consume (TOK_RBRACK, "']' expected");
         if (CurTok.Tok == TOK_COMMA) {
-            /* [dir],y */
+            // [dir],y
             NextTok ();
             if (GetCPU () == CPU_45GS02) {
                 Consume (TOK_Z, "'Z' expected");
@@ -203,7 +203,7 @@ void GetEA (EffAddr* A)
                 A->AddrModeSet = AM65_DIR_IND_LONG_Y;
             }
         } else {
-            /* [dir] */
+            // [dir]
             A->AddrModeSet = AM65_DIR_IND_LONG | AM65_ABS_IND_LONG;
         }
 
@@ -240,7 +240,7 @@ void GetEA (EffAddr* A)
                     break;
 
                 default:
-                    /* FIXME: syntax error if not zp, ind */
+                    // FIXME: syntax error if not zp, ind
                     A->AddrModeSet = AM65_ZP_REL;
                     break;
 
@@ -253,6 +253,6 @@ void GetEA (EffAddr* A)
         }
     }
 
-    /* Apply addressing mode overrides */
+    // Apply addressing mode overrides
     A->AddrModeSet &= Restrictions;
 }

@@ -1,35 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 scanner.h                                 */
-/*                                                                           */
-/*              Configuration file scanner for the ld65 linker               */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2013, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                 scanner.h
+//
+//              Configuration file scanner for the ld65 linker
+//
+//
+//
+// (C) 1998-2013, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
@@ -38,24 +38,24 @@
 
 
 
-/* common */
+// common
 #include "filepos.h"
 #include "strbuf.h"
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* Config file tokens */
+// Config file tokens
 typedef enum {
     CFGTOK_NONE,
-    CFGTOK_INTCON,              /* Integer constant */
-    CFGTOK_STRCON,              /* String constant */
-    CFGTOK_IDENT,               /* Identifier */
+    CFGTOK_INTCON,              // Integer constant
+    CFGTOK_STRCON,              // String constant
+    CFGTOK_IDENT,               // Identifier
     CFGTOK_PLUS,
     CFGTOK_MINUS,
     CFGTOK_MUL,
@@ -71,7 +71,7 @@ typedef enum {
     CFGTOK_DOT,
     CFGTOK_EOF,
 
-    /* Special identifiers */
+    // Special identifiers
     CFGTOK_MEMORY,
     CFGTOK_FILES,
     CFGTOK_SEGMENTS,
@@ -154,17 +154,17 @@ typedef enum {
 
 
 
-/* Mapping table entry, special identifier --> token */
+// Mapping table entry, special identifier --> token
 typedef struct IdentTok IdentTok;
 struct IdentTok {
-    const char* Ident;          /* Identifier */
-    cfgtok_t    Tok;            /* Token for identifier */
+    const char* Ident;          // Identifier
+    cfgtok_t    Tok;            // Token for identifier
 };
 #define ENTRY_COUNT(s)  (sizeof (s) / sizeof (s [0]))
 
 
 
-/* Current token and attributes */
+// Current token and attributes
 extern cfgtok_t         CfgTok;
 extern StrBuf           CfgSVal;
 extern unsigned long    CfgIVal;
@@ -180,68 +180,68 @@ extern FilePos          CfgErrorPos;
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 void CfgWarning (const FilePos* Pos, const char* Format, ...) attribute((format(printf,2,3)));
-/* Print a warning message adding file name and line number of the config file */
+// Print a warning message adding file name and line number of the config file
 
 void CfgError (const FilePos* Pos, const char* Format, ...) attribute((format(printf,2,3)));
-/* Print an error message adding file name and line number of a given file */
+// Print an error message adding file name and line number of a given file
 
 void CfgNextTok (void);
-/* Read the next token from the input stream */
+// Read the next token from the input stream
 
 void CfgConsume (cfgtok_t T, const char* Msg);
-/* Skip a token, print an error message if not found */
+// Skip a token, print an error message if not found
 
 void CfgConsumeSemi (void);
-/* Consume a semicolon */
+// Consume a semicolon
 
 void CfgConsumeColon (void);
-/* Consume a colon */
+// Consume a colon
 
 void CfgOptionalComma (void);
-/* Consume a comma if there is one */
+// Consume a comma if there is one
 
 void CfgOptionalAssign (void);
-/* Consume an equal sign if there is one */
+// Consume an equal sign if there is one
 
 void CfgAssureInt (void);
-/* Make sure the next token is an integer */
+// Make sure the next token is an integer
 
 void CfgAssureStr (void);
-/* Make sure the next token is a string constant */
+// Make sure the next token is a string constant
 
 void CfgAssureIdent (void);
-/* Make sure the next token is an identifier */
+// Make sure the next token is an identifier
 
 void CfgRangeCheck (unsigned long Lo, unsigned long Hi);
-/* Check the range of CfgIVal */
+// Check the range of CfgIVal
 
 void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name);
-/* Map an identifier to one of the special tokens in the table */
+// Map an identifier to one of the special tokens in the table
 
 void CfgBoolToken (void);
-/* Map an identifier or integer to a boolean token */
+// Map an identifier or integer to a boolean token
 
 void CfgSetName (const char* Name);
-/* Set a name for a config file */
+// Set a name for a config file
 
 int CfgAvail (void);
-/* Return true if we have a configuration available */
+// Return true if we have a configuration available
 
 void CfgOpenInput (void);
-/* Open the input file if we have one */
+// Open the input file if we have one
 
 void CfgCloseInput (void);
-/* Close the input file if we have one */
+// Close the input file if we have one
 
 
 
-/* End of scanner.h */
+// End of scanner.h
 
 #endif

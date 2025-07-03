@@ -1,35 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                 codeseg.h                                 */
-/*                                                                           */
-/*                          Code segment structure                           */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2009, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                 codeseg.h
+//
+//                          Code segment structure
+//
+//
+//
+// (C) 2001-2009, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
@@ -40,21 +40,21 @@
 
 #include <stdarg.h>
 
-/* common */
+// common
 #include "attrib.h"
 #include "coll.h"
 #include "inline.h"
 
-/* cc65 */
+// cc65
 #include "codelab.h"
 #include "lineinfo.h"
 #include "symentry.h"
 
 
 
-/*****************************************************************************/
-/*                                 Forwards                                  */
-/*****************************************************************************/
+//***************************************************************************
+//                                 Forwards
+//***************************************************************************
 
 
 
@@ -62,53 +62,53 @@ struct CodeEntry;
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* Size of the label hash table */
+// Size of the label hash table
 #define CS_LABEL_HASH_SIZE      29
 
-/* Code segment structure */
+// Code segment structure
 typedef struct CodeSeg CodeSeg;
 struct CodeSeg {
-    char*           SegName;                    /* Segment name */
-    SymEntry*       Func;                       /* Owner function */
-    Collection      Entries;                    /* List of code entries */
-    Collection      Labels;                     /* Labels for next insn */
-    CodeLabel*      LabelHash[CS_LABEL_HASH_SIZE]; /* Label hash table */
-    unsigned short  ExitRegs;                   /* Register use on exit */
+    char*           SegName;                    // Segment name
+    SymEntry*       Func;                       // Owner function
+    Collection      Entries;                    // List of code entries
+    Collection      Labels;                     // Labels for next insn
+    CodeLabel*      LabelHash[CS_LABEL_HASH_SIZE]; // Label hash table
+    unsigned short  ExitRegs;                   // Register use on exit
 
-    /* Optimization settings for this segment */
-    unsigned char   Optimize;                   /* On/off switch */
+    // Optimization settings for this segment
+    unsigned char   Optimize;                   // On/off switch
     unsigned        CodeSizeFactor;
 };
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func);
-/* Create a new code segment, initialize and return it */
+// Create a new code segment, initialize and return it
 
 void CS_AddEntry (CodeSeg* S, struct CodeEntry* E);
-/* Add an entry to the given code segment */
+// Add an entry to the given code segment
 
 void CS_AddVLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap) attribute ((format(printf,3,0)));
-/* Add a line to the given code segment */
+// Add a line to the given code segment
 
 void CS_AddLine (CodeSeg* S, LineInfo* LI, const char* Format, ...) attribute ((format(printf,3,4)));
-/* Add a line to the given code segment */
+// Add a line to the given code segment
 
 #if defined(HAVE_INLINE)
 INLINE unsigned CS_GetEntryCount (const CodeSeg* S)
-/* Return the number of entries for the given code segment */
+// Return the number of entries for the given code segment
 {
     return CollCount (&S->Entries);
 }
@@ -159,7 +159,7 @@ INLINE void CS_MoveEntry (CodeSeg* S, unsigned OldPos, unsigned NewPos)
 
 #if defined(HAVE_INLINE)
 INLINE struct CodeEntry* CS_GetEntry (CodeSeg* S, unsigned Index)
-/* Get an entry from the given code segment */
+// Get an entry from the given code segment
 {
     return CollAt (&S->Entries, Index);
 }
@@ -184,7 +184,7 @@ int CS_GetEntries (CodeSeg* S, struct CodeEntry** List,
 */
 
 unsigned CS_GetEntryIndex (CodeSeg* S, struct CodeEntry* E);
-/* Return the index of a code entry */
+// Return the index of a code entry
 
 int CS_RangeHasLabel (CodeSeg* S, unsigned Start, unsigned Count);
 /* Return true if any of the code entries in the given range has a label
@@ -205,7 +205,7 @@ INLINE int CS_HavePendingLabel (const CodeSeg* S)
 #endif
 
 CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name);
-/* Add a code label for the next instruction to follow */
+// Add a code label for the next instruction to follow
 
 CodeLabel* CS_GenLabel (CodeSeg* S, struct CodeEntry* E);
 /* If the code entry E does already have a label, return it. Otherwise
@@ -213,7 +213,7 @@ CodeLabel* CS_GenLabel (CodeSeg* S, struct CodeEntry* E);
 */
 
 void CS_DelLabel (CodeSeg* S, CodeLabel* L);
-/* Remove references from this label and delete it. */
+// Remove references from this label and delete it.
 
 void CS_MergeLabels (CodeSeg* S);
 /* Merge code labels. That means: For each instruction, remove all labels but
@@ -248,19 +248,19 @@ void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last);
 */
 
 void CS_ErrorOnNonDefinition (CodeSeg* S, unsigned First, unsigned Last);
-/* emit an Error on anything other variable definition. */
+// emit an Error on anything other variable definition.
 
 void CS_CleanupSwitch(CodeSeg *S, unsigned loc);
 
 void CS_DelCodeAfter (CodeSeg* S, unsigned Last);
-/* Delete all entries including the given one */
+// Delete all entries including the given one
 
 void CS_ResetMarks (CodeSeg* S, unsigned First, unsigned Last);
-/* Remove all user marks from the entries in the given range */
+// Remove all user marks from the entries in the given range
 
 #if defined(HAVE_INLINE)
 INLINE void CS_ResetAllMarks (CodeSeg* S)
-/* Remove all user marks from the code segment */
+// Remove all user marks from the code segment
 {
     if (CS_GetEntryCount (S) > 0) {
         CS_ResetMarks (S, 0, CS_GetEntryCount (S));
@@ -291,16 +291,16 @@ void CS_OutputEpilogue (const CodeSeg* S);
 */
 
 void CS_Output (CodeSeg* S);
-/* Output the code segment data to a file */
+// Output the code segment data to a file
 
 void CS_FreeRegInfo (CodeSeg* S);
-/* Free register infos for all instructions */
+// Free register infos for all instructions
 
 void CS_GenRegInfo (CodeSeg* S);
-/* Generate register infos for all instructions */
+// Generate register infos for all instructions
 
 
 
-/* End of codeseg.h */
+// End of codeseg.h
 
 #endif

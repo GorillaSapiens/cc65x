@@ -1,42 +1,42 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                  expr.c                                   */
-/*                                                                           */
-/*             Expression evaluation for the ca65 macroassembler             */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                  expr.c
+//
+//             Expression evaluation for the ca65 macroassembler
+//
+//
+//
+// (C) 1998-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
 #include <string.h>
 #include <time.h>
 
-/* common */
+// common
 #include "check.h"
 #include "cpu.h"
 #include "exprdefs.h"
@@ -48,7 +48,7 @@
 #include "version.h"
 #include "xmalloc.h"
 
-/* ca65 */
+// ca65
 #include "error.h"
 #include "expr.h"
 #include "global.h"
@@ -66,9 +66,9 @@
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
@@ -84,25 +84,25 @@ static unsigned         FreeNodeCount = 0;
 
 
 
-/*****************************************************************************/
-/*                                  Helpers                                  */
-/*****************************************************************************/
+//***************************************************************************
+//                                  Helpers
+//***************************************************************************
 
 
 
 static ExprNode* NewExprNode (unsigned Op)
-/* Create a new expression node */
+// Create a new expression node
 {
     ExprNode* N;
 
-    /* Do we have some nodes in the list already? */
+    // Do we have some nodes in the list already?
     if (FreeNodeCount) {
-        /* Use first node from list */
+        // Use first node from list
         N = FreeExprNodes;
         FreeExprNodes = N->Left;
         --FreeNodeCount;
     } else {
-        /* Allocate fresh memory */
+        // Allocate fresh memory
         N = xmalloc (sizeof (ExprNode));
     }
     N->Op = Op;
@@ -115,21 +115,21 @@ static ExprNode* NewExprNode (unsigned Op)
 
 
 static void FreeExprNode (ExprNode* E)
-/* Free a node */
+// Free a node
 {
     if (E) {
         if (E->Op == EXPR_SYMBOL) {
-            /* Remove the symbol reference */
+            // Remove the symbol reference
             SymDelExprRef (E->V.Sym, E);
         }
-        /* Place the symbol into the free nodes list if possible */
+        // Place the symbol into the free nodes list if possible
         if (FreeNodeCount < MAX_FREE_NODES) {
-            /* Remember this node for later */
+            // Remember this node for later
             E->Left = FreeExprNodes;
             FreeExprNodes = E;
             ++FreeNodeCount;
         } else {
-            /* Free the memory */
+            // Free the memory
             xfree (E);
         }
     }
@@ -137,9 +137,9 @@ static void FreeExprNode (ExprNode* E)
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
@@ -148,7 +148,7 @@ static ExprNode* Expr0 (void);
 
 
 int IsByteRange (long Val)
-/* Return true if this is a byte value */
+// Return true if this is a byte value
 {
     return (Val & ~0xFFL) == 0;
 }
@@ -156,7 +156,7 @@ int IsByteRange (long Val)
 
 
 int IsWordRange (long Val)
-/* Return true if this is a word value */
+// Return true if this is a word value
 {
     return (Val & ~0xFFFFL) == 0;
 }
@@ -164,7 +164,7 @@ int IsWordRange (long Val)
 
 
 int IsFarRange (long Val)
-/* Return true if this is a far (24 bit) value */
+// Return true if this is a far (24 bit) value
 {
     return (Val & ~0xFFFFFFL) == 0;
 }
@@ -172,7 +172,7 @@ int IsFarRange (long Val)
 
 
 static const ExprNode* ResolveSymbolChain(const ExprNode* E)
-/* Recursive helper function for IsEasyConst */
+// Recursive helper function for IsEasyConst
 {
     if (E->Op == EXPR_SYMBOL) {
         SymEntry* Sym = E->V.Sym;
@@ -196,14 +196,14 @@ int IsEasyConst (const ExprNode* E, long* Val)
 ** into Val, provided that Val is not NULL.
 */
 {
-    /* Resolve symbols, follow symbol chains */
+    // Resolve symbols, follow symbol chains
     E = ResolveSymbolChain (E);
     if (E == 0) {
-        /* Could not resolve */
+        // Could not resolve
         return 0;
     }
 
-    /* Symbols resolved, check for a literal */
+    // Symbols resolved, check for a literal
     if (E->Op == EXPR_LITERAL) {
         if (Val) {
             *Val = E->V.IVal;
@@ -211,24 +211,24 @@ int IsEasyConst (const ExprNode* E, long* Val)
         return 1;
     }
 
-    /* Not found to be a const according to our tests */
+    // Not found to be a const according to our tests
     return 0;
 }
 
 
 
 static ExprNode* LoByte (ExprNode* Operand)
-/* Return the low byte of the given expression */
+// Return the low byte of the given expression
 {
     ExprNode* Expr;
     long      Val;
 
-    /* Special handling for const expressions */
+    // Special handling for const expressions
     if (IsEasyConst (Operand, &Val)) {
         FreeExpr (Operand);
         Expr = GenLiteralExpr (Val & 0xFF);
     } else {
-        /* Extract byte #0 */
+        // Extract byte #0
         Expr = NewExprNode (EXPR_BYTE0);
         Expr->Left = Operand;
     }
@@ -238,17 +238,17 @@ static ExprNode* LoByte (ExprNode* Operand)
 
 
 static ExprNode* HiByte (ExprNode* Operand)
-/* Return the high byte of the given expression */
+// Return the high byte of the given expression
 {
     ExprNode* Expr;
     long      Val;
 
-    /* Special handling for const expressions */
+    // Special handling for const expressions
     if (IsEasyConst (Operand, &Val)) {
         FreeExpr (Operand);
         Expr = GenLiteralExpr ((Val >> 8) & 0xFF);
     } else {
-        /* Extract byte #1 */
+        // Extract byte #1
         Expr = NewExprNode (EXPR_BYTE1);
         Expr->Left = Operand;
     }
@@ -258,30 +258,30 @@ static ExprNode* HiByte (ExprNode* Operand)
 
 
 static ExprNode* Bank (ExprNode* Operand)
-/* Return the bank of the given segmented expression */
+// Return the bank of the given segmented expression
 {
-    /* Generate the bank expression */
+    // Generate the bank expression
     ExprNode* Expr = NewExprNode (EXPR_BANK);
     Expr->Left = Operand;
 
-    /* Return the result */
+    // Return the result
     return Expr;
 }
 
 
 
 static ExprNode* BankByte (ExprNode* Operand)
-/* Return the bank byte of the given expression */
+// Return the bank byte of the given expression
 {
     ExprNode* Expr;
     long      Val;
 
-    /* Special handling for const expressions */
+    // Special handling for const expressions
     if (IsEasyConst (Operand, &Val)) {
         FreeExpr (Operand);
         Expr = GenLiteralExpr ((Val >> 16) & 0xFF);
     } else {
-        /* Extract byte #2 */
+        // Extract byte #2
         Expr = NewExprNode (EXPR_BYTE2);
         Expr->Left = Operand;
     }
@@ -291,17 +291,17 @@ static ExprNode* BankByte (ExprNode* Operand)
 
 
 static ExprNode* LoWord (ExprNode* Operand)
-/* Return the low word of the given expression */
+// Return the low word of the given expression
 {
     ExprNode* Expr;
     long      Val;
 
-    /* Special handling for const expressions */
+    // Special handling for const expressions
     if (IsEasyConst (Operand, &Val)) {
         FreeExpr (Operand);
         Expr = GenLiteralExpr (Val & 0xFFFF);
     } else {
-        /* Extract word #0 */
+        // Extract word #0
         Expr = NewExprNode (EXPR_WORD0);
         Expr->Left = Operand;
     }
@@ -311,17 +311,17 @@ static ExprNode* LoWord (ExprNode* Operand)
 
 
 static ExprNode* HiWord (ExprNode* Operand)
-/* Return the high word of the given expression */
+// Return the high word of the given expression
 {
     ExprNode* Expr;
     long      Val;
 
-    /* Special handling for const expressions */
+    // Special handling for const expressions
     if (IsEasyConst (Operand, &Val)) {
         FreeExpr (Operand);
         Expr = GenLiteralExpr ((Val >> 16) & 0xFFFF);
     } else {
-        /* Extract word #1 */
+        // Extract word #1
         Expr = NewExprNode (EXPR_WORD1);
         Expr->Left = Operand;
     }
@@ -331,13 +331,13 @@ static ExprNode* HiWord (ExprNode* Operand)
 
 
 static ExprNode* Symbol (SymEntry* S)
-/* Reference a symbol and return an expression for it */
+// Reference a symbol and return an expression for it
 {
     if (S == 0) {
-        /* Some weird error happened before */
+        // Some weird error happened before
         return GenLiteralExpr (0);
     } else {
-        /* Mark the symbol as referenced */
+        // Mark the symbol as referenced
         SymRef (S);
         /* If the symbol is a variable, return just its value, otherwise
         ** return a reference to the symbol.
@@ -345,7 +345,7 @@ static ExprNode* Symbol (SymEntry* S)
         if (SymIsVar (S)) {
             return CloneExpr (GetSymExpr (S));
         } else {
-            /* Create symbol node */
+            // Create symbol node
             return GenSymExpr (S);
         }
     }
@@ -354,7 +354,7 @@ static ExprNode* Symbol (SymEntry* S)
 
 
 ExprNode* FuncBank (void)
-/* Handle the .BANK builtin function */
+// Handle the .BANK builtin function
 {
     return Bank (Expression ());
 }
@@ -362,7 +362,7 @@ ExprNode* FuncBank (void)
 
 
 ExprNode* FuncBankByte (void)
-/* Handle the .BANKBYTE builtin function */
+// Handle the .BANKBYTE builtin function
 {
     return BankByte (Expression ());
 }
@@ -370,7 +370,7 @@ ExprNode* FuncBankByte (void)
 
 
 static ExprNode* FuncBlank (void)
-/* Handle the .BLANK builtin function */
+// Handle the .BLANK builtin function
 {
     /* We have a list of tokens that ends with the closing paren. Skip
     ** the tokens, and count them. Allow optionally curly braces.
@@ -387,67 +387,67 @@ static ExprNode* FuncBlank (void)
             break;
         }
 
-        /* One more token */
+        // One more token
         ++Count;
 
-        /* Skip the token */
+        // Skip the token
         NextTok ();
     }
 
-    /* If the list was enclosed in curly braces, skip the closing brace */
+    // If the list was enclosed in curly braces, skip the closing brace
     if (Term == TOK_RCURLY && CurTok.Tok == TOK_RCURLY) {
         NextTok ();
     }
 
-    /* Return true if the list was empty */
+    // Return true if the list was empty
     return GenLiteralExpr (Count == 0);
 }
 
 
 
 static ExprNode* FuncConst (void)
-/* Handle the .CONST builtin function */
+// Handle the .CONST builtin function
 {
-    /* Read an expression */
+    // Read an expression
     ExprNode* Expr = Expression ();
 
-    /* Check the constness of the expression */
+    // Check the constness of the expression
     ExprNode* Result = GenLiteralExpr (IsConstExpr (Expr, 0));
 
-    /* Free the expression */
+    // Free the expression
     FreeExpr (Expr);
 
-    /* Done */
+    // Done
     return Result;
 }
 
 
 
 static ExprNode* FuncDefined (void)
-/* Handle the .DEFINED builtin function */
+// Handle the .DEFINED builtin function
 {
-    /* Parse the symbol name and search for the symbol */
+    // Parse the symbol name and search for the symbol
     SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
 
-    /* Check if the symbol is defined */
+    // Check if the symbol is defined
     return GenLiteralExpr (Sym != 0 && SymIsDef (Sym));
 }
 
 
 
 static ExprNode* FuncDefinedMacro (void)
-/* Handle the .DEFINEDMACRO builtin function */
+// Handle the .DEFINEDMACRO builtin function
 {
     Macro* Mac = 0;
 
-    /* Check if the identifier is a macro */
+    // Check if the identifier is a macro
 
     if (CurTok.Tok == TOK_IDENT) {
         Mac = FindMacro (&CurTok.SVal);
     } else {
         Error ("Identifier expected.");
     }
-    /* Skip the name */
+    // Skip the name
     NextTok ();
 
     return GenLiteralExpr (Mac != 0);
@@ -456,7 +456,7 @@ static ExprNode* FuncDefinedMacro (void)
 
 
 ExprNode* FuncHiByte (void)
-/* Handle the .HIBYTE builtin function */
+// Handle the .HIBYTE builtin function
 {
     return HiByte (Expression ());
 }
@@ -464,7 +464,7 @@ ExprNode* FuncHiByte (void)
 
 
 static ExprNode* FuncHiWord (void)
-/* Handle the .HIWORD builtin function */
+// Handle the .HIWORD builtin function
 {
     return HiWord (Expression ());
 }
@@ -472,28 +472,28 @@ static ExprNode* FuncHiWord (void)
 
 
 static ExprNode* FuncIsMnemonic (void)
-/* Handle the .ISMNEMONIC, .ISMNEM builtin function */
+// Handle the .ISMNEMONIC, .ISMNEM builtin function
 {
     int Instr = -1;
 
-    /* Check for a macro or an instruction depending on UbiquitousIdents */
+    // Check for a macro or an instruction depending on UbiquitousIdents
 
     if (CurTok.Tok == TOK_IDENT) {
         if (UbiquitousIdents) {
-            /* Macros CAN be instructions, so check for them first */
+            // Macros CAN be instructions, so check for them first
             if (FindMacro (&CurTok.SVal) == 0) {
                 Instr = FindInstruction (&CurTok.SVal);
             }
         }
         else {
-            /* Macros and symbols may NOT use the names of instructions, so just check for the instruction */
+            // Macros and symbols may NOT use the names of instructions, so just check for the instruction
             Instr = FindInstruction (&CurTok.SVal);
         }
     }
     else {
         Error ("Identifier expected.");
     }
-    /* Skip the name */
+    // Skip the name
     NextTok ();
 
     return GenLiteralExpr (Instr >= 0);
@@ -502,7 +502,7 @@ static ExprNode* FuncIsMnemonic (void)
 
 
 ExprNode* FuncLoByte (void)
-/* Handle the .LOBYTE builtin function */
+// Handle the .LOBYTE builtin function
 {
     return LoByte (Expression ());
 }
@@ -510,7 +510,7 @@ ExprNode* FuncLoByte (void)
 
 
 static ExprNode* FuncLoWord (void)
-/* Handle the .LOWORD builtin function */
+// Handle the .LOWORD builtin function
 {
     return LoWord (Expression ());
 }
@@ -518,7 +518,7 @@ static ExprNode* FuncLoWord (void)
 
 
 static ExprNode* DoMatch (enum TC EqualityLevel)
-/* Handle the .MATCH and .XMATCH builtin functions */
+// Handle the .MATCH and .XMATCH builtin functions
 {
     int Result;
     TokNode* Root = 0;
@@ -532,16 +532,16 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     token_t Term = GetTokListTerm (TOK_COMMA);
     while (CurTok.Tok != Term) {
 
-        /* We may not end-of-line of end-of-file here */
+        // We may not end-of-line of end-of-file here
         if (TokIsSep (CurTok.Tok)) {
             Error ("Unexpected end of line");
             return GenLiteral0 ();
         }
 
-        /* Get a node with this token */
+        // Get a node with this token
         Node = NewTokNode ();
 
-        /* Insert the node into the list */
+        // Insert the node into the list
         if (Last == 0) {
             Root = Node;
         } else {
@@ -549,14 +549,14 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
         }
         Last = Node;
 
-        /* Skip the token */
+        // Skip the token
         NextTok ();
     }
 
-    /* Skip the terminator token*/
+    // Skip the terminator token
     NextTok ();
 
-    /* If the token list was enclosed in curly braces, we expect a comma */
+    // If the token list was enclosed in curly braces, we expect a comma
     if (Term == TOK_RCURLY) {
         ConsumeComma ();
     }
@@ -570,57 +570,57 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     Node = Root;
     while (CurTok.Tok != Term) {
 
-        /* We may not end-of-line of end-of-file here */
+        // We may not end-of-line of end-of-file here
         if (TokIsSep (CurTok.Tok)) {
             Error ("Unexpected end of line");
             return GenLiteral0 ();
         }
 
-        /* Compare the tokens if the result is not already known */
+        // Compare the tokens if the result is not already known
         if (Result != 0) {
             if (Node == 0) {
-                /* The second list is larger than the first one */
+                // The second list is larger than the first one
                 Result = 0;
             } else if (TokCmp (Node) < EqualityLevel) {
-                /* Tokens do not match */
+                // Tokens do not match
                 Result = 0;
             }
         }
 
-        /* Next token in first list */
+        // Next token in first list
         if (Node) {
             Node = Node->Next;
         }
 
-        /* Next token in current list */
+        // Next token in current list
         NextTok ();
     }
 
-    /* If the token list was enclosed in curly braces, eat the closing brace */
+    // If the token list was enclosed in curly braces, eat the closing brace
     if (Term == TOK_RCURLY) {
         NextTok ();
     }
 
-    /* Check if there are remaining tokens in the first list */
+    // Check if there are remaining tokens in the first list
     if (Node != 0) {
         Result = 0;
     }
 
-    /* Free the token list */
+    // Free the token list
     while (Root) {
         Node = Root;
         Root = Root->Next;
         FreeTokNode (Node);
     }
 
-    /* Done, return the result */
+    // Done, return the result
     return GenLiteralExpr (Result);
 }
 
 
 
 static ExprNode* FuncMatch (void)
-/* Handle the .MATCH function */
+// Handle the .MATCH function
 {
     return DoMatch (tcSameToken);
 }
@@ -628,25 +628,25 @@ static ExprNode* FuncMatch (void)
 
 
 static ExprNode* FuncMax (void)
-/* Handle the .MAX function */
+// Handle the .MAX function
 {
     ExprNode* Left;
     ExprNode* Right;
     ExprNode* Expr;
     long LeftVal, RightVal;
 
-    /* Two arguments to the pseudo function */
+    // Two arguments to the pseudo function
     Left = Expression ();
     ConsumeComma ();
     Right = Expression ();
 
-    /* Check if we can evaluate the value immediately */
+    // Check if we can evaluate the value immediately
     if (IsEasyConst (Left, &LeftVal) && IsEasyConst (Right, &RightVal)) {
         FreeExpr (Left);
         FreeExpr (Right);
         Expr = GenLiteralExpr ((LeftVal > RightVal)? LeftVal : RightVal);
     } else {
-        /* Make an expression node */
+        // Make an expression node
         Expr = NewExprNode (EXPR_MAX);
         Expr->Left = Left;
         Expr->Right = Right;
@@ -657,25 +657,25 @@ static ExprNode* FuncMax (void)
 
 
 static ExprNode* FuncMin (void)
-/* Handle the .MIN function */
+// Handle the .MIN function
 {
     ExprNode* Left;
     ExprNode* Right;
     ExprNode* Expr;
     long LeftVal, RightVal;
 
-    /* Two arguments to the pseudo function */
+    // Two arguments to the pseudo function
     Left = Expression ();
     ConsumeComma ();
     Right = Expression ();
 
-    /* Check if we can evaluate the value immediately */
+    // Check if we can evaluate the value immediately
     if (IsEasyConst (Left, &LeftVal) && IsEasyConst (Right, &RightVal)) {
         FreeExpr (Left);
         FreeExpr (Right);
         Expr = GenLiteralExpr ((LeftVal < RightVal)? LeftVal : RightVal);
     } else {
-        /* Make an expression node */
+        // Make an expression node
         Expr = NewExprNode (EXPR_MIN);
         Expr->Left = Left;
         Expr->Right = Right;
@@ -686,19 +686,19 @@ static ExprNode* FuncMin (void)
 
 
 static ExprNode* FuncReferenced (void)
-/* Handle the .REFERENCED builtin function */
+// Handle the .REFERENCED builtin function
 {
-    /* Parse the symbol name and search for the symbol */
+    // Parse the symbol name and search for the symbol
     SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
 
-    /* Check if the symbol is referenced */
+    // Check if the symbol is referenced
     return GenLiteralExpr (Sym != 0 && SymIsRef (Sym));
 }
 
 
 
 static ExprNode* FuncAddrSize (void)
-/* Handle the .ADDRSIZE function */
+// Handle the .ADDRSIZE function
 {
     StrBuf    ScopeName = STATIC_STRBUF_INITIALIZER;
     StrBuf    Name = STATIC_STRBUF_INITIALIZER;
@@ -707,13 +707,13 @@ static ExprNode* FuncAddrSize (void)
     int       NoScope;
 
 
-    /* Assume we don't know the size */
+    // Assume we don't know the size
     AddrSize = 0;
 
-    /* Check for a cheap local which needs special handling */
+    // Check for a cheap local which needs special handling
     if (CurTok.Tok == TOK_LOCAL_IDENT) {
 
-        /* Cheap local symbol */
+        // Cheap local symbol
         Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
             Error ("Unknown symbol or scope: '%m%p'", &CurTok.SVal);
@@ -721,19 +721,19 @@ static ExprNode* FuncAddrSize (void)
             AddrSize = Sym->AddrSize;
         }
 
-        /* Remember and skip SVal, terminate ScopeName so it is empty */
+        // Remember and skip SVal, terminate ScopeName so it is empty
         SB_Copy (&Name, &CurTok.SVal);
         NextTok ();
         SB_Terminate (&ScopeName);
 
     } else {
 
-        /* Parse the scope and the name */
+        // Parse the scope and the name
         SymTable* ParentScope = ParseScopedIdent (&Name, &ScopeName);
 
-        /* Check if the parent scope is valid */
+        // Check if the parent scope is valid
         if (ParentScope == 0) {
-            /* No such scope */
+            // No such scope
             SB_Done (&ScopeName);
             SB_Done (&Name);
             return GenLiteral0 ();
@@ -752,7 +752,7 @@ static ExprNode* FuncAddrSize (void)
         } else {
             Sym = SymFind (ParentScope, &Name, SYM_FIND_EXISTING);
         }
-        /* If we found the symbol retrieve the size, otherwise complain */
+        // If we found the symbol retrieve the size, otherwise complain
         if (Sym) {
             AddrSize = Sym->AddrSize;
         } else {
@@ -765,11 +765,11 @@ static ExprNode* FuncAddrSize (void)
         Warning (1, "Unknown address size: '%m%p%m%p'", &ScopeName, &Name);
     }
 
-    /* Free the string buffers */
+    // Free the string buffers
     SB_Done (&ScopeName);
     SB_Done (&Name);
 
-    /* Return the size. */
+    // Return the size.
 
     return GenLiteralExpr (AddrSize);
 }
@@ -777,7 +777,7 @@ static ExprNode* FuncAddrSize (void)
 
 
 static ExprNode* FuncSizeOf (void)
-/* Handle the .SIZEOF function */
+// Handle the .SIZEOF function
 {
     StrBuf    ScopeName = STATIC_STRBUF_INITIALIZER;
     StrBuf    Name = STATIC_STRBUF_INITIALIZER;
@@ -788,13 +788,13 @@ static ExprNode* FuncSizeOf (void)
     int       NoScope;
 
 
-    /* Assume an error */
+    // Assume an error
     SizeSym = 0;
 
-    /* Check for a cheap local which needs special handling */
+    // Check for a cheap local which needs special handling
     if (CurTok.Tok == TOK_LOCAL_IDENT) {
 
-        /* Cheap local symbol */
+        // Cheap local symbol
         Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
             Error ("Unknown symbol or scope: '%m%p'", &CurTok.SVal);
@@ -802,19 +802,19 @@ static ExprNode* FuncSizeOf (void)
             SizeSym = GetSizeOfSymbol (Sym);
         }
 
-        /* Remember and skip SVal, terminate ScopeName so it is empty */
+        // Remember and skip SVal, terminate ScopeName so it is empty
         SB_Copy (&Name, &CurTok.SVal);
         NextTok ();
         SB_Terminate (&ScopeName);
 
     } else {
 
-        /* Parse the scope and the name */
+        // Parse the scope and the name
         SymTable* ParentScope = ParseScopedIdent (&Name, &ScopeName);
 
-        /* Check if the parent scope is valid */
+        // Check if the parent scope is valid
         if (ParentScope == 0) {
-            /* No such scope */
+            // No such scope
             SB_Done (&ScopeName);
             SB_Done (&Name);
             return GenLiteral0 ();
@@ -825,7 +825,7 @@ static ExprNode* FuncSizeOf (void)
         */
         NoScope = SB_IsEmpty (&ScopeName);
 
-        /* First search for a scope with the given name */
+        // First search for a scope with the given name
         if (NoScope) {
             Scope = SymFindAnyScope (ParentScope, &Name);
         } else {
@@ -836,7 +836,7 @@ static ExprNode* FuncSizeOf (void)
         ** size, otherwise search for a symbol entry with the name and scope.
         */
         if (Scope) {
-            /* Yep, it's a scope */
+            // Yep, it's a scope
             SizeSym = GetSizeOfScope (Scope);
         } else {
             if (NoScope) {
@@ -845,7 +845,7 @@ static ExprNode* FuncSizeOf (void)
                 Sym = SymFind (ParentScope, &Name, SYM_FIND_EXISTING);
             }
 
-            /* If we found the symbol retrieve the size, otherwise complain */
+            // If we found the symbol retrieve the size, otherwise complain
             if (Sym) {
                 SizeSym = GetSizeOfSymbol (Sym);
             } else {
@@ -855,47 +855,47 @@ static ExprNode* FuncSizeOf (void)
         }
     }
 
-    /* Check if we have a size */
+    // Check if we have a size
     if (SizeSym == 0 || !SymIsConst (SizeSym, &Size)) {
         Error ("Size of '%m%p%m%p' is unknown", &ScopeName, &Name);
         Size = 0;
     }
 
-    /* Free the string buffers */
+    // Free the string buffers
     SB_Done (&ScopeName);
     SB_Done (&Name);
 
-    /* Return the size */
+    // Return the size
     return GenLiteralExpr (Size);
 }
 
 
 
 static ExprNode* FuncStrAt (void)
-/* Handle the .STRAT function */
+// Handle the .STRAT function
 {
     StrBuf Str = STATIC_STRBUF_INITIALIZER;
     long Index;
     unsigned char C = 0;
 
-    /* String constant expected */
+    // String constant expected
     if (CurTok.Tok != TOK_STRCON) {
         Error ("String constant expected");
         NextTok ();
         goto ExitPoint;
     }
 
-    /* Remember the string and skip it */
+    // Remember the string and skip it
     SB_Copy (&Str, &CurTok.SVal);
     NextTok ();
 
-    /* Comma must follow */
+    // Comma must follow
     ConsumeComma ();
 
-    /* Expression expected */
+    // Expression expected
     Index = ConstExpression ();
 
-    /* Must be a valid index */
+    // Must be a valid index
     if (Index >= (long) SB_GetLen (&Str)) {
         Error ("Range error");
         goto ExitPoint;
@@ -907,25 +907,25 @@ static ExprNode* FuncStrAt (void)
     C = TgtTranslateChar (SB_At (&Str, (unsigned)Index));
 
 ExitPoint:
-    /* Free string buffer memory */
+    // Free string buffer memory
     SB_Done (&Str);
 
-    /* Return the char expression */
+    // Return the char expression
     return GenLiteralExpr (C);
 }
 
 
 
 static ExprNode* FuncStrLen (void)
-/* Handle the .STRLEN function */
+// Handle the .STRLEN function
 {
     int Len;
 
-    /* String constant expected */
+    // String constant expected
     if (CurTok.Tok != TOK_STRCON) {
 
         Error ("String constant expected");
-        /* Smart error recovery */
+        // Smart error recovery
         if (CurTok.Tok != TOK_RPAREN) {
             NextTok ();
         }
@@ -933,21 +933,21 @@ static ExprNode* FuncStrLen (void)
 
     } else {
 
-        /* Get the length of the string */
+        // Get the length of the string
         Len = SB_GetLen (&CurTok.SVal);
 
-        /* Skip the string */
+        // Skip the string
         NextTok ();
     }
 
-    /* Return the length */
+    // Return the length
     return GenLiteralExpr (Len);
 }
 
 
 
 static ExprNode* FuncTCount (void)
-/* Handle the .TCOUNT function */
+// Handle the .TCOUNT function
 {
     /* We have a list of tokens that ends with the closing paren. Skip
     ** the tokens, and count them. Allow optionally curly braces.
@@ -964,26 +964,26 @@ static ExprNode* FuncTCount (void)
             break;
         }
 
-        /* One more token */
+        // One more token
         ++Count;
 
-        /* Skip the token */
+        // Skip the token
         NextTok ();
     }
 
-    /* If the list was enclosed in curly braces, skip the closing brace */
+    // If the list was enclosed in curly braces, skip the closing brace
     if (Term == TOK_RCURLY && CurTok.Tok == TOK_RCURLY) {
         NextTok ();
     }
 
-    /* Return the number of tokens */
+    // Return the number of tokens
     return GenLiteralExpr (Count);
 }
 
 
 
 static ExprNode* FuncXMatch (void)
-/* Handle the .XMATCH function */
+// Handle the .XMATCH function
 {
     return DoMatch (tcIdentical);
 }
@@ -991,14 +991,14 @@ static ExprNode* FuncXMatch (void)
 
 
 static ExprNode* Function (ExprNode* (*F) (void))
-/* Handle builtin functions */
+// Handle builtin functions
 {
     ExprNode* E;
 
-    /* Skip the keyword */
+    // Skip the keyword
     NextTok ();
 
-    /* Expression must be enclosed in braces */
+    // Expression must be enclosed in braces
     if (CurTok.Tok != TOK_LPAREN) {
         Error ("'(' expected");
         SkipUntilSep ();
@@ -1006,13 +1006,13 @@ static ExprNode* Function (ExprNode* (*F) (void))
     }
     NextTok ();
 
-    /* Call the function itself */
+    // Call the function itself
     E = F ();
 
-    /* Closing brace must follow */
+    // Closing brace must follow
     ConsumeRParen ();
 
-    /* Return the result of the actual function */
+    // Return the result of the actual function
     return E;
 }
 
@@ -1093,7 +1093,7 @@ static ExprNode* Factor (void)
             break;
 
         case TOK_XOR:
-            /* ^ means the bank byte of an expression */
+            // ^ means the bank byte of an expression
             NextTok ();
             N = BankByte (Factor ());
             break;
@@ -1224,11 +1224,11 @@ static ExprNode* Factor (void)
         default:
             if (LooseCharTerm && CurTok.Tok == TOK_STRCON &&
                 SB_GetLen (&CurTok.SVal) == 1) {
-                /* A character constant */
+                // A character constant
                 N = GenLiteralExpr (TgtTranslateChar (SB_At (&CurTok.SVal, 0)));
                 NextTok ();
             } else {
-                N = GenLiteral0 ();     /* Dummy */
+                N = GenLiteral0 ();     // Dummy
                 Error ("Syntax error");
             }
             break;
@@ -1240,10 +1240,10 @@ static ExprNode* Factor (void)
 
 static ExprNode* Term (void)
 {
-    /* Read left hand side */
+    // Read left hand side
     ExprNode* Root = Factor ();
 
-    /* Handle multiplicative operations */
+    // Handle multiplicative operations
     while (CurTok.Tok == TOK_MUL || CurTok.Tok == TOK_DIV ||
            CurTok.Tok == TOK_MOD || CurTok.Tok == TOK_AND ||
            CurTok.Tok == TOK_XOR || CurTok.Tok == TOK_SHL ||
@@ -1253,15 +1253,15 @@ static ExprNode* Term (void)
         ExprNode* Left;
         ExprNode* Right;
 
-        /* Remember the token and skip it */
+        // Remember the token and skip it
         token_t T = CurTok.Tok;
         NextTok ();
 
-        /* Move root to left side and read the right side */
+        // Move root to left side and read the right side
         Left  = Root;
         Right = Factor ();
 
-        /* If both expressions are constant, we can evaluate the term */
+        // If both expressions are constant, we can evaluate the term
         if (IsEasyConst (Left, &LVal) && IsEasyConst (Right, &RVal)) {
 
             switch (T) {
@@ -1316,7 +1316,7 @@ static ExprNode* Term (void)
 
         } else {
 
-            /* Generate an expression tree */
+            // Generate an expression tree
             unsigned char Op;
             switch (T) {
                 case TOK_MUL:   Op = EXPR_MUL;  break;
@@ -1336,7 +1336,7 @@ static ExprNode* Term (void)
 
     }
 
-    /* Return the expression tree we've created */
+    // Return the expression tree we've created
     return Root;
 }
 
@@ -1344,10 +1344,10 @@ static ExprNode* Term (void)
 
 static ExprNode* SimpleExpr (void)
 {
-    /* Read left hand side */
+    // Read left hand side
     ExprNode* Root = Term ();
 
-    /* Handle additive operations */
+    // Handle additive operations
     while (CurTok.Tok == TOK_PLUS  ||
            CurTok.Tok == TOK_MINUS ||
            CurTok.Tok == TOK_OR) {
@@ -1356,15 +1356,15 @@ static ExprNode* SimpleExpr (void)
         ExprNode* Left;
         ExprNode* Right;
 
-        /* Remember the token and skip it */
+        // Remember the token and skip it
         token_t T = CurTok.Tok;
         NextTok ();
 
-        /* Move root to left side and read the right side */
+        // Move root to left side and read the right side
         Left  = Root;
         Right = Term ();
 
-        /* If both expressions are constant, we can evaluate the term */
+        // If both expressions are constant, we can evaluate the term
         if (IsEasyConst (Left, &LVal) && IsEasyConst (Right, &RVal)) {
 
             switch (T) {
@@ -1383,7 +1383,7 @@ static ExprNode* SimpleExpr (void)
 
         } else {
 
-            /* Generate an expression tree */
+            // Generate an expression tree
             unsigned char Op;
             switch (T) {
                 case TOK_PLUS:  Op = EXPR_PLUS;  break;
@@ -1398,19 +1398,19 @@ static ExprNode* SimpleExpr (void)
         }
     }
 
-    /* Return the expression tree we've created */
+    // Return the expression tree we've created
     return Root;
 }
 
 
 
 static ExprNode* BoolExpr (void)
-/* Evaluate a boolean expression */
+// Evaluate a boolean expression
 {
-    /* Read left hand side */
+    // Read left hand side
     ExprNode* Root = SimpleExpr ();
 
-    /* Handle booleans */
+    // Handle booleans
     while (CurTok.Tok == TOK_EQ || CurTok.Tok == TOK_NE ||
            CurTok.Tok == TOK_LT || CurTok.Tok == TOK_GT ||
            CurTok.Tok == TOK_LE || CurTok.Tok == TOK_GE) {
@@ -1419,15 +1419,15 @@ static ExprNode* BoolExpr (void)
         ExprNode* Left;
         ExprNode* Right;
 
-        /* Remember the token and skip it */
+        // Remember the token and skip it
         token_t T = CurTok.Tok;
         NextTok ();
 
-        /* Move root to left side and read the right side */
+        // Move root to left side and read the right side
         Left  = Root;
         Right = SimpleExpr ();
 
-        /* If both expressions are constant, we can evaluate the term */
+        // If both expressions are constant, we can evaluate the term
         if (IsEasyConst (Left, &LVal) && IsEasyConst (Right, &RVal)) {
 
             switch (T) {
@@ -1449,7 +1449,7 @@ static ExprNode* BoolExpr (void)
 
         } else {
 
-            /* Generate an expression tree */
+            // Generate an expression tree
             unsigned char Op;
             switch (T) {
                 case TOK_EQ:    Op = EXPR_EQ;   break;
@@ -1467,34 +1467,34 @@ static ExprNode* BoolExpr (void)
         }
     }
 
-    /* Return the expression tree we've created */
+    // Return the expression tree we've created
     return Root;
 }
 
 
 
 static ExprNode* Expr2 (void)
-/* Boolean operators: AND and XOR */
+// Boolean operators: AND and XOR
 {
-    /* Read left hand side */
+    // Read left hand side
     ExprNode* Root = BoolExpr ();
 
-    /* Handle booleans */
+    // Handle booleans
     while (CurTok.Tok == TOK_BOOLAND || CurTok.Tok == TOK_BOOLXOR) {
 
         long LVal, RVal, Val;
         ExprNode* Left;
         ExprNode* Right;
 
-        /* Remember the token and skip it */
+        // Remember the token and skip it
         token_t T = CurTok.Tok;
         NextTok ();
 
-        /* Move root to left side and read the right side */
+        // Move root to left side and read the right side
         Left  = Root;
         Right = BoolExpr ();
 
-        /* If both expressions are constant, we can evaluate the term */
+        // If both expressions are constant, we can evaluate the term
         if (IsEasyConst (Left, &LVal) && IsEasyConst (Right, &RVal)) {
 
             switch (T) {
@@ -1512,7 +1512,7 @@ static ExprNode* Expr2 (void)
 
         } else {
 
-            /* Generate an expression tree */
+            // Generate an expression tree
             unsigned char Op;
             switch (T) {
                 case TOK_BOOLAND:   Op = EXPR_BOOLAND; break;
@@ -1526,34 +1526,34 @@ static ExprNode* Expr2 (void)
         }
     }
 
-    /* Return the expression tree we've created */
+    // Return the expression tree we've created
     return Root;
 }
 
 
 
 static ExprNode* Expr1 (void)
-/* Boolean operators: OR */
+// Boolean operators: OR
 {
-    /* Read left hand side */
+    // Read left hand side
     ExprNode* Root = Expr2 ();
 
-    /* Handle booleans */
+    // Handle booleans
     while (CurTok.Tok == TOK_BOOLOR) {
 
         long LVal, RVal, Val;
         ExprNode* Left;
         ExprNode* Right;
 
-        /* Remember the token and skip it */
+        // Remember the token and skip it
         token_t T = CurTok.Tok;
         NextTok ();
 
-        /* Move root to left side and read the right side */
+        // Move root to left side and read the right side
         Left  = Root;
         Right = Expr2 ();
 
-        /* If both expressions are constant, we can evaluate the term */
+        // If both expressions are constant, we can evaluate the term
         if (IsEasyConst (Left, &LVal) && IsEasyConst (Right, &RVal)) {
 
             switch (T) {
@@ -1570,7 +1570,7 @@ static ExprNode* Expr1 (void)
 
         } else {
 
-            /* Generate an expression tree */
+            // Generate an expression tree
             unsigned char Op;
             switch (T) {
                 case TOK_BOOLOR:    Op = EXPR_BOOLOR;  break;
@@ -1583,30 +1583,30 @@ static ExprNode* Expr1 (void)
         }
     }
 
-    /* Return the expression tree we've created */
+    // Return the expression tree we've created
     return Root;
 }
 
 
 
 static ExprNode* Expr0 (void)
-/* Boolean operators: NOT */
+// Boolean operators: NOT
 {
     ExprNode* Root;
 
-    /* Handle booleans */
+    // Handle booleans
     if (CurTok.Tok == TOK_BOOLNOT) {
 
         long Val;
         ExprNode* Left;
 
-        /* Skip the operator token */
+        // Skip the operator token
         NextTok ();
 
-        /* Read the argument */
+        // Read the argument
         Left = Expr0 ();
 
-        /* If the argument is const, evaluate it directly */
+        // If the argument is const, evaluate it directly
         if (IsEasyConst (Left, &Val)) {
             FreeExpr (Left);
             Root = GenLiteralExpr (!Val);
@@ -1617,12 +1617,12 @@ static ExprNode* Expr0 (void)
 
     } else {
 
-        /* Read left hand side */
+        // Read left hand side
         Root = Expr1 ();
 
     }
 
-    /* Return the expression tree we've created */
+    // Return the expression tree we've created
     return Root;
 }
 
@@ -1646,15 +1646,15 @@ long ConstExpression (void)
 {
     long Val;
 
-    /* Read the expression */
+    // Read the expression
     ExprNode* Expr = Expression ();
 
-    /* Study the expression */
+    // Study the expression
     ExprDesc D;
     ED_Init (&D);
     StudyExpr (Expr, &D);
 
-    /* Check if the expression is constant */
+    // Check if the expression is constant
     if (ED_IsConst (&D)) {
         Val = D.Val;
     } else {
@@ -1662,18 +1662,18 @@ long ConstExpression (void)
         Val = 0;
     }
 
-    /* Free the expression tree and allocated memory for D */
+    // Free the expression tree and allocated memory for D
     FreeExpr (Expr);
     ED_Done (&D);
 
-    /* Return the value */
+    // Return the value
     return Val;
 }
 
 
 
 void FreeExpr (ExprNode* Root)
-/* Free the expression, Root is pointing to. */
+// Free the expression, Root is pointing to.
 {
     if (Root) {
         FreeExpr (Root->Left);
@@ -1685,10 +1685,10 @@ void FreeExpr (ExprNode* Root)
 
 
 ExprNode* SimplifyExpr (ExprNode* Expr, const ExprDesc* D)
-/* Try to simplify the given expression tree */
+// Try to simplify the given expression tree
 {
     if (Expr->Op != EXPR_LITERAL && ED_IsConst (D)) {
-        /* No external references */
+        // No external references
         FreeExpr (Expr);
         Expr = GenLiteralExpr (D->Val);
     }
@@ -1698,7 +1698,7 @@ ExprNode* SimplifyExpr (ExprNode* Expr, const ExprDesc* D)
 
 
 ExprNode* GenLiteralExpr (long Val)
-/* Return an expression tree that encodes the given literal value */
+// Return an expression tree that encodes the given literal value
 {
     ExprNode* Expr = NewExprNode (EXPR_LITERAL);
     Expr->V.IVal = Val;
@@ -1708,7 +1708,7 @@ ExprNode* GenLiteralExpr (long Val)
 
 
 ExprNode* GenLiteral0 (void)
-/* Return an expression tree that encodes the number zero */
+// Return an expression tree that encodes the number zero
 {
     return GenLiteralExpr (0);
 }
@@ -1716,7 +1716,7 @@ ExprNode* GenLiteral0 (void)
 
 
 ExprNode* GenSymExpr (SymEntry* Sym)
-/* Return an expression node that encodes the given symbol */
+// Return an expression node that encodes the given symbol
 {
     ExprNode* Expr = NewExprNode (EXPR_SYMBOL);
     Expr->V.Sym = Sym;
@@ -1727,7 +1727,7 @@ ExprNode* GenSymExpr (SymEntry* Sym)
 
 
 static ExprNode* GenSectionExpr (unsigned SecNum)
-/* Return an expression node for the given section */
+// Return an expression node for the given section
 {
     ExprNode* Expr = NewExprNode (EXPR_SECTION);
     Expr->V.SecNum = SecNum;
@@ -1737,7 +1737,7 @@ static ExprNode* GenSectionExpr (unsigned SecNum)
 
 
 static ExprNode* GenBankExpr (unsigned SecNum)
-/* Return an expression node for the given bank */
+// Return an expression node for the given bank
 {
     ExprNode* Expr = NewExprNode (EXPR_BANK);
     Expr->V.SecNum = SecNum;
@@ -1747,7 +1747,7 @@ static ExprNode* GenBankExpr (unsigned SecNum)
 
 
 ExprNode* GenAddExpr (ExprNode* Left, ExprNode* Right)
-/* Generate an addition from the two operands */
+// Generate an addition from the two operands
 {
     long Val;
     if (IsEasyConst (Left, &Val) && Val == 0) {
@@ -1767,16 +1767,16 @@ ExprNode* GenAddExpr (ExprNode* Left, ExprNode* Right)
 
 
 ExprNode* GenCurrentPC (void)
-/* Return the current program counter as expression */
+// Return the current program counter as expression
 {
     ExprNode* Root;
 
     if (GetRelocMode ()) {
-        /* Create SegmentBase + Offset */
+        // Create SegmentBase + Offset
         Root = GenAddExpr (GenSectionExpr (GetCurrentSegNum ()),
                            GenLiteralExpr (GetPC ()));
     } else {
-        /* Absolute mode, just return PC value */
+        // Absolute mode, just return PC value
         Root = GenLiteralExpr (GetPC ());
     }
 
@@ -1786,7 +1786,7 @@ ExprNode* GenCurrentPC (void)
 
 
 ExprNode* GenSwapExpr (ExprNode* Expr)
-/* Return an extended expression with lo and hi bytes swapped */
+// Return an extended expression with lo and hi bytes swapped
 {
     ExprNode* N = NewExprNode (EXPR_SWAP);
     N->Left = Expr;
@@ -1804,13 +1804,13 @@ ExprNode* GenBranchExpr (unsigned Offs)
     ExprNode* Root;
     long      Val;
 
-    /* Read Expression() */
+    // Read Expression()
     N = Expression ();
 
-    /* If the expression is a cheap constant, generate a simpler tree */
+    // If the expression is a cheap constant, generate a simpler tree
     if (IsEasyConst (N, &Val)) {
 
-        /* Free the constant expression tree */
+        // Free the constant expression tree
         FreeExpr (N);
 
         /* Generate the final expression:
@@ -1846,47 +1846,47 @@ ExprNode* GenBranchExpr (unsigned Offs)
         }
     }
 
-    /* Return the result */
+    // Return the result
     return Root;
 }
 
 
 
 ExprNode* GenULabelExpr (unsigned Num)
-/* Return an expression for an unnamed label with the given index */
+// Return an expression for an unnamed label with the given index
 {
     ExprNode* Node = NewExprNode (EXPR_ULABEL);
     Node->V.IVal        = Num;
 
-    /* Return the new node */
+    // Return the new node
     return Node;
 }
 
 
 
 ExprNode* GenByteExpr (ExprNode* Expr)
-/* Force the given expression into a byte and return the result */
+// Force the given expression into a byte and return the result
 {
-    /* Use the low byte operator to force the expression into byte size */
+    // Use the low byte operator to force the expression into byte size
     return LoByte (Expr);
 }
 
 
 
 ExprNode* GenWordExpr (ExprNode* Expr)
-/* Force the given expression into a word and return the result. */
+// Force the given expression into a word and return the result.
 {
-    /* Use the low byte operator to force the expression into word size */
+    // Use the low byte operator to force the expression into word size
     return LoWord (Expr);
 }
 
 
 
 ExprNode* GenNearAddrExpr (ExprNode* Expr)
-/* A word sized expression that will error if given a far expression at assemble time. */
+// A word sized expression that will error if given a far expression at assemble time.
 {
     long      Val;
-    /* Special handling for const expressions */
+    // Special handling for const expressions
     if (IsEasyConst (Expr, &Val)) {
         FreeExpr (Expr);
         Expr = GenLiteralExpr (Val & 0xFFFF);
@@ -1905,11 +1905,11 @@ ExprNode* GenNearAddrExpr (ExprNode* Expr)
 
 
 ExprNode* GenFarAddrExpr (ExprNode* Expr)
-/* Force the given expression into a far address and return the result. */
+// Force the given expression into a far address and return the result.
 {
     long      Val;
 
-    /* Special handling for const expressions */
+    // Special handling for const expressions
     if (IsEasyConst (Expr, &Val)) {
         FreeExpr (Expr);
         Expr = GenLiteralExpr (Val & 0xFFFFFF);
@@ -1924,11 +1924,11 @@ ExprNode* GenFarAddrExpr (ExprNode* Expr)
 
 
 ExprNode* GenDWordExpr (ExprNode* Expr)
-/* Force the given expression into a dword and return the result. */
+// Force the given expression into a dword and return the result.
 {
     long      Val;
 
-    /* Special handling for const expressions */
+    // Special handling for const expressions
     if (IsEasyConst (Expr, &Val)) {
         FreeExpr (Expr);
         Expr = GenLiteralExpr (Val & 0xFFFFFFFF);
@@ -1943,14 +1943,14 @@ ExprNode* GenDWordExpr (ExprNode* Expr)
 
 
 ExprNode* GenNE (ExprNode* Expr, long Val)
-/* Generate an expression that compares Expr and Val for inequality */
+// Generate an expression that compares Expr and Val for inequality
 {
-    /* Generate a compare node */
+    // Generate a compare node
     ExprNode* Root = NewExprNode (EXPR_NE);
     Root->Left  = Expr;
     Root->Right = GenLiteralExpr (Val);
 
-    /* Return the result */
+    // Return the result
     return Root;
 }
 
@@ -1964,18 +1964,18 @@ int IsConstExpr (ExprNode* Expr, long* Val)
 {
     int IsConst;
 
-    /* Study the expression */
+    // Study the expression
     ExprDesc D;
     ED_Init (&D);
     StudyExpr (Expr, &D);
 
-    /* Check if the expression is constant */
+    // Check if the expression is constant
     IsConst = ED_IsConst (&D);
     if (IsConst && Val != 0) {
         *Val = D.Val;
     }
 
-    /* Delete allocated memory and return the result */
+    // Delete allocated memory and return the result
     ED_Done (&D);
     return IsConst;
 }
@@ -1989,12 +1989,12 @@ ExprNode* CloneExpr (ExprNode* Expr)
 {
     ExprNode* Clone;
 
-    /* Accept NULL pointers */
+    // Accept NULL pointers
     if (Expr == 0) {
         return 0;
     }
 
-    /* Clone the node */
+    // Clone the node
     switch (Expr->Op) {
 
         case EXPR_LITERAL:
@@ -2018,24 +2018,24 @@ ExprNode* CloneExpr (ExprNode* Expr)
             break;
 
         default:
-            /* Generate a new node */
+            // Generate a new node
             Clone = NewExprNode (Expr->Op);
-            /* Clone the tree nodes */
+            // Clone the tree nodes
             Clone->Left = CloneExpr (Expr->Left);
             Clone->Right = CloneExpr (Expr->Right);
             break;
     }
 
-    /* Done */
+    // Done
     return Clone;
 }
 
 
 
 void WriteExpr (ExprNode* Expr)
-/* Write the given expression to the object file */
+// Write the given expression to the object file
 {
-    /* Null expressions are encoded by a type byte of zero */
+    // Null expressions are encoded by a type byte of zero
     if (Expr == 0) {
         ObjWrite8 (EXPR_NULL);
         return;
@@ -2070,7 +2070,7 @@ void WriteExpr (ExprNode* Expr)
             break;
 
         default:
-            /* Not a leaf node */
+            // Not a leaf node
             ObjWrite8 (Expr->Op);
             WriteExpr (Expr->Left);
             WriteExpr (Expr->Right);
@@ -2090,18 +2090,18 @@ void ExprGuessedAddrSize (const ExprNode* Expr, unsigned char AddrSize)
 ** and mark these symbols accordingly.
 */
 {
-    /* Accept NULL expressions */
+    // Accept NULL expressions
     if (Expr == 0) {
         return;
     }
 
-    /* Check the type code */
+    // Check the type code
     switch (EXPR_NODETYPE (Expr->Op)) {
 
         case EXPR_LEAFNODE:
             if (Expr->Op == EXPR_SYMBOL) {
                 if (!SymIsDef (Expr->V.Sym)) {
-                    /* Symbol is undefined, mark it */
+                    // Symbol is undefined, mark it
                     SymGuessedAddrSize (Expr->V.Sym, AddrSize);
                 }
             }
@@ -2109,7 +2109,7 @@ void ExprGuessedAddrSize (const ExprNode* Expr, unsigned char AddrSize)
 
         case EXPR_BINARYNODE:
             ExprGuessedAddrSize (Expr->Right, AddrSize);
-            /* FALLTHROUGH */
+            // FALLTHROUGH
 
         case EXPR_UNARYNODE:
             ExprGuessedAddrSize (Expr->Left, AddrSize);
@@ -2120,7 +2120,7 @@ void ExprGuessedAddrSize (const ExprNode* Expr, unsigned char AddrSize)
 
 
 ExprNode* MakeBoundedExpr (ExprNode* Expr, unsigned Size)
-/* Force the given expression into a specific size of ForceRange is true */
+// Force the given expression into a specific size of ForceRange is true
 {
     if (ForceRange) {
         switch (Size) {
@@ -2137,7 +2137,7 @@ ExprNode* MakeBoundedExpr (ExprNode* Expr, unsigned Size)
 
 
 ExprNode* BoundedExpr (ExprNode* (*ExprFunc) (void), unsigned Size)
-/* Parse an expression and force it within a given size if ForceRange is true */
+// Parse an expression and force it within a given size if ForceRange is true
 {
     return MakeBoundedExpr (ExprFunc (), Size);
 }

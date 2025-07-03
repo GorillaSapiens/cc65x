@@ -1,35 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                codeinfo.h                                 */
-/*                                                                           */
-/*                  Additional information about 6502 code                   */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                codeinfo.h
+//
+//                  Additional information about 6502 code
+//
+//
+//
+// (C) 2001-2002 Ullrich von Bassewitz
+//               Wacholderweg 14
+//               D-70597 Stuttgart
+// EMail:        uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
@@ -38,9 +38,9 @@
 
 
 
-/*****************************************************************************/
-/*                                 Forwards                                  */
-/*****************************************************************************/
+//***************************************************************************
+//                                 Forwards
+//***************************************************************************
 
 
 
@@ -48,16 +48,16 @@ struct CodeSeg;
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-/* Forward to struct RegContents */
+// Forward to struct RegContents
 struct RegContents;
 
-/* Defines for registers */
+// Defines for registers
 #define REG_NONE        0x0000U
 #define REG_A           0x0001U
 #define REG_X           0x0002U
@@ -74,25 +74,25 @@ struct RegContents;
 #define REG_SP_LO       0x1000U
 #define REG_SP_HI       0x2000U
 
-/* Defines for some special register usage */
-#define SLV_IND         0x00010000U     /* Accesses (c_sp),y */
-#define SLV_TOP         0x00020000U     /* Accesses (c_sp),0 */
-#define SLV_SP65        0x00200000U     /* Accesses 6502 stack pointer */
-#define SLV_PH65        0x00400000U     /* Pushes onto 6502 stack */
-#define SLV_PL65        0x00800000U     /* Pops from 6502 stack */
+// Defines for some special register usage
+#define SLV_IND         0x00010000U     // Accesses (c_sp),y
+#define SLV_TOP         0x00020000U     // Accesses (c_sp),0
+#define SLV_SP65        0x00200000U     // Accesses 6502 stack pointer
+#define SLV_PH65        0x00400000U     // Pushes onto 6502 stack
+#define SLV_PL65        0x00800000U     // Pops from 6502 stack
 
-/* Defines for processor states */
+// Defines for processor states
 #define PSTATE_NONE     0x00000000U
-#define PSTATE_C        0x01000000U     /* Carry */
-#define PSTATE_Z        0x02000000U     /* Zero */
-#define PSTATE_I        0x04000000U     /* Interrupt */
-#define PSTATE_D        0x08000000U     /* Decimal */
-#define PSTATE_U        0x10000000U     /* Unused */
-#define PSTATE_B        0x20000000U     /* Break */
-#define PSTATE_V        0x40000000U     /* Overflow */
-#define PSTATE_N        0x80000000U     /* Negative */
+#define PSTATE_C        0x01000000U     // Carry
+#define PSTATE_Z        0x02000000U     // Zero
+#define PSTATE_I        0x04000000U     // Interrupt
+#define PSTATE_D        0x08000000U     // Decimal
+#define PSTATE_U        0x10000000U     // Unused
+#define PSTATE_B        0x20000000U     // Break
+#define PSTATE_V        0x40000000U     // Overflow
+#define PSTATE_N        0x80000000U     // Negative
 
-/* Combined register defines */
+// Combined register defines
 #define REG_PTR1        (REG_PTR1_LO | REG_PTR1_HI)
 #define REG_PTR2        (REG_PTR2_LO | REG_PTR2_HI)
 #define REG_SREG        (REG_SREG_LO | REG_SREG_HI)
@@ -118,19 +118,19 @@ struct RegContents;
 
 
 
-/* Zero page register info */
+// Zero page register info
 typedef struct ZPInfo ZPInfo;
 struct ZPInfo {
-    unsigned char  Len;         /* Length of the following string */
-    char           Name[64];    /* Name of zero page symbol */
-    unsigned char  Size;        /* Maximum buffer size of this register */
-    unsigned short ByteUse;     /* Register info for this symbol */
-    unsigned short WordUse;     /* Register info for 16 bit access */
+    unsigned char  Len;         // Length of the following string
+    char           Name[64];    // Name of zero page symbol
+    unsigned char  Size;        // Maximum buffer size of this register
+    unsigned short ByteUse;     // Register info for this symbol
+    unsigned short WordUse;     // Register info for 16 bit access
 };
 
 
 
-/* Defines for the conditions in a compare */
+// Defines for the conditions in a compare
 typedef enum {
     CMP_INV = -1,
     CMP_EQ,
@@ -144,30 +144,30 @@ typedef enum {
     CMP_ULT,
     CMP_ULE,
 
-    /* End of the enumeration */
+    // End of the enumeration
     CMP_END
 } cmp_t;
 
 
 
-/* Defines for the conditions in a compare */
+// Defines for the conditions in a compare
 typedef enum {
-    FNCLS_UNKNOWN = -1, /* Unknown */
-    FNCLS_BUILTIN,      /* Builtin */
-    FNCLS_GLOBAL,       /* Found in global sym table minus the leading underscore */
-    FNCLS_NUMERIC       /* A call to a numeric address */
+    FNCLS_UNKNOWN = -1, // Unknown
+    FNCLS_BUILTIN,      // Builtin
+    FNCLS_GLOBAL,       // Found in global sym table minus the leading underscore
+    FNCLS_NUMERIC       // A call to a numeric address
 } fncls_t;
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 int IsZPArg (const char* Arg);
-/* Exam if the main part of the arg string indicates a ZP loc */
+// Exam if the main part of the arg string indicates a ZP loc
 
 fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg);
 /* For the given function, lookup register information and store it into
@@ -187,22 +187,22 @@ unsigned GetRegInfo (struct CodeSeg* S, unsigned Index, unsigned Wanted);
 */
 
 int RegAUsed (struct CodeSeg* S, unsigned Index);
-/* Check if the value in A is used. */
+// Check if the value in A is used.
 
 int RegXUsed (struct CodeSeg* S, unsigned Index);
-/* Check if the value in X is used. */
+// Check if the value in X is used.
 
 int RegYUsed (struct CodeSeg* S, unsigned Index);
-/* Check if the value in Y is used. */
+// Check if the value in Y is used.
 
 int RegAXUsed (struct CodeSeg* S, unsigned Index);
-/* Check if the value in A or(!) the value in X are used. */
+// Check if the value in A or(!) the value in X are used.
 
 int RegEAXUsed (struct CodeSeg* S, unsigned Index);
-/* Check if any of the four bytes in EAX are used. */
+// Check if any of the four bytes in EAX are used.
 
 int LoadFlagsUsed (struct CodeSeg* S, unsigned Index);
-/* Check if one of the flags set by a register load (Z and N) are used. */
+// Check if one of the flags set by a register load (Z and N) are used.
 
 unsigned GetKnownReg (unsigned Use, const struct RegContents* RC);
 /* Return the register or zero page location from the set in Use, thats
@@ -222,16 +222,16 @@ cmp_t FindTosCmpCond (const char* Name);
 */
 
 const char* GetBoolTransformer (cmp_t Cond);
-/* Get the bool transformer corresponding to the given compare condition */
+// Get the bool transformer corresponding to the given compare condition
 
 cmp_t GetNegatedCond (cmp_t Cond);
-/* Get the logically opposite compare condition */
+// Get the logically opposite compare condition
 
 cmp_t GetRevertedCond (cmp_t Cond);
-/* Get the compare condition in reverted order of operands */
+// Get the compare condition in reverted order of operands
 
 const char* GetCmpSuffix (cmp_t Cond);
-/* Return the compare suffix by the given a compare condition or 0 on failure */
+// Return the compare suffix by the given a compare condition or 0 on failure
 
 char* GetBoolCmpSuffix (char* Buf, cmp_t Cond);
 /* Search for a boolean transformer subroutine (eg. booleq) by the given compare
@@ -246,6 +246,6 @@ char* GetTosCmpSuffix (char* Buf, cmp_t Cond);
 ** failure.
 */
 
-/* End of codeinfo.h */
+// End of codeinfo.h
 
 #endif

@@ -1,35 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                filetime.c                                 */
-/*                                                                           */
-/*                       Replacement for Windows code                        */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2012,      Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                filetime.c
+//
+//                       Replacement for Windows code
+//
+//
+//
+// (C) 2012,      Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
@@ -46,19 +46,19 @@
 #  include <errno.h>
 #  include <windows.h>
 #else
-#  include <sys/types.h>                          /* FreeBSD needs this */
+#  include <sys/types.h>                          // FreeBSD needs this
 #  include <utime.h>
 #endif
 
 
-/* common */
+// common
 #include "filetime.h"
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
@@ -94,30 +94,30 @@ int SetFileTimes (const char* Path, time_t T)
 {
     HANDLE   H;
     FILETIME FileTime;
-    int      Error = EACCES;                    /* Assume an error */
+    int      Error = EACCES;                    // Assume an error
 
 
-    /* Open the file */
+    // Open the file
     H = CreateFile (Path,
                     GENERIC_WRITE,
                     FILE_SHARE_READ,
-                    0,                          /* Security attributes */
+                    0,                          // Security attributes
                     OPEN_EXISTING,
-                    0,                          /* File flags */
-                    0);                         /* Template file */
+                    0,                          // File flags
+                    0);                         // Template file
     if (H != INVALID_HANDLE_VALUE) {
-        /* Set access and modification time */
+        // Set access and modification time
         UnixTimeToFileTime (T, &FileTime);
         if (SetFileTime (H, 0, &FileTime, &FileTime)) {
-            /* Done */
+            // Done
             Error = 0;
         }
 
-        /* Close the handle */
+        // Close the handle
         (void) CloseHandle (H);
     }
 
-    /* Return the error code */
+    // Return the error code
     return Error;
 }
 
@@ -135,7 +135,7 @@ int SetFileTimes (const char* Path, time_t T)
 {
     struct utimbuf U;
 
-    /* Set access and modification time */
+    // Set access and modification time
     U.actime  = T;
     U.modtime = T;
     return utime (Path, &U);

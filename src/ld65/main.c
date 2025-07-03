@@ -1,35 +1,35 @@
-/*****************************************************************************/
-/*                                                                           */
-/*                                  main.c                                   */
-/*                                                                           */
-/*                     Main program for the ld65 linker                      */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2013, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
-/*****************************************************************************/
+//***************************************************************************
+//
+//                                  main.c
+//
+//                     Main program for the ld65 linker
+//
+//
+//
+// (C) 1998-2013, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//***************************************************************************
 
 
 
@@ -38,7 +38,7 @@
 #include <string.h>
 #include <errno.h>
 
-/* common */
+// common
 #include "addrsize.h"
 #include "chartype.h"
 #include "cmdline.h"
@@ -50,7 +50,7 @@
 #include "version.h"
 #include "xmalloc.h"
 
-/* ld65 */
+// ld65
 #include "asserts.h"
 #include "binfmt.h"
 #include "condes.h"
@@ -71,25 +71,25 @@
 
 
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Data
+//***************************************************************************
 
 
 
-static unsigned         ObjFiles   = 0; /* Count of object files linked */
-static unsigned         LibFiles   = 0; /* Count of library files linked */
+static unsigned         ObjFiles   = 0; // Count of object files linked
+static unsigned         LibFiles   = 0; // Count of library files linked
 
-/* struct InputFile.Type definitions */
-#define INPUT_FILES_FILE       0        /* Entry is a file (unknown type) */
-#define INPUT_FILES_FILE_OBJ   1        /* Entry is a object file */
-#define INPUT_FILES_FILE_LIB   2        /* Entry is a library file */
-#define INPUT_FILES_SGROUP     3        /* Entry is 'StartGroup' */
-#define INPUT_FILES_EGROUP     4        /* Entry is 'EndGroup' */
+// struct InputFile.Type definitions
+#define INPUT_FILES_FILE       0        // Entry is a file (unknown type)
+#define INPUT_FILES_FILE_OBJ   1        // Entry is a object file
+#define INPUT_FILES_FILE_LIB   2        // Entry is a library file
+#define INPUT_FILES_SGROUP     3        // Entry is 'StartGroup'
+#define INPUT_FILES_EGROUP     4        // Entry is 'EndGroup'
 
 #define MAX_INPUTFILES         256
 
-/* Array of inputs (libraries and object files) */
+// Array of inputs (libraries and object files)
 static struct InputFile {
     const char *FileName;
     unsigned Type;
@@ -100,14 +100,14 @@ static const char              *CmdlineCfgFile = NULL,
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+//***************************************************************************
+//                                   Code
+//***************************************************************************
 
 
 
 static void Usage (void)
-/* Print usage information and exit */
+// Print usage information and exit
 {
     printf ("Usage: %s [options] module ...\n"
             "Short options:\n"
@@ -160,7 +160,7 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
     unsigned long Val;
     int           Converted;
 
-    /* Convert */
+    // Convert
     if (*Number == '$') {
         ++Number;
         Converted = sscanf (Number, "%lx", &Val);
@@ -168,31 +168,31 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
         Converted = sscanf (Number, "%li", (long*)&Val);
     }
 
-    /* Check if we do really have a number */
+    // Check if we do really have a number
     if (Converted != 1) {
         Error ("Invalid number given in argument: %s\n", Arg);
     }
 
-    /* Return the result */
+    // Return the result
     return Val;
 }
 
 
 
 static void LinkFile (const char* Name, FILETYPE Type)
-/* Handle one file */
+// Handle one file
 {
     char*         PathName;
     FILE*         F;
     unsigned long Magic;
 
 
-    /* If we don't know the file type, determine it from the extension */
+    // If we don't know the file type, determine it from the extension
     if (Type == FILETYPE_UNKNOWN) {
         Type = GetTypeOfFile (Name);
     }
 
-    /* For known file types, search the file in the directory list */
+    // For known file types, search the file in the directory list
     switch (Type) {
 
         case FILETYPE_LIB:
@@ -210,22 +210,22 @@ static void LinkFile (const char* Name, FILETYPE Type)
             break;
 
         default:
-            PathName = xstrdup (Name);   /* Use the name as is */
+            PathName = xstrdup (Name);   // Use the name as is
             break;
     }
 
-    /* We must have a valid name now */
+    // We must have a valid name now
     if (PathName == 0) {
         Error ("Input file '%s' not found", Name);
     }
 
-    /* Try to open the file */
+    // Try to open the file
     F = fopen (PathName, "rb");
     if (F == 0) {
         Error ("Cannot open '%s': %s", PathName, strerror (errno));
     }
 
-    /* Read the magic word */
+    // Read the magic word
     Magic = Read32 (F);
 
     /* Check the magic for known file types. The handling is somewhat weird
@@ -252,37 +252,37 @@ static void LinkFile (const char* Name, FILETYPE Type)
 
     }
 
-    /* Free allocated memory. */
+    // Free allocated memory.
     xfree (PathName);
 }
 
 
 
 static void DefineSymbol (const char* Def)
-/* Define a symbol from the command line */
+// Define a symbol from the command line
 {
     const char* P;
     long Val;
     StrBuf SymName = AUTO_STRBUF_INITIALIZER;
 
 
-    /* The symbol must start with a character or underline */
+    // The symbol must start with a character or underline
     if (Def [0] != '_' && !IsAlpha (Def [0])) {
         InvDef (Def);
     }
     P = Def;
 
-    /* Copy the symbol, checking the remainder */
+    // Copy the symbol, checking the remainder
     while (IsAlNum (*P) || *P == '_') {
         SB_AppendChar (&SymName, *P++);
     }
     SB_Terminate (&SymName);
 
-    /* Do we have a value given? */
+    // Do we have a value given?
     if (*P != '=') {
         InvDef (Def);
     } else {
-        /* We have a value */
+        // We have a value
         ++P;
         if (*P == '$') {
             ++P;
@@ -296,14 +296,14 @@ static void DefineSymbol (const char* Def)
         }
     }
 
-    /* Define the new symbol */
+    // Define the new symbol
     CreateConstExport (GetStringId (SB_GetConstBuf (&SymName)), Val);
 }
 
 
 
 static void OptCfgPath (const char* Opt attribute ((unused)), const char* Arg)
-/* Specify a config file search path */
+// Specify a config file search path
 {
     AddSearchPath (CfgSearchPath, Arg);
 }
@@ -311,14 +311,14 @@ static void OptCfgPath (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
-/* Define the config file */
+// Define the config file
 {
     char* PathName;
 
     if (CfgAvail ()) {
         Error ("Cannot use -C/-t twice");
     }
-    /* Search for the file */
+    // Search for the file
     PathName = SearchFile (CfgSearchPath, Arg);
     if (PathName == 0) {
         PathName = SearchFile (CfgDefaultPath, Arg);
@@ -327,7 +327,7 @@ static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
         Error ("Cannot find config file '%s'", Arg);
     }
 
-    /* Read the config */
+    // Read the config
     CfgSetName (PathName);
     CfgRead ();
 }
@@ -335,7 +335,7 @@ static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptDbgFile (const char* Opt attribute ((unused)), const char* Arg)
-/* Give the name of the debug file */
+// Give the name of the debug file
 {
     DbgFileName = Arg;
 }
@@ -343,7 +343,7 @@ static void OptDbgFile (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptDefine (const char* Opt attribute ((unused)), const char* Arg)
-/* Define a symbol on the command line */
+// Define a symbol on the command line
 {
     DefineSymbol (Arg);
 }
@@ -352,7 +352,7 @@ static void OptDefine (const char* Opt attribute ((unused)), const char* Arg)
 
 static void OptEndGroup (const char* Opt attribute ((unused)),
                          const char* Arg attribute ((unused)))
-/* End a library group */
+// End a library group
 {
     LibEndGroup ();
 }
@@ -360,9 +360,9 @@ static void OptEndGroup (const char* Opt attribute ((unused)),
 
 
 static void OptForceImport (const char* Opt attribute ((unused)), const char* Arg)
-/* Force an import of a symbol */
+// Force an import of a symbol
 {
-    /* An optional address size may be specified */
+    // An optional address size may be specified
     const char* ColPos = strchr (Arg, ':');
     if (ColPos == 0) {
 
@@ -375,22 +375,22 @@ static void OptForceImport (const char* Opt attribute ((unused)), const char* Ar
 
         char* A;
 
-        /* Get the address size and check it */
+        // Get the address size and check it
         unsigned char AddrSize = AddrSizeFromStr (ColPos+1);
         if (AddrSize == ADDR_SIZE_INVALID) {
             Error ("Invalid address size '%s'", ColPos+1);
         }
 
-        /* Create a copy of the argument */
+        // Create a copy of the argument
         A = xstrdup (Arg);
 
-        /* We need just the symbol */
+        // We need just the symbol
         A[ColPos - Arg] = '\0';
 
-        /* Generate the import */
+        // Generate the import
         InsertImport (GenImport (GetStringId (A), AddrSize));
 
-        /* Delete the copy of the argument */
+        // Delete the copy of the argument
         xfree (A);
     }
 }
@@ -399,7 +399,7 @@ static void OptForceImport (const char* Opt attribute ((unused)), const char* Ar
 
 static void OptHelp (const char* Opt attribute ((unused)),
                      const char* Arg attribute ((unused)))
-/* Print usage information and exit */
+// Print usage information and exit
 {
     Usage ();
     exit (EXIT_SUCCESS);
@@ -409,14 +409,14 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 static void OptLargeAlignment (const char* Opt attribute ((unused)),
                                const char* Arg attribute ((unused)))
-/* Don't warn about large alignments */
+// Don't warn about large alignments
 {
     LargeAlignment = 1;
 }
 
 
 static void OptLib (const char* Opt attribute ((unused)), const char* Arg)
-/* Link a library */
+// Link a library
 {
     InputFiles[InputFilesCount].Type = INPUT_FILES_FILE_LIB;
     InputFiles[InputFilesCount].FileName = Arg;
@@ -427,7 +427,7 @@ static void OptLib (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptLibPath (const char* Opt attribute ((unused)), const char* Arg)
-/* Specify a library file search path */
+// Specify a library file search path
 {
     AddSearchPath (LibSearchPath, Arg);
 }
@@ -435,7 +435,7 @@ static void OptLibPath (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptMapFile (const char* Opt attribute ((unused)), const char* Arg)
-/* Give the name of the map file */
+// Give the name of the map file
 {
     if (MapFileName) {
         Error ("Cannot use -m twice");
@@ -446,7 +446,7 @@ static void OptMapFile (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptModuleId (const char* Opt, const char* Arg)
-/* Specify a module id */
+// Specify a module id
 {
     unsigned long Id = CvtNumber (Opt, Arg);
     if (Id > 0xFFFFUL) {
@@ -458,7 +458,7 @@ static void OptModuleId (const char* Opt, const char* Arg)
 
 
 static void OptObj (const char* Opt attribute ((unused)), const char* Arg)
-/* Link an object file */
+// Link an object file
 {
     InputFiles[InputFilesCount].Type = INPUT_FILES_FILE_OBJ;
     InputFiles[InputFilesCount].FileName = Arg;
@@ -469,7 +469,7 @@ static void OptObj (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptObjPath (const char* Opt attribute ((unused)), const char* Arg)
-/* Specify an object file search path */
+// Specify an object file search path
 {
     AddSearchPath (ObjSearchPath, Arg);
 }
@@ -477,7 +477,7 @@ static void OptObjPath (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptOutputName (const char* Opt attribute ((unused)), const char* Arg)
-/* Give the name of the output file */
+// Give the name of the output file
 {
     static int OutputNameSeen = 0;
     if (OutputNameSeen) {
@@ -490,7 +490,7 @@ static void OptOutputName (const char* Opt attribute ((unused)), const char* Arg
 
 
 static void OptStartAddr (const char* Opt, const char* Arg)
-/* Set the default start address */
+// Set the default start address
 {
     if (HaveStartAddr) {
         Error ("Cannot use -S twice");
@@ -503,7 +503,7 @@ static void OptStartAddr (const char* Opt, const char* Arg)
 
 static void OptStartGroup (const char* Opt attribute ((unused)),
                            const char* Arg attribute ((unused)))
-/* Start a library group */
+// Start a library group
 {
     LibStartGroup ();
 }
@@ -511,26 +511,26 @@ static void OptStartGroup (const char* Opt attribute ((unused)),
 
 
 static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
-/* Set the target system */
+// Set the target system
 {
     StrBuf FileName = STATIC_STRBUF_INITIALIZER;
     char*  PathName;
 
-    /* Map the target name to a target id */
+    // Map the target name to a target id
     Target = FindTarget (Arg);
     if (Target == TGT_UNKNOWN) {
         Error ("Invalid target name: '%s'", Arg);
     }
 
-    /* Set the target binary format */
+    // Set the target binary format
     DefaultBinFmt = GetTargetProperties (Target)->BinFmt;
 
-    /* Build config file name from target name */
+    // Build config file name from target name
     SB_CopyStr (&FileName, GetTargetName (Target));
     SB_AppendStr (&FileName, ".cfg");
     SB_Terminate (&FileName);
 
-    /* Search for the file */
+    // Search for the file
     PathName = SearchFile (CfgSearchPath, SB_GetBuf (&FileName));
     if (PathName == 0) {
         PathName = SearchFile (CfgDefaultPath, SB_GetBuf (&FileName));
@@ -539,10 +539,10 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
         Error ("Cannot find config file '%s'", SB_GetBuf (&FileName));
     }
 
-    /* Free file name memory */
+    // Free file name memory
     SB_Done (&FileName);
 
-    /* Read the file */
+    // Read the file
     CfgSetName (PathName);
     CfgRead ();
 }
@@ -551,7 +551,7 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
-/* Print the assembler version */
+// Print the assembler version
 {
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
     exit(EXIT_SUCCESS);
@@ -561,7 +561,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
                                  const char* Arg attribute ((unused)))
-/* Generate an error if any warnings occur */
+// Generate an error if any warnings occur
 {
     WarningsAsErrors = 1;
 }
@@ -570,7 +570,7 @@ static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
 
 static void OptMultDef (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
-/* Set flag to allow multiple definitions of a global symbol */
+// Set flag to allow multiple definitions of a global symbol
 {
     AllowMultDef = 1;
 }
@@ -579,10 +579,10 @@ static void OptMultDef (const char* Opt attribute ((unused)),
 
 static void CmdlOptStartGroup (const char* Opt attribute ((unused)),
                                const char* Arg attribute ((unused)))
-/* Remember 'start group' occurrence in input files array */
+// Remember 'start group' occurrence in input files array
 {
     InputFiles[InputFilesCount].Type = INPUT_FILES_SGROUP;
-    InputFiles[InputFilesCount].FileName = Arg;  /* Unused */
+    InputFiles[InputFilesCount].FileName = Arg;  // Unused
     if (++InputFilesCount >= MAX_INPUTFILES)
         Error ("Too many input files");
 }
@@ -591,10 +591,10 @@ static void CmdlOptStartGroup (const char* Opt attribute ((unused)),
 
 static void CmdlOptEndGroup (const char* Opt attribute ((unused)),
                              const char* Arg attribute ((unused)))
-/* Remember 'end group' occurrence in input files array */
+// Remember 'end group' occurrence in input files array
 {
     InputFiles[InputFilesCount].Type = INPUT_FILES_EGROUP;
-    InputFiles[InputFilesCount].FileName = Arg;  /* Unused */
+    InputFiles[InputFilesCount].FileName = Arg;  // Unused
     if (++InputFilesCount >= MAX_INPUTFILES)
         Error ("Too many input files");
 }
@@ -602,7 +602,7 @@ static void CmdlOptEndGroup (const char* Opt attribute ((unused)),
 
 
 static void CmdlOptConfig (const char* Opt attribute ((unused)), const char* Arg)
-/* Set 'config file' command line parameter */
+// Set 'config file' command line parameter
 {
     if (CmdlineCfgFile || CmdlineTarget) {
         Error ("Cannot use -C/-t twice");
@@ -613,7 +613,7 @@ static void CmdlOptConfig (const char* Opt attribute ((unused)), const char* Arg
 
 
 static void CmdlOptTarget (const char* Opt attribute ((unused)), const char* Arg)
-/* Set 'target' command line parameter */
+// Set 'target' command line parameter
 {
     if (CmdlineCfgFile || CmdlineTarget) {
         Error ("Cannot use -C/-t twice");
@@ -625,7 +625,7 @@ static void CmdlOptTarget (const char* Opt attribute ((unused)), const char* Arg
 
 static void ParseCommandLine(void)
 {
-    /* Program long options */
+    // Program long options
     static const LongOpt OptTab[] = {
         { "--allow-multiple-definition", 0,      OptMultDef              },
         { "--cfg-path",                  1,      OptCfgPath              },
@@ -652,20 +652,20 @@ static void ParseCommandLine(void)
     unsigned I;
     unsigned LabelFileGiven = 0;
 
-    /* Allocate memory for input file array */
+    // Allocate memory for input file array
     InputFiles = xmalloc (MAX_INPUTFILES * sizeof (struct InputFile));
 
-    /* Defer setting of config/target and input files until all options are parsed */
+    // Defer setting of config/target and input files until all options are parsed
     I = 1;
     while (I < ArgCount) {
 
-        /* Get the argument */
+        // Get the argument
         const char* Arg = ArgVec[I];
 
-        /* Check for an option */
+        // Check for an option
         if (Arg [0] == '-') {
 
-            /* An option */
+            // An option
             switch (Arg [1]) {
 
                 case '-':
@@ -720,7 +720,7 @@ static void ParseCommandLine(void)
                 case 'L':
                     switch (Arg [2]) {
                         case 'n':
-                            /* ## This one is obsolete and will go */
+                            // ## This one is obsolete and will go
                             if (LabelFileGiven) {
                                 Error ("Cannot use -Ln twice");
                             }
@@ -748,7 +748,7 @@ static void ParseCommandLine(void)
 
         } else {
 
-            /* A filename */
+            // A filename
             InputFiles[InputFilesCount].Type = INPUT_FILES_FILE;
             InputFiles[InputFilesCount].FileName = Arg;
             if (++InputFilesCount >= MAX_INPUTFILES)
@@ -756,7 +756,7 @@ static void ParseCommandLine(void)
 
         }
 
-        /* Next argument */
+        // Next argument
         ++I;
     }
 
@@ -766,7 +766,7 @@ static void ParseCommandLine(void)
         OptConfig (NULL, CmdlineCfgFile);
     }
 
-    /* Process input files */
+    // Process input files
     for (I = 0; I < InputFilesCount; ++I) {
         switch (InputFiles[I].Type) {
             case INPUT_FILES_FILE:
@@ -789,46 +789,46 @@ static void ParseCommandLine(void)
         }
     }
 
-    /* Free memory used for input file array */
+    // Free memory used for input file array
     xfree (InputFiles);
 }
 
 
 
 int main (int argc, char* argv [])
-/* Linker main program */
+// Linker main program
 {
     unsigned MemoryAreaOverflows;
 
-    /* Initialize the cmdline module */
+    // Initialize the cmdline module
     InitCmdLine (&argc, &argv, "ld65");
 
-    /* Initialize the input file search paths */
+    // Initialize the input file search paths
     InitSearchPaths ();
 
-    /* Initialize the string pool */
+    // Initialize the string pool
     InitStrPool ();
 
-    /* Initialize the type pool */
+    // Initialize the type pool
     InitTypePool ();
 
-    /* Parse the command line */
+    // Parse the command line
     ParseCommandLine ();
 
-    /* Check if we had any object files */
+    // Check if we had any object files
     if (ObjFiles == 0) {
         Error ("No object files to link");
     }
 
-    /* Check if we have a valid configuration */
+    // Check if we have a valid configuration
     if (!CfgAvail ()) {
         Error ("Memory configuration missing");
     }
 
-    /* Check if we have open library groups */
+    // Check if we have open library groups
     LibCheckGroup ();
 
-    /* Create the condes tables if requested */
+    // Create the condes tables if requested
     ConDesCreate ();
 
     /* Process data from the config file. Assign start addresses for the
@@ -837,10 +837,10 @@ int main (int argc, char* argv [])
     */
     MemoryAreaOverflows = CfgProcess ();
 
-    /* Check module assertions */
+    // Check module assertions
     CheckAssertions ();
 
-    /* Check for import/export mismatches */
+    // Check for import/export mismatches
     CheckExports ();
 
     /* If we had a memory area overflow before, we cannot generate the output
@@ -859,13 +859,13 @@ int main (int argc, char* argv [])
         Error("Warnings as errors");
     }
 
-    /* Create the output file */
+    // Create the output file
     CfgWriteTarget ();
 
-    /* Check for segments not written to the output file */
+    // Check for segments not written to the output file
     CheckSegments ();
 
-    /* If requested, create a map file and a label file for VICE */
+    // If requested, create a map file and a label file for VICE
     if (MapFileName) {
         CreateMapFile (LONG_MAPFILE);
     }
@@ -876,12 +876,12 @@ int main (int argc, char* argv [])
         CreateDbgFile ();
     }
 
-    /* Dump the data for debugging */
+    // Dump the data for debugging
     if (Verbosity > 1) {
         SegDump ();
         ConDesDump ();
     }
 
-    /* Return an apropriate exit code */
+    // Return an apropriate exit code
     return EXIT_SUCCESS;
 }
