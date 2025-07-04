@@ -2168,6 +2168,7 @@ static void hie_internal(const GenDesc *Ops, // List of generators
       GetCodePos(&Mark1);
       ltype = CG_TypeOf(Expr->Type);
       lconst = ED_IsConstAbs(Expr);
+
       if (lconst) {
          g_nop("");
          // Constant value
@@ -2196,6 +2197,7 @@ static void hie_internal(const GenDesc *Ops, // List of generators
 
       // Check for a constant expression
       rconst = (ED_IsConstAbs(&Expr2) && ED_CodeRangeIsEmpty(&Expr2));
+
       if (!rconst) {
          g_nop("");
          // Not constant, load into the primary
@@ -2367,7 +2369,6 @@ static void hie_internal(const GenDesc *Ops, // List of generators
          ED_FinalizeRValLoad(Expr);
       }
       else {
-
          // If the right hand side is constant, and the generator function
          // expects the lhs in the primary, remove the push of the primary
          // now.
@@ -2402,11 +2403,12 @@ static void hie_internal(const GenDesc *Ops, // List of generators
          }
 
          // Determine the type of the operation result.
-         g_nop("");
+         g_nop("t=%04x l=%04x r=%04x", type, ltype, rtype);
          type |= g_typeadjust(ltype, rtype);
-         g_nop("");
+         g_nop("t=%04x l=%04x r=%04x", type, ltype, rtype);
 
          Expr->Type = ArithmeticConvert(Expr->Type, Expr2.Type);
+         g_nop("");
 
          // Generate code
          if (CG_TypeOf(Expr2.Type) == CF_FLOAT) {
@@ -2451,14 +2453,19 @@ static void hie_internal(const GenDesc *Ops, // List of generators
          }
          else {
             // right side is not float
+            g_nop("%04X", type);
             Gen->Func(type, Expr2.IVal);
+            g_nop("");
          }
 
          // We have an rvalue in the primary now
+      g_nop("");
          ED_FinalizeRValLoad(Expr);
+      g_nop("");
       }
 
       // Propagate viral flags
+      g_nop("");
       ED_PropagateFrom(Expr, &Expr2);
       g_nop("");
    }

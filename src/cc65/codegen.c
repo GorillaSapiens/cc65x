@@ -1441,7 +1441,12 @@ unsigned g_typeadjust(unsigned lhs, unsigned rhs)
       return const_flag | CF_FLOAT;
    }
    else if (ltype == CF_FLOAT) {
-      g_regfloat(rhs);
+      if (lhs & CF_PRIMARY) {
+         g_nop("TODO FIX !!!");
+      }
+      else {
+         g_regfloat(rhs);
+      }
       return (lhs & CF_CONST) | CF_FLOAT;
    }
    else if (rtype == CF_FLOAT) {
@@ -2411,6 +2416,8 @@ static void oper(unsigned Flags, unsigned long Val, const char *const *Subs)
 {
    int n = 0;
 
+   g_nop("%08x %08x", Flags, Val);
+
    // Determine the offset into the array
    if (Flags & CF_FLOAT) {
       n = OPER_IDX_FLOAT;
@@ -2428,6 +2435,12 @@ static void oper(unsigned Flags, unsigned long Val, const char *const *Subs)
    if (Flags & CF_CONST) {
       // Load value
       g_getimmed(Flags, Val, 0);
+   }
+
+   if (Flags & CF_FLOAT) {
+      // convert to float
+      // TODO FIX might break for large unsigned values
+      AddCodeLine("jsr eaxfloat");
    }
 
    if (Subs[n] == NULL) {
