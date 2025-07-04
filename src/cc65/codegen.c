@@ -2416,8 +2416,6 @@ static void oper(unsigned Flags, unsigned long Val, const char *const *Subs)
 {
    int n = 0;
 
-   g_nop("%08x %08x", Flags, Val);
-
    // Determine the offset into the array
    if (Flags & CF_FLOAT) {
       n = OPER_IDX_FLOAT;

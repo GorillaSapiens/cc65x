@@ -2130,8 +2130,6 @@ static void hie_internal(const GenDesc *Ops, // List of generators
       ED_Init(&Expr2);
       Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
-      g_nop("");
-
       // Tell the caller that we handled it's ops
       *UsedGen = 1;
 
@@ -2152,7 +2150,6 @@ static void hie_internal(const GenDesc *Ops, // List of generators
       if (!IsClassInt(Expr->Type) &&
           // FIXME: float
           !(floatop && IsClassFloat(Expr->Type))) {
-         g_nop("");
          Error("LHS Integer expression expected (hie_internal)");
          // To avoid further errors, make Expr a valid int expression
          ED_MakeConstAbsInt(Expr, 1);
@@ -2170,7 +2167,6 @@ static void hie_internal(const GenDesc *Ops, // List of generators
       lconst = ED_IsConstAbs(Expr);
 
       if (lconst) {
-         g_nop("");
          // Constant value
          GetCodePos(&Mark2);
          // If the operator is commutative, don't push the left side, if
@@ -2185,7 +2181,6 @@ static void hie_internal(const GenDesc *Ops, // List of generators
          }
       }
       else {
-         g_nop("");
          // Value not constant
          LoadExpr(CF_NONE, Expr);
          GetCodePos(&Mark2);
@@ -2199,7 +2194,6 @@ static void hie_internal(const GenDesc *Ops, // List of generators
       rconst = (ED_IsConstAbs(&Expr2) && ED_CodeRangeIsEmpty(&Expr2));
 
       if (!rconst) {
-         g_nop("");
          // Not constant, load into the primary
          LoadExpr(CF_NONE, &Expr2);
       }
@@ -2208,14 +2202,11 @@ static void hie_internal(const GenDesc *Ops, // List of generators
       if (!IsClassInt(Expr2.Type) &&
           // FIXME: float
           !(floatop && IsClassFloat(Expr2.Type))) {
-         g_nop("");
          Error("RHS Integer expression expected (hie_internal)");
       }
 
       // Check for const operands
       if (lconst && rconst) {
-         g_nop("");
-
          // Evaluate the result for operands
          unsigned long Val1 = Expr->IVal;
          unsigned long Val2 = Expr2.IVal;
@@ -2352,9 +2343,7 @@ static void hie_internal(const GenDesc *Ops, // List of generators
          }
 
          // Determine the type of the operation result.
-         g_nop("");
          type |= g_typeadjust(ltype, rtype);
-         g_nop("");
          Expr->Type = ArithmeticConvert(Expr->Type, Expr2.Type);
 
          // Generate code
@@ -2403,12 +2392,9 @@ static void hie_internal(const GenDesc *Ops, // List of generators
          }
 
          // Determine the type of the operation result.
-         g_nop("t=%04x l=%04x r=%04x", type, ltype, rtype);
          type |= g_typeadjust(ltype, rtype);
-         g_nop("t=%04x l=%04x r=%04x", type, ltype, rtype);
 
          Expr->Type = ArithmeticConvert(Expr->Type, Expr2.Type);
-         g_nop("");
 
          // Generate code
          if (CG_TypeOf(Expr2.Type) == CF_FLOAT) {
@@ -2453,21 +2439,15 @@ static void hie_internal(const GenDesc *Ops, // List of generators
          }
          else {
             // right side is not float
-            g_nop("%04X", type);
             Gen->Func(type, Expr2.IVal);
-            g_nop("");
          }
 
          // We have an rvalue in the primary now
-      g_nop("");
          ED_FinalizeRValLoad(Expr);
-      g_nop("");
       }
 
       // Propagate viral flags
-      g_nop("");
       ED_PropagateFrom(Expr, &Expr2);
-      g_nop("");
    }
 }
 
@@ -3007,9 +2987,7 @@ static void hie_compare(const GenDesc *Ops, // List of generators
                // right is float
             }
             else {
-               g_nop("");
                flags |= g_typeadjust(ltype, rtype);
-               g_nop("");
             }
          }
 
