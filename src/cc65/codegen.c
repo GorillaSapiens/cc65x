@@ -1209,10 +1209,10 @@ void g_toslong(unsigned flags)
    }
 }
 
+#if 0
 void g_tosfloat(unsigned flags)
 // Make sure, the value on TOS is a long. Convert if necessary
 {
-g_nop("");
    switch (flags & CF_TYPEMASK) {
 
       case CF_CHAR:
@@ -1240,8 +1240,8 @@ g_nop("");
       AddCodeLine("jsr eaxfloat");
    }
    AddCodeLine("jsr pusheax");
-g_nop("");
 }
+#endif
 
 void g_tosint(unsigned flags)
 // Make sure, the value on TOS is an int. Convert if necessary

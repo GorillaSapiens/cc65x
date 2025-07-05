@@ -2125,7 +2125,6 @@ static void hie_internal(const GenDesc *Ops, // List of generators
 
    *UsedGen = 0;
    while ((Gen = FindGen(CurTok.Tok, Ops)) != 0) {
-   g_nop("");
 
       ExprDesc Expr2;
       ED_Init(&Expr2);
@@ -2151,7 +2150,6 @@ static void hie_internal(const GenDesc *Ops, // List of generators
       if (!IsClassInt(Expr->Type) &&
           // FIXME: float
           !(floatop && IsClassFloat(Expr->Type))) {
-   g_nop("");
          Error("LHS Integer expression expected (hie_internal)");
          // To avoid further errors, make Expr a valid int expression
          ED_MakeConstAbsInt(Expr, 1);
@@ -2169,31 +2167,24 @@ static void hie_internal(const GenDesc *Ops, // List of generators
       lconst = ED_IsConstAbs(Expr);
 
       if (lconst) {
-   g_nop("");
          // Constant value
          GetCodePos(&Mark2);
          // If the operator is commutative, don't push the left side, if
          // it's a constant, since we will exchange both operands.
          if ((Gen->Flags & GEN_COMM) == 0) {
-   g_nop("");
             if (ltype == CF_FLOAT) {
-   g_nop("");
                g_push(ltype | CF_CONST, FP_D_As32bitRaw(Expr->V.FVal));
             }
             else {
-   g_nop("");
                g_push(ltype | CF_CONST, Expr->IVal);
             }
          }
-   g_nop("");
       }
       else {
-   g_nop("");
          // Value not constant
          LoadExpr(CF_NONE, Expr);
          GetCodePos(&Mark2);
          g_push(ltype, 0);
-   g_nop("");
       }
 
       // Get the right hand side
@@ -2204,9 +2195,7 @@ static void hie_internal(const GenDesc *Ops, // List of generators
 
       if (!rconst) {
          // Not constant, load into the primary
-   g_nop("");
          LoadExpr(CF_NONE, &Expr2);
-   g_nop("");
       }
 
       // Check the type of the rhs
@@ -2218,7 +2207,6 @@ static void hie_internal(const GenDesc *Ops, // List of generators
 
       // Check for const operands
       if (lconst && rconst) {
-   g_nop("");
          // Evaluate the result for operands
          unsigned long Val1 = Expr->IVal;
          unsigned long Val2 = Expr2.IVal;
@@ -2328,10 +2316,8 @@ static void hie_internal(const GenDesc *Ops, // List of generators
 
          // Limit the calculated value to the range of its type
          LimitExprValue(Expr, 1);
-   g_nop("");
       }
       else if (lconst && (Gen->Flags & GEN_COMM) && !rconst) {
-   g_nop("");
          // If the LHS constant is an int that fits into an unsigned char,
          // change the codegen type to unsigned char.  If the RHS is also an
          // unsigned char, then g_typeadjust will return unsigned int (instead
@@ -2350,9 +2336,7 @@ static void hie_internal(const GenDesc *Ops, // List of generators
          ltype = CG_TypeOf(Expr2.Type); // Expr2 is now left
          type = CF_CONST;
          if ((Gen->Flags & GEN_NOPUSH) == 0) {
-   g_nop("");
             g_push(ltype, 0);
-   g_nop("");
          }
          else {
             ltype |= CF_PRIMARY; // Value is in register
@@ -2364,31 +2348,21 @@ static void hie_internal(const GenDesc *Ops, // List of generators
 
          // Generate code
          if (CG_TypeOf(Expr->Type) == CF_FLOAT) {
-   g_nop("");
             if ((rtype & CF_TYPEMASK) == CF_FLOAT) {
-   g_nop("");
                Gen->Func(type, FP_D_As32bitRaw(Expr->V.FVal));
-   g_nop("");
             }
             else {
-   g_nop("");
                Gen->Func(type, FP_D_As32bitRaw(FP_D_FromInt(Expr->IVal)));
-   g_nop("");
             }
-   g_nop("");
          }
          else {
-   g_nop("");
             Gen->Func(type, Expr->IVal);
-   g_nop("");
          }
 
          // We have an rvalue in the primary now
          ED_FinalizeRValLoad(Expr);
-   g_nop("");
       }
       else {
-   g_nop("");
          // If the right hand side is constant, and the generator function
          // expects the lhs in the primary, remove the push of the primary
          // now.
@@ -2480,12 +2454,10 @@ static void hie_internal(const GenDesc *Ops, // List of generators
 
          // We have an rvalue in the primary now
          ED_FinalizeRValLoad(Expr);
-   g_nop("");
       }
 
       // Propagate viral flags
       ED_PropagateFrom(Expr, &Expr2);
-   g_nop("");
    }
 }
 
