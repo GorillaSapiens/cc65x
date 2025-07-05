@@ -517,7 +517,7 @@ static void OpAssignArithmetic(const GenDesc *Gen, ExprDesc *Expr,
 
          // Special handling for add and sub - some sort of a hack, but short
          // code
-         if (Gen->Func == g_add) {
+         if (Gen->Func == g_add && (Flags & CF_TYPEMASK) != CF_FLOAT) {
             if (IsClassFloat(Expr2.Type)) {
                g_inc(Flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
             }
@@ -525,7 +525,7 @@ static void OpAssignArithmetic(const GenDesc *Gen, ExprDesc *Expr,
                g_inc(Flags | CF_CONST, Expr2.IVal);
             }
          }
-         else if (Gen->Func == g_sub) {
+         else if (Gen->Func == g_sub && (Flags & CF_TYPEMASK) != CF_FLOAT) {
             if (IsClassFloat(Expr2.Type)) {
                g_dec(Flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
             }
@@ -572,7 +572,12 @@ static void OpAssignArithmetic(const GenDesc *Gen, ExprDesc *Expr,
                   }
                }
             }
-            Gen->Func(Flags | CF_CONST, Expr2.IVal);
+            if ((Flags & CF_TYPEMASK) == CF_FLOAT) {
+               Gen->Func(Flags | CF_CONST, FP_D_As32bitRaw(FP_D_FromInt(Expr2.IVal)));
+            }
+            else {
+               Gen->Func(Flags | CF_CONST, Expr2.IVal);
+            }
          }
       }
       else {
