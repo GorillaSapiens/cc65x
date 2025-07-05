@@ -103,6 +103,7 @@ Double FP_D_Make(double Val);
 
 Double FP_D_FromInt(long Val);
 // Convert an integer into a floating point variable
+
 long FP_D_ToLong(Double Val);
 
 double FP_D_ToFloat(Double Val); // FIXME: better name

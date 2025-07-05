@@ -2439,7 +2439,12 @@ static void hie_internal(const GenDesc *Ops, // List of generators
          }
          else {
             // right side is not float
-            Gen->Func(type, Expr2.IVal);
+            if ((ltype & CF_TYPEMASK) == CF_FLOAT) {
+               Gen->Func(type, FP_D_As32bitRaw(FP_D_FromInt(Expr2.IVal)));
+            }
+            else {
+               Gen->Func(type, Expr2.IVal);
+            }
          }
 
          // We have an rvalue in the primary now

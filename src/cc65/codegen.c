@@ -1209,6 +1209,40 @@ void g_toslong(unsigned flags)
    }
 }
 
+void g_tosfloat(unsigned flags)
+// Make sure, the value on TOS is a long. Convert if necessary
+{
+g_nop("");
+   switch (flags & CF_TYPEMASK) {
+
+      case CF_CHAR:
+      case CF_INT:
+         if (flags & CF_UNSIGNED) {
+            AddCodeLine("jsr tosulong");
+         }
+         else {
+            AddCodeLine("jsr toslong");
+         }
+         push(CF_INT);
+         break;
+
+      case CF_LONG:
+         break;
+
+      default:
+         typeerror(flags);
+   }
+   AddCodeLine("jsr popeax");
+   if (flags & CF_UNSIGNED) {
+      AddCodeLine("jsr eaxufloat");
+   }
+   else {
+      AddCodeLine("jsr eaxfloat");
+   }
+   AddCodeLine("jsr pusheax");
+g_nop("");
+}
+
 void g_tosint(unsigned flags)
 // Make sure, the value on TOS is an int. Convert if necessary
 {
@@ -1441,10 +1475,7 @@ unsigned g_typeadjust(unsigned lhs, unsigned rhs)
       return const_flag | CF_FLOAT;
    }
    else if (ltype == CF_FLOAT) {
-      if (lhs & CF_PRIMARY) {
-         g_nop("TODO FIX !!!");
-      }
-      else {
+      if ((rhs & CF_CONST) == 0) {
          g_regfloat(rhs);
       }
       return (lhs & CF_CONST) | CF_FLOAT;
@@ -2435,11 +2466,13 @@ static void oper(unsigned Flags, unsigned long Val, const char *const *Subs)
       g_getimmed(Flags, Val, 0);
    }
 
+#if 0
    if (Flags & CF_FLOAT) {
       // convert to float
       // TODO FIX might break for large unsigned values
-      AddCodeLine("jsr eaxfloat");
+//      AddCodeLine("jsr eaxfloat");
    }
+   #endif
 
    if (Subs[n] == NULL) {
       Internal("oper Subs NULL (%d)", n);

@@ -87,15 +87,15 @@ void varintconst(void)
     printf("fp1:0x%08lx [c20f820c] %s (-35.877)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "c20f820c");
 #endif
-#if 0 // works but gives wrong result
+#if 1
     fp1 = var_float * 47;
-    printf("fp1:0x%08lx [42687df4] %s (522.781)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    test1(fp1, "42687df4");
+    printf("fp1:0x%08lx [4402b1fc] %s (522.781)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "4402b1fc");
 #endif
-#if 0 // works but gives wrong result
+#if 1
     fp1 = var_float / 47;
-    printf("fp1:0x%08lx [42687df4] %s (0.2367)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    test1(fp1, "42687df4");
+    printf("fp1:0x%08lx [3e7256e3] %s (0.2367)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "3e7256e3");
 #endif
 
 }
