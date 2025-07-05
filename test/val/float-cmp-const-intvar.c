@@ -45,7 +45,7 @@ void constintvar(void)
 {
     printf("const vs int var\n");
 
-#if 0 // compiles but produces wrong results
+#if 1
     expect("10.0f == 20 is", 0, (10.0f == i2));
     expect("20.0f == 10 is", 0, (20.0f == i1));
     expect("20.0f == 20 is", 1, (20.0f == i2));
