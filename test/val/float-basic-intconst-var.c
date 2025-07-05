@@ -74,24 +74,24 @@ void intconstvar(void)
     var_float = 11.123f;
 #if 1
     fp1 = 47;
-    printf("fp1:0x%08lx [?] %s (47)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    printf("fp1:0x%08lx [423c0000] %s (47)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     fp1 = var_float;
-    printf("fp1:0x%08lx [?] %s (11.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    printf("fp1:0x%08lx [4131f7cf] %s (11.123)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
 
     /* addition */
     fp1 = 47 + var_float;
-    printf("fp1:0x%08lx [?] %s (58.123)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    printf("fp1:0x%08lx [42687df4] %s (58.123)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "42687df4");
 
 
     fp1 = 47 - var_float;
-    printf("fp1:0x%08lx [?] %s (35.877)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    printf("fp1:0x%08lx [420f820c] %s (35.877)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "420f820c");
 #endif
-#if 0 // compiles, but wrong result
+#if 1
     fp1 = 47 * var_float;
-    printf("fp1:0x%08lx [?] %s (522.781)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
-    test1(fp1, "42687df4");
+    printf("fp1:0x%08lx [4402b1fc] %s (522.781)", *((uint32_t*)&fp1), _ftostr(buf, fp1));
+    test1(fp1, "4402b1fc");
 #endif
 #if 0 // Internal compiler error
     fp1 = 47 / var_float;
