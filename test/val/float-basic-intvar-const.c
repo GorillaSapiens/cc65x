@@ -100,7 +100,7 @@ void intvarconst(void)
     test1(fp1, "42687df4");
 #endif
     /* subtraction */
-#if 1 // gives wrong result
+#if 1
     fp1 = var_int - 11.123f;
     printf("fp1:0x%08lx [420f820c] %s (35.877)\n", *((uint32_t*)&fp1), _ftostr(buf, fp1));
     test1(fp1, "420f820c");
