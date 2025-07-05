@@ -51,7 +51,7 @@ void varintvar(void)
 
     fp1 = 10.0f;
     fp2 = 20.0f;
-#if 1 // works but gives wrong results
+#if 1
     expect("10 == 20 is", 0, (fp1 == i2), fp1, i2);
     expect("20 == 10 is", 0, (fp2 == i1), fp2, i1);
     expect("20 == 20 is", 1, (fp2 == i2), fp2, i2);
