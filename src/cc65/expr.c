@@ -2562,7 +2562,20 @@ static void hie_compare(const GenDesc *Ops, // List of generators
       rconst = (ED_IsConstAbs(&Expr2) && ED_CodeRangeIsEmpty(&Expr2));
       if (!rconst) {
          // Not numeric constant, load into the primary
+         unsigned rtype = CG_TypeOf(Expr2.Type);
          LoadExpr(CF_NONE, &Expr2);
+         // TODO FIX remove this comment fnord
+         if (ltype == CF_FLOAT && (rtype & CF_TYPEMASK) != CF_FLOAT) {
+            if ((rtype & CF_TYPEMASK) != CF_LONG) {
+               if (rtype & CF_UNSIGNED) {
+                  AddCodeLine("jsr axulong");
+               }
+               else {
+                  AddCodeLine("jsr axlong");
+               }
+            }
+            AddCodeLine("jsr eaxfloat");
+         }
       }
 
       // Check if operands have allowed types for this operation
