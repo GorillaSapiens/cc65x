@@ -1,4 +1,4 @@
-/*****************************************************************************/
+////////////////////////////////////////////////////////////////////////////////
 /*                                                                           */
 /*                                 strpool.c                                 */
 /*                                                                           */
@@ -29,7 +29,7 @@
 /* 3. This notice may not be removed or altered from any source              */
 /*    distribution.                                                          */
 /*                                                                           */
-/*****************************************************************************/
+////////////////////////////////////////////////////////////////////////////////
 
 // A string pool is used to store identifiers and other strings. Each string
 // stored in the pool has a unique id, which may be used to access the string
@@ -47,9 +47,9 @@
 #include "strpool.h"
 #include "xmalloc.h"
 
-/*****************************************************************************/
+////////////////////////////////////////////////////////////////////////////////
 /*                                 Forwards                                  */
-/*****************************************************************************/
+////////////////////////////////////////////////////////////////////////////////
 
 static unsigned HT_GenHash(const void *Key);
 /* Generate the hash over a key. */
@@ -62,9 +62,9 @@ static int HT_Compare(const void *Key1, const void *Key2);
 // Key1 is smaller than Key2, zero if both are equal, and a value greater
 // than zero if Key1 is greater then Key2.
 
-/*****************************************************************************/
+////////////////////////////////////////////////////////////////////////////////
 /*                                     Data                                  */
-/*****************************************************************************/
+////////////////////////////////////////////////////////////////////////////////
 
 /* A string pool entry */
 struct StringPoolEntry {
@@ -83,9 +83,9 @@ struct StringPool {
 /* Hash table functions */
 static const HashFunctions HashFunc = {HT_GenHash, HT_GetKey, HT_Compare};
 
-/*****************************************************************************/
+////////////////////////////////////////////////////////////////////////////////
 /*                          struct StringPoolEntry                           */
-/*****************************************************************************/
+////////////////////////////////////////////////////////////////////////////////
 
 static StringPoolEntry *NewStringPoolEntry(const StrBuf *S, unsigned Id)
 /* Create a new string pool entry and return it. */
@@ -106,9 +106,9 @@ static StringPoolEntry *NewStringPoolEntry(const StrBuf *S, unsigned Id)
    return E;
 }
 
-/*****************************************************************************/
+////////////////////////////////////////////////////////////////////////////////
 /*                           Hash table functions                            */
-/*****************************************************************************/
+////////////////////////////////////////////////////////////////////////////////
 
 static unsigned HT_GenHash(const void *Key)
 /* Generate the hash over a key. */
@@ -130,9 +130,9 @@ static int HT_Compare(const void *Key1, const void *Key2)
    return SB_Compare(Key1, Key2);
 }
 
-/*****************************************************************************/
+////////////////////////////////////////////////////////////////////////////////
 /*                                     Code                                  */
-/*****************************************************************************/
+////////////////////////////////////////////////////////////////////////////////
 
 StringPool *NewStringPool(unsigned HashSlots)
 /* Allocate, initialize and return a new string pool */
