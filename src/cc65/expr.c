@@ -2564,7 +2564,6 @@ static void hie_compare(const GenDesc *Ops, // List of generators
          // Not numeric constant, load into the primary
          unsigned rtype = CG_TypeOf(Expr2.Type);
          LoadExpr(CF_NONE, &Expr2);
-         // TODO FIX remove this comment fnord
          if (ltype == CF_FLOAT && (rtype & CF_TYPEMASK) != CF_FLOAT) {
             if ((rtype & CF_TYPEMASK) != CF_LONG) {
                if (rtype & CF_UNSIGNED) {
@@ -2890,10 +2889,19 @@ static void hie_compare(const GenDesc *Ops, // List of generators
              IsClassInt(Expr->Type) && IsClassInt(Expr2.Type) &&
              IsSignSigned(ArithmeticConvert(Expr->Type, Expr2.Type));
 
+         // this might not be right, but it causes
+         // more test cases to pass...
+         unsigned flags = 0;
+         unsigned rtype = CF_TYPEMASK & CG_TypeOf(Expr2.Type);
+         if (rtype == CF_FLOAT) {
+            ltype = CF_TYPEMASK & CG_TypeOf(Expr->Type);
+            flags = CF_FLOAT;
+         }
+
          // If the right hand side is constant, and the generator function
          // expects the lhs in the primary, remove the push of the primary
          // now.
-         unsigned flags = 0;
+
          if (rconst) {
             flags |= CF_CONST;
             if ((Gen->Flags & GEN_NOPUSH) != 0) {
@@ -2904,7 +2912,6 @@ static void hie_compare(const GenDesc *Ops, // List of generators
 
          // Determine the type of the operation.
          if (IsRankChar(Expr->Type) && rconst && (!LeftSigned || RightSigned)) {
-
             // Left side is unsigned char, right side is constant.
             // Determine the minimum and maximum values
             int LeftMin, LeftMax;
@@ -3006,8 +3013,9 @@ static void hie_compare(const GenDesc *Ops, // List of generators
                // left is float
                flags |= CF_FLOAT;
             }
-            else if (CG_TypeOf(Expr2.Type) == CF_FLOAT) {
+            else if ((CF_TYPEMASK & CG_TypeOf(Expr2.Type)) == CF_FLOAT) {
                // right is float
+               flags |= g_typeadjust(ltype, rtype);
             }
             else {
                flags |= g_typeadjust(ltype, rtype);

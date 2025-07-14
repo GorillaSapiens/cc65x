@@ -45,7 +45,7 @@ void intvarconst(void)
 {
     printf("int var vs const\n");
 
-#if 0 // internal compiler error
+#if 1
     expect("10 == 20.0f is", 0, (i1 == 20.0f));
     expect("20 == 10.0f is", 0, (i2 == 10.0f));
     expect("20 == 20.0f is", 1, (i2 == 20.0f));
