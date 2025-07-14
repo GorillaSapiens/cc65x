@@ -1,34 +1,34 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 scanner.c                                 */
-/*                                                                           */
-/*                  The scanner for the ca65 macroassembler                  */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2013, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 scanner.c
+//
+//                  The scanner for the ca65 macroassembler
+//
+//
+//
+// (C) 1998-2013, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
@@ -37,7 +37,7 @@
 #include <ctype.h>
 #include <errno.h>
 
-/* common */
+// common
 #include "addrsize.h"
 #include "attrib.h"
 #include "chartype.h"
@@ -47,7 +47,7 @@
 #include "tgttrans.h"
 #include "xmalloc.h"
 
-/* ca65 */
+// ca65
 #include "condasm.h"
 #include "error.h"
 #include "filetab.h"
@@ -61,76 +61,76 @@
 #include "scanner.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Current input token incl. attributes */
+// Current input token incl. attributes
 Token CurTok = STATIC_TOKEN_INITIALIZER;
 
-/* Struct to handle include files. */
+// Struct to handle include files.
 typedef struct InputFile InputFile;
 struct InputFile {
-   FILE *F;           /* Input file descriptor */
-   FilePos Pos;       /* Position in file */
-   token_t Tok;       /* Last token */
-   int C;             /* Last character */
-   StrBuf Line;       /* The current input line */
-   int IncSearchPath; /* True if we've added a search path */
-   int BinSearchPath; /* True if we've added a search path */
-   InputFile *Next;   /* Linked list of input files */
+   FILE *F;           // Input file descriptor
+   FilePos Pos;       // Position in file
+   token_t Tok;       // Last token
+   int C;             // Last character
+   StrBuf Line;       // The current input line
+   int IncSearchPath; // True if we've added a search path
+   int BinSearchPath; // True if we've added a search path
+   InputFile *Next;   // Linked list of input files
 };
 
-/* Struct to handle textual input data */
+// Struct to handle textual input data
 typedef struct InputData InputData;
 struct InputData {
-   char *Text;      /* Pointer to the text data */
-   const char *Pos; /* Pointer to current position */
-   int Malloced;    /* Memory was malloced */
-   token_t Tok;     /* Last token */
-   int C;           /* Last character */
-   InputData *Next; /* Linked list of input data */
+   char *Text;      // Pointer to the text data
+   const char *Pos; // Pointer to current position
+   int Malloced;    // Memory was malloced
+   token_t Tok;     // Last token
+   int C;           // Last character
+   InputData *Next; // Linked list of input data
 };
 
-/* Input source: Either file or data */
+// Input source: Either file or data
 typedef struct CharSource CharSource;
 
-/* Set of input functions */
+// Set of input functions
 typedef struct CharSourceFunctions CharSourceFunctions;
 struct CharSourceFunctions {
-   void (*MarkStart)(CharSource *); /* Mark the start pos of a token */
-   void (*NextChar)(CharSource *);  /* Read next char from input */
-   void (*Done)(CharSource *);      /* Close input source */
+   void (*MarkStart)(CharSource *); // Mark the start pos of a token
+   void (*NextChar)(CharSource *);  // Read next char from input
+   void (*Done)(CharSource *);      // Close input source
 };
 
-/* Input source: Either file or data */
+// Input source: Either file or data
 struct CharSource {
-   CharSource *Next;  /* Linked list of char sources */
-   token_t Tok;       /* Last token */
-   int C;             /* Last character */
-   int SkipN;         /* For '\r\n' line endings, skip '\n\ if next */
-   InputStack IStack; /* Saved input stack */
-   const CharSourceFunctions *Func; /* Pointer to function table */
+   CharSource *Next;  // Linked list of char sources
+   token_t Tok;       // Last token
+   int C;             // Last character
+   int SkipN;         // For '\r\n' line endings, skip '\n\ if next
+   InputStack IStack; // Saved input stack
+   const CharSourceFunctions *Func; // Pointer to function table
    union {
-      InputFile File; /* File data */
-      InputData Data; /* Textual data */
+      InputFile File; // File data
+      InputData Data; // Textual data
    } V;
 };
 
-/* Current input variables */
-static CharSource *Source = 0; /* Current char source */
-static unsigned FCount = 0;    /* Count of input files */
-static int C = 0;              /* Current input character */
+// Current input variables
+static CharSource *Source = 0; // Current char source
+static unsigned FCount = 0;    // Count of input files
+static int C = 0;              // Current input character
 
-/* Force end of assembly */
+// Force end of assembly
 int ForcedEnd = 0;
 
-/* List of dot keywords with the corresponding tokens */
-/* CAUTION: table must be sorted for bsearch */
+// List of dot keywords with the corresponding tokens
+// CAUTION: table must be sorted for bsearch
 struct DotKeyword {
-   const char *Key; /* MUST be first field */
+   const char *Key; // MUST be first field
    token_t Tok;
 } DotKeywords[] = {
-    /* BEGIN SORTED.SH */
+    // BEGIN SORTED.SH
     {".A16", TOK_A16},
     {".A8", TOK_A8},
     {".ADDR", TOK_ADDR},
@@ -316,28 +316,28 @@ struct DotKeyword {
     {".XMATCH", TOK_XMATCH},
     {".XOR", TOK_BOOLXOR},
     {".ZEROPAGE", TOK_ZEROPAGE},
-    /* END SORTED.SH */
+    // END SORTED.SH
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                            CharSource functions                           */
+//                            CharSource functions
 ////////////////////////////////////////////////////////////////////////////////
 
 static void UseCharSource(CharSource *S)
-/* Initialize a new input source and start to use it. */
+// Initialize a new input source and start to use it.
 {
-   /* Remember the current input char and token */
+   // Remember the current input char and token
    S->Tok = CurTok.Tok;
    S->C = C;
 
-   /* Remember the current input stack */
+   // Remember the current input stack
    S->IStack = RetrieveInputStack();
 
-   /* Use the new input source */
+   // Use the new input source
    S->Next = Source;
    Source = S;
 
-   /* Read the first character from the new file */
+   // Read the first character from the new file
    S->SkipN = 0;
    S->Func->NextChar(S);
 
@@ -347,49 +347,49 @@ static void UseCharSource(CharSource *S)
 }
 
 static void DoneCharSource(void)
-/* Close the top level character source */
+// Close the top level character source
 {
    CharSource *S;
 
-   /* First, call the type specific function */
+   // First, call the type specific function
    Source->Func->Done(Source);
 
-   /* Restore the old token */
+   // Restore the old token
    CurTok.Tok = Source->Tok;
    C = Source->C;
 
-   /* Restore the old input source */
+   // Restore the old input source
    RestoreInputStack(Source->IStack);
 
-   /* Remember the last stacked input source */
+   // Remember the last stacked input source
    S = Source->Next;
 
-   /* Delete the top level one ... */
+   // Delete the top level one ...
    xfree(Source);
 
-   /* ... and use the one before */
+   // ... and use the one before
    Source = S;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                            InputFile functions                            */
+//                            InputFile functions
 ////////////////////////////////////////////////////////////////////////////////
 
 static void IFMarkStart(CharSource *S)
-/* Mark the start of the next token */
+// Mark the start of the next token
 {
    CurTok.Pos = S->V.File.Pos;
 }
 
 static void IFNextChar(CharSource *S)
-/* Read the next character from the input file */
+// Read the next character from the input file
 {
-   /* Check for end of line, read the next line if needed */
+   // Check for end of line, read the next line if needed
    while (SB_GetIndex(&S->V.File.Line) >= SB_GetLen(&S->V.File.Line)) {
 
       unsigned Len;
 
-      /* End of current line reached, read next line */
+      // End of current line reached, read next line
       SB_Clear(&S->V.File.Line);
       while (1) {
 
@@ -400,7 +400,7 @@ static void IFNextChar(CharSource *S)
          S->SkipN = 0;
 
          if (N == EOF) {
-            /* End of file. Accept files without a newline at the end */
+            // End of file. Accept files without a newline at the end
             if (SB_NotEmpty(&S->V.File.Line)) {
                break;
             }
@@ -411,22 +411,22 @@ static void IFNextChar(CharSource *S)
             C = EOF;
             return;
 
-            /* Check for end of line */
+            // Check for end of line
          }
          else if (N == '\n') {
-            /* End of line */
+            // End of line
             break;
          }
          else if (N == '\r') {
-            /* End of line, skip '\n' if it's the next character */
+            // End of line, skip '\n' if it's the next character
             S->SkipN = 1;
             break;
 
-            /* Collect other stuff */
+            // Collect other stuff
          }
          else {
 
-            /* Append data to line */
+            // Append data to line
             SB_AppendChar(&S->V.File.Line, N);
          }
       }
@@ -441,25 +441,25 @@ static void IFNextChar(CharSource *S)
       SB_Drop(&S->V.File.Line, SB_GetLen(&S->V.File.Line) - Len);
       SB_AppendChar(&S->V.File.Line, '\n');
 
-      /* Terminate the string buffer */
+      // Terminate the string buffer
       SB_Terminate(&S->V.File.Line);
 
-      /* One more line */
+      // One more line
       S->V.File.Pos.Line++;
 
-      /* Remember the new line for the listing */
+      // Remember the new line for the listing
       NewListingLine(&S->V.File.Line, S->V.File.Pos.Name, FCount);
    }
 
-   /* Set the column pointer */
+   // Set the column pointer
    S->V.File.Pos.Col = SB_GetIndex(&S->V.File.Line);
 
-   /* Return the next character from the buffer */
+   // Return the next character from the buffer
    C = SB_Get(&S->V.File.Line);
 }
 
 void IFDone(CharSource *S)
-/* Close the current input file */
+// Close the current input file
 {
    // We're at the end of an include file. Check if we have any
    // open .IFs, or any open token lists in this file. This
@@ -468,7 +468,7 @@ void IFDone(CharSource *S)
    // allowing these things will help finding errors.
    CheckOpenIfs();
 
-   /* If we've added search paths for this file, remove them */
+   // If we've added search paths for this file, remove them
    if (S->V.File.IncSearchPath) {
       PopSearchPath(IncSearchPath);
    }
@@ -476,7 +476,7 @@ void IFDone(CharSource *S)
       PopSearchPath(BinSearchPath);
    }
 
-   /* Free the line buffer */
+   // Free the line buffer
    SB_Done(&S->V.File.Line);
 
    // Close the input file and decrement the file count. We will ignore
@@ -485,18 +485,18 @@ void IFDone(CharSource *S)
    --FCount;
 }
 
-/* Set of input file handling functions */
+// Set of input file handling functions
 static const CharSourceFunctions IFFunc = {IFMarkStart, IFNextChar, IFDone};
 
 int NewInputFile(const char *Name)
 // Open a new input file. Returns true if the file could be successfully opened
 // and false otherwise.
 {
-   int RetCode = 0; /* Return code. Assume an error. */
+   int RetCode = 0; // Return code. Assume an error.
    char *PathName = 0;
    FILE *F;
    struct stat Buf;
-   StrBuf NameBuf; /* No need to initialize */
+   StrBuf NameBuf; // No need to initialize
    StrBuf Path = AUTO_STRBUF_INITIALIZER;
    unsigned FileIdx;
    CharSource *S;
@@ -504,7 +504,7 @@ int NewInputFile(const char *Name)
    // If this is the main file, just try to open it. If it's an include file,
    // search for it using the include path list.
    if (FCount == 0) {
-      /* Main file */
+      // Main file
       F = fopen(Name, "r");
       if (F == 0) {
          Fatal("Cannot open input file '%s': %s", Name, strerror(errno));
@@ -515,12 +515,12 @@ int NewInputFile(const char *Name)
       // directories.
       PathName = SearchFile(IncSearchPath, Name);
       if (PathName == 0 || (F = fopen(PathName, "r")) == 0) {
-         /* Not found or cannot open, print an error and bail out */
+         // Not found or cannot open, print an error and bail out
          Error("Cannot open include file '%s': %s", Name, strerror(errno));
          goto ExitPoint;
       }
 
-      /* Use the path name from now on */
+      // Use the path name from now on
       Name = PathName;
    }
 
@@ -535,12 +535,12 @@ int NewInputFile(const char *Name)
       Fatal("Cannot stat input file '%s': %s", Name, strerror(errno));
    }
 
-   /* Add the file to the input file table and remember the index */
+   // Add the file to the input file table and remember the index
    FileIdx = AddFile(SB_InitFromString(&NameBuf, Name),
                      (FCount == 0) ? FT_MAIN : FT_INCLUDE, Buf.st_size,
                      (unsigned long)Buf.st_mtime);
 
-   /* Create a new input source variable and initialize it */
+   // Create a new input source variable and initialize it
    S = xmalloc(sizeof(*S));
    S->Func = &IFFunc;
    S->V.File.F = F;
@@ -549,7 +549,7 @@ int NewInputFile(const char *Name)
    S->V.File.Pos.Name = FileIdx;
    SB_Init(&S->V.File.Line);
 
-   /* Push the path for this file onto the include search lists */
+   // Push the path for this file onto the include search lists
    SB_CopyBuf(&Path, Name, FindName(Name) - Name);
    SB_Terminate(&Path);
    S->V.File.IncSearchPath =
@@ -558,95 +558,95 @@ int NewInputFile(const char *Name)
        PushSearchPath(BinSearchPath, SB_GetConstBuf(&Path));
    SB_Done(&Path);
 
-   /* Count active input files */
+   // Count active input files
    ++FCount;
 
-   /* Use this input source */
+   // Use this input source
    UseCharSource(S);
 
-   /* File successfully opened */
+   // File successfully opened
    RetCode = 1;
 
 ExitPoint:
-   /* Free an allocated name buffer */
+   // Free an allocated name buffer
    xfree(PathName);
 
-   /* Return the success code */
+   // Return the success code
    return RetCode;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                            InputData functions                            */
+//                            InputData functions
 ////////////////////////////////////////////////////////////////////////////////
 
 static void IDMarkStart(CharSource *S attribute((unused)))
-/* Mark the start of the next token */
+// Mark the start of the next token
 {
-   /* Nothing to do here */
+   // Nothing to do here
 }
 
 static void IDNextChar(CharSource *S)
-/* Read the next character from the input text */
+// Read the next character from the input text
 {
    C = *S->V.Data.Pos++;
    if (C == '\0') {
-      /* End of input data */
+      // End of input data
       --S->V.Data.Pos;
       C = EOF;
    }
 }
 
 void IDDone(CharSource *S)
-/* Close the current input data */
+// Close the current input data
 {
-   /* Cleanup the current stuff */
+   // Cleanup the current stuff
    if (S->V.Data.Malloced) {
       xfree(S->V.Data.Text);
    }
 }
 
-/* Set of input data handling functions */
+// Set of input data handling functions
 static const CharSourceFunctions IDFunc = {IDMarkStart, IDNextChar, IDDone};
 
 void NewInputData(char *Text, int Malloced)
-/* Add a chunk of input data to the input stream */
+// Add a chunk of input data to the input stream
 {
    CharSource *S;
 
-   /* Create a new input source variable and initialize it */
+   // Create a new input source variable and initialize it
    S = xmalloc(sizeof(*S));
    S->Func = &IDFunc;
    S->V.Data.Text = Text;
    S->V.Data.Pos = Text;
    S->V.Data.Malloced = Malloced;
 
-   /* Use this input source */
+   // Use this input source
    UseCharSource(S);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                    Character classification functions                     */
+//                    Character classification functions
 ////////////////////////////////////////////////////////////////////////////////
 
 int IsIdChar(int C)
-/* Return true if the character is a valid character for an identifier */
+// Return true if the character is a valid character for an identifier
 {
    return IsAlNum(C) || (C == '_') || (C == '@' && AtInIdents) ||
           (C == '$' && DollarInIdents);
 }
 
 int IsIdStart(int C)
-/* Return true if the character may start an identifier */
+// Return true if the character may start an identifier
 {
    return IsAlpha(C) || C == '_';
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 static unsigned DigitVal(unsigned char C)
-/* Convert a digit into it's numerical representation */
+// Convert a digit into it's numerical representation
 {
    if (IsDigit(C)) {
       return C - '0';
@@ -657,25 +657,25 @@ static unsigned DigitVal(unsigned char C)
 }
 
 static void NextChar(void)
-/* Read the next character from the input file */
+// Read the next character from the input file
 {
    Source->Func->NextChar(Source);
 }
 
 void LocaseSVal(void)
-/* Make SVal lower case */
+// Make SVal lower case
 {
    SB_ToLower(&CurTok.SVal);
 }
 
 void UpcaseSVal(void)
-/* Make SVal upper case */
+// Make SVal upper case
 {
    SB_ToUpper(&CurTok.SVal);
 }
 
 static int CmpDotKeyword(const void *K1, const void *K2)
-/* Compare function for the dot keyword search */
+// Compare function for the dot keyword search
 {
    return strcmp(((struct DotKeyword *)K1)->Key,
                  ((struct DotKeyword *)K2)->Key);
@@ -688,16 +688,16 @@ static token_t FindDotKeyword(void)
    struct DotKeyword K;
    struct DotKeyword *R;
 
-   /* Initialize K */
+   // Initialize K
    K.Key = SB_GetConstBuf(&CurTok.SVal);
    K.Tok = 0;
 
-   /* If we aren't in ignore case mode, we have to uppercase the keyword */
+   // If we aren't in ignore case mode, we have to uppercase the keyword
    if (!IgnoreCase) {
       UpcaseSVal();
    }
 
-   /* Search for the keyword */
+   // Search for the keyword
    R = bsearch(&K, DotKeywords, sizeof(DotKeywords) / sizeof(DotKeywords[0]),
                sizeof(DotKeywords[0]), CmpDotKeyword);
    if (R != 0) {
@@ -714,28 +714,28 @@ static void ReadIdent(void)
 // that any characters already filled in are ok, and the character in C is
 // checked.
 {
-   /* Read the identifier */
+   // Read the identifier
    do {
       SB_AppendChar(&CurTok.SVal, C);
       NextChar();
    } while (IsIdChar(C));
    SB_Terminate(&CurTok.SVal);
 
-   /* If we should ignore case, convert the identifier to upper case */
+   // If we should ignore case, convert the identifier to upper case
    if (IgnoreCase) {
       UpcaseSVal();
    }
 }
 
 static void ReadStringConst(int StringTerm)
-/* Read a string constant into SVal. */
+// Read a string constant into SVal.
 {
    int NeedNext;
 
-   /* Skip the leading string terminator */
+   // Skip the leading string terminator
    NextChar();
 
-   /* Read the string */
+   // Read the string
    while (1) {
       int Cooked = 1;
       NeedNext = 1;
@@ -779,7 +779,7 @@ static void ReadStringConst(int StringTerm)
                C = '\b';
                break;
             case 'e':
-               C = '\x1B'; /* see comments in cc65/scanner.c */
+               C = '\x1B'; // see comments in cc65/scanner.c
                break;
             case 'f':
                C = '\f';
@@ -797,10 +797,10 @@ static void ReadStringConst(int StringTerm)
                C = '\v';
                break;
             case '\\':
-               C = '\\'; /* unnecessary but more readable */
+               C = '\\'; // unnecessary but more readable
                break;
             case '\'':
-               C = '\''; /* unnecessary but more readable */
+               C = '\''; // unnecessary but more readable
                if (StringTerm == 0) {
                   // special case used by character constants
                   // when LooseStringTerm not set.  this will
@@ -810,7 +810,7 @@ static void ReadStringConst(int StringTerm)
                }
                break;
             case '\"':
-               C = '\"'; /* unnecessary but more readable */
+               C = '\"'; // unnecessary but more readable
                break;
             case '0':
             case '1':
@@ -819,7 +819,7 @@ static void ReadStringConst(int StringTerm)
             case '4':
             case '5':
             case '6':
-            case '7': { /* brace needed for scoping */
+            case '7': { // brace needed for scoping
                int Count = 1;
                int Final = DigitVal(C);
                Cooked = 0;
@@ -843,29 +843,29 @@ static void ReadStringConst(int StringTerm)
                      break;
                   }
                }
-               /* FALLTHROUGH */
+               // FALLTHROUGH
             default:
                Error("Unsupported escape sequence in string constant");
                break;
          }
       }
 
-      /* Append the char to the string */
+      // Append the char to the string
       SB_AppendCharCooked(&CurTok.SVal, C, Cooked);
 
       if (NeedNext) {
-         /* Skip the character */
+         // Skip the character
          NextChar();
          NeedNext = 1;
       }
    }
 
    if (NeedNext) {
-      /* Skip the trailing terminator */
+      // Skip the trailing terminator
       NextChar();
    }
 
-   /* Terminate the string */
+   // Terminate the string
    SB_Terminate(&CurTok.SVal);
 }
 
@@ -888,30 +888,30 @@ static int Sweet16Reg(const StrBuf *Id)
 
    if (sscanf(SB_GetConstBuf(Id) + 1, "%u%c", &RegNum, &Check) != 1 ||
        RegNum > 15) {
-      /* Invalid register */
+      // Invalid register
       return -1;
    }
 
-   /* The register number is valid */
+   // The register number is valid
    return (int)RegNum;
 }
 
 void NextRawTok(void)
-/* Read the next raw token from the input stream */
+// Read the next raw token from the input stream
 {
    Macro *M;
 
-   /* If we've a forced end of assembly, don't read further */
+   // If we've a forced end of assembly, don't read further
    if (ForcedEnd) {
       CurTok.Tok = TOK_EOF;
       return;
    }
 
 Restart:
-   /* Check if we have tokens from another input source */
+   // Check if we have tokens from another input source
    if (InputFromStack()) {
       if (CurTok.Tok == TOK_IDENT && (M = FindDefine(&CurTok.SVal)) != 0) {
-         /* This is a define style macro - expand it */
+         // This is a define style macro - expand it
          MacExpandStart(M);
          goto Restart;
       }
@@ -919,27 +919,27 @@ Restart:
    }
 
 Again:
-   /* Skip whitespace, remember if we had some */
+   // Skip whitespace, remember if we had some
    if ((CurTok.WS = IsBlank(C)) != 0) {
       do {
          NextChar();
       } while (IsBlank(C));
    }
 
-   /* Mark the file position of the next token */
+   // Mark the file position of the next token
    Source->Func->MarkStart(Source);
 
-   /* Clear the string attribute */
+   // Clear the string attribute
    SB_Clear(&CurTok.SVal);
 
-   /* Generate line info for the current token */
+   // Generate line info for the current token
    NewAsmLine();
 
-   /* Hex number or PC symbol? */
+   // Hex number or PC symbol?
    if (C == '$') {
       NextChar();
 
-      /* Hex digit must follow or DollarIsPC must be enabled */
+      // Hex digit must follow or DollarIsPC must be enabled
       if (!IsXDigit(C)) {
          if (DollarIsPC) {
             CurTok.Tok = TOK_PC;
@@ -950,7 +950,7 @@ Again:
          }
       }
 
-      /* Read the number */
+      // Read the number
       CurTok.IVal = 0;
       while (1) {
          if (UnderlineInNumbers && C == '_') {
@@ -974,21 +974,21 @@ Again:
          }
       }
 
-      /* This is an integer constant */
+      // This is an integer constant
       CurTok.Tok = TOK_INTCON;
       return;
    }
 
-   /* Binary number? */
+   // Binary number?
    if (C == '%') {
       NextChar();
 
-      /* 0 or 1 must follow */
+      // 0 or 1 must follow
       if (!IsBDigit(C)) {
          Error("Binary digit expected");
       }
 
-      /* Read the number */
+      // Read the number
       CurTok.IVal = 0;
       while (1) {
          if (UnderlineInNumbers && C == '_') {
@@ -1012,12 +1012,12 @@ Again:
          }
       }
 
-      /* This is an integer constant */
+      // This is an integer constant
       CurTok.Tok = TOK_INTCON;
       return;
    }
 
-   /* Number? */
+   // Number?
    if (IsDigit(C)) {
 
       char Buf[16];
@@ -1027,12 +1027,12 @@ Again:
       long Max;
       unsigned DVal;
 
-      /* Ignore leading zeros */
+      // Ignore leading zeros
       while (C == '0') {
          NextChar();
       }
 
-      /* Read the number into Buf counting the digits */
+      // Read the number into Buf counting the digits
       Digits = 0;
       while (1) {
          if (UnderlineInNumbers && C == '_') {
@@ -1057,7 +1057,7 @@ Again:
          }
       }
 
-      /* Allow zilog/intel style hex numbers with a 'h' suffix */
+      // Allow zilog/intel style hex numbers with a 'h' suffix
       if (C == 'h' || C == 'H') {
          NextChar();
          Base = 16;
@@ -1068,7 +1068,7 @@ Again:
          Max = 0xFFFFFFFFUL / 10;
       }
 
-      /* Convert the number using the given base */
+      // Convert the number using the given base
       CurTok.IVal = 0;
       for (I = 0; I < Digits; ++I) {
          if (CurTok.IVal > Max) {
@@ -1085,36 +1085,36 @@ Again:
          CurTok.IVal = (CurTok.IVal * Base) + DVal;
       }
 
-      /* This is an integer constant */
+      // This is an integer constant
       CurTok.Tok = TOK_INTCON;
       return;
    }
 
-   /* Control command? */
+   // Control command?
    if (C == '.') {
 
-      /* Remember and skip the dot */
+      // Remember and skip the dot
       NextChar();
 
-      /* Check if it's just a dot */
+      // Check if it's just a dot
       if (!IsIdStart(C)) {
 
-         /* Just a dot */
+         // Just a dot
          CurTok.Tok = TOK_DOT;
       }
       else {
 
-         /* Read the remainder of the identifier */
+         // Read the remainder of the identifier
          SB_AppendChar(&CurTok.SVal, '.');
          ReadIdent();
 
-         /* Dot keyword, search for it */
+         // Dot keyword, search for it
          CurTok.Tok = FindDotKeyword();
          if (CurTok.Tok == TOK_NONE) {
 
-            /* Not found */
+            // Not found
             if (!LeadingDotInIdents) {
-               /* Invalid pseudo instruction */
+               // Invalid pseudo instruction
                Error("'%m%p' is not a recognized control command",
                      &CurTok.SVal);
                goto Again;
@@ -1123,12 +1123,12 @@ Again:
             // An identifier with a dot. Check if it's a define style
             // macro.
             if ((M = FindDefine(&CurTok.SVal)) != 0) {
-               /* This is a define style macro - expand it */
+               // This is a define style macro - expand it
                MacExpandStart(M);
                goto Restart;
             }
 
-            /* Just an identifier with a dot */
+            // Just an identifier with a dot
             CurTok.Tok = TOK_IDENT;
          }
       }
@@ -1143,19 +1143,19 @@ Again:
       return;
    }
 
-   /* Local symbol? */
+   // Local symbol?
    if (C == LocalStart) {
 
       NextChar();
 
       if (IsIdChar(C)) {
-         /* Read a local identifier */
+         // Read a local identifier
          CurTok.Tok = TOK_LOCAL_IDENT;
          SB_AppendChar(&CurTok.SVal, LocalStart);
          ReadIdent();
       }
       else {
-         /* Read an unnamed label */
+         // Read an unnamed label
          CurTok.IVal = 0;
          CurTok.Tok = TOK_ULABEL;
 
@@ -1178,10 +1178,10 @@ Again:
       return;
    }
 
-   /* Identifier or keyword? */
+   // Identifier or keyword?
    if (IsIdStart(C)) {
 
-      /* Read the identifier */
+      // Read the identifier
       ReadIdent();
 
       // Check for special names. Bail out if we have identified the type of
@@ -1261,31 +1261,31 @@ Again:
                CurTok.Tok = TOK_S;
                return;
             }
-            /* FALL THROUGH */
+            // FALL THROUGH
          default:
             if (CPU == CPU_SWEET16 &&
                 (CurTok.IVal = Sweet16Reg(&CurTok.SVal)) >= 0) {
 
-               /* A sweet16 register number in sweet16 mode */
+               // A sweet16 register number in sweet16 mode
                CurTok.Tok = TOK_REG;
                return;
             }
       }
 
-      /* Check for define style macro */
+      // Check for define style macro
       if ((M = FindDefine(&CurTok.SVal)) != 0) {
-         /* Macro - expand it */
+         // Macro - expand it
          MacExpandStart(M);
          goto Restart;
       }
       else {
-         /* An identifier */
+         // An identifier
          CurTok.Tok = TOK_IDENT;
       }
       return;
    }
 
-   /* Ok, let's do the switch */
+   // Ok, let's do the switch
 CharAgain:
    switch (C) {
 
@@ -1305,7 +1305,7 @@ CharAgain:
             CurTok.Tok = TOK_DIV;
          }
          else if (CComments) {
-            /* Remember the position, then skip the '*' */
+            // Remember the position, then skip the '*'
             Collection LineInfos = STATIC_COLLECTION_INITIALIZER;
             GetFullLineInfo(&LineInfos);
             NextChar();
@@ -1533,18 +1533,18 @@ CharAgain:
          return;
 
       case '\\':
-         /* Line continuation? */
+         // Line continuation?
          if (LineCont) {
             NextChar();
             /* Next char should be a LF, if not, will result in an error later
              */
             if (C == '\n') {
-               /* Ignore the '\n' */
+               // Ignore the '\n'
                NextChar();
                goto Again;
             }
             else {
-               /* Make it clear what the problem is: */
+               // Make it clear what the problem is:
                Error("EOL expected.");
             }
          }
@@ -1557,7 +1557,7 @@ CharAgain:
 
       case EOF:
          CheckInputStack();
-         /* In case of the main file, do not close it, but return EOF. */
+         // In case of the main file, do not close it, but return EOF.
          if (Source && Source->Next) {
             DoneCharSource();
             goto Restart;
@@ -1583,23 +1583,23 @@ int GetSubKey(const char *const *Keys, unsigned Count)
 {
    unsigned I;
 
-   /* Must have an identifier */
+   // Must have an identifier
    PRECONDITION(CurTok.Tok == TOK_IDENT);
 
-   /* If we aren't in ignore case mode, we have to uppercase the identifier */
+   // If we aren't in ignore case mode, we have to uppercase the identifier
    if (!IgnoreCase) {
       UpcaseSVal();
    }
 
-   /* Do a linear search (a binary search is not worth the effort) */
+   // Do a linear search (a binary search is not worth the effort)
    for (I = 0; I < Count; ++I) {
       if (SB_CompareStr(&CurTok.SVal, Keys[I]) == 0) {
-         /* Found it */
+         // Found it
          return I;
       }
    }
 
-   /* Not found */
+   // Not found
    return -1;
 }
 
@@ -1610,32 +1610,32 @@ unsigned char ParseAddrSize(void)
 {
    unsigned char AddrSize;
 
-   /* Check for an identifier */
+   // Check for an identifier
    if (CurTok.Tok != TOK_IDENT) {
       Error("Address size specifier expected");
       return ADDR_SIZE_DEFAULT;
    }
 
-   /* Convert the attribute */
+   // Convert the attribute
    AddrSize = AddrSizeFromStr(SB_GetConstBuf(&CurTok.SVal));
    if (AddrSize == ADDR_SIZE_INVALID) {
       Error("Address size specifier expected");
       AddrSize = ADDR_SIZE_DEFAULT;
    }
 
-   /* Done */
+   // Done
    return AddrSize;
 }
 
 void InitScanner(const char *InFile)
-/* Initialize the scanner, open the given input file */
+// Initialize the scanner, open the given input file
 {
-   /* Open the input file */
+   // Open the input file
    NewInputFile(InFile);
 }
 
 void DoneScanner(void)
-/* Release scanner resources */
+// Release scanner resources
 {
    DoneCharSource();
 }

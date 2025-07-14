@@ -1,40 +1,40 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 struct.c                                  */
-/*                                                                           */
-/*                          .STRUCT/.UNION commands                          */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2003-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 struct.c
+//
+//                          .STRUCT/.UNION commands
+//
+//
+// (C) 2003-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
-/* common */
+// common
 #include "addrsize.h"
 #include "scopedefs.h"
 
-/* ca65 */
+// ca65
 #include "condasm.h"
 #include "error.h"
 #include "expr.h"
@@ -47,21 +47,21 @@
 #include "struct.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
 enum { STRUCT, UNION };
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 static long Member(long AllocSize)
-/* Read one struct member and return its size */
+// Read one struct member and return its size
 {
    long Multiplier;
 
-   /* A multiplier may follow */
+   // A multiplier may follow
    if (CurTok.Tok != TOK_SEP) {
       Multiplier = ConstExpression();
       if (Multiplier <= 0) {
@@ -71,18 +71,18 @@ static long Member(long AllocSize)
       AllocSize *= Multiplier;
    }
 
-   /* Check the size for a reasonable value */
+   // Check the size for a reasonable value
    if (AllocSize >= 0x1000000) {
       ErrorSkip("Range error");
       AllocSize = 1;
    }
 
-   /* Return the size */
+   // Return the size
    return AllocSize;
 }
 
 static long DoStructInternal(long Offs, unsigned Type)
-/* Handle the .STRUCT command */
+// Handle the .STRUCT command
 {
    long Size = 0;
 
@@ -92,30 +92,30 @@ static long DoStructInternal(long Offs, unsigned Type)
    int Anon = (CurTok.Tok != TOK_IDENT);
 
    if (!Anon) {
-      /* Enter a new scope, then skip the name */
+      // Enter a new scope, then skip the name
       SymEnterLevel(&CurTok.SVal, SCOPE_STRUCT, ADDR_SIZE_ABS, 0);
       NextTok();
-      /* Start at zero offset in the new scope */
+      // Start at zero offset in the new scope
       Offs = 0;
    }
 
-   /* Test for end of line */
+   // Test for end of line
    ConsumeSep();
 
-   /* Read until end of struct */
+   // Read until end of struct
    while (CurTok.Tok != TOK_ENDSTRUCT && CurTok.Tok != TOK_ENDUNION &&
           CurTok.Tok != TOK_EOF) {
       long MemberSize;
       SymTable *Struct;
       SymEntry *Sym;
 
-      /* Allow empty and comment lines */
+      // Allow empty and comment lines
       if (CurTok.Tok == TOK_SEP) {
          NextTok();
          continue;
       }
 
-      /* The format is "[identifier ].storage-allocator[ multiplier]" */
+      // The format is "[identifier ].storage-allocator[ multiplier]"
       Sym = 0;
       if (CurTok.Tok == TOK_IDENT) {
          // Beware: An identifier may be a macro also;
@@ -127,18 +127,18 @@ static long DoStructInternal(long Offs, unsigned Type)
             continue;
          }
 
-         /* We have an identifier, generate a symbol */
+         // We have an identifier, generate a symbol
          Sym = SymFind(CurrentScope, &CurTok.SVal, SYM_ALLOC_NEW);
 
-         /* Assign the symbol the offset of the current member */
+         // Assign the symbol the offset of the current member
          SymDef(Sym, GenLiteralExpr(Offs), ADDR_SIZE_DEFAULT, SF_NONE);
 
-         /* Skip the member name */
+         // Skip the member name
          NextTok();
       }
 
-      /* Read the storage allocator */
-      MemberSize = 0; /* In case of errors or .ORG, use zero */
+      // Read the storage allocator
+      MemberSize = 0; // In case of errors or .ORG, use zero
       switch (CurTok.Tok) {
          case TOK_BYTE:
             NextTok();
@@ -180,7 +180,7 @@ static long DoStructInternal(long Offs, unsigned Type)
             else {
                Offs = ConstExpression();
 
-               /* Check the address for a reasonable value */
+               // Check the address for a reasonable value
                if (Offs >= 0x1000000) {
                   ErrorSkip("Range error");
                   Offs = 0;
@@ -218,30 +218,30 @@ static long DoStructInternal(long Offs, unsigned Type)
 
          default:
             if (!CheckConditionals()) {
-               /* Not a conditional directive */
+               // Not a conditional directive
                ErrorSkip("Invalid storage allocator in struct/union");
             }
       }
 
-      /* Assign the size to the member if it has a name */
+      // Assign the size to the member if it has a name
       if (Sym) {
          DefSizeOfSymbol(Sym, MemberSize);
       }
 
-      /* Next member */
+      // Next member
       if (Type == STRUCT) {
-         /* Struct */
+         // Struct
          Offs += MemberSize;
          Size += MemberSize;
       }
       else {
-         /* Union */
+         // Union
          if (MemberSize > Size) {
             Size = MemberSize;
          }
       }
 
-      /* Expect end of line */
+      // Expect end of line
       ConsumeSep();
    }
 
@@ -251,15 +251,15 @@ static long DoStructInternal(long Offs, unsigned Type)
    // by user code.
    // Leave the struct scope level.
    if (!Anon) {
-      /* Add a symbol */
+      // Add a symbol
       SymEntry *SizeSym = GetSizeOfScope(CurrentScope);
       SymDef(SizeSym, GenLiteralExpr(Size), ADDR_SIZE_DEFAULT, SF_NONE);
 
-      /* Close the struct scope */
+      // Close the struct scope
       SymLeaveLevel();
    }
 
-   /* End of struct/union definition */
+   // End of struct/union definition
    if (Type == STRUCT) {
       Consume(TOK_ENDSTRUCT, "'.ENDSTRUCT' expected");
    }
@@ -267,12 +267,12 @@ static long DoStructInternal(long Offs, unsigned Type)
       Consume(TOK_ENDUNION, "'.ENDUNION' expected");
    }
 
-   /* Return the size of the struct */
+   // Return the size of the struct
    return Size;
 }
 
 long GetStructSize(SymTable *Struct)
-/* Get the size of a struct or union */
+// Get the size of a struct or union
 {
    SymEntry *SizeSym = FindSizeOfScope(Struct);
    if (SizeSym == 0) {
@@ -285,13 +285,13 @@ long GetStructSize(SymTable *Struct)
 }
 
 void DoStruct(void)
-/* Handle the .STRUCT command */
+// Handle the .STRUCT command
 {
    DoStructInternal(0, STRUCT);
 }
 
 void DoUnion(void)
-/* Handle the .UNION command */
+// Handle the .UNION command
 {
    DoStructInternal(0, UNION);
 }

@@ -1,34 +1,34 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                paravirt.c                                 */
-/*                                                                           */
-/*                Paravirtualization for the sim65 6502 simulator            */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2013-2013 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                paravirt.c
+//
+//                Paravirtualization for the sim65 6502 simulator
+//
+//
+//
+// (C) 2013-2013 Ullrich von Bassewitz
+//               Roemerstrasse 52
+//               D-70794 Filderstadt
+// EMail:        uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <string.h>
@@ -41,10 +41,10 @@
 #define O_INITIAL 0
 #endif
 #if defined(_MSC_VER)
-/* Microsoft compiler */
+// Microsoft compiler
 #include <io.h>
 #else
-/* Anyone else */
+// Anyone else
 #include <unistd.h>
 #endif
 #ifndef S_IREAD
@@ -54,19 +54,19 @@
 #define S_IWRITE S_IWUSR
 #endif
 
-/* common */
+// common
 #include "cmdline.h"
 #include "print.h"
 #include "xmalloc.h"
 
-/* sim65 */
+// sim65
 #include "6502.h"
 #include "error.h"
 #include "memory.h"
 #include "paravirt.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
 typedef void (*PVFunc)(CPURegs *Regs);
@@ -75,7 +75,7 @@ static unsigned ArgStart;
 static unsigned char SPAddr;
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 static unsigned GetAX(CPURegs *Regs) { return Regs->AC + (Regs->XR << 8); }
@@ -99,7 +99,7 @@ static unsigned PopParam(unsigned char Incr) {
 
 static void PVExit(CPURegs *Regs) {
    Print(stderr, 1, "PVExit ($%02X)\n", Regs->AC);
-   SimExit(Regs->AC); /* Error code in range 0-255. */
+   SimExit(Regs->AC); // Error code in range 0-255.
 }
 
 static void PVArgs(CPURegs *Regs) {
@@ -130,7 +130,7 @@ static void PVArgs(CPURegs *Regs) {
    SetAX(Regs, ArgC);
 }
 
-/* Match between standard POSIX whence and cc65 whence. */
+// Match between standard POSIX whence and cc65 whence.
 static unsigned SEEK_MODE_MATCH[3] = {SEEK_CUR, SEEK_END, SEEK_SET};
 
 static void PVLseek(CPURegs *Regs) {
@@ -315,27 +315,27 @@ static const PVFunc Hooks[] = {
 };
 
 void ParaVirtInit(unsigned aArgStart, unsigned char aSPAddr)
-/* Initialize the paravirtualization subsystem */
+// Initialize the paravirtualization subsystem
 {
    ArgStart = aArgStart;
    SPAddr = aSPAddr;
 };
 
 void ParaVirtHooks(CPURegs *Regs)
-/* Potentially execute paravirtualization hooks */
+// Potentially execute paravirtualization hooks
 {
    unsigned lo;
 
-   /* Check for paravirtualization address range */
+   // Check for paravirtualization address range
    if (Regs->PC < PARAVIRT_BASE ||
        Regs->PC >= PARAVIRT_BASE + sizeof(Hooks) / sizeof(Hooks[0])) {
       return;
    }
 
-   /* Call paravirtualization hook */
+   // Call paravirtualization hook
    Hooks[Regs->PC - PARAVIRT_BASE](Regs);
 
-   /* Simulate RTS */
+   // Simulate RTS
    lo = Pop(Regs);
    Regs->PC = lo + (Pop(Regs) << 8) + 1;
 }

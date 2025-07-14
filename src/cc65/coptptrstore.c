@@ -1,62 +1,62 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                               coptptrstore.c                              */
-/*                                                                           */
-/*                      Optimize stores through pointers                     */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2012,      Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                               coptptrstore.c
+//
+//                      Optimize stores through pointers
+//
+//
+//
+// (C) 2012,      Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <string.h>
 
-/* common */
+// common
 #include "chartype.h"
 #include "strbuf.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
 
-/* cc65 */
+// cc65
 #include "codeent.h"
 #include "codeinfo.h"
 #include "coptptrstore.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                             Helper functions                              */
+//                             Helper functions
 ////////////////////////////////////////////////////////////////////////////////
 
 static unsigned OptPtrStore1Sub(CodeSeg *S, unsigned I, CodeEntry **const L)
-/* Check if this is one of the allowed suboperation for OptPtrStore1 */
+// Check if this is one of the allowed suboperation for OptPtrStore1
 {
-   /* Check for a label attached to the entry */
+   // Check for a label attached to the entry
    if (CE_HasLabel(L[0])) {
       return 0;
    }
 
-   /* Check for single insn sub ops */
+   // Check for single insn sub ops
    if (L[0]->OPC == OP65_AND || L[0]->OPC == OP65_EOR ||
        L[0]->OPC == OP65_ORA ||
        (L[0]->OPC == OP65_JSR &&
@@ -64,7 +64,7 @@ static unsigned OptPtrStore1Sub(CodeSeg *S, unsigned I, CodeEntry **const L)
          strncmp(L[0]->Arg, "shrax", 5) == 0) &&
         strlen(L[0]->Arg) == 6 && IsDigit(L[0]->Arg[5]))) {
 
-      /* One insn */
+      // One insn
       return 1;
    }
    else if (L[0]->OPC == OP65_CLC && (L[1] = CS_GetNextEntry(S, I)) != 0 &&
@@ -76,7 +76,7 @@ static unsigned OptPtrStore1Sub(CodeSeg *S, unsigned I, CodeEntry **const L)
       return 2;
    }
 
-   /* Not found */
+   // Not found
    return 0;
 }
 
@@ -95,12 +95,12 @@ static const char *LoadAXZP(CodeSeg *S, unsigned I)
        memcmp(L[0]->Arg, L[1]->Arg, Len) == 0 && L[1]->Arg[Len] == '+' &&
        L[1]->Arg[Len + 1] == '1') {
 
-      /* Return the label */
+      // Return the label
       return L[0]->Arg;
    }
    else {
 
-      /* Not found */
+      // Not found
       return 0;
    }
 }
@@ -118,19 +118,19 @@ static const char *LoadAXImm(CodeSeg *S, unsigned I)
    CodeEntry *XLoad;
    unsigned Len;
 
-   /* Fetch entry at I and check if A/X is known */
+   // Fetch entry at I and check if A/X is known
    L[0] = CS_GetEntry(S, I);
    if (L[0] != 0 && RegValIsKnown(L[0]->RI->In.RegA) &&
        RegValIsKnown(L[0]->RI->In.RegX)) {
 
-      /* Numeric argument - get low and high byte */
+      // Numeric argument - get low and high byte
       unsigned Lo = (L[0]->RI->In.RegA & 0xFF);
       unsigned Hi = (L[0]->RI->In.RegX & 0xFF);
 
-      /* Format into buffer */
+      // Format into buffer
       SB_Printf(&Buf, "$%04X", Lo | (Hi << 8));
 
-      /* Return the address as a string */
+      // Return the address as a string
       return SB_GetConstBuf(&Buf);
    }
 
@@ -140,54 +140,54 @@ static const char *LoadAXImm(CodeSeg *S, unsigned I)
    ALoad = 0;
    XLoad = 0;
    while (I-- > 0) {
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Check for the loads of A and X */
+      // Check for the loads of A and X
       if (ALoad == 0 && E->OPC == OP65_LDA && E->AM == AM65_IMM) {
          ALoad = E;
       }
       else if (E->Chg & REG_A) {
-         /* A is changed before we get the load */
+         // A is changed before we get the load
          return 0;
       }
       else if (XLoad == 0 && E->OPC == OP65_LDX && E->AM == AM65_IMM) {
          XLoad = E;
       }
       else if (E->Chg & REG_X) {
-         /* X is changed before we get the load */
+         // X is changed before we get the load
          return 0;
       }
 
       if (ALoad != 0 && XLoad != 0) {
-         /* We have both */
+         // We have both
          break;
       }
 
-      /* If we have a label, before both are found, bail out */
+      // If we have a label, before both are found, bail out
       if (CE_HasLabel(E)) {
          return 0;
       }
    }
 
-   /* Check for a load of a label address */
+   // Check for a load of a label address
    if ((Len = strlen(ALoad->Arg)) > 3 && ALoad->Arg[0] == '<' &&
        ALoad->Arg[1] == '(' && strlen(XLoad->Arg) == Len &&
        XLoad->Arg[0] == '>' &&
        memcmp(ALoad->Arg + 1, XLoad->Arg + 1, Len - 1) == 0) {
 
-      /* Load of an address label */
+      // Load of an address label
       SB_CopyBuf(&Buf, ALoad->Arg + 2, Len - 3);
       SB_Terminate(&Buf);
       return SB_GetConstBuf(&Buf);
    }
 
-   /* Not found */
+   // Not found
    return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptPtrStore1(CodeSeg *S)
@@ -238,16 +238,16 @@ unsigned OptPtrStore1(CodeSeg *S)
    unsigned Changes = 0;
    unsigned I;
 
-   /* Walk over the entries */
+   // Walk over the entries
    I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[9];
 
-      /* Get next entry */
+      // Get next entry
       L[0] = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if (L[0]->OPC == OP65_CLC && CS_GetEntries(S, L + 1, I + 1, 8) &&
           L[1]->OPC == OP65_ADC &&
           (L[1]->AM == AM65_ABS || L[1]->AM == AM65_ZP ||
@@ -265,7 +265,7 @@ unsigned OptPtrStore1(CodeSeg *S)
          const char *Loc;
          am_t AM;
 
-         /* Track the insertion point */
+         // Track the insertion point
          unsigned IP = I + 9;
          if ((Loc = LoadAXZP(S, I)) != 0) {
             // If the sequence is preceeded by a load of a ZP value,
@@ -285,7 +285,7 @@ unsigned OptPtrStore1(CodeSeg *S)
          // ptr1 in this case.
          if (Loc == 0) {
 
-            /* Must use ptr1 */
+            // Must use ptr1
             Loc = "ptr1";
             AM = AM65_ZP_INDY;
 
@@ -321,21 +321,21 @@ unsigned OptPtrStore1(CodeSeg *S)
          X = NewCodeEntry(OP65_STA, AM, Loc, 0, L[8]->LI);
          CS_InsertEntry(S, X, IP++);
 
-         /* Remove the old code */
+         // Remove the old code
          CS_DelEntries(S, I, 9);
 
-         /* Skip most of the generated replacement code */
+         // Skip most of the generated replacement code
          I += 3;
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -392,16 +392,16 @@ unsigned OptPtrStore2(CodeSeg *S)
    unsigned Changes = 0;
    unsigned I;
 
-   /* Walk over the entries */
+   // Walk over the entries
    I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[10];
 
-      /* Get next entry */
+      // Get next entry
       L[0] = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if (L[0]->OPC == OP65_CLC && CS_GetEntries(S, L + 1, I + 1, 9) &&
           L[1]->OPC == OP65_ADC &&
           (L[1]->AM == AM65_ABS || L[1]->AM == AM65_ZP ||
@@ -424,7 +424,7 @@ unsigned OptPtrStore2(CodeSeg *S)
          const char *Loc;
          am_t AM;
 
-         /* Track the insertion point */
+         // Track the insertion point
          unsigned IP = I + 10;
          if ((Loc = LoadAXZP(S, I)) != 0) {
             // If the sequence is preceeded by a load of a ZP value,
@@ -444,7 +444,7 @@ unsigned OptPtrStore2(CodeSeg *S)
          // ptr1 in this case.
          if (Loc == 0) {
 
-            /* Must use ptr1 */
+            // Must use ptr1
             Loc = "ptr1";
             AM = AM65_ZP_INDY;
 
@@ -471,7 +471,7 @@ unsigned OptPtrStore2(CodeSeg *S)
          // the A register when loading Y the second time.
          if (L[1]->AM != AM65_ZP_INDY) {
 
-            /* Case 1 */
+            // Case 1
             Arg = MakeHexArg(L[5]->Num - 2);
             X = NewCodeEntry(OP65_LDY, AM65_IMM, Arg, 0, L[5]->LI);
             CS_InsertEntry(S, X, IP++);
@@ -490,7 +490,7 @@ unsigned OptPtrStore2(CodeSeg *S)
          }
          else if (AM == AM65_ABSY) {
 
-            /* Case 2 */
+            // Case 2
             X = NewCodeEntry(OP65_LDA, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
             CS_InsertEntry(S, X, IP++);
 
@@ -512,7 +512,7 @@ unsigned OptPtrStore2(CodeSeg *S)
          }
          else {
 
-            /* Case 3 */
+            // Case 3
             Arg = MakeHexArg(L[5]->Num - 2);
             X = NewCodeEntry(OP65_LDY, AM65_IMM, Arg, 0, L[5]->LI);
             CS_InsertEntry(S, X, IP++);
@@ -543,21 +543,21 @@ unsigned OptPtrStore2(CodeSeg *S)
             CS_InsertEntry(S, X, IP++);
          }
 
-         /* Remove the old code */
+         // Remove the old code
          CS_DelEntries(S, I, 10);
 
-         /* Skip most of the generated replacement code */
+         // Skip most of the generated replacement code
          I += 4;
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -587,17 +587,17 @@ unsigned OptPtrStore3(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       unsigned K;
       CodeEntry *L[10];
 
-      /* Get next entry */
+      // Get next entry
       L[0] = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if (CE_IsCallTo(L[0], "pushax") && CS_GetEntries(S, L + 1, I + 1, 3) &&
           L[1]->OPC == OP65_LDY && CE_IsConstImm(L[1]) && !CE_HasLabel(L[1]) &&
           CE_IsCallTo(L[2], "ldauidx") && !CE_HasLabel(L[2]) &&
@@ -629,27 +629,27 @@ unsigned OptPtrStore3(CodeSeg *S)
                    P[1]->Arg[Len + 0] == '+' && P[1]->Arg[Len + 1] == '1' &&
                    P[1]->Arg[Len + 2] == '\0') {
 
-                  /* Ok, found. Use the name of the register bank */
+                  // Ok, found. Use the name of the register bank
                   RegBank = ZPLoc = P[0]->Arg;
                }
             }
          }
 
-         /* Insert the load via the zp pointer */
+         // Insert the load via the zp pointer
          X = NewCodeEntry(OP65_LDX, AM65_IMM, "$00", 0, L[3]->LI);
          CS_InsertEntry(S, X, I + 3);
          X = NewCodeEntry(OP65_LDA, AM65_ZP_INDY, ZPLoc, 0, L[2]->LI);
          CS_InsertEntry(S, X, I + 4);
 
-         /* Insert the store through the zp pointer */
+         // Insert the store through the zp pointer
          X = NewCodeEntry(OP65_STA, AM65_ZP_INDY, ZPLoc, 0, L[3]->LI);
          CS_InsertEntry(S, X, I + 6 + K);
 
-         /* Delete the old code */
-         CS_DelEntry(S, I + 7 + K); /* jsr spaspidx */
-         CS_DelEntry(S, I + 2);     /* jsr ldauidx */
+         // Delete the old code
+         CS_DelEntry(S, I + 7 + K); // jsr spaspidx
+         CS_DelEntry(S, I + 2);     // jsr ldauidx
 
-         /* Create and insert the stores into the zp pointer if needed */
+         // Create and insert the stores into the zp pointer if needed
          if (RegBank == 0) {
             X = NewCodeEntry(OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
             CS_InsertEntry(S, X, I + 1);
@@ -659,16 +659,16 @@ unsigned OptPtrStore3(CodeSeg *S)
 
          // Delete more old code. Do it here to keep a label attached to
          // entry I in place.
-         CS_DelEntry(S, I); /* jsr pushax */
+         CS_DelEntry(S, I); // jsr pushax
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }

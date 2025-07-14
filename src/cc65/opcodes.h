@@ -1,47 +1,47 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 opcodes.h                                 */
-/*                                                                           */
-/*                  Opcode and addressing mode definitions                   */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2004 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 opcodes.h
+//
+//                  Opcode and addressing mode definitions
+//
+//
+//
+// (C) 2001-2004 Ullrich von Bassewitz
+//               Roemerstrasse 52
+//               D-70794 Filderstadt
+// EMail:        uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef OPCODES_H
 #define OPCODES_H
 
-/* common */
+// common
 #include "inline.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* 65XX opcodes */
+// 65XX opcodes
 typedef enum {
    OP65_ADC,
    OP65_AND,
@@ -106,7 +106,7 @@ typedef enum {
    OP65_SED,
    OP65_SEI,
    OP65_STA,
-   OP65_STP, /* 65c02, 65816 stop */
+   OP65_STP, // 65c02, 65816 stop
    OP65_STX,
    OP65_STY,
    OP65_STZ,
@@ -119,73 +119,73 @@ typedef enum {
    OP65_TXS,
    OP65_TYA,
 
-   /* Number of opcodes available */
+   // Number of opcodes available
    OP65_COUNT,
 
-   /* Invalid opcode */
+   // Invalid opcode
    OP65_INVALID = OP65_COUNT,
 } opc_t;
 
-/* 65XX addressing modes */
+// 65XX addressing modes
 typedef enum {
-   AM65_IMP,     /* implicit */
-   AM65_ACC,     /* accumulator */
-   AM65_IMM,     /* immediate */
-   AM65_ZP,      /* zeropage */
-   AM65_ZPX,     /* zeropage,X */
-   AM65_ZPY,     /* zeropage,Y */
-   AM65_ABS,     /* absolute */
-   AM65_ABSX,    /* absolute,X */
-   AM65_ABSY,    /* absolute,Y */
-   AM65_ZPX_IND, /* (zeropage,x) */
-   AM65_ZP_INDY, /* (zeropage),y */
-   AM65_ZP_IND,  /* (zeropage) */
-   AM65_BRA      /* branch */
+   AM65_IMP,     // implicit
+   AM65_ACC,     // accumulator
+   AM65_IMM,     // immediate
+   AM65_ZP,      // zeropage
+   AM65_ZPX,     // zeropage,X
+   AM65_ZPY,     // zeropage,Y
+   AM65_ABS,     // absolute
+   AM65_ABSX,    // absolute,X
+   AM65_ABSY,    // absolute,Y
+   AM65_ZPX_IND, // (zeropage,x)
+   AM65_ZP_INDY, // (zeropage),y
+   AM65_ZP_IND,  // (zeropage)
+   AM65_BRA      // branch
 } am_t;
 
-/* Branch conditions */
+// Branch conditions
 typedef enum { BC_CC, BC_CS, BC_EQ, BC_MI, BC_NE, BC_PL, BC_VC, BC_VS } bc_t;
 
-/* Opcode info */
-#define OF_NONE 0x0000U       /* No additional information */
-#define OF_UBRA 0x0001U       /* Unconditional branch */
-#define OF_CBRA 0x0002U       /* Conditional branch */
-#define OF_ZBRA 0x0004U       /* Branch on zero flag condition */
-#define OF_FBRA 0x0008U       /* Branch on cond set by a load */
-#define OF_LBRA 0x0010U       /* Jump/branch is long */
-#define OF_RET 0x0020U        /* Return from function */
-#define OF_LOAD 0x0040U       /* Register load */
-#define OF_STORE 0x0080U      /* Register store */
-#define OF_XFR 0x0100U        /* Transfer instruction */
-#define OF_CALL 0x0200U       /* A subroutine call */
-#define OF_REG_INCDEC 0x0400U /* A register increment or decrement */
+// Opcode info
+#define OF_NONE 0x0000U       // No additional information
+#define OF_UBRA 0x0001U       // Unconditional branch
+#define OF_CBRA 0x0002U       // Conditional branch
+#define OF_ZBRA 0x0004U       // Branch on zero flag condition
+#define OF_FBRA 0x0008U       // Branch on cond set by a load
+#define OF_LBRA 0x0010U       // Jump/branch is long
+#define OF_RET 0x0020U        // Return from function
+#define OF_LOAD 0x0040U       // Register load
+#define OF_STORE 0x0080U      // Register store
+#define OF_XFR 0x0100U        // Transfer instruction
+#define OF_CALL 0x0200U       // A subroutine call
+#define OF_REG_INCDEC 0x0400U // A register increment or decrement
 #define OF_SETF                                                                \
-   0x0800U /* Insn will set both Z and N flags according to the result */
-#define OF_CMP 0x1000U   /* A compare A/X/Y instruction */
-#define OF_NOIMP 0x2000U /* Implicit addressing mode is actually A */
-#define OF_READ 0x4000U  /* Read from the memory address */
-#define OF_WRITE 0x8000U /* Write to the memory address */
+   0x0800U // Insn will set both Z and N flags according to the result
+#define OF_CMP 0x1000U   // A compare A/X/Y instruction
+#define OF_NOIMP 0x2000U // Implicit addressing mode is actually A
+#define OF_READ 0x4000U  // Read from the memory address
+#define OF_WRITE 0x8000U // Write to the memory address
 
-/* Combined infos */
-#define OF_BRA (OF_UBRA | OF_CBRA)  /* Operation is a jump/branch */
-#define OF_DEAD (OF_UBRA | OF_RET)  /* Dead end - no exec behind this point */
-#define OF_RMW (OF_READ | OF_WRITE) /* Read, Modify and Write */
+// Combined infos
+#define OF_BRA (OF_UBRA | OF_CBRA)  // Operation is a jump/branch
+#define OF_DEAD (OF_UBRA | OF_RET)  // Dead end - no exec behind this point
+#define OF_RMW (OF_READ | OF_WRITE) // Read, Modify and Write
 
-/* Opcode description */
+// Opcode description
 typedef struct {
-   opc_t OPC;           /* Opcode */
-   char Mnemo[9];       /* Mnemonic */
-   unsigned char Size;  /* Size, 0 = check addressing mode */
-   unsigned short Info; /* Additional information */
-   unsigned int Use;    /* Registers used by this insn */
-   unsigned int Chg;    /* Registers changed by this insn */
+   opc_t OPC;           // Opcode
+   char Mnemo[9];       // Mnemonic
+   unsigned char Size;  // Size, 0 = check addressing mode
+   unsigned short Info; // Additional information
+   unsigned int Use;    // Registers used by this insn
+   unsigned int Chg;    // Registers changed by this insn
 } OPCDesc;
 
-/* Opcode description table */
+// Opcode description table
 extern const OPCDesc OPCTable[OP65_COUNT];
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 const OPCDesc *FindOP65(const char *OPC);
@@ -193,13 +193,13 @@ const OPCDesc *FindOP65(const char *OPC);
 // not found, NULL is returned.
 
 unsigned GetInsnSize(opc_t OPC, am_t AM);
-/* Return the size of the given instruction */
+// Return the size of the given instruction
 
 #if defined(HAVE_INLINE)
 INLINE const OPCDesc *GetOPCDesc(opc_t OPC)
-/* Get an opcode description */
+// Get an opcode description
 {
-   /* Return the description */
+   // Return the description
    return &OPCTable[OPC];
 }
 #else
@@ -208,9 +208,9 @@ INLINE const OPCDesc *GetOPCDesc(opc_t OPC)
 
 #if defined(HAVE_INLINE)
 INLINE unsigned GetOPCInfo(opc_t OPC)
-/* Get opcode information */
+// Get opcode information
 {
-   /* Return the info */
+   // Return the info
    return OPCTable[OPC].Info;
 }
 #else
@@ -222,7 +222,7 @@ unsigned char GetAMUseInfo(am_t AM);
 // index registers return REG_r info for these registers).
 
 opc_t GetInverseBranch(opc_t OPC);
-/* Return a branch that reverse the condition of the branch given in OPC */
+// Return a branch that reverse the condition of the branch given in OPC
 
 opc_t MakeShortBranch(opc_t OPC);
 // Return the short version of the given branch. If the branch is already
@@ -233,11 +233,11 @@ opc_t MakeLongBranch(opc_t OPC);
 // a long branch, return the opcode unchanged.
 
 bc_t GetBranchCond(opc_t OPC);
-/* Get the condition for the conditional branch in OPC */
+// Get the condition for the conditional branch in OPC
 
 bc_t GetInverseCond(bc_t BC);
-/* Return the inverse condition of the given one */
+// Return the inverse condition of the given one
 
-/* End of opcodes.h */
+// End of opcodes.h
 
 #endif

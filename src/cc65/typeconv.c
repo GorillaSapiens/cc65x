@@ -1,40 +1,40 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                typeconv.c                                 */
-/*                                                                           */
-/*                          Handle type conversions                          */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2002-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                typeconv.c
+//
+//                          Handle type conversions
+//
+//
+//
+// (C) 2002-2008 Ullrich von Bassewitz
+//               Roemerstrasse 52
+//               D-70794 Filderstadt
+// EMail:        uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
-/* common */
+// common
 #include "shift.h"
 
-/* cc65 */
+// cc65
 #include "codegen.h"
 #include "datatype.h"
 #include "declare.h"
@@ -46,27 +46,27 @@
 #include "typeconv.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 static void DoConversion(ExprDesc *Expr, const Type *NewType, int Explicit)
-/* Emit code to convert the given expression to a new type. */
+// Emit code to convert the given expression to a new type.
 {
    const Type *OldType;
    unsigned OldBits;
    unsigned NewBits;
 
-   /* Remember the old type */
+   // Remember the old type
    OldType = Expr->Type;
 
    // If we're converting to void, we're done. Note: This does also cover a
    // conversion void -> void.
    if (IsTypeVoid(NewType)) {
-      ED_MarkExprAsRVal(Expr); /* Never an lvalue */
+      ED_MarkExprAsRVal(Expr); // Never an lvalue
       goto ExitPoint;
    }
 
-   /* Don't allow casts from void to something else. */
+   // Don't allow casts from void to something else.
    if (IsTypeVoid(OldType)) {
       Error("Cannot convert from 'void' to something else");
       goto ExitPoint;
@@ -81,13 +81,13 @@ static void DoConversion(ExprDesc *Expr, const Type *NewType, int Explicit)
       OldBits = CheckedSizeOf(OldType) * CHAR_BITS;
    }
 
-   /* If the new type is a bit-field, we use its underlying type instead */
+   // If the new type is a bit-field, we use its underlying type instead
    if (IsTypeBitField(NewType)) {
       NewType = GetUnderlyingType(NewType);
    }
    NewBits = CheckedSizeOf(NewType) * CHAR_BITS;
 
-   /* lvalue? */
+   // lvalue?
    if (ED_IsLVal(Expr)) {
 
       // We have an lvalue. If the new size is smaller than the old one,
@@ -98,13 +98,13 @@ static void DoConversion(ExprDesc *Expr, const Type *NewType, int Explicit)
       // If both sizes are equal, do also leave the value alone.
       // If the new size is larger, we must convert the value.
       if (NewBits > OldBits) {
-         /* Load the value into the primary */
+         // Load the value into the primary
          LoadExpr(CF_NONE, Expr);
 
-         /* Emit typecast code */
+         // Emit typecast code
          g_typecast(CG_TypeOf(NewType), CG_TypeOf(OldType));
 
-         /* Value is now in primary and an rvalue */
+         // Value is now in primary and an rvalue
          ED_FinalizeRValLoad(Expr);
       }
    }
@@ -131,13 +131,13 @@ static void DoConversion(ExprDesc *Expr, const Type *NewType, int Explicit)
       if (NewBits <= OldBits) {
          long OldVal = Expr->IVal;
 
-         /* Cut the value to the new size */
+         // Cut the value to the new size
          Expr->IVal &= (0xFFFFFFFFUL >> (32 - NewBits));
 
-         /* If the new type is signed, sign extend the value */
+         // If the new type is signed, sign extend the value
          if (IsSignSigned(NewType)) {
             if (Expr->IVal & (0x01UL << (NewBits - 1))) {
-               /* Beware: Use the safe shift routine here. */
+               // Beware: Use the safe shift routine here.
                Expr->IVal |= shl_l(~0UL, NewBits);
             }
          }
@@ -150,7 +150,7 @@ static void DoConversion(ExprDesc *Expr, const Type *NewType, int Explicit)
          }
       }
 
-      /* Do the integer constant <-> absolute address conversion if necessary */
+      // Do the integer constant <-> absolute address conversion if necessary
       if (IsClassPtr(NewType)) {
          Expr->Flags &= ~E_MASK_LOC;
          Expr->Flags |= E_LOC_ABS | E_ADDRESS_OF;
@@ -167,19 +167,19 @@ static void DoConversion(ExprDesc *Expr, const Type *NewType, int Explicit)
       // correctly.
       if (OldBits != NewBits) {
 
-         /* Load the value into the primary */
+         // Load the value into the primary
          LoadExpr(CF_NONE, Expr);
 
-         /* Emit typecast code. */
+         // Emit typecast code.
          g_typecast(CG_TypeOf(NewType), CG_TypeOf(OldType));
 
-         /* Value is now an rvalue in the primary */
+         // Value is now an rvalue in the primary
          ED_FinalizeRValLoad(Expr);
       }
    }
 
 ExitPoint:
-   /* The expression has always the new type */
+   // The expression has always the new type
    ReplaceType(Expr, NewType);
 }
 
@@ -189,7 +189,7 @@ void TypeConversion(ExprDesc *Expr, const Type *NewType)
 // impossible.
 {
 #if 0
-    /* Debugging */
+    // Debugging
     printf ("Expr:\n=======================================\n");
     PrintExprDesc (stdout, Expr);
     printf ("Type:\n=======================================\n");
@@ -197,31 +197,31 @@ void TypeConversion(ExprDesc *Expr, const Type *NewType)
     printf ("\n");
     PrintRawType (stdout, NewType);
 #endif
-   /* First, do some type checking */
+   // First, do some type checking
    typecmp_t Result = TYPECMP_INITIALIZER;
    int HasError = 0;
    const char *Msg = 0;
    const Type *OldType = Expr->Type;
 
-   /* If one of the sides is of type void, it is an error */
+   // If one of the sides is of type void, it is an error
    if (IsTypeVoid(NewType) || IsTypeVoid(OldType)) {
       HasError = 1;
    }
 
-   /* If both types are the same, no conversion is needed */
+   // If both types are the same, no conversion is needed
    Result = TypeCmp(NewType, OldType);
    if (Result.C < TC_IDENTICAL &&
        (IsTypeArray(OldType) || IsTypeFunc(OldType))) {
-      /* If Expr is an array or a function, convert it to a pointer */
+      // If Expr is an array or a function, convert it to a pointer
       Expr->Type = PtrConversion(Expr->Type);
-      /* Recompare */
+      // Recompare
       Result = TypeCmp(NewType, Expr->Type);
    }
 
-   /* Check for conversion problems */
+   // Check for conversion problems
    if (IsClassInt(NewType)) {
 
-      /* Handle conversions to int type */
+      // Handle conversions to int type
       if (IsClassPtr(Expr->Type)) {
          Warning("Converting pointer to integer without a cast");
       }
@@ -236,7 +236,7 @@ void TypeConversion(ExprDesc *Expr, const Type *NewType)
    }
    else if (IsClassPtr(NewType)) {
 
-      /* Handle conversions to pointer type */
+      // Handle conversions to pointer type
       if (IsClassPtr(Expr->Type)) {
 
          // Implicit pointer-to-pointer conversion is valid, if:
@@ -246,7 +246,7 @@ void TypeConversion(ExprDesc *Expr, const Type *NewType)
          // Note: We additionally allow converting function pointers to and from
          // void pointers, just with warnings.
          if (Result.C == TC_PTR_SIGN_DIFF) {
-            /* Specific warning for pointer signedness difference */
+            // Specific warning for pointer signedness difference
             if (IS_Get(&WarnPointerSign)) {
                TypeCompatibilityDiagnostic(NewType, Expr->Type, 0,
                                            "Pointer conversion to '%s' from "
@@ -255,7 +255,7 @@ void TypeConversion(ExprDesc *Expr, const Type *NewType)
          }
          else if ((Result.C <= TC_PTR_INCOMPATIBLE ||
                    (Result.F & TCF_INCOMPATIBLE_QUAL) != 0)) {
-            /* Incompatible pointee types or qualifiers */
+            // Incompatible pointee types or qualifiers
             if (IS_Get(&WarnPointerTypes)) {
                TypeCompatibilityDiagnostic(
                    NewType, Expr->Type, 0,
@@ -264,14 +264,14 @@ void TypeConversion(ExprDesc *Expr, const Type *NewType)
          }
 
          if ((Result.F & TCF_PTR_QUAL_DIFF) != 0) {
-            /* Discarding qualifiers is a bad thing and we always warn */
+            // Discarding qualifiers is a bad thing and we always warn
             TypeCompatibilityDiagnostic(
                 NewType, Expr->Type, 0,
                 "Pointer conversion to '%s' from '%s' discards qualifiers");
          }
       }
       else if (IsClassInt(Expr->Type)) {
-         /* Int to pointer conversion is valid only for constant zero */
+         // Int to pointer conversion is valid only for constant zero
          if (!ED_IsConstAbsInt(Expr) || Expr->IVal != 0) {
             Warning("Converting integer to pointer without a cast");
          }
@@ -281,11 +281,11 @@ void TypeConversion(ExprDesc *Expr, const Type *NewType)
       }
    }
    else if (Result.C < TC_IDENTICAL) {
-      /* Invalid automatic conversion */
+      // Invalid automatic conversion
       HasError = 1;
    }
 
-   /* Set default diagnostic message */
+   // Set default diagnostic message
    if (Msg == 0) {
       Msg = "Converting to '%s' from '%s'";
    }
@@ -294,9 +294,9 @@ void TypeConversion(ExprDesc *Expr, const Type *NewType)
       TypeCompatibilityDiagnostic(NewType, OldType, 1, Msg);
    }
    else {
-      /* Both types must be complete */
+      // Both types must be complete
       if (!IsIncompleteESUType(NewType) && !IsIncompleteESUType(Expr->Type)) {
-         /* Do the actual conversion */
+         // Do the actual conversion
          DoConversion(Expr, NewType, 0);
       }
       else {
@@ -316,20 +316,20 @@ void TypeConversion(ExprDesc *Expr, const Type *NewType)
 }
 
 void TypeCast(ExprDesc *Expr)
-/* Handle an explicit cast. */
+// Handle an explicit cast.
 {
    Type NewType[MAXTYPELEN];
 
-   /* Read the type enclosed in parentheses */
+   // Read the type enclosed in parentheses
    ParseType(NewType);
 
-   /* Read the expression we have to cast */
+   // Read the expression we have to cast
    hie10(Expr);
 
-   /* Only allow casts to arithmetic, pointer or void types */
+   // Only allow casts to arithmetic, pointer or void types
    if (IsCastType(NewType)) {
       if (!IsIncompleteESUType(NewType)) {
-         /* Convert functions and arrays to "pointer to" object */
+         // Convert functions and arrays to "pointer to" object
          Expr->Type = PtrConversion(Expr->Type);
 
          if (TypeCmp(NewType, Expr->Type).C >= TC_PTR_INCOMPATIBLE) {
@@ -338,7 +338,7 @@ void TypeCast(ExprDesc *Expr)
             ReplaceType(Expr, NewType);
          }
          else if (IsCastType(Expr->Type)) {
-            /* Convert the value. The result has always the new type */
+            // Convert the value. The result has always the new type
             DoConversion(Expr, NewType, 1);
          }
          else {
@@ -356,34 +356,34 @@ void TypeCast(ExprDesc *Expr)
             GetBasicTypeName(NewType));
    }
 
-   /* If the new type is void, the cast expression can have no effects */
+   // If the new type is void, the cast expression can have no effects
    if (IsTypeVoid(NewType)) {
       Expr->Flags |= E_EVAL_MAYBE_UNUSED;
    }
 
-   /* The result is always an rvalue */
+   // The result is always an rvalue
    ED_MarkExprAsRVal(Expr);
 }
 
 static void ComposeFuncParamList(const FuncDesc *F1, const FuncDesc *F2)
-/* Compose two function symbol tables regarding function parameters into F1 */
+// Compose two function symbol tables regarding function parameters into F1
 {
-   /* Get the symbol tables */
+   // Get the symbol tables
    const SymTable *Tab1 = F1->SymTab;
    const SymTable *Tab2 = F2->SymTab;
 
-   /* Compose the parameter lists */
+   // Compose the parameter lists
    SymEntry *Sym1 = Tab1->SymHead;
    SymEntry *Sym2 = Tab2->SymHead;
 
-   /* Sanity check */
+   // Sanity check
    CHECK((F1->Flags & FD_EMPTY) == 0 && (F2->Flags & FD_EMPTY) == 0);
 
-   /* Compose the fields */
+   // Compose the fields
    while (Sym1 && (Sym1->Flags & SC_PARAM) && Sym2 &&
           (Sym2->Flags & SC_PARAM)) {
 
-      /* Get the symbol types */
+      // Get the symbol types
       const Type *Type1 = Sym1->Type;
       const Type *Type2 = Sym2->Type;
 
@@ -410,10 +410,10 @@ static void ComposeFuncParamList(const FuncDesc *F1, const FuncDesc *F2)
          Sym1->Type = TypeDup(Type1);
       }
 
-      /* Compose this field */
+      // Compose this field
       TypeComposition(Sym1->Type, Type2);
 
-      /* Get the pointers to the next fields */
+      // Get the pointers to the next fields
       Sym1 = Sym1->NextSym;
       Sym2 = Sym2->NextSym;
    }
@@ -423,20 +423,20 @@ void TypeComposition(Type *lhs, const Type *rhs)
 // Recursively compose two types into lhs. The two types must have compatible
 // type or this fails with a critical check.
 {
-   /* Compose two types */
+   // Compose two types
    while (lhs->C != T_END) {
 
-      /* Check if the end of the type string is reached */
+      // Check if the end of the type string is reached
       if (rhs->C == T_END) {
          break;
       }
 
-      /* Check for sanity */
+      // Check for sanity
       CHECK(GetUnderlyingTypeCode(lhs) == GetUnderlyingTypeCode(rhs));
 
-      /* Check for special type elements */
+      // Check for special type elements
       if (IsTypeFunc(lhs)) {
-         /* Compose the function descriptors */
+         // Compose the function descriptors
          FuncDesc *F1 = GetFuncDesc(lhs);
          FuncDesc *F2 = GetFuncDesc(rhs);
 
@@ -447,26 +447,26 @@ void TypeComposition(Type *lhs, const Type *rhs)
          // as well as other attributes.
          if ((F1->Flags & FD_EMPTY) == FD_EMPTY) {
             if ((F2->Flags & FD_EMPTY) == 0) {
-               /* Copy the parameters and flags */
+               // Copy the parameters and flags
                TypeCopy(lhs, rhs);
                F1->Flags = F2->Flags;
             }
          }
          else if ((F2->Flags & FD_EMPTY) == 0) {
-            /* Compose the parameter lists */
+            // Compose the parameter lists
             ComposeFuncParamList(F1, F2);
-            /* Prefer non-old-style */
+            // Prefer non-old-style
             if ((F2->Flags & FD_OLDSTYLE) == 0) {
                F1->Flags &= ~FD_OLDSTYLE;
             }
          }
       }
       else if (IsTypeArray(lhs)) {
-         /* Check member count */
+         // Check member count
          long LeftCount = GetElementCount(lhs);
          long RightCount = GetElementCount(rhs);
 
-         /* Set composite type if it is requested */
+         // Set composite type if it is requested
          if (LeftCount != UNSPECIFIED) {
             SetElementCount(lhs, LeftCount);
          }
@@ -475,7 +475,7 @@ void TypeComposition(Type *lhs, const Type *rhs)
          }
       }
 
-      /* Next type string element */
+      // Next type string element
       ++lhs;
       ++rhs;
    }

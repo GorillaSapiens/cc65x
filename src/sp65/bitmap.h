@@ -1,58 +1,58 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 bitmap.h                                  */
-/*                                                                           */
-/*         Bitmap definition for the sp65 sprite and bitmap utility          */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2012,      Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 bitmap.h
+//
+//         Bitmap definition for the sp65 sprite and bitmap utility
+//
+//
+//
+// (C) 2012,      Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef BITMAP_H
 #define BITMAP_H
 
-/* common */
+// common
 #include "strbuf.h"
 
-/* sp65 */
+// sp65
 #include "palette.h"
 #include "pixel.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Safety limit for the bitmap sizes */
+// Safety limit for the bitmap sizes
 #define BM_MAX_WIDTH 4096U
 #define BM_MAX_HEIGHT 4096U
 
-/* Safety limit for the size of the bitmap in pixels */
+// Safety limit for the size of the bitmap in pixels
 #define BM_MAX_SIZE 4194304UL
 
-/* Bitmap structure */
+// Bitmap structure
 typedef struct Bitmap Bitmap;
 struct Bitmap {
 
@@ -62,32 +62,32 @@ struct Bitmap {
    // a good idea.
    StrBuf Name;
 
-   /* Size of the bitmap */
+   // Size of the bitmap
    unsigned Width;
    unsigned Height;
 
-   /* Bits per pixels */
+   // Bits per pixels
    unsigned BPP;
 
-   /* Palette for indexed bitmap types, otherwise NULL */
+   // Palette for indexed bitmap types, otherwise NULL
    Palette *Pal;
 
-   /* Pixel data, dynamically allocated */
+   // Pixel data, dynamically allocated
    Pixel Data[1];
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 Bitmap *NewBitmap(unsigned Width, unsigned Height);
-/* Create a new bitmap. The type is set to unknown and the palette to NULL */
+// Create a new bitmap. The type is set to unknown and the palette to NULL
 
 void FreeBitmap(Bitmap *B);
-/* Free a dynamically allocated bitmap */
+// Free a dynamically allocated bitmap
 
 int ValidBitmapSize(unsigned Width, unsigned Height);
-/* Return true if this is a valid size for a bitmap */
+// Return true if this is a valid size for a bitmap
 
 Bitmap *SliceBitmap(const Bitmap *Original, unsigned X, unsigned Y,
                     unsigned Width, unsigned Height);
@@ -105,7 +105,7 @@ Pixel GetPixel(const Bitmap *B, unsigned X, unsigned Y);
 
 #if defined(HAVE_INLINE)
 INLINE int BitmapIsIndexed(const Bitmap *B)
-/* Return true if this is an indexed bitmap */
+// Return true if this is an indexed bitmap
 {
    return (B->Pal != 0);
 }
@@ -115,7 +115,7 @@ INLINE int BitmapIsIndexed(const Bitmap *B)
 
 #if defined(HAVE_INLINE)
 INLINE unsigned GetBitmapWidth(const Bitmap *B)
-/* Get the width of a bitmap */
+// Get the width of a bitmap
 {
    return B->Width;
 }
@@ -125,7 +125,7 @@ INLINE unsigned GetBitmapWidth(const Bitmap *B)
 
 #if defined(HAVE_INLINE)
 INLINE unsigned GetBitmapHeight(const Bitmap *B)
-/* Get the height of a bitmap */
+// Get the height of a bitmap
 {
    return B->Height;
 }
@@ -135,7 +135,7 @@ INLINE unsigned GetBitmapHeight(const Bitmap *B)
 
 #if defined(HAVE_INLINE)
 INLINE const Palette *GetBitmapPalette(const Bitmap *B)
-/* Get the palette of a bitmap */
+// Get the palette of a bitmap
 {
    return B->Pal;
 }
@@ -145,7 +145,7 @@ INLINE const Palette *GetBitmapPalette(const Bitmap *B)
 
 #if defined(HAVE_INLINE)
 INLINE const StrBuf *GetBitmapName(const Bitmap *B)
-/* Get the name of a bitmap */
+// Get the name of a bitmap
 {
    return &B->Name;
 }
@@ -174,6 +174,6 @@ INLINE unsigned GetBitmapBPP(const Bitmap *B)
 #define GetBitmapBPP(B)     ((B)->BPP
 #endif
 
-/* End of bitmap.h */
+// End of bitmap.h
 
 #endif

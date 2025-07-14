@@ -1,42 +1,42 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 asmstmt.c                                 */
-/*                                                                           */
-/*            Inline assembler statements for the cc65 C compiler            */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@musoftware.de                                            */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 asmstmt.c
+//
+//            Inline assembler statements for the cc65 C compiler
+//
+//
+//
+// (C) 2001-2008 Ullrich von Bassewitz
+//               Roemerstrasse 52
+//               D-70794 Filderstadt
+// EMail:        uz@musoftware.de
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <string.h>
 
-/* common */
+// common
 #include "xsprintf.h"
 
-/* cc65 */
+// cc65
 #include "asmlabel.h"
 #include "codegen.h"
 #include "codeseg.h"
@@ -52,7 +52,7 @@
 #include "asmstmt.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 static void AsmRangeError(unsigned Arg)
@@ -76,55 +76,55 @@ static SymEntry *AsmGetSym(unsigned Arg, int OnStack)
 {
    SymEntry *Sym;
 
-   /* We expect an argument separated by a comma */
+   // We expect an argument separated by a comma
    ConsumeComma();
 
-   /* Argument must be an identifier */
+   // Argument must be an identifier
    if (CurTok.Tok != TOK_IDENT) {
       Error("Identifier expected for argument %u", Arg);
       AsmErrorSkip();
       return 0;
    }
 
-   /* Get a pointer to the symbol table entry */
+   // Get a pointer to the symbol table entry
    Sym = FindSym(CurTok.Ident);
 
-   /* Did we find a symbol with this name? */
+   // Did we find a symbol with this name?
    if (Sym == 0) {
       Error("Undeclared symbol '%s' for argument %u", CurTok.Ident, Arg);
       AsmErrorSkip();
       return 0;
    }
 
-   /* We found the symbol - skip the name token */
+   // We found the symbol - skip the name token
    NextToken();
 
-   /* Check if the symbol is on the stack */
+   // Check if the symbol is on the stack
    if ((Sym->Flags & SC_STORAGEMASK) != SC_AUTO ? OnStack : !OnStack) {
       Error("Type of argument %u differs from format specifier", Arg);
       AsmErrorSkip();
       return 0;
    }
 
-   /* Mark the symbol as referenced */
+   // Mark the symbol as referenced
    Sym->Flags |= SC_REF;
 
-   /* Return it */
+   // Return it
    return Sym;
 }
 
 static void ParseByteArg(StrBuf *T, unsigned Arg)
-/* Parse the %b format specifier */
+// Parse the %b format specifier
 {
    char Buf[16];
 
-   /* We expect an argument separated by a comma */
+   // We expect an argument separated by a comma
    ConsumeComma();
 
-   /* Evaluate the expression */
+   // Evaluate the expression
    ExprDesc Expr = NoCodeConstAbsIntExpr(hie1);
 
-   /* Check the range but allow negative values if the type is signed */
+   // Check the range but allow negative values if the type is signed
    if (IsSignUnsigned(Expr.Type)) {
       if (Expr.IVal < 0 || Expr.IVal > 0xFF) {
          AsmRangeError(Arg);
@@ -138,25 +138,25 @@ static void ParseByteArg(StrBuf *T, unsigned Arg)
       }
    }
 
-   /* Convert into a hex number */
+   // Convert into a hex number
    xsprintf(Buf, sizeof(Buf), "$%02lX", Expr.IVal & 0xFF);
 
-   /* Add the number to the target buffer */
+   // Add the number to the target buffer
    SB_AppendStr(T, Buf);
 }
 
 static void ParseWordArg(StrBuf *T, unsigned Arg)
-/* Parse the %w format specifier */
+// Parse the %w format specifier
 {
    char Buf[16];
 
-   /* We expect an argument separated by a comma */
+   // We expect an argument separated by a comma
    ConsumeComma();
 
-   /* Evaluate the expression */
+   // Evaluate the expression
    ExprDesc Expr = NoCodeConstAbsIntExpr(hie1);
 
-   /* Check the range but allow negative values if the type is signed */
+   // Check the range but allow negative values if the type is signed
    if (IsSignUnsigned(Expr.Type)) {
       if (Expr.IVal < 0 || Expr.IVal > 0xFFFF) {
          AsmRangeError(Arg);
@@ -170,28 +170,28 @@ static void ParseWordArg(StrBuf *T, unsigned Arg)
       }
    }
 
-   /* Convert into a hex number */
+   // Convert into a hex number
    xsprintf(Buf, sizeof(Buf), "$%04lX", Expr.IVal & 0xFFFF);
 
-   /* Add the number to the target buffer */
+   // Add the number to the target buffer
    SB_AppendStr(T, Buf);
 }
 
 static void ParseLongArg(StrBuf *T, unsigned Arg attribute((unused)))
-/* Parse the %l format specifier */
+// Parse the %l format specifier
 {
    char Buf[16];
 
-   /* We expect an argument separated by a comma */
+   // We expect an argument separated by a comma
    ConsumeComma();
 
-   /* Evaluate the expression */
+   // Evaluate the expression
    ExprDesc Expr = NoCodeConstAbsIntExpr(hie1);
 
-   /* Convert into a hex number */
+   // Convert into a hex number
    xsprintf(Buf, sizeof(Buf), "$%08lX", Expr.IVal & 0xFFFFFFFF);
 
-   /* Add the number to the target buffer */
+   // Add the number to the target buffer
    SB_AppendStr(T, Buf);
 }
 
@@ -199,41 +199,41 @@ static void ParseGVarArg(StrBuf *T, unsigned Arg)
 // Parse the %v format specifier.
 // ### FIXME: Asm names should be generated in the same place.
 {
-   /* Parse the symbol name parameter and check the type */
+   // Parse the symbol name parameter and check the type
    SymEntry *Sym = AsmGetSym(Arg, 0);
    if (Sym == 0) {
-      /* Some sort of error */
+      // Some sort of error
       return;
    }
 
-   /* Get the correct asm name */
+   // Get the correct asm name
    if ((Sym->Flags & SC_TYPEMASK) == SC_FUNC || SymIsGlobal(Sym)) {
-      /* External or internal linkage or a function */
+      // External or internal linkage or a function
       SB_AppendChar(T, '_');
       SB_AppendStr(T, Sym->Name);
    }
    else if ((Sym->Flags & SC_STORAGEMASK) == SC_REGISTER) {
-      /* Register variable */
+      // Register variable
       char Buf[32];
       xsprintf(Buf, sizeof(Buf), "regbank+%d", Sym->V.R.RegOffs);
       SB_AppendStr(T, Buf);
    }
    else {
-      /* Local static variable */
+      // Local static variable
       SB_AppendStr(T, LocalDataLabelName(Sym->V.L.Label));
    }
 }
 
 static void ParseLVarArg(StrBuf *T, unsigned Arg)
-/* Parse the %o format specifier */
+// Parse the %o format specifier
 {
    unsigned Offs;
    char Buf[16];
 
-   /* Parse the symbol name parameter and check the type */
+   // Parse the symbol name parameter and check the type
    SymEntry *Sym = AsmGetSym(Arg, 1);
    if (Sym == 0) {
-      /* Some sort of error */
+      // Some sort of error
       return;
    }
 
@@ -246,18 +246,18 @@ static void ParseLVarArg(StrBuf *T, unsigned Arg)
       return;
    }
 
-   /* Calculate the current offset from SP */
+   // Calculate the current offset from SP
    Offs = Sym->V.Offs - StackPtr;
 
-   /* Output the offset */
+   // Output the offset
    xsprintf(Buf, sizeof(Buf), (Offs > 0xFF) ? "$%04X" : "$%02X", Offs);
    SB_AppendStr(T, Buf);
 }
 
 static void ParseLabelArg(StrBuf *T, unsigned Arg attribute((unused)))
-/* Parse the %g format specifier */
+// Parse the %g format specifier
 {
-   /* We expect an identifier separated by a comma */
+   // We expect an identifier separated by a comma
    ConsumeComma();
    if (CurTok.Tok != TOK_IDENT) {
 
@@ -265,37 +265,37 @@ static void ParseLabelArg(StrBuf *T, unsigned Arg attribute((unused)))
    }
    else {
 
-      /* Add a new C label symbol if we don't have one until now */
+      // Add a new C label symbol if we don't have one until now
       SymEntry *Entry = AddLabelSym(CurTok.Ident, SC_REF);
 
-      /* Append the label name to the buffer */
+      // Append the label name to the buffer
       SB_AppendStr(T, LocalLabelName(Entry->V.L.Label));
 
-      /* Eat the label name */
+      // Eat the label name
       NextToken();
    }
 }
 
 static void ParseStrArg(StrBuf *T, unsigned Arg attribute((unused)))
-/* Parse the %s format specifier */
+// Parse the %s format specifier
 {
    ExprDesc Expr;
    char Buf[64];
 
-   /* We expect an argument separated by a comma */
+   // We expect an argument separated by a comma
    ConsumeComma();
 
-   /* Check what comes */
+   // Check what comes
    switch (CurTok.Tok) {
 
       case TOK_IDENT:
-         /* Identifier */
+         // Identifier
          SB_AppendStr(T, CurTok.Ident);
          NextToken();
          break;
 
       case TOK_SCONST:
-         /* String constant */
+         // String constant
          SB_Append(T, GetLiteralStrBuf(CurTok.SVal));
          NextToken();
          break;
@@ -309,19 +309,19 @@ static void ParseStrArg(StrBuf *T, unsigned Arg attribute((unused)))
 }
 
 static void ParseAsm(void)
-/* Parse the contents of the ASM statement */
+// Parse the contents of the ASM statement
 {
    unsigned Arg;
    char C;
 
-   /* Create a target string buffer */
+   // Create a target string buffer
    StrBuf T = AUTO_STRBUF_INITIALIZER;
 
-   /* Create a string buffer from the string literal */
+   // Create a string buffer from the string literal
    StrBuf S = AUTO_STRBUF_INITIALIZER;
    SB_Append(&S, GetLiteralStrBuf(CurTok.SVal));
 
-   /* Skip the string token */
+   // Skip the string token
    NextToken();
 
    // Parse the statement. It may contain several lines and one or more
@@ -337,16 +337,16 @@ static void ParseAsm(void)
    Arg = 0;
    while ((C = SB_Get(&S)) != '\0') {
 
-      /* If it is a newline, the current line is ready to go */
+      // If it is a newline, the current line is ready to go
       if (C == '\n') {
 
-         /* Pass it to the backend and start over */
+         // Pass it to the backend and start over
          g_asmcode(&T);
          SB_Clear(&T);
       }
       else if (C == '%') {
 
-         /* Format specifier */
+         // Format specifier
          ++Arg;
          C = SB_Get(&S);
          switch (C) {
@@ -382,18 +382,18 @@ static void ParseAsm(void)
       }
       else {
 
-         /* A normal character, just copy it */
+         // A normal character, just copy it
          SB_AppendChar(&T, C);
       }
    }
 
-   /* If the target buffer is not empty, we have a last line in there */
+   // If the target buffer is not empty, we have a last line in there
    if (!SB_IsEmpty(&T)) {
       g_asmcode(&T);
    }
 
 Done:
-   /* Call the string buf destructors */
+   // Call the string buf destructors
    SB_Done(&S);
    SB_Done(&T);
 }
@@ -403,21 +403,21 @@ void AsmStatement(void)
 // looks like the one defined for C++ (C has no ASM directive), that is,
 // a string literal in parenthesis.
 {
-   /* Prevent from translating the inline code string literal in asm */
+   // Prevent from translating the inline code string literal in asm
    NoCharMap = 1;
 
-   /* Skip the ASM */
+   // Skip the ASM
    NextToken();
 
    // An optional volatile qualifier disables optimization for
    // the entire function [same as #pragma optimize(push, off)].
    if (CurTok.Tok == TOK_VOLATILE) {
-      /* Don't optimize the Current code Segment */
+      // Don't optimize the Current code Segment
       CS->Code->Optimize = 0;
       NextToken();
    }
 
-   /* Need left parenthesis */
+   // Need left parenthesis
    if (!ConsumeLParen()) {
       NoCharMap = 0;
       return;
@@ -427,10 +427,10 @@ void AsmStatement(void)
    // literal translation for string arguments (if any).
    NoCharMap = 0;
 
-   /* String literal */
+   // String literal
    if (CurTok.Tok != TOK_SCONST) {
 
-      /* Print a diagnostic */
+      // Print a diagnostic
       Error("String literal expected");
 
       // Try some smart error recovery: Skip tokens until we reach the
@@ -439,10 +439,10 @@ void AsmStatement(void)
    }
    else {
 
-      /* Parse the ASM statement */
+      // Parse the ASM statement
       ParseAsm();
    }
 
-   /* Closing paren needed */
+   // Closing paren needed
    ConsumeRParen();
 }

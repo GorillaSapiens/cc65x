@@ -1,42 +1,42 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                alignment.c                                */
-/*                                                                           */
-/*                             Address aligment                              */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2011,      Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                70794 Filderstadt                                          */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                alignment.c
+//
+//                             Address aligment
+//
+//
+//
+// (C) 2011,      Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
-/* common */
+// common
 #include "alignment.h"
 #include "check.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
 // To factorize an alignment, we will use the following prime table. It lists
@@ -50,20 +50,20 @@ static const unsigned char Primes[] = {
 #define PRIME_COUNT (sizeof(Primes) / sizeof(Primes[0]))
 #define LAST_PRIME ((unsigned long)Primes[PRIME_COUNT - 1])
 
-/* A number together with its prime factors */
+// A number together with its prime factors
 typedef struct FactorizedNumber FactorizedNumber;
 struct FactorizedNumber {
-   unsigned long Value;               /* The actual number */
-   unsigned long Remainder;           /* Remaining prime */
-   unsigned char Powers[PRIME_COUNT]; /* Powers of the factors */
+   unsigned long Value;               // The actual number
+   unsigned long Remainder;           // Remaining prime
+   unsigned char Powers[PRIME_COUNT]; // Powers of the factors
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 static void Initialize(FactorizedNumber *F, unsigned long Value)
-/* Initialize a FactorizedNumber structure */
+// Initialize a FactorizedNumber structure
 {
    unsigned I;
 
@@ -75,45 +75,45 @@ static void Initialize(FactorizedNumber *F, unsigned long Value)
 }
 
 static void Factorize(unsigned long Value, FactorizedNumber *F)
-/* Factorize a value between 1 and 0x10000 that is in F */
+// Factorize a value between 1 and 0x10000 that is in F
 {
    unsigned I;
 
-   /* Initialize F */
+   // Initialize F
    Initialize(F, Value);
 
-   /* If the value is 1 we're already done */
+   // If the value is 1 we're already done
    if (Value == 1) {
       return;
    }
 
-   /* Be sure we can factorize */
+   // Be sure we can factorize
    CHECK(Value <= MAX_ALIGNMENT && Value != 0);
 
-   /* Handle factor 2 separately for speed */
+   // Handle factor 2 separately for speed
    while ((Value & 0x01UL) == 0UL) {
       ++F->Powers[0];
       Value >>= 1;
    }
 
-   /* Factorize. */
-   I = 1; /* Skip 2 because it was handled above */
+   // Factorize.
+   I = 1; // Skip 2 because it was handled above
    while (Value > 1) {
       unsigned long Tmp = Value / Primes[I];
       if (Tmp * Primes[I] == Value) {
-         /* This is a factor */
+         // This is a factor
          ++F->Powers[I];
          Value = Tmp;
       }
       else {
-         /* This is not a factor, try next one */
+         // This is not a factor, try next one
          if (++I >= PRIME_COUNT) {
             break;
          }
       }
    }
 
-   /* If something is left, it must be a remaining prime */
+   // If something is left, it must be a remaining prime
    F->Remainder = Value;
 }
 
@@ -125,7 +125,7 @@ unsigned long LeastCommonMultiple(unsigned long Left, unsigned long Right)
    FactorizedNumber L, R;
    unsigned long Res;
 
-   /* Factorize the two numbers */
+   // Factorize the two numbers
    Factorize(Left, &L);
    Factorize(Right, &R);
 
@@ -142,18 +142,18 @@ unsigned long LeastCommonMultiple(unsigned long Left, unsigned long Right)
       }
    }
 
-   /* Return the calculated lcm */
+   // Return the calculated lcm
    return Res;
 }
 
 unsigned long AlignAddr(unsigned long Addr, unsigned long Alignment)
-/* Align an address to the given alignment */
+// Align an address to the given alignment
 {
    return ((Addr + Alignment - 1) / Alignment) * Alignment;
 }
 
 unsigned long AlignCount(unsigned long Addr, unsigned long Alignment)
-/* Calculate how many bytes must be inserted to align Addr to Alignment */
+// Calculate how many bytes must be inserted to align Addr to Alignment
 {
    return AlignAddr(Addr, Alignment) - Addr;
 }

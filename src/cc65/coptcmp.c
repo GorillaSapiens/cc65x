@@ -1,46 +1,46 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 coptcmp.c                                 */
-/*                                                                           */
-/*                             Optimize compares                             */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 coptcmp.c
+//
+//                             Optimize compares
+//
+//
+//
+// (C) 2001-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <string.h>
 
-/* cc65 */
+// cc65
 #include "codeent.h"
 #include "codeinfo.h"
 #include "error.h"
 #include "coptcmp.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                             Helper functions                              */
+//                             Helper functions
 ////////////////////////////////////////////////////////////////////////////////
 
 static int IsImmCmp16(CodeEntry **L)
@@ -58,7 +58,7 @@ static int IsImmCmp16(CodeEntry **L)
 }
 
 static int GetCmpRegVal(const CodeEntry *E)
-/* Return the register value for an immediate compare */
+// Return the register value for an immediate compare
 {
    switch (E->OPC) {
       case OP65_CMP:
@@ -69,12 +69,12 @@ static int GetCmpRegVal(const CodeEntry *E)
          return E->RI->In.RegY;
       default:
          Internal("Invalid opcode in GetCmpRegVal");
-         return 0; /* Not reached */
+         return 0; // Not reached
    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                        Optimizations for compares                         */
+//                        Optimizations for compares
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptCmp1(CodeSeg *S)
@@ -90,16 +90,16 @@ unsigned OptCmp1(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[3];
 
-      /* Get next entry */
+      // Get next entry
       L[0] = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if (L[0]->OPC == OP65_LDX && !CS_RangeHasLabel(S, I + 1, 2) &&
           CS_GetEntries(S, L + 1, I + 1, 2) && L[1]->OPC == OP65_STX &&
           strcmp(L[1]->Arg, "tmp1") == 0 && L[2]->OPC == OP65_ORA &&
@@ -107,22 +107,22 @@ unsigned OptCmp1(CodeSeg *S)
 
          CodeEntry *X;
 
-         /* Insert the ora instead */
+         // Insert the ora instead
          X = NewCodeEntry(OP65_ORA, L[0]->AM, L[0]->Arg, 0, L[0]->LI);
          CS_InsertEntry(S, X, I + 3);
 
-         /* Remove all other instructions */
+         // Remove all other instructions
          CS_DelEntries(S, I, 3);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -140,37 +140,37 @@ unsigned OptCmp2(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[2];
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if (E->OPC == OP65_STX && !CS_RangeHasLabel(S, I + 1, 2) &&
           CS_GetEntries(S, L, I + 1, 2) && L[0]->OPC == OP65_STX &&
           strcmp(L[0]->Arg, "tmp1") == 0 && L[1]->OPC == OP65_ORA &&
           strcmp(L[1]->Arg, "tmp1") == 0) {
 
-         /* Remove the remaining instructions */
+         // Remove the remaining instructions
          CS_DelEntries(S, I + 1, 2);
 
-         /* Insert the ora instead */
+         // Insert the ora instead
          CS_InsertEntry(S, NewCodeEntry(OP65_ORA, E->AM, E->Arg, 0, E->LI),
                         I + 1);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -189,16 +189,16 @@ unsigned OptCmp3(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[3];
 
-      /* Get next entry */
+      // Get next entry
       L[0] = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if ((L[0]->OPC == OP65_ADC || L[0]->OPC == OP65_AND ||
            L[0]->OPC == OP65_ASL || L[0]->OPC == OP65_DEA ||
            L[0]->OPC == OP65_EOR || L[0]->OPC == OP65_INA ||
@@ -223,12 +223,12 @@ unsigned OptCmp3(CodeSeg *S)
                case CMP_GE:
                case CMP_LT:
                case CMP_LE:
-                  /* Remove the compare */
+                  // Remove the compare
                   Delete = 1;
                   break;
 
                default:
-                  /* Leave it alone */
+                  // Leave it alone
                   break;
             }
          }
@@ -252,18 +252,18 @@ unsigned OptCmp3(CodeSeg *S)
             }
          }
 
-         /* Delete the compare if we can */
+         // Delete the compare if we can
          if (Delete) {
             CS_DelEntry(S, I + 1);
             ++Changes;
          }
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -289,22 +289,22 @@ unsigned OptCmp4(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[5];
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if (E->OPC == OP65_LDA && CS_GetEntries(S, L, I + 1, 5) &&
           L[0]->OPC == OP65_LDX && !CE_HasLabel(L[0]) && IsImmCmp16(L + 1) &&
           !RegAXUsed(S, I + 6)) {
 
          if ((L[4]->Info & OF_FBRA) != 0 && L[1]->Num == 0 && L[3]->Num == 0) {
-            /* The value is zero, we may use the simple code version. */
+            // The value is zero, we may use the simple code version.
             CE_ReplaceOPC(L[0], OP65_ORA);
             CS_DelEntries(S, I + 2, 3);
          }
@@ -314,7 +314,7 @@ unsigned OptCmp4(CodeSeg *S)
             // test.
             CS_MoveEntry(S, I, I + 4);
 
-            /* We will replace the ldx/cpx by lda/cmp */
+            // We will replace the ldx/cpx by lda/cmp
             CE_ReplaceOPC(L[0], OP65_LDA);
             CE_ReplaceOPC(L[1], OP65_CMP);
 
@@ -328,11 +328,11 @@ unsigned OptCmp4(CodeSeg *S)
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -348,16 +348,16 @@ unsigned OptCmp5(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[6];
 
-      /* Get the next entry */
+      // Get the next entry
       L[0] = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if (L[0]->OPC == OP65_LDY && CE_IsConstImm(L[0]) &&
           CS_GetEntries(S, L + 1, I + 1, 5) && !CE_HasLabel(L[1]) &&
           CE_IsCallTo(L[1], "ldaxysp") && IsImmCmp16(L + 2)) {
@@ -386,8 +386,8 @@ unsigned OptCmp5(CodeSeg *S)
             X = NewCodeEntry(OP65_ORA, AM65_ZP_INDY, "c_sp", 0, L[1]->LI);
             CS_InsertEntry(S, X, I + 4);
 
-            CS_DelEntries(S, I + 5, 3); /* cpx/bne/cmp */
-            CS_DelEntry(S, I);          /* ldy */
+            CS_DelEntries(S, I + 5, 3); // cpx/bne/cmp
+            CS_DelEntry(S, I);          // ldy
          }
          else {
 
@@ -421,17 +421,17 @@ unsigned OptCmp5(CodeSeg *S)
             X = NewCodeEntry(OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[1]->LI);
             CS_InsertEntry(S, X, I + 8);
 
-            CS_DelEntries(S, I, 3); /* ldy/jsr/cpx */
+            CS_DelEntries(S, I, 3); // ldy/jsr/cpx
          }
 
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -442,13 +442,13 @@ unsigned OptCmp6(CodeSeg *S)
    unsigned Changes = 0;
    unsigned I;
 
-   /* Walk over the entries */
+   // Walk over the entries
    I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *N;
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
       // Check for a compare followed by something else.
@@ -456,22 +456,22 @@ unsigned OptCmp6(CodeSeg *S)
       // function explicitly against the flags set by the compare instruction.
       // For current code generation this makes no difference, however.
       if ((E->Info & OF_CMP) != 0 && (N = CS_GetNextEntry(S, I)) != 0 &&
-          (N->OPC == OP65_RTS ||          /* Either RTS, or ... */
-           (N->OPC == OP65_JSR &&         /* ... or JSR ... */
-            N->JumpTo == 0 &&             /* ... to external ... */
-            (N->Use & PSTATE_ALL) == 0 && /* ... with no flags used ... */
-            (N->Chg & PSTATE_ALL) == PSTATE_ALL))) { /* ... but all destroyed */
+          (N->OPC == OP65_RTS ||          // Either RTS, or ...
+           (N->OPC == OP65_JSR &&         // ... or JSR ...
+            N->JumpTo == 0 &&             // ... to external ...
+            (N->Use & PSTATE_ALL) == 0 && // ... with no flags used ...
+            (N->Chg & PSTATE_ALL) == PSTATE_ALL))) { // ... but all destroyed
 
-         /* Found, remove the compare */
+         // Found, remove the compare
          CS_DelEntry(S, I);
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -481,33 +481,33 @@ unsigned OptCmp7(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[2];
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if ((E->OPC == OP65_LDX) && CS_GetEntries(S, L, I + 1, 2) &&
           L[0]->OPC == OP65_TXA && !CE_HasLabel(L[0]) &&
           (L[1]->Info & OF_FBRA) != 0 && !CE_HasLabel(L[1]) &&
           !RegAUsed(S, I + 3)) {
 
-         /* Remove the txa */
+         // Remove the txa
          CS_DelEntry(S, I + 1);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -518,16 +518,16 @@ unsigned OptCmp8(CodeSeg *S)
    unsigned Changes = 0;
    unsigned I;
 
-   /* Walk over the entries */
+   // Walk over the entries
    I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       int RegVal;
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Check for a compare against an immediate value */
+      // Check for a compare against an immediate value
       if ((E->Info & OF_CMP) != 0 && (RegVal = GetCmpRegVal(E)) >= 0 &&
           CE_IsConstImm(E)) {
 
@@ -537,11 +537,11 @@ unsigned OptCmp8(CodeSeg *S)
          unsigned JumpsChanged = 0;
          CodeEntry *N;
          while ((N = CS_GetNextEntry(S, I)) !=
-                    0 &&                    /* Followed by something.. */
-                (N->Info & OF_CBRA) != 0 && /* ..that is a cond branch.. */
-                !CE_HasLabel(N)) {          /* ..and has no label */
+                    0 &&                    // Followed by something..
+                (N->Info & OF_CBRA) != 0 && // ..that is a cond branch..
+                !CE_HasLabel(N)) {          // ..and has no label
 
-            /* Evaluate the branch condition */
+            // Evaluate the branch condition
             int Cond;
             switch (GetBranchCond(N->OPC)) {
                case BC_CC:
@@ -598,7 +598,7 @@ unsigned OptCmp8(CodeSeg *S)
                // shared branch operation. This prevents the unsafe
                // removal of the compare for known problem cases.
                if (
-                   /* Jump to branch that relies on the comparison. */
+                   // Jump to branch that relies on the comparison.
                    (L->Owner->Info & (OF_CBRA | OF_ZBRA)) ||
                    /* Jump to boolean transformer that relies on the comparison.
                     */
@@ -608,23 +608,23 @@ unsigned OptCmp8(CodeSeg *S)
                }
             }
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++JumpsChanged;
             ++Changes;
          }
 
-         /* Delete the original compare, if safe to do so. */
+         // Delete the original compare, if safe to do so.
          if (JumpsChanged && !ProtectCompare) {
             CS_DelEntry(S, I);
          }
       }
 
    NextEntry:
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -643,16 +643,16 @@ unsigned OptCmp9(CodeSeg *S)
    unsigned Changes = 0;
    unsigned I;
 
-   /* Walk over the entries */
+   // Walk over the entries
    I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[5];
 
-      /* Get next entry */
+      // Get next entry
       L[0] = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if (L[0]->OPC == OP65_SBC && CS_GetEntries(S, L + 1, I + 1, 4) &&
           (L[1]->OPC == OP65_BVC || L[1]->OPC == OP65_BVS ||
            L[1]->OPC == OP65_JVC || L[1]->OPC == OP65_JVS) &&
@@ -663,7 +663,7 @@ unsigned OptCmp9(CodeSeg *S)
            L[4]->OPC == OP65_JCC || L[4]->OPC == OP65_JCS) &&
           !CE_HasLabel(L[4]) && !RegAUsed(S, I + 4)) {
 
-         /* Replace the branch condition */
+         // Replace the branch condition
          switch (GetBranchCond(L[4]->OPC)) {
             case BC_CC:
                CE_ReplaceOPC(L[4], OP65_JPL);
@@ -675,20 +675,20 @@ unsigned OptCmp9(CodeSeg *S)
                Internal("Unknown branch condition in OptCmp9");
          }
 
-         /* Delete the asl insn */
+         // Delete the asl insn
          CS_DelEntry(S, I + 3);
 
-         /* Next sequence is somewhat ahead (if any) */
+         // Next sequence is somewhat ahead (if any)
          I += 3;
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }

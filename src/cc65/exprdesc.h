@@ -1,34 +1,34 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                exprdesc.h                                 */
-/*                                                                           */
-/*                      Expression descriptor structure                      */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2002-2010, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                exprdesc.h
+//
+//                      Expression descriptor structure
+//
+//
+//
+// (C) 2002-2010, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef EXPRDESC_H
@@ -37,19 +37,19 @@
 #include <inttypes.h>
 #include <string.h>
 
-/* common */
+// common
 #include "fp.h"
 #include "inline.h"
 
-/* cc65 */
+// cc65
 #include "asmcode.h"
 #include "datatype.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Defines for the flags field of the expression descriptor */
+// Defines for the flags field of the expression descriptor
 enum {
    // Location: Where is the value we're talking about?
    //
@@ -86,18 +86,18 @@ enum {
    // E_LOC_<else>   -- dereference  -> E_LOC_EXPR (pointed-to-value, must load)
    // + E_ADDRESS_OF -- dereference  -> (lvalue reference)
    E_MASK_LOC = 0x01FF,
-   E_LOC_NONE = 0x0000,     /* Pure rvalue with no storage */
-   E_LOC_ABS = 0x0001,      /* Absolute numeric addressed variable */
-   E_LOC_GLOBAL = 0x0002,   /* Global variable */
-   E_LOC_STATIC = 0x0004,   /* Local static variable */
-   E_LOC_REGISTER = 0x0008, /* Register variable */
-   E_LOC_STACK = 0x0010,    /* Value on the stack */
-   E_LOC_PRIMARY = 0x0020,  /* Temporary in primary register */
-   E_LOC_EXPR = 0x0040,     /* A location that the primary register points to */
-   E_LOC_LITERAL = 0x0080,  /* Literal in the literal pool */
-   E_LOC_CODE = 0x0100,     /* C code label location (&&Label) */
+   E_LOC_NONE = 0x0000,     // Pure rvalue with no storage
+   E_LOC_ABS = 0x0001,      // Absolute numeric addressed variable
+   E_LOC_GLOBAL = 0x0002,   // Global variable
+   E_LOC_STATIC = 0x0004,   // Local static variable
+   E_LOC_REGISTER = 0x0008, // Register variable
+   E_LOC_STACK = 0x0010,    // Value on the stack
+   E_LOC_PRIMARY = 0x0020,  // Temporary in primary register
+   E_LOC_EXPR = 0x0040,     // A location that the primary register points to
+   E_LOC_LITERAL = 0x0080,  // Literal in the literal pool
+   E_LOC_CODE = 0x0100,     // C code label location (&&Label)
 
-   /* Immutable location addresses (immutable bases and offsets) */
+   // Immutable location addresses (immutable bases and offsets)
    E_LOC_CONST = E_LOC_NONE | E_LOC_ABS | E_LOC_GLOBAL | E_LOC_STATIC |
                  E_LOC_REGISTER | E_LOC_LITERAL | E_LOC_CODE,
 
@@ -105,25 +105,25 @@ enum {
     */
    E_LOC_QUASICONST = E_LOC_CONST | E_LOC_STACK,
 
-   /* Expression type modifiers */
-   E_ADDRESS_OF = 0x0400, /* Expression is the address of the lvalue */
+   // Expression type modifiers
+   E_ADDRESS_OF = 0x0400, // Expression is the address of the lvalue
 
-   /* lvalue/rvalue in C language's sense */
+   // lvalue/rvalue in C language's sense
    E_MASK_RTYPE = 0x0800,
    E_RTYPE_RVAL = 0x0000,
    E_RTYPE_LVAL = 0x0800,
 
-   /* Expression status */
-   E_LOADED = 0x1000,       /* Expression is loaded in primary */
-   E_CC_SET = 0x2000,       /* Condition codes are set */
-   E_HAVE_MARKS = 0x4000,   /* Code marks are valid */
-   E_SIDE_EFFECTS = 0x8000, /* Expression has had side effects */
+   // Expression status
+   E_LOADED = 0x1000,       // Expression is loaded in primary
+   E_CC_SET = 0x2000,       // Condition codes are set
+   E_HAVE_MARKS = 0x4000,   // Code marks are valid
+   E_SIDE_EFFECTS = 0x8000, // Expression has had side effects
 
-   /* Optimization hints */
+   // Optimization hints
    E_MASK_NEED = 0x030000,
-   E_NEED_EAX = 0x000000,  /* Expression result needs to be loaded in Primary */
-   E_NEED_NONE = 0x010000, /* Expression result is unused */
-   E_NEED_TEST = 0x020000, /* Expression needs a test to set cc */
+   E_NEED_EAX = 0x000000,  // Expression result needs to be loaded in Primary
+   E_NEED_NONE = 0x010000, // Expression result is unused
+   E_NEED_TEST = 0x020000, // Expression needs a test to set cc
 
    // Expression evaluation requirements.
    // Usage: (Flags & E_EVAL_<Flag>) == E_EVAL_<Flag>
@@ -163,68 +163,68 @@ enum {
    // - "constant expression" in C = "compiler-known" AND "no-code", with minor
    // differences
    E_MASK_EVAL = 0xFC0000,
-   E_EVAL_NONE = 0x000000,             /* No requirements */
-   E_EVAL_IMMUTABLE_RESULT = 0x040000, /* Expression result must be immutable */
+   E_EVAL_NONE = 0x000000,             // No requirements
+   E_EVAL_IMMUTABLE_RESULT = 0x040000, // Expression result must be immutable
    E_EVAL_COMPILER_KNOWN =
-       0x0C0000, /* Expression result must be known to the compiler */
-   E_EVAL_NO_SIDE_EFFECTS = 0x100000, /* Evaluation must have no side effects */
-   E_EVAL_NO_CODE = 0x340000,         /* Evaluation must generate no code */
-   E_EVAL_MAYBE_UNUSED = 0x400000,    /* Expression result may be unused */
-   E_EVAL_UNEVAL = 0xC00000,          /* Expression is unevaluated */
+       0x0C0000, // Expression result must be known to the compiler
+   E_EVAL_NO_SIDE_EFFECTS = 0x100000, // Evaluation must have no side effects
+   E_EVAL_NO_CODE = 0x340000,         // Evaluation must generate no code
+   E_EVAL_MAYBE_UNUSED = 0x400000,    // Expression result may be unused
+   E_EVAL_UNEVAL = 0xC00000,          // Expression is unevaluated
 
    /* Expression result must be known to the compiler and generate no code to
       load */
    E_EVAL_C_CONST = E_EVAL_COMPILER_KNOWN | E_EVAL_NO_CODE,
 
-   /* Flags to combine from subexpressions */
+   // Flags to combine from subexpressions
    E_MASK_VIRAL = E_SIDE_EFFECTS,
 
-   /* Flags to keep in subexpressions of most operations other than ternary */
+   // Flags to keep in subexpressions of most operations other than ternary
    E_MASK_KEEP_SUBEXPR = E_MASK_EVAL,
 
    /* Flags to keep for the two result subexpressions of the ternary operation
     */
    E_MASK_KEEP_RESULT = E_MASK_NEED | E_MASK_EVAL,
 
-   /* Flags to keep when using the ED_Make functions */
+   // Flags to keep when using the ED_Make functions
    E_MASK_KEEP_MAKE = E_HAVE_MARKS | E_MASK_KEEP_RESULT,
 };
 
-/* Forward */
+// Forward
 struct Literal;
 
-/* Describe the result of an expression */
+// Describe the result of an expression
 typedef struct ExprDesc ExprDesc;
 struct ExprDesc {
-   const Type *Type;     /* C type of the expression */
-   unsigned Flags;       /* Properties of the expression */
-   uintptr_t Name;       /* Name pointer or label number */
-   struct SymEntry *Sym; /* Symbol table entry if any */
-   long IVal;            /* Integer value if expression constant */
+   const Type *Type;     // C type of the expression
+   unsigned Flags;       // Properties of the expression
+   uintptr_t Name;       // Name pointer or label number
+   struct SymEntry *Sym; // Symbol table entry if any
+   long IVal;            // Integer value if expression constant
    union {
-      Double FVal;          /* Floating point value */
-      struct Literal *LVal; /* Literal value */
+      Double FVal;          // Floating point value
+      struct Literal *LVal; // Literal value
    } V;
 
-   /* Start and end of generated code */
+   // Start and end of generated code
    CodeMark Start;
    CodeMark End;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 ExprDesc *ED_Init(ExprDesc *Expr);
-/* Initialize an ExprDesc */
+// Initialize an ExprDesc
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                              Info Extraction                              */
+//                              Info Extraction
 ////////////////////////////////////////////////////////////////////////////////
 
 #if defined(HAVE_INLINE)
 INLINE int ED_GetLoc(const ExprDesc *Expr)
-/* Return the location flags from the expression */
+// Return the location flags from the expression
 {
    return (Expr->Flags & E_MASK_LOC);
 }
@@ -234,7 +234,7 @@ INLINE int ED_GetLoc(const ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_GetNeeds(const ExprDesc *Expr)
-/* Get flags about what the expression needs. */
+// Get flags about what the expression needs.
 {
    return (Expr->Flags & E_MASK_NEED);
 }
@@ -252,12 +252,12 @@ int ED_GetStackOffs(const ExprDesc *Expr, int Offs);
 // an additional offset in Offs.
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                Predicates                                 */
+//                                Predicates
 ////////////////////////////////////////////////////////////////////////////////
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLocNone(const ExprDesc *Expr)
-/* Return true if the expression is an absolute value */
+// Return true if the expression is an absolute value
 {
    return (Expr->Flags & E_MASK_LOC) == E_LOC_NONE;
 }
@@ -267,7 +267,7 @@ INLINE int ED_IsLocNone(const ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLocAbs(const ExprDesc *Expr)
-/* Return true if the expression is referenced with an absolute address */
+// Return true if the expression is referenced with an absolute address
 {
    return (Expr->Flags & E_MASK_LOC) == E_LOC_ABS;
 }
@@ -277,7 +277,7 @@ INLINE int ED_IsLocAbs(const ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLocRegister(const ExprDesc *Expr)
-/* Return true if the expression is located in a register */
+// Return true if the expression is located in a register
 {
    return (Expr->Flags & E_MASK_LOC) == E_LOC_REGISTER;
 }
@@ -287,7 +287,7 @@ INLINE int ED_IsLocRegister(const ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLocStack(const ExprDesc *Expr)
-/* Return true if the expression is located on the stack */
+// Return true if the expression is located on the stack
 {
    return (Expr->Flags & E_MASK_LOC) == E_LOC_STACK;
 }
@@ -297,7 +297,7 @@ INLINE int ED_IsLocStack(const ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLocPrimary(const ExprDesc *Expr)
-/* Return true if the expression is an expression in the primary */
+// Return true if the expression is an expression in the primary
 {
    return (Expr->Flags & E_MASK_LOC) == E_LOC_PRIMARY;
 }
@@ -307,7 +307,7 @@ INLINE int ED_IsLocPrimary(const ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLocExpr(const ExprDesc *Expr)
-/* Return true if the expression is an expression referenced in the primary */
+// Return true if the expression is an expression referenced in the primary
 {
    return (Expr->Flags & E_MASK_LOC) == E_LOC_EXPR;
 }
@@ -317,7 +317,7 @@ INLINE int ED_IsLocExpr(const ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLocLiteral(const ExprDesc *Expr)
-/* Return true if the expression is a string from the literal pool */
+// Return true if the expression is a string from the literal pool
 {
    return (Expr->Flags & E_MASK_LOC) == E_LOC_LITERAL;
 }
@@ -327,7 +327,7 @@ INLINE int ED_IsLocLiteral(const ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLocConst(const ExprDesc *Expr)
-/* Return true if the expression is a constant location of some sort */
+// Return true if the expression is a constant location of some sort
 {
    return ((Expr)->Flags & E_MASK_LOC & ~E_LOC_CONST) == 0;
 }
@@ -349,22 +349,22 @@ int ED_IsLocQuasiConst(const ExprDesc *Expr);
 #endif
 
 int ED_IsLocZP(const ExprDesc *Expr);
-/* Return true if the expression is in a location on a zeropage */
+// Return true if the expression is in a location on a zeropage
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLocPrimaryOrExpr(const ExprDesc *Expr)
-/* Return true if the expression is E_LOC_PRIMARY or E_LOC_EXPR */
+// Return true if the expression is E_LOC_PRIMARY or E_LOC_EXPR
 {
    return ED_IsLocPrimary(Expr) || ED_IsLocExpr(Expr);
 }
 #else
 int ED_IsLocPrimaryOrExpr(const ExprDesc *Expr);
-/* Return true if the expression is E_LOC_PRIMARY or E_LOC_EXPR */
+// Return true if the expression is E_LOC_PRIMARY or E_LOC_EXPR
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int ED_NeedsPrimary(const ExprDesc *Expr)
-/* Check if the expression needs to be in Primary. */
+// Check if the expression needs to be in Primary.
 {
    return (Expr->Flags & E_MASK_NEED) == E_NEED_EAX;
 }
@@ -374,7 +374,7 @@ INLINE int ED_NeedsPrimary(const ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_NeedsTest(const ExprDesc *Expr)
-/* Check if the expression needs a test. */
+// Check if the expression needs a test.
 {
    return (Expr->Flags & E_NEED_TEST) != 0;
 }
@@ -384,7 +384,7 @@ INLINE int ED_NeedsTest(const ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsTested(const ExprDesc *Expr)
-/* Check if the expression has set the condition codes. */
+// Check if the expression has set the condition codes.
 {
    return (Expr->Flags & E_CC_SET) != 0;
 }
@@ -394,7 +394,7 @@ INLINE int ED_IsTested(const ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_YetToTest(const ExprDesc *Expr)
-/* Check if the expression needs to be tested but not yet. */
+// Check if the expression needs to be tested but not yet.
 {
    return ((Expr)->Flags & (E_NEED_TEST | E_CC_SET)) == E_NEED_TEST;
 }
@@ -415,11 +415,11 @@ INLINE int ED_IsLoaded(const ExprDesc *Expr)
 #endif
 
 int ED_YetToLoad(const ExprDesc *Expr);
-/* Check if the expression is yet to be loaded somehow. */
+// Check if the expression is yet to be loaded somehow.
 
 #if defined(HAVE_INLINE)
 INLINE int ED_NeedsConst(const ExprDesc *Expr)
-/* Check if the expression need be immutable */
+// Check if the expression need be immutable
 {
    return (Expr->Flags & E_EVAL_IMMUTABLE_RESULT) == E_EVAL_IMMUTABLE_RESULT;
 }
@@ -430,7 +430,7 @@ INLINE int ED_NeedsConst(const ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsUneval(const ExprDesc *Expr)
-/* Check if the expression is not to be evaluated */
+// Check if the expression is not to be evaluated
 {
    return (Expr->Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL;
 }
@@ -440,7 +440,7 @@ INLINE int ED_IsUneval(const ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_MayHaveNoEffect(const ExprDesc *Expr)
-/* Check if the expression may be present without effects */
+// Check if the expression may be present without effects
 {
    return (Expr->Flags & E_EVAL_MAYBE_UNUSED) == E_EVAL_MAYBE_UNUSED;
 }
@@ -461,19 +461,19 @@ INLINE int ED_IsAddrExpr(const ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsIndExpr(const ExprDesc *Expr)
-/* Check if the expression is a reference to its value */
+// Check if the expression is a reference to its value
 {
    return (Expr->Flags & E_ADDRESS_OF) == 0 && !ED_IsLocNone(Expr) &&
           !ED_IsLocPrimary(Expr);
 }
 #else
 int ED_IsIndExpr(const ExprDesc *Expr);
-/* Check if the expression is a reference to its value */
+// Check if the expression is a reference to its value
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLVal(const ExprDesc *Expr)
-/* Return true if the expression is a reference */
+// Return true if the expression is a reference
 {
    return ((Expr)->Flags & E_MASK_RTYPE) == E_RTYPE_LVAL;
 }
@@ -483,7 +483,7 @@ INLINE int ED_IsLVal(const ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsRVal(const ExprDesc *Expr)
-/* Return true if the expression is an rvalue */
+// Return true if the expression is an rvalue
 {
    return ((Expr)->Flags & E_MASK_RTYPE) == E_RTYPE_RVAL;
 }
@@ -493,7 +493,7 @@ INLINE int ED_IsRVal(const ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsAbs(const ExprDesc *Expr)
-/* Return true if the expression denotes a numeric value or address. */
+// Return true if the expression denotes a numeric value or address.
 {
    return (Expr->Flags & (E_MASK_LOC)) == (E_LOC_NONE) ||
           (Expr->Flags & (E_MASK_LOC | E_ADDRESS_OF)) ==
@@ -501,7 +501,7 @@ INLINE int ED_IsAbs(const ExprDesc *Expr)
 }
 #else
 int ED_IsAbs(const ExprDesc *Expr);
-/* Return true if the expression denotes a numeric value or address. */
+// Return true if the expression denotes a numeric value or address.
 #endif
 
 #if defined(HAVE_INLINE)
@@ -518,10 +518,10 @@ int ED_IsConstAbs(const ExprDesc *Expr);
 #endif
 
 int ED_IsConstAbsInt(const ExprDesc *Expr);
-/* Return true if the expression is a constant (numeric) integer. */
+// Return true if the expression is a constant (numeric) integer.
 
 int ED_IsConstBool(const ExprDesc *Expr);
-/* Return true if the expression can be constantly evaluated as a boolean. */
+// Return true if the expression can be constantly evaluated as a boolean.
 
 int ED_IsConstTrue(const ExprDesc *Expr);
 // Return true if the constant expression can be evaluated as boolean true at
@@ -549,10 +549,10 @@ int ED_IsQuasiConstAddr(const ExprDesc *Expr);
 // This can be a constant address or a stack variable address.
 
 int ED_IsStackAddr(const ExprDesc *Expr);
-/* Return true if the expression denotes a fixed address on stack */
+// Return true if the expression denotes a fixed address on stack
 
 int ED_IsZPInd(const ExprDesc *Expr);
-/* Return true if the expression is located on the zeropage */
+// Return true if the expression is located on the zeropage
 
 int ED_IsNullPtr(const ExprDesc *Expr);
 // Return true if the given expression is a null pointer.
@@ -573,20 +573,20 @@ int ED_IsBool(const ExprDesc *Expr);
 // be an operand to a compare operation with 0/NULL.
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                               Manipulation                                */
+//                               Manipulation
 ////////////////////////////////////////////////////////////////////////////////
 
 ExprDesc *ED_MakeConstAbs(ExprDesc *Expr, long Value, const Type *Type);
-/* Replace Expr with an absolute const with the given value and type */
+// Replace Expr with an absolute const with the given value and type
 
 ExprDesc *ED_MakeConstAbsInt(ExprDesc *Expr, long Value);
-/* Replace Expr with an constant integer with the given value */
+// Replace Expr with an constant integer with the given value
 
 ExprDesc *ED_MakeConstBool(ExprDesc *Expr, long Value);
-/* Replace Expr with a constant boolean expression with the given value */
+// Replace Expr with a constant boolean expression with the given value
 
 ExprDesc *ED_FinalizeRValLoad(ExprDesc *Expr);
-/* Finalize the result of LoadExpr to be an rvalue in the primary register */
+// Finalize the result of LoadExpr to be an rvalue in the primary register
 
 #if defined(HAVE_INLINE)
 INLINE void ED_MarkExprAsLVal(ExprDesc *Expr)
@@ -621,14 +621,14 @@ INLINE void ED_MarkExprAsRVal(ExprDesc *Expr)
 #endif
 
 void ED_AddrExpr(ExprDesc *Expr);
-/* Take address of Expr */
+// Take address of Expr
 
 void ED_IndExpr(ExprDesc *Expr);
-/* Dereference Expr */
+// Dereference Expr
 
 #if defined(HAVE_INLINE)
 INLINE void ED_RequireTest(ExprDesc *Expr)
-/* Mark the expression for a test. */
+// Mark the expression for a test.
 {
    Expr->Flags |= E_NEED_TEST;
 }
@@ -641,7 +641,7 @@ INLINE void ED_RequireTest(ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE void ED_RequireNoTest(ExprDesc *Expr)
-/* Mark the expression not for a test. */
+// Mark the expression not for a test.
 {
    Expr->Flags &= ~E_NEED_TEST;
 }
@@ -654,7 +654,7 @@ INLINE void ED_RequireNoTest(ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE void ED_TestDone(ExprDesc *Expr)
-/* Mark the expression as tested and condition codes set. */
+// Mark the expression as tested and condition codes set.
 {
    Expr->Flags |= E_CC_SET;
 }
@@ -667,7 +667,7 @@ INLINE void ED_TestDone(ExprDesc *Expr)
 
 #if defined(HAVE_INLINE)
 INLINE void ED_MarkAsUntested(ExprDesc *Expr)
-/* Mark the expression as not tested (condition codes not set). */
+// Mark the expression as not tested (condition codes not set).
 {
    Expr->Flags &= ~E_CC_SET;
 }
@@ -679,11 +679,11 @@ INLINE void ED_MarkAsUntested(ExprDesc *Expr)
 #endif
 
 void ED_MarkForUneval(ExprDesc *Expr);
-/* Mark the expression as not to be evaluated */
+// Mark the expression as not to be evaluated
 
 #if defined(HAVE_INLINE)
 INLINE void ED_PropagateFrom(ExprDesc *Expr, const ExprDesc *SubExpr)
-/* Propagate viral flags from subexpression */
+// Propagate viral flags from subexpression
 {
    Expr->Flags |= SubExpr->Flags & E_MASK_VIRAL;
 }
@@ -697,19 +697,19 @@ const Type *ReplaceType(ExprDesc *Expr, const Type *NewType);
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                               Other Helpers                               */
+//                               Other Helpers
 ////////////////////////////////////////////////////////////////////////////////
 
 void PrintExprDesc(FILE *F, ExprDesc *Expr);
-/* Print an ExprDesc */
+// Print an ExprDesc
 
 void ED_SetCodeRange(ExprDesc *Expr, const CodeMark *Start,
                      const CodeMark *End);
-/* Set the code range for this expression */
+// Set the code range for this expression
 
 int ED_CodeRangeIsEmpty(const ExprDesc *Expr);
-/* Return true if no code was output for this expression */
+// Return true if no code was output for this expression
 
-/* End of exprdesc.h */
+// End of exprdesc.h
 
 #endif

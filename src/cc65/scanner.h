@@ -1,56 +1,56 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 scanner.h                                 */
-/*                                                                           */
-/*                      Source file line info structure                      */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 scanner.h
+//
+//                      Source file line info structure
+//
+//
+//
+// (C) 1998-2010, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef SCANNER_H
 #define SCANNER_H
 
-/* common */
+// common
 #include "fp.h"
 
-/* cc65 */
+// cc65
 #include "datatype.h"
 #include "ident.h"
 #include "lineinfo.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                             Token definitions                             */
+//                             Token definitions
 ////////////////////////////////////////////////////////////////////////////////
 
 typedef enum token_t {
    TOK_INVALID,
    TOK_CEOF,
 
-   /* Storage specifiers */
+   // Storage specifiers
    TOK_FIRST_STORAGE_CLASS,
    TOK_AUTO = TOK_FIRST_STORAGE_CLASS,
    TOK_EXTERN,
@@ -59,24 +59,24 @@ typedef enum token_t {
    TOK_TYPEDEF,
    TOK_LAST_STORAGE_CLASS = TOK_TYPEDEF,
 
-   /* Tokens denoting type qualifiers */
+   // Tokens denoting type qualifiers
    TOK_FIRST_TYPEQUAL,
    TOK_CONST = TOK_FIRST_TYPEQUAL,
    TOK_VOLATILE,
    TOK_RESTRICT,
    TOK_LAST_TYPEQUAL = TOK_RESTRICT,
 
-   /* Function specifiers */
+   // Function specifiers
    TOK_INLINE,
    TOK_NORETURN,
    TOK_FASTCALL,
    TOK_CDECL,
 
-   /* Address sizes */
+   // Address sizes
    TOK_FAR,
    TOK_NEAR,
 
-   /* Tokens denoting types */
+   // Tokens denoting types
    TOK_FIRST_TYPE,
    TOK_ENUM = TOK_FIRST_TYPE,
    TOK_CHAR,
@@ -92,34 +92,34 @@ typedef enum token_t {
    TOK_VOID,
    TOK_LAST_TYPE = TOK_VOID,
 
-   /* Selection statements */
+   // Selection statements
    TOK_IF,
    TOK_ELSE,
    TOK_SWITCH,
 
-   /* Iteration statements */
+   // Iteration statements
    TOK_WHILE,
    TOK_DO,
    TOK_FOR,
 
-   /* Jump statements */
+   // Jump statements
    TOK_GOTO,
    TOK_CONTINUE,
    TOK_BREAK,
    TOK_RETURN,
 
-   /* Labels */
+   // Labels
    TOK_CASE,
    TOK_DEFAULT,
 
-   /* Misc. */
+   // Misc.
    TOK_ATTRIBUTE,
    TOK_PRAGMA,
    TOK_STATIC_ASSERT,
    TOK_ASM,
    TOK_SIZEOF,
 
-   /* Punctuators */
+   // Punctuators
    TOK_FIRST_PUNC,
    TOK_LBRACK = TOK_FIRST_PUNC,
    TOK_RBRACK,
@@ -132,9 +132,9 @@ typedef enum token_t {
    TOK_INC,
    TOK_DEC,
    TOK_ADDR,
-   TOK_AND = TOK_ADDR, /* Alias */
+   TOK_AND = TOK_ADDR, // Alias
    TOK_STAR,
-   TOK_MUL = TOK_STAR, /* Alias */
+   TOK_MUL = TOK_STAR, // Alias
    TOK_PLUS,
    TOK_MINUS,
    TOK_COMP,
@@ -171,10 +171,10 @@ typedef enum token_t {
    TOK_COMMA,
    TOK_HASH,
    TOK_HASH_HASH,
-   TOK_DOUBLE_HASH = TOK_HASH_HASH, /* Alias */
+   TOK_DOUBLE_HASH = TOK_HASH_HASH, // Alias
    TOK_LAST_PUNC = TOK_DOUBLE_HASH,
 
-   /* Primary expressions */
+   // Primary expressions
    TOK_ICONST,
    TOK_CCONST,
    TOK_WCCONST,
@@ -190,38 +190,38 @@ typedef enum token_t {
 } token_t;
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Forward for struct Literal */
+// Forward for struct Literal
 struct Literal;
 
-/* Token stuff */
+// Token stuff
 typedef struct Token Token;
 struct Token {
-   token_t Tok;          /* The token itself */
-   long IVal;            /* The integer attribute */
-   int Cooked;           /* The "cooked" flag for char constants */
-   Double FVal;          /* The float attribute */
-   struct Literal *SVal; /* String literal is any */
-   ident Ident;          /* Identifier if IDENT */
-   LineInfo *LI;         /* Source line where the token comes from */
-   const Type *Type;     /* Type if integer or float constant */
+   token_t Tok;          // The token itself
+   long IVal;            // The integer attribute
+   int Cooked;           // The "cooked" flag for char constants
+   Double FVal;          // The float attribute
+   struct Literal *SVal; // String literal is any
+   ident Ident;          // Identifier if IDENT
+   LineInfo *LI;         // Source line where the token comes from
+   const Type *Type;     // Type if integer or float constant
 };
 
-extern Token CurTok;            /* The current token */
-extern Token NextTok;           /* The next token */
-extern int PPParserRunning;     /* Is tokenizer used by the preprocessor */
-extern int NoCharMap;           /* Disable literal translation */
-extern unsigned InPragmaParser; /* Depth of pragma parser calling */
+extern Token CurTok;            // The current token
+extern Token NextTok;           // The next token
+extern int PPParserRunning;     // Is tokenizer used by the preprocessor
+extern int NoCharMap;           // Disable literal translation
+extern unsigned InPragmaParser; // Depth of pragma parser calling
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 #if defined(HAVE_INLINE)
 INLINE int TokIsPunc(const Token *T)
-/* Return true if the token is a punctuator */
+// Return true if the token is a punctuator
 {
    return (T->Tok >= TOK_FIRST_PUNC && T->Tok <= TOK_LAST_PUNC);
 }
@@ -231,7 +231,7 @@ INLINE int TokIsPunc(const Token *T)
 
 #if defined(HAVE_INLINE)
 INLINE int TokIsStorageClass(const Token *T)
-/* Return true if the token is a storage class specifier */
+// Return true if the token is a storage class specifier
 {
    return (T->Tok >= TOK_FIRST_STORAGE_CLASS &&
            T->Tok <= TOK_LAST_STORAGE_CLASS);
@@ -243,7 +243,7 @@ INLINE int TokIsStorageClass(const Token *T)
 
 #if defined(HAVE_INLINE)
 INLINE int TokIsType(const Token *T)
-/* Return true if the token is a type */
+// Return true if the token is a type
 {
    return (T->Tok >= TOK_FIRST_TYPE && T->Tok <= TOK_LAST_TYPE);
 }
@@ -253,7 +253,7 @@ INLINE int TokIsType(const Token *T)
 
 #if defined(HAVE_INLINE)
 INLINE int TokIsTypeQual(const Token *T)
-/* Return true if the token is a type qualifier */
+// Return true if the token is a type qualifier
 {
    return (T->Tok >= TOK_FIRST_TYPEQUAL && T->Tok <= TOK_LAST_TYPEQUAL);
 }
@@ -263,7 +263,7 @@ INLINE int TokIsTypeQual(const Token *T)
 #endif
 
 int TokIsFuncSpec(const Token *T);
-/* Return true if the token is a function specifier */
+// Return true if the token is a function specifier
 
 void SymName(char *S);
 // Read a symbol from the input stream. The first character must have been
@@ -275,14 +275,14 @@ int IsWideQuoted(char First, char Second);
 // a wide char constant, otherwise return 0.
 
 int IsSym(char *S);
-/* If a symbol follows, read it and return 1, otherwise return 0 */
+// If a symbol follows, read it and return 1, otherwise return 0
 
 int IsPPNumber(int Cur, int Next);
 // Return 1 if the two successive characters indicate a pp-number, otherwise
 // return 0.
 
 void CopyPPNumber(StrBuf *Target);
-/* Copy a pp-number from the input to Target */
+// Copy a pp-number from the input to Target
 
 void NextToken(void);
 // Get next non-pragma token from input stream consuming any pragmas
@@ -329,32 +329,32 @@ int Consume(token_t Token, const char *ErrorMsg);
 // message. Returns true if the token was found and false otherwise.
 
 int ConsumeColon(void);
-/* Check for a colon and skip it. */
+// Check for a colon and skip it.
 
 int ConsumeSemi(void);
-/* Check for a semicolon and skip it. */
+// Check for a semicolon and skip it.
 
 int ConsumeComma(void);
-/* Check for a comma and skip it. */
+// Check for a comma and skip it.
 
 int ConsumeLParen(void);
-/* Check for a left parenthesis and skip it */
+// Check for a left parenthesis and skip it
 
 int ConsumeRParen(void);
-/* Check for a right parenthesis and skip it */
+// Check for a right parenthesis and skip it
 
 int ConsumeLBrack(void);
-/* Check for a left bracket and skip it */
+// Check for a left bracket and skip it
 
 int ConsumeRBrack(void);
-/* Check for a right bracket and skip it */
+// Check for a right bracket and skip it
 
 int ConsumeLCurly(void);
-/* Check for a left curly brace and skip it */
+// Check for a left curly brace and skip it
 
 int ConsumeRCurly(void);
-/* Check for a right curly brace and skip it */
+// Check for a right curly brace and skip it
 
-/* End of scanner.h */
+// End of scanner.h
 
 #endif

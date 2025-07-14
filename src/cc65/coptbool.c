@@ -1,53 +1,53 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                coptbool.c                                 */
-/*                                                                           */
-/*                        Optimize boolean sequences                         */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                coptbool.c
+//
+//                        Optimize boolean sequences
+//
+//
+//
+// (C) 2001-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
-/* cc65 */
+// cc65
 #include "codeent.h"
 #include "codeinfo.h"
 #include "error.h"
 #include "coptbool.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Table used to invert a condition, indexed by condition */
+// Table used to invert a condition, indexed by condition
 static const unsigned char CmpInvertTab[] = {CMP_NE,  CMP_EQ, CMP_LE,  CMP_LT,
                                              CMP_GE,  CMP_GT, CMP_ULE, CMP_ULT,
                                              CMP_UGE, CMP_UGT};
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                             Helper functions                              */
+//                             Helper functions
 ////////////////////////////////////////////////////////////////////////////////
 
 static void ReplaceBranchCond(CodeSeg *S, unsigned I, cmp_t Cond)
@@ -60,10 +60,10 @@ static void ReplaceBranchCond(CodeSeg *S, unsigned I, cmp_t Cond)
    CodeEntry *N;
    CodeLabel *L;
 
-   /* Get the entry */
+   // Get the entry
    CodeEntry *E = CS_GetEntry(S, I);
 
-   /* Replace the conditional branch */
+   // Replace the conditional branch
    switch (Cond) {
 
       case CMP_EQ:
@@ -80,7 +80,7 @@ static void ReplaceBranchCond(CodeSeg *S, unsigned I, cmp_t Cond)
          // jpl Target
          // @L: ...
          if ((N = CS_GetNextEntry(S, I)) == 0) {
-            /* No such entry */
+            // No such entry
             Internal("Invalid program flow");
          }
          L = CS_GenLabel(S, N);
@@ -113,7 +113,7 @@ static void ReplaceBranchCond(CodeSeg *S, unsigned I, cmp_t Cond)
          // jcs Target
          // @L: ...
          if ((N = CS_GetNextEntry(S, I)) == 0) {
-            /* No such entry */
+            // No such entry
             Internal("Invalid program flow");
          }
          L = CS_GenLabel(S, N);
@@ -146,7 +146,7 @@ static void ReplaceBranchCond(CodeSeg *S, unsigned I, cmp_t Cond)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*    Optimize bool comparison and transformer subroutines with branches     */
+//    Optimize bool comparison and transformer subroutines with branches
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptBoolCmp(CodeSeg *S)
@@ -157,17 +157,17 @@ unsigned OptBoolCmp(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *N;
       cmp_t Cond;
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if (E->OPC == OP65_JSR && (Cond = FindTosCmpCond(E->Arg)) != CMP_INV &&
           (N = CS_GetNextEntry(S, I)) != 0 && (N->Info & OF_ZBRA) != 0 &&
           !CE_HasLabel(N)) {
@@ -179,27 +179,27 @@ unsigned OptBoolCmp(CodeSeg *S)
          // the condition is not met, jne jumps if the condition is met.
          // Invert the code if we jump on condition not met.
          if (GetBranchCond(N->OPC) == BC_EQ) {
-            /* Jumps if condition false, invert condition */
+            // Jumps if condition false, invert condition
             Cond = CmpInvertTab[Cond];
          }
 
-         /* Replace the subroutine call. */
+         // Replace the subroutine call.
          E = NewCodeEntry(OP65_JSR, AM65_ABS, "tosicmp", 0, E->LI);
          CS_InsertEntry(S, E, I + 1);
          CS_DelEntry(S, I);
 
-         /* Replace the conditional branch */
+         // Replace the conditional branch
          ReplaceBranchCond(S, I + 1, Cond);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -209,17 +209,17 @@ unsigned OptBoolTrans(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *N;
       cmp_t Cond;
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Check for a boolean transformer */
+      // Check for a boolean transformer
       if (E->OPC == OP65_JSR && (Cond = FindBoolCmpCond(E->Arg)) != CMP_INV &&
           (N = CS_GetNextEntry(S, I)) != 0 && (N->Info & OF_ZBRA) != 0 &&
           (GetRegInfo(S, I + 2, PSTATE_Z) & PSTATE_Z) == 0) {
@@ -230,25 +230,25 @@ unsigned OptBoolTrans(CodeSeg *S)
          // the condition is not met, jne jumps if the condition is met.
          // Invert the code if we jump on condition not met.
          if (GetBranchCond(N->OPC) == BC_EQ) {
-            /* Jumps if condition false, invert condition */
+            // Jumps if condition false, invert condition
             Cond = CmpInvertTab[Cond];
          }
 
-         /* Check if we can replace the code by something better */
+         // Check if we can replace the code by something better
          ReplaceBranchCond(S, I + 1, Cond);
 
-         /* Remove the call to the bool transformer */
+         // Remove the call to the bool transformer
          CS_DelEntry(S, I);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -258,17 +258,17 @@ unsigned OptBoolUnary(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *N;
       cmp_t Cond;
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Check for a boolean transformer */
+      // Check for a boolean transformer
       if (E->OPC == OP65_JSR && (Cond = FindBoolCmpCond(E->Arg)) != CMP_INV &&
           (N = CS_GetNextEntry(S, I)) != 0 && (N->Info & OF_ZBRA) != 0) {
 
@@ -278,30 +278,30 @@ unsigned OptBoolUnary(CodeSeg *S)
          // the condition is not met, jne jumps if the condition is met.
          // Invert the code if we jump on condition not met.
          if (GetBranchCond(N->OPC) == BC_EQ) {
-            /* Jumps if condition false, invert condition */
+            // Jumps if condition false, invert condition
             Cond = CmpInvertTab[Cond];
          }
 
-         /* Check if we can replace the code by something better */
+         // Check if we can replace the code by something better
          ReplaceBranchCond(S, I + 1, Cond);
 
-         /* Remove the call to the bool transformer */
+         // Remove the call to the bool transformer
          CS_DelEntry(S, I);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*           Remove calls to the boolean cast/negation subroutines           */
+//           Remove calls to the boolean cast/negation subroutines
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptBoolUnary1(CodeSeg *S)
@@ -312,13 +312,13 @@ unsigned OptBoolUnary1(CodeSeg *S)
    unsigned Changes = 0;
    int Neg = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[2];
 
-      /* Get next entry */
+      // Get next entry
       L[0] = CS_GetEntry(S, I);
 
       // Check for the sequence.
@@ -332,42 +332,42 @@ unsigned OptBoolUnary1(CodeSeg *S)
             Neg = 0;
          }
          else {
-            /* Next entry */
+            // Next entry
             ++I;
             continue;
          }
          if ((L[1]->OPC == OP65_CMP && CE_IsKnownImm(L[1], 0x0)) ||
              CE_IsCallTo(L[1], "boolne") || CE_IsCallTo(L[1], "bcastax")) {
-            /* Delete the entry no longer needed. */
+            // Delete the entry no longer needed.
             CS_DelEntry(S, I + 1);
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
 
-            /* We are still at this index */
+            // We are still at this index
             continue;
          }
          else if ((L[1]->OPC == OP65_CMP && CE_IsKnownImm(L[1], 0x1)) ||
                   CE_IsCallTo(L[1], "booleq") || CE_IsCallTo(L[1], "bnegax")) {
-            /* Invert the previous bool conversion */
+            // Invert the previous bool conversion
             CE_SetArg(L[0], Neg ? "bcastax" : "bnegax");
 
-            /* Delete the entry no longer needed */
+            // Delete the entry no longer needed
             CS_DelEntry(S, I + 1);
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
 
-            /* We are still at this index */
+            // We are still at this index
             continue;
          }
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -380,13 +380,13 @@ unsigned OptBoolUnary2(CodeSeg *S)
    cmp_t Cond;
    char Buf[16];
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[2];
 
-      /* Get next entry */
+      // Get next entry
       L[0] = CS_GetEntry(S, I);
 
       // Check for the sequence.
@@ -396,39 +396,39 @@ unsigned OptBoolUnary2(CodeSeg *S)
           (Cond = FindBoolCmpCond(L[0]->Arg)) != CMP_INV) {
          if ((L[1]->OPC == OP65_CMP && CE_IsKnownImm(L[1], 0x0)) ||
              CE_IsCallTo(L[1], "boolne") || CE_IsCallTo(L[1], "bcastax")) {
-            /* Delete the entry no longer needed */
+            // Delete the entry no longer needed
             CS_DelEntry(S, I + 1);
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
 
-            /* We are still at this index */
+            // We are still at this index
             continue;
          }
          else if ((L[1]->OPC == OP65_CMP && CE_IsKnownImm(L[1], 0x1)) ||
                   CE_IsCallTo(L[1], "booleq") || CE_IsCallTo(L[1], "bnegax")) {
-            /* Invert the bool conversion */
+            // Invert the bool conversion
             if (GetBoolCmpSuffix(Buf, GetNegatedCond(Cond)) == 0) {
                Internal("No inverted boolean transformer for: %s", L[0]->Arg);
             }
             CE_SetArg(L[0], Buf);
 
-            /* Delete the entry no longer needed */
+            // Delete the entry no longer needed
             CS_DelEntry(S, I + 1);
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
 
-            /* We are still at this index */
+            // We are still at this index
             continue;
          }
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -448,63 +448,63 @@ unsigned OptBoolUnary3(CodeSeg *S)
    opc_t Op = OP65_COUNT;
    const char *Sub = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *E;
       CodeEntry *X;
 
-      /* Get next entry */
+      // Get next entry
       E = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if (!CE_HasLabel(E)) {
-         /* Choose the right subroutine */
+         // Choose the right subroutine
          if (CE_IsCallTo(E, "bnegax")) {
             Sub = "booleq";
          }
          else if (CE_IsCallTo(E, "bcastax")) {
             Sub = "boolne";
          }
-         /* Choose the right opcode */
+         // Choose the right opcode
          if (RegValIsKnown(E->RI->In.RegA) && E->RI->In.RegA == 0) {
             Op = OP65_CPX;
          }
          else if (RegValIsKnown(E->RI->In.RegX) && E->RI->In.RegX == 0) {
             Op = OP65_CMP;
          }
-         /* Replace the sequence if all requirements are met*/
+         // Replace the sequence if all requirements are met
          if (Op != OP65_COUNT && Sub != 0) {
-            /* Replace bcastax/bnegax with boolne/booleq */
+            // Replace bcastax/bnegax with boolne/booleq
             CE_SetArg(E, Sub);
 
-            /* Insert the compare */
+            // Insert the compare
             X = NewCodeEntry(Op, AM65_IMM, "$00", 0, E->LI);
             CS_InsertEntry(S, X, I);
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
 
-            /* Correct the index */
+            // Correct the index
             ++I;
          }
 
-         /* Reset the choices */
+         // Reset the choices
          Op = OP65_COUNT;
          Sub = 0;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                            bnega optimizations                            */
+//                            bnega optimizations
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptBNegA1(CodeSeg *S)
@@ -518,34 +518,34 @@ unsigned OptBNegA1(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[2];
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Check for a ldx */
+      // Check for a ldx
       if (E->OPC == OP65_LDX && E->AM == AM65_IMM && CE_HasNumArg(E) &&
           E->Num == 0 && CS_GetEntries(S, L, I + 1, 2) &&
           L[0]->OPC == OP65_LDA && (L[0]->Use & REG_X) == 0 &&
           !CE_HasLabel(L[0]) && CE_IsCallTo(L[1], "bnega") &&
           !CE_HasLabel(L[1])) {
 
-         /* Remove the ldx instruction */
+         // Remove the ldx instruction
          CS_DelEntry(S, I);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -560,16 +560,16 @@ unsigned OptBNegA2(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[2];
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if ((E->OPC == OP65_ADC || E->OPC == OP65_AND || E->OPC == OP65_DEA ||
            E->OPC == OP65_EOR || E->OPC == OP65_INA || E->OPC == OP65_LDA ||
            E->OPC == OP65_ORA || E->OPC == OP65_PLA || E->OPC == OP65_SBC ||
@@ -579,26 +579,26 @@ unsigned OptBNegA2(CodeSeg *S)
           !CE_HasLabel(L[1]) &&
           (GetRegInfo(S, I + 3, PSTATE_Z) & PSTATE_Z) == 0) {
 
-         /* Invert the branch */
+         // Invert the branch
          CE_ReplaceOPC(L[1], GetInverseBranch(L[1]->OPC));
 
-         /* Delete the subroutine call */
+         // Delete the subroutine call
          CS_DelEntry(S, I + 1);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                            bnegax optimizations                           */
+//                            bnegax optimizations
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptBNegAX1(CodeSeg *S)
@@ -609,29 +609,29 @@ unsigned OptBNegAX1(CodeSeg *S)
    unsigned Changes = 0;
    unsigned I;
 
-   /* Walk over the entries */
+   // Walk over the entries
    I = 0;
    while (I < CS_GetEntryCount(S)) {
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Check if this is a call to bnegax, and if X is known and zero */
+      // Check if this is a call to bnegax, and if X is known and zero
       if (E->RI->In.RegX == 0 && CE_IsCallTo(E, "bnegax")) {
 
          CodeEntry *X = NewCodeEntry(OP65_JSR, AM65_ABS, "bnega", 0, E->LI);
          CS_InsertEntry(S, X, I + 1);
          CS_DelEntry(S, I);
 
-         /* We had changes */
+         // We had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -653,16 +653,16 @@ unsigned OptBNegAX2(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[4];
 
-      /* Get next entry */
+      // Get next entry
       L[0] = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if (L[0]->OPC == OP65_LDY && CE_IsConstImm(L[0]) &&
           !CS_RangeHasLabel(S, I + 1, 3) && CS_GetEntries(S, L + 1, I + 1, 3) &&
           CE_IsCallTo(L[1], "ldaxysp") && CE_IsCallTo(L[2], "bnegax") &&
@@ -671,33 +671,33 @@ unsigned OptBNegAX2(CodeSeg *S)
 
          CodeEntry *X;
 
-         /* lda (c_sp),y */
+         // lda (c_sp),y
          X = NewCodeEntry(OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[1]->LI);
          CS_InsertEntry(S, X, I + 1);
 
-         /* dey */
+         // dey
          X = NewCodeEntry(OP65_DEY, AM65_IMP, 0, 0, L[1]->LI);
          CS_InsertEntry(S, X, I + 2);
 
-         /* ora (c_sp),y */
+         // ora (c_sp),y
          X = NewCodeEntry(OP65_ORA, AM65_ZP_INDY, "c_sp", 0, L[1]->LI);
          CS_InsertEntry(S, X, I + 3);
 
-         /* Invert the branch */
+         // Invert the branch
          CE_ReplaceOPC(L[3], GetInverseBranch(L[3]->OPC));
 
-         /* Delete the entries no longer needed. */
+         // Delete the entries no longer needed.
          CS_DelEntries(S, I + 4, 2);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -717,40 +717,40 @@ unsigned OptBNegAX3(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[3];
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if (E->OPC == OP65_LDA && CS_GetEntries(S, L, I + 1, 3) &&
           L[0]->OPC == OP65_LDX && !CE_HasLabel(L[0]) &&
           CE_IsCallTo(L[1], "bnegax") && !CE_HasLabel(L[1]) &&
           (L[2]->Info & OF_ZBRA) != 0 && !CE_HasLabel(L[2]) &&
           (GetRegInfo(S, I + 4, PSTATE_Z) & PSTATE_Z) == 0) {
 
-         /* ldx --> ora */
+         // ldx --> ora
          CE_ReplaceOPC(L[0], OP65_ORA);
 
-         /* Invert the branch */
+         // Invert the branch
          CE_ReplaceOPC(L[2], GetInverseBranch(L[2]->OPC));
 
-         /* Delete the subroutine call */
+         // Delete the subroutine call
          CS_DelEntry(S, I + 2);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -769,16 +769,16 @@ unsigned OptBNegAX4(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[2];
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if (E->OPC == OP65_JSR && CS_GetEntries(S, L, I + 1, 2) &&
           L[0]->OPC == OP65_JSR && strncmp(L[0]->Arg, "bnega", 5) == 0 &&
           !CE_HasLabel(L[0]) && (L[1]->Info & OF_ZBRA) != 0 &&
@@ -787,37 +787,37 @@ unsigned OptBNegAX4(CodeSeg *S)
 
          CodeEntry *X;
 
-         /* Check if we're calling bnega or bnegax */
+         // Check if we're calling bnega or bnegax
          int ByteSized = (strcmp(L[0]->Arg, "bnega") == 0);
 
-         /* Insert apropriate test code */
+         // Insert apropriate test code
          if (ByteSized) {
-            /* Test bytes */
+            // Test bytes
             X = NewCodeEntry(OP65_TAX, AM65_IMP, 0, 0, L[0]->LI);
             CS_InsertEntry(S, X, I + 2);
          }
          else {
-            /* Test words */
+            // Test words
             X = NewCodeEntry(OP65_STX, AM65_ZP, "tmp1", 0, L[0]->LI);
             CS_InsertEntry(S, X, I + 2);
             X = NewCodeEntry(OP65_ORA, AM65_ZP, "tmp1", 0, L[0]->LI);
             CS_InsertEntry(S, X, I + 3);
          }
 
-         /* Delete the subroutine call */
+         // Delete the subroutine call
          CS_DelEntry(S, I + 1);
 
-         /* Invert the branch */
+         // Invert the branch
          CE_ReplaceOPC(L[1], GetInverseBranch(L[1]->OPC));
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }

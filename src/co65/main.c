@@ -1,34 +1,34 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                  main.c                                   */
-/*                                                                           */
-/*              Main program for the co65 object file converter              */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2003-2009, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                  main.c
+//
+//              Main program for the co65 object file converter
+//
+//
+//
+// (C) 2003-2009, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
@@ -37,7 +37,7 @@
 #include <errno.h>
 #include <time.h>
 
-/* common */
+// common
 #include "chartype.h"
 #include "cmdline.h"
 #include "debugflag.h"
@@ -48,7 +48,7 @@
 #include "xmalloc.h"
 #include "xsprintf.h"
 
-/* co65 */
+// co65
 #include "convert.h"
 #include "error.h"
 #include "global.h"
@@ -56,11 +56,11 @@
 #include "o65.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 static void Usage(void)
-/* Print usage information and exit */
+// Print usage information and exit
 {
    printf(
        "Usage: %s [options] file\n"
@@ -92,7 +92,7 @@ static void Usage(void)
 }
 
 static void CheckLabelName(const char *Label)
-/* Check if the given label is a valid label name */
+// Check if the given label is a valid label name
 {
    const char *L = Label;
 
@@ -110,91 +110,91 @@ static void CheckLabelName(const char *Label)
 }
 
 static void CheckSegName(const char *Seg)
-/* Abort if the given name is not a valid segment name */
+// Abort if the given name is not a valid segment name
 {
-   /* Print an error and abort if the name is not ok */
+   // Print an error and abort if the name is not ok
    if (!ValidSegName(Seg)) {
       Error("Segment name '%s' is invalid", Seg);
    }
 }
 
 static void OptBssLabel(const char *Opt attribute((unused)), const char *Arg)
-/* Handle the --bss-label option */
+// Handle the --bss-label option
 {
-   /* Check for a label name */
+   // Check for a label name
    CheckLabelName(Arg);
 
-   /* Set the label */
+   // Set the label
    BssLabel = xstrdup(Arg);
 }
 
 static void OptBssName(const char *Opt attribute((unused)), const char *Arg)
-/* Handle the --bss-name option */
+// Handle the --bss-name option
 {
-   /* Check for a valid name */
+   // Check for a valid name
    CheckSegName(Arg);
 
-   /* Set the name */
+   // Set the name
    BssSeg = xstrdup(Arg);
 }
 
 static void OptCodeLabel(const char *Opt attribute((unused)), const char *Arg)
-/* Handle the --code-label option */
+// Handle the --code-label option
 {
-   /* Check for a label name */
+   // Check for a label name
    CheckLabelName(Arg);
 
-   /* Set the label */
+   // Set the label
    CodeLabel = xstrdup(Arg);
 }
 
 static void OptCodeName(const char *Opt attribute((unused)), const char *Arg)
-/* Handle the --code-name option */
+// Handle the --code-name option
 {
-   /* Check for a valid name */
+   // Check for a valid name
    CheckSegName(Arg);
 
-   /* Set the name */
+   // Set the name
    CodeSeg = xstrdup(Arg);
 }
 
 static void OptDataLabel(const char *Opt attribute((unused)), const char *Arg)
-/* Handle the --data-label option */
+// Handle the --data-label option
 {
-   /* Check for a label name */
+   // Check for a label name
    CheckLabelName(Arg);
 
-   /* Set the label */
+   // Set the label
    DataLabel = xstrdup(Arg);
 }
 
 static void OptDataName(const char *Opt attribute((unused)), const char *Arg)
-/* Handle the --data-name option */
+// Handle the --data-name option
 {
-   /* Check for a valid name */
+   // Check for a valid name
    CheckSegName(Arg);
 
-   /* Set the name */
+   // Set the name
    DataSeg = xstrdup(Arg);
 }
 
 static void OptDebug(const char *Opt attribute((unused)),
                      const char *Arg attribute((unused)))
-/* Enable debugging code */
+// Enable debugging code
 {
    ++Debug;
 }
 
 static void OptDebugInfo(const char *Opt attribute((unused)),
                          const char *Arg attribute((unused)))
-/* Add debug info to the object file */
+// Add debug info to the object file
 {
    DebugInfo = 1;
 }
 
 static void OptHelp(const char *Opt attribute((unused)),
                     const char *Arg attribute((unused)))
-/* Print usage information and exit */
+// Print usage information and exit
 {
    Usage();
    exit(EXIT_SUCCESS);
@@ -202,15 +202,15 @@ static void OptHelp(const char *Opt attribute((unused)),
 
 static void OptNoOutput(const char *Opt attribute((unused)),
                         const char *Arg attribute((unused)))
-/* Handle the --no-output option */
+// Handle the --no-output option
 {
    NoOutput = 1;
 }
 
 static void OptO65Model(const char *Opt attribute((unused)), const char *Arg)
-/* Handle the --o65-model option */
+// Handle the --o65-model option
 {
-   /* Search for the model name */
+   // Search for the model name
    Model = FindModel(Arg);
    if (Model == O65_MODEL_INVALID) {
       Error("Unknown o65 model '%s'", Arg);
@@ -219,14 +219,14 @@ static void OptO65Model(const char *Opt attribute((unused)), const char *Arg)
 
 static void OptVerbose(const char *Opt attribute((unused)),
                        const char *Arg attribute((unused)))
-/* Increase verbosity */
+// Increase verbosity
 {
    ++Verbosity;
 }
 
 static void OptVersion(const char *Opt attribute((unused)),
                        const char *Arg attribute((unused)))
-/* Print the assembler version */
+// Print the assembler version
 {
    fprintf(stderr, "%s V%s\n", ProgName, GetVersionAsString());
    exit(EXIT_SUCCESS);
@@ -234,43 +234,43 @@ static void OptVersion(const char *Opt attribute((unused)),
 
 static void OptZeropageLabel(const char *Opt attribute((unused)),
                              const char *Arg)
-/* Handle the --zeropage-label option */
+// Handle the --zeropage-label option
 {
-   /* Check for a label name */
+   // Check for a label name
    CheckLabelName(Arg);
 
-   /* Set the label */
+   // Set the label
    ZeropageLabel = xstrdup(Arg);
 }
 
 static void OptZeropageName(const char *Opt attribute((unused)),
                             const char *Arg)
-/* Handle the --zeropage-name option */
+// Handle the --zeropage-name option
 {
-   /* Check for a valid name */
+   // Check for a valid name
    CheckSegName(Arg);
 
-   /* Set the name */
+   // Set the name
    ZeropageSeg = xstrdup(Arg);
 }
 
 static void DoConversion(void)
-/* Do file conversion */
+// Do file conversion
 {
-   /* Read the o65 file into memory */
+   // Read the o65 file into memory
    O65Data *D = ReadO65File(InputName);
 
-   /* Do the conversion */
+   // Do the conversion
    Convert(D);
 
-   /* Free the o65 module data */
-   /* ### */
+   // Free the o65 module data
+   // ###
 }
 
 int main(int argc, char *argv[])
-/* Converter main program */
+// Converter main program
 {
-   /* Program long options */
+   // Program long options
    static const LongOpt OptTab[] = {
        {"--bss-label", 1, OptBssLabel},
        {"--bss-name", 1, OptBssName},
@@ -291,17 +291,17 @@ int main(int argc, char *argv[])
 
    unsigned I;
 
-   /* Initialize the cmdline module */
+   // Initialize the cmdline module
    InitCmdLine(&argc, &argv, "co65");
 
-   /* Check the parameters */
+   // Check the parameters
    I = 1;
    while (I < ArgCount) {
 
-      /* Get the argument */
+      // Get the argument
       const char *Arg = ArgVec[I];
 
-      /* Check for an option */
+      // Check for an option
       if (Arg[0] == '-') {
          switch (Arg[1]) {
 
@@ -343,7 +343,7 @@ int main(int argc, char *argv[])
          }
       }
       else {
-         /* Filename. Check if we already had one */
+         // Filename. Check if we already had one
          if (InputName) {
             Error("Don't know what to do with '%s'", Arg);
          }
@@ -352,23 +352,23 @@ int main(int argc, char *argv[])
          }
       }
 
-      /* Next argument */
+      // Next argument
       ++I;
    }
 
-   /* Do we have an input file? */
+   // Do we have an input file?
    if (InputName == 0) {
       Error("No input file");
    }
 
-   /* Generate the name of the output file if none was specified */
+   // Generate the name of the output file if none was specified
    if (OutputName == 0) {
       OutputName = MakeFilename(InputName, AsmExt);
    }
 
-   /* Do the conversion */
+   // Do the conversion
    DoConversion();
 
-   /* Return an apropriate exit code */
+   // Return an apropriate exit code
    return EXIT_SUCCESS;
 }

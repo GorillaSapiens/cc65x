@@ -1,37 +1,37 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 easw16.c                                  */
-/*                                                                           */
-/*       SWEET16 effective address parsing for the ca65 macroassembler       */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2004-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 easw16.c
+//
+//       SWEET16 effective address parsing for the ca65 macroassembler
+//
+//
+//
+// (C) 2004-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
-/* ca65 */
+// ca65
 #include "ea.h"
 #include "ea65.h"
 #include "error.h"
@@ -40,7 +40,7 @@
 #include "nexttok.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 static long RegNum()
@@ -51,33 +51,33 @@ static long RegNum()
    long Val;
    ExprNode *Expr = Expression();
    if (!IsConstExpr(Expr, &Val) || Val < 0 || Val > 15) {
-      /* Invalid register */
+      // Invalid register
       Val = -1L;
    }
 
-   /* Free the expression and return the register number */
+   // Free the expression and return the register number
    FreeExpr(Expr);
    return Val;
 }
 
 void GetSweet16EA(EffAddr *A)
-/* Parse an effective address, return the result in A */
+// Parse an effective address, return the result in A
 {
    long Reg;
 
-   /* Clear the output struct */
+   // Clear the output struct
    A->AddrModeSet = 0;
    A->Expr = 0;
    A->Reg = 0;
 
-   /* Parse the effective address */
+   // Parse the effective address
    if (TokIsSep(CurTok.Tok)) {
 
       A->AddrModeSet = AMSW16_IMP;
    }
    else if (CurTok.Tok == TOK_AT) {
 
-      /* @reg or @regnumber */
+      // @reg or @regnumber
       A->AddrModeSet = AMSW16_IND;
       NextTok();
       if (CurTok.Tok == TOK_REG) {
@@ -85,7 +85,7 @@ void GetSweet16EA(EffAddr *A)
          NextTok();
       }
       else if ((Reg = RegNum()) >= 0) {
-         /* Register number */
+         // Register number
          A->Reg = (unsigned)Reg;
       }
       else {
@@ -100,7 +100,7 @@ void GetSweet16EA(EffAddr *A)
 
       if (CurTok.Tok == TOK_COMMA) {
 
-         /* Rx, constant */
+         // Rx, constant
          NextTok();
          A->Expr = Expression();
 
@@ -113,7 +113,7 @@ void GetSweet16EA(EffAddr *A)
    }
    else {
 
-      /* OPC ea  or: OPC regnum, constant */
+      // OPC ea  or: OPC regnum, constant
       A->Expr = Expression();
       A->AddrModeSet = AMSW16_BRA;
 
@@ -123,7 +123,7 @@ void GetSweet16EA(EffAddr *A)
          FreeExpr(A->Expr);
          A->Reg = (unsigned)Reg;
 
-         /* If a comma follows, it is: OPC Rx, constant */
+         // If a comma follows, it is: OPC Rx, constant
          if (CurTok.Tok == TOK_COMMA) {
             NextTok();
             A->Expr = Expression();

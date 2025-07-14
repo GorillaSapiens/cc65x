@@ -1,34 +1,34 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                  main.c                                   */
-/*                                                                           */
-/*                              sim65 main program                           */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2002-2009, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                  main.c
+//
+//                              sim65 main program
+//
+//
+//
+// (C) 2002-2009, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <string.h>
@@ -36,13 +36,13 @@
 #include <stdbool.h>
 #include <errno.h>
 
-/* common */
+// common
 #include "abend.h"
 #include "cmdline.h"
 #include "print.h"
 #include "version.h"
 
-/* sim65 */
+// sim65
 #include "6502.h"
 #include "error.h"
 #include "memory.h"
@@ -52,23 +52,23 @@
 #include "profile.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Name of program file */
+// Name of program file
 const char *ProgramFile;
 
 /* Set to True if CPU mode override is in effect. If set, the CPU is not read
  * from the program file. */
 static bool CPUOverrideActive = false;
 
-/* exit simulator after MaxCycles Cccles */
+// exit simulator after MaxCycles Cccles
 unsigned long long MaxCycles = 0;
 
-/* countdown from MaxCycles */
+// countdown from MaxCycles
 unsigned long long RemainCycles;
 
-/* Header signature 'sim65' */
+// Header signature 'sim65'
 static const unsigned char HeaderSignature[] = {0x73, 0x69, 0x6D, 0x36, 0x35};
 #define HEADER_SIGNATURE_LENGTH                                                \
    (sizeof(HeaderSignature) / sizeof(HeaderSignature[0]))
@@ -76,7 +76,7 @@ static const unsigned char HeaderSignature[] = {0x73, 0x69, 0x6D, 0x36, 0x35};
 static const unsigned char HeaderVersion = 2;
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 static void Usage(void) {
@@ -102,16 +102,16 @@ static void Usage(void) {
 
 static void OptHelp(const char *Opt attribute((unused)),
                     const char *Arg attribute((unused)))
-/* Print usage information and exit */
+// Print usage information and exit
 {
    Usage();
    exit(EXIT_SUCCESS);
 }
 
 static void OptCPU(const char *Opt, const char *Arg)
-/* Set CPU type */
+// Set CPU type
 {
-   /* Don't use FindCPU here. Enum constants would clash. */
+   // Don't use FindCPU here. Enum constants would clash.
    if (strcmp(Arg, "6502") == 0) {
       CPU = CPU_6502;
       CPUOverrideActive = true;
@@ -131,27 +131,27 @@ static void OptCPU(const char *Opt, const char *Arg)
 
 static void OptTrace(const char *Opt attribute((unused)),
                      const char *Arg attribute((unused)))
-/* Enable trace mode */
+// Enable trace mode
 {
-   TraceMode = TRACE_ENABLE_FULL; /* Enable full trace mode. */
+   TraceMode = TRACE_ENABLE_FULL; // Enable full trace mode.
 }
 
 static void OptVerbose(const char *Opt attribute((unused)),
                        const char *Arg attribute((unused)))
-/* Increase verbosity */
+// Increase verbosity
 {
    ++Verbosity;
 }
 
 static void OptCycles(const char *Opt attribute((unused)),
                       const char *Arg attribute((unused)))
-/* Set flag to print amount of cycles at the end */
+// Set flag to print amount of cycles at the end
 {
    PrintCycles = 1;
 }
 
 static void OptProfile(const char *Opt attribute((unused)), const char *Arg)
-/* Set flag to enable profiling at the end */
+// Set flag to enable profiling at the end
 {
    enableProfiling = 1;
    symInfoFile = strdup(Arg);
@@ -159,20 +159,20 @@ static void OptProfile(const char *Opt attribute((unused)), const char *Arg)
 
 static void OptVersion(const char *Opt attribute((unused)),
                        const char *Arg attribute((unused)))
-/* Print the simulator version */
+// Print the simulator version
 {
    fprintf(stderr, "%s V%s\n", ProgName, GetVersionAsString());
    exit(EXIT_SUCCESS);
 }
 
 static void OptQuitXIns(const char *Opt attribute((unused)), const char *Arg)
-/* Quit after MaxCycles cycles */
+// Quit after MaxCycles cycles
 {
    MaxCycles = strtoull(Arg, NULL, 0);
 }
 
 static unsigned char ReadProgramFile(void)
-/* Load program into memory */
+// Load program into memory
 {
    unsigned I;
    int Val, Val2;
@@ -181,20 +181,20 @@ static unsigned char ReadProgramFile(void)
    unsigned Load, Reset;
    unsigned char SPAddr = 0x00;
 
-   /* Open the file */
+   // Open the file
    FILE *F = fopen(ProgramFile, "rb");
    if (F == 0) {
       Error("Cannot open '%s': %s", ProgramFile, strerror(errno));
    }
 
-   /* Verify the header signature */
+   // Verify the header signature
    for (I = 0; I < HEADER_SIGNATURE_LENGTH; ++I) {
       if ((Val = fgetc(F)) != HeaderSignature[I]) {
          Error("'%s': Invalid header signature.", ProgramFile);
       }
    }
 
-   /* Get header version */
+   // Get header version
    if ((Version = fgetc(F)) != HeaderVersion) {
       Error("'%s': Invalid header version.", ProgramFile);
    }
@@ -215,25 +215,25 @@ static unsigned char ReadProgramFile(void)
       }
    }
 
-   /* Get the address of c_sp from the file header */
+   // Get the address of c_sp from the file header
    if ((Val = fgetc(F)) != EOF) {
       SPAddr = Val;
    }
 
-   /* Get load address */
-   Val2 = 0; /* suppress uninitialized variable warning */
+   // Get load address
+   Val2 = 0; // suppress uninitialized variable warning
    if (((Val = fgetc(F)) == EOF) || ((Val2 = fgetc(F)) == EOF)) {
       Error("'%s': Header missing load address", ProgramFile);
    }
    Load = Val | (Val2 << 8);
 
-   /* Get reset address */
+   // Get reset address
    if (((Val = fgetc(F)) == EOF) || ((Val2 = fgetc(F)) == EOF)) {
       Error("'%s': Header missing reset address", ProgramFile);
    }
    Reset = Val | (Val2 << 8);
 
-   /* Read the file body into memory */
+   // Read the file body into memory
    Addr = Load;
    while ((Val = fgetc(F)) != EOF) {
       if (Addr >= PARAVIRT_BASE) {
@@ -243,12 +243,12 @@ static unsigned char ReadProgramFile(void)
       MemWriteByte(Addr++, (unsigned char)Val);
    }
 
-   /* Check for errors */
+   // Check for errors
    if (ferror(F)) {
       Error("Error reading from '%s': %s", ProgramFile, strerror(errno));
    }
 
-   /* Close the file */
+   // Close the file
    fclose(F);
 
    Print(stderr, 1, "Loaded '%s' at $%04X-$%04X\n", ProgramFile, Load,
@@ -261,7 +261,7 @@ static unsigned char ReadProgramFile(void)
 }
 
 int main(int argc, char *argv[]) {
-   /* Program long options */
+   // Program long options
    static const LongOpt OptTab[] = {
        {"--help", 0, OptHelp},       {"--cycles", 0, OptCycles},
        {"--cpu", 1, OptCPU},         {"--trace", 0, OptTrace},
@@ -273,21 +273,21 @@ int main(int argc, char *argv[]) {
    unsigned char SPAddr;
    unsigned int Cycles;
 
-   /* Set reasonable defaults. */
+   // Set reasonable defaults.
    CPU = CPU_6502;
-   TraceMode = TRACE_DISABLED; /* Disabled by default */
+   TraceMode = TRACE_DISABLED; // Disabled by default
 
-   /* Initialize the cmdline module */
+   // Initialize the cmdline module
    InitCmdLine(&argc, &argv, "sim65");
 
-   /* Parse the command line */
+   // Parse the command line
    I = 1;
    while (I < ArgCount) {
 
-      /* Get the argument */
+      // Get the argument
       const char *Arg = ArgVec[I];
 
-      /* Check for an option */
+      // Check for an option
       if (Arg[0] == '-') {
 
          switch (Arg[1]) {
@@ -331,19 +331,19 @@ int main(int argc, char *argv[]) {
          break;
       }
 
-      /* Next argument */
+      // Next argument
       ++I;
    }
 
-   /* Do we have a program file? */
+   // Do we have a program file?
    if (ProgramFile == NULL) {
       AbEnd("No program file");
    }
 
-   /* Reset memory */
+   // Reset memory
    MemInit();
 
-   /* Reset peripherals. */
+   // Reset peripherals.
    PeripheralsInit();
 
    // Read program file into memory.
@@ -356,7 +356,7 @@ int main(int argc, char *argv[]) {
    TraceInit(SPAddr);
    ParaVirtInit(I, SPAddr);
 
-   /* Reset the CPU */
+   // Reset the CPU
    Reset();
 
    RemainCycles = MaxCycles;

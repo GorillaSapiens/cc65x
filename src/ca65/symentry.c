@@ -1,77 +1,77 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                symentry.c                                 */
-/*                                                                           */
-/*              Symbol table entry for the ca65 macroassembler               */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                symentry.c
+//
+//              Symbol table entry for the ca65 macroassembler
+//
+//
+//
+// (C) 1998-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <string.h>
 
-/* common */
+// common
 #include "addrsize.h"
 #include "symdefs.h"
 #include "xmalloc.h"
 
-/* ca65 */
+// ca65
 #include "error.h"
 #include "expr.h"
 #include "global.h"
 #include "scanner.h"
 #include "segment.h"
 #include "spool.h"
-#include "studyexpr.h" /* ### */
+#include "studyexpr.h" // ###
 #include "symentry.h"
 #include "symtab.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* List of all symbol table entries */
+// List of all symbol table entries
 SymEntry *SymList = 0;
 
-/* Pointer to last defined symbol */
+// Pointer to last defined symbol
 SymEntry *SymLast = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 SymEntry *NewSymEntry(const StrBuf *Name, unsigned Flags)
-/* Allocate a symbol table entry, initialize and return it */
+// Allocate a symbol table entry, initialize and return it
 {
    unsigned I;
 
-   /* Allocate memory */
+   // Allocate memory
    SymEntry *S = xmalloc(sizeof(SymEntry));
 
-   /* Initialize the entry */
+   // Initialize the entry
    S->Left = 0;
    S->Right = 0;
    S->Locals = 0;
@@ -93,11 +93,11 @@ SymEntry *NewSymEntry(const StrBuf *Name, unsigned Flags)
    memset(S->ConDesPrio, 0, sizeof(S->ConDesPrio));
    S->Name = GetStrBufId(Name);
 
-   /* Insert it into the list of all entries */
+   // Insert it into the list of all entries
    S->List = SymList;
    SymList = S;
 
-   /* Return the initialized entry */
+   // Return the initialized entry
    return S;
 }
 
@@ -109,19 +109,19 @@ int SymSearchTree(SymEntry *T, const StrBuf *Name, SymEntry **E)
 // the entry should be inserted on the left side, and >0 if it should get
 // inserted on the right side.
 {
-   /* Is there a tree? */
+   // Is there a tree?
    if (T == 0) {
       *E = 0;
       return 1;
    }
 
-   /* We have a table, search it */
+   // We have a table, search it
    while (1) {
 
-      /* Get the symbol name */
+      // Get the symbol name
       const StrBuf *SymName = GetStrBuf(T->Name);
 
-      /* Choose next entry */
+      // Choose next entry
       int Cmp = SB_Compare(Name, SymName);
       if (Cmp < 0 && T->Left) {
          T = T->Left;
@@ -130,7 +130,7 @@ int SymSearchTree(SymEntry *T, const StrBuf *Name, SymEntry **E)
          T = T->Right;
       }
       else {
-         /* Found or end of search, return the result */
+         // Found or end of search, return the result
          *E = T;
          return Cmp;
       }
@@ -138,46 +138,46 @@ int SymSearchTree(SymEntry *T, const StrBuf *Name, SymEntry **E)
 }
 
 void SymTransferExprRefs(SymEntry *From, SymEntry *To)
-/* Transfer all expression references from one symbol to another. */
+// Transfer all expression references from one symbol to another.
 {
    unsigned I;
 
    for (I = 0; I < CollCount(&From->ExprRefs); ++I) {
 
-      /* Get the expression node */
+      // Get the expression node
       ExprNode *E = CollAtUnchecked(&From->ExprRefs, I);
 
-      /* Safety */
+      // Safety
       CHECK(E->Op == EXPR_SYMBOL && E->V.Sym == From);
 
-      /* Replace the symbol reference */
+      // Replace the symbol reference
       E->V.Sym = To;
 
-      /* Add the expression reference */
+      // Add the expression reference
       SymAddExprRef(To, E);
    }
 
-   /* Remove all symbol references from the old symbol */
+   // Remove all symbol references from the old symbol
    CollDeleteAll(&From->ExprRefs);
 }
 
 static void SymReplaceExprRefs(SymEntry *S)
-/* Replace the references to this symbol by a copy of the symbol expression */
+// Replace the references to this symbol by a copy of the symbol expression
 {
    unsigned I;
    long Val;
 
-   /* Check if the expression is const and get its value */
+   // Check if the expression is const and get its value
    int IsConst = IsConstExpr(S->Expr, &Val);
    CHECK(IsConst);
 
-   /* Loop over all references */
+   // Loop over all references
    for (I = 0; I < CollCount(&S->ExprRefs); ++I) {
 
-      /* Get the expression node */
+      // Get the expression node
       ExprNode *E = CollAtUnchecked(&S->ExprRefs, I);
 
-      /* Safety */
+      // Safety
       CHECK(E->Op == EXPR_SYMBOL && E->V.Sym == S);
 
       // We cannot touch the root node, since there are pointers to it.
@@ -186,35 +186,35 @@ static void SymReplaceExprRefs(SymEntry *S)
       E->V.IVal = Val;
    }
 
-   /* Remove all symbol references from the symbol */
+   // Remove all symbol references from the symbol
    CollDeleteAll(&S->ExprRefs);
 }
 
 void SymDef(SymEntry *S, ExprNode *Expr, unsigned char AddrSize, unsigned Flags)
-/* Define a new symbol */
+// Define a new symbol
 {
-   int Redef = 0; /* Flag for symbol redefinition */
+   int Redef = 0; // Flag for symbol redefinition
 
    if (S->Flags & SF_IMPORT) {
-      /* Defined symbol is marked as imported external symbol */
+      // Defined symbol is marked as imported external symbol
       Error("Symbol '%m%p' is already an import", GetSymName(S));
       return;
    }
    if ((Flags & SF_VAR) != 0 && (S->Flags & (SF_EXPORT | SF_GLOBAL))) {
-      /* Variable symbols cannot be exports or globals */
+      // Variable symbols cannot be exports or globals
       Error("Var symbol '%m%p' cannot be an export or global symbol",
             GetSymName(S));
       return;
    }
    if (S->Flags & SF_DEFINED) {
-      /* Multiple definition. In case of a variable, this is legal. */
+      // Multiple definition. In case of a variable, this is legal.
       if ((S->Flags & SF_VAR) == 0) {
          Error("Symbol '%m%p' is already defined", GetSymName(S));
          S->Flags |= SF_MULTDEF;
          return;
       }
       else {
-         /* Redefinition must also be a variable symbol */
+         // Redefinition must also be a variable symbol
          if ((Flags & SF_VAR) == 0) {
             Error("Symbol '%m%p' is already different kind", GetSymName(S));
             return;
@@ -227,9 +227,9 @@ void SymDef(SymEntry *S, ExprNode *Expr, unsigned char AddrSize, unsigned Flags)
       }
    }
 
-   /* Map a default address size to a real value */
+   // Map a default address size to a real value
    if (AddrSize == ADDR_SIZE_DEFAULT) {
-      /* ### Must go! Delay address size calculation until end of assembly! */
+      // ### Must go! Delay address size calculation until end of assembly!
       ExprDesc ED;
       ED_Init(&ED);
       StudyExpr(Expr, &ED);
@@ -237,7 +237,7 @@ void SymDef(SymEntry *S, ExprNode *Expr, unsigned char AddrSize, unsigned Flags)
       ED_Done(&ED);
    }
 
-   /* Set the symbol value */
+   // Set the symbol value
    S->Expr = Expr;
 
    // In case of a variable symbol, walk over all expressions containing
@@ -255,21 +255,21 @@ void SymDef(SymEntry *S, ExprNode *Expr, unsigned char AddrSize, unsigned Flags)
       ReleaseFullLineInfo(&S->DefLines);
    }
 
-   /* Mark the symbol as defined and use the given address size */
+   // Mark the symbol as defined and use the given address size
    S->Flags |= (SF_DEFINED | Flags);
    S->AddrSize = AddrSize;
 
-   /* Remember the line info of the symbol definition */
+   // Remember the line info of the symbol definition
    GetFullLineInfo(&S->DefLines);
 
-   /* If the symbol is exported, check the address sizes */
+   // If the symbol is exported, check the address sizes
    if (S->Flags & SF_EXPORT) {
       if (S->ExportSize == ADDR_SIZE_DEFAULT) {
-         /* Use the real size of the symbol */
+         // Use the real size of the symbol
          S->ExportSize = S->AddrSize;
       }
       else if (S->AddrSize > S->ExportSize) {
-         /* We're exporting a symbol smaller than it actually is */
+         // We're exporting a symbol smaller than it actually is
          Warning(1, "Symbol '%m%p' is %s but exported %s", GetSymName(S),
                  AddrSizeToStr(S->AddrSize), AddrSizeToStr(S->ExportSize));
       }
@@ -283,17 +283,17 @@ void SymDef(SymEntry *S, ExprNode *Expr, unsigned char AddrSize, unsigned Flags)
 }
 
 void SymRef(SymEntry *S)
-/* Mark the given symbol as referenced */
+// Mark the given symbol as referenced
 {
-   /* Mark the symbol as referenced */
+   // Mark the symbol as referenced
    S->Flags |= SF_REFERENCED;
 
-   /* Remember the current location */
+   // Remember the current location
    CollAppend(&S->RefLines, GetAsmLineInfo());
 }
 
 void SymImport(SymEntry *S, unsigned char AddrSize, unsigned Flags)
-/* Mark the given symbol as an imported symbol */
+// Mark the given symbol as an imported symbol
 {
    if (S->Flags & SF_DEFINED) {
       Error("Symbol '%m%p' is already defined", GetSymName(S));
@@ -301,7 +301,7 @@ void SymImport(SymEntry *S, unsigned char AddrSize, unsigned Flags)
       return;
    }
    if (S->Flags & SF_EXPORT) {
-      /* The symbol is already marked as exported symbol */
+      // The symbol is already marked as exported symbol
       Error("Cannot import exported symbol '%m%p'", GetSymName(S));
       return;
    }
@@ -329,7 +329,7 @@ void SymImport(SymEntry *S, unsigned char AddrSize, unsigned Flags)
       }
    }
 
-   /* Set the symbol data */
+   // Set the symbol data
    S->Flags |= (SF_IMPORT | Flags);
    S->AddrSize = AddrSize;
 
@@ -340,16 +340,16 @@ void SymImport(SymEntry *S, unsigned char AddrSize, unsigned Flags)
 }
 
 void SymExport(SymEntry *S, unsigned char AddrSize, unsigned Flags)
-/* Mark the given symbol as an exported symbol */
+// Mark the given symbol as an exported symbol
 {
-   /* Check if it's ok to export the symbol */
+   // Check if it's ok to export the symbol
    if (S->Flags & SF_IMPORT) {
-      /* The symbol is already marked as imported external symbol */
+      // The symbol is already marked as imported external symbol
       Error("Symbol '%m%p' is already an import", GetSymName(S));
       return;
    }
    if (S->Flags & SF_VAR) {
-      /* Variable symbols cannot be exported */
+      // Variable symbols cannot be exported
       Error("Var symbol '%m%p' cannot be exported", GetSymName(S));
       return;
    }
@@ -380,20 +380,20 @@ void SymExport(SymEntry *S, unsigned char AddrSize, unsigned Flags)
    // exported size.
    if (S->Flags & SF_DEFINED) {
       if (S->ExportSize == ADDR_SIZE_DEFAULT) {
-         /* No export size given, use the real size of the symbol */
+         // No export size given, use the real size of the symbol
          S->ExportSize = S->AddrSize;
       }
       else if (S->AddrSize > S->ExportSize) {
-         /* We're exporting a symbol smaller than it actually is */
+         // We're exporting a symbol smaller than it actually is
          Warning(1, "Symbol '%m%p' is %s but exported %s", GetSymName(S),
                  AddrSizeToStr(S->AddrSize), AddrSizeToStr(S->ExportSize));
       }
    }
 
-   /* Set the symbol data */
+   // Set the symbol data
    S->Flags |= (SF_EXPORT | SF_REFERENCED | Flags);
 
-   /* Remember line info for this reference */
+   // Remember line info for this reference
    CollAppend(&S->RefLines, GetAsmLineInfo());
 }
 
@@ -402,7 +402,7 @@ void SymGlobal(SymEntry *S, unsigned char AddrSize, unsigned Flags)
 // either imported or exported.
 {
    if (S->Flags & SF_VAR) {
-      /* Variable symbols cannot be exported or imported */
+      // Variable symbols cannot be exported or imported
       Error("Var symbol '%m%p' cannot be made global", GetSymName(S));
       return;
    }
@@ -411,7 +411,7 @@ void SymGlobal(SymEntry *S, unsigned char AddrSize, unsigned Flags)
    // Apart from that, ignore the global declaration.
    if (S->Flags & SF_IMPORT) {
       if (AddrSize == ADDR_SIZE_DEFAULT) {
-         /* Use the size of the current segment */
+         // Use the size of the current segment
          AddrSize = GetCurrentSegAddrSize();
       }
       if (AddrSize != S->AddrSize) {
@@ -424,13 +424,13 @@ void SymGlobal(SymEntry *S, unsigned char AddrSize, unsigned Flags)
    // sizes must match.
    if (S->Flags & SF_EXPORT) {
       if ((S->Flags & SF_DEFINED) == 0) {
-         /* Symbol is undefined */
+         // Symbol is undefined
          if (AddrSize != S->ExportSize) {
             Error("Address size mismatch for symbol '%m%p'", GetSymName(S));
          }
       }
       else if (AddrSize != ADDR_SIZE_DEFAULT) {
-         /* Symbol is defined and address size given */
+         // Symbol is defined and address size given
          if (AddrSize != S->ExportSize) {
             Error("Address size mismatch for symbol '%m%p'", GetSymName(S));
          }
@@ -453,14 +453,14 @@ void SymGlobal(SymEntry *S, unsigned char AddrSize, unsigned Flags)
    // become an export. If it is not defined, mark it as global and remember
    // the given address sizes.
    if (S->Flags & SF_DEFINED) {
-      /* The symbol is defined, export it */
+      // The symbol is defined, export it
       S->ExportSize = AddrSize;
       if (S->ExportSize == ADDR_SIZE_DEFAULT) {
-         /* No export size given, use the real size of the symbol */
+         // No export size given, use the real size of the symbol
          S->ExportSize = S->AddrSize;
       }
       else if (S->AddrSize > S->ExportSize) {
-         /* We're exporting a symbol smaller than it actually is */
+         // We're exporting a symbol smaller than it actually is
          Warning(1, "Symbol '%m%p' is %s but exported %s", GetSymName(S),
                  AddrSizeToStr(S->AddrSize), AddrSizeToStr(S->ExportSize));
       }
@@ -472,7 +472,7 @@ void SymGlobal(SymEntry *S, unsigned char AddrSize, unsigned Flags)
       // and the other one for an export in ExportSize.
       S->AddrSize = AddrSize;
       if (S->AddrSize == ADDR_SIZE_DEFAULT) {
-         /* Use the size of the current segment */
+         // Use the size of the current segment
          S->AddrSize = GetCurrentSegAddrSize();
       }
       S->ExportSize = AddrSize;
@@ -489,7 +489,7 @@ void SymConDes(SymEntry *S, unsigned char AddrSize, unsigned Type,
 // Mark the given symbol as a module constructor/destructor. This will also
 // mark the symbol as an export. Initializers may never be zero page symbols.
 {
-   /* Check the parameters */
+   // Check the parameters
 #if (CD_TYPE_MIN != 0)
    CHECK(Type >= CD_TYPE_MIN && Type <= CD_TYPE_MAX);
 #else
@@ -497,14 +497,14 @@ void SymConDes(SymEntry *S, unsigned char AddrSize, unsigned Type,
 #endif
    CHECK(Prio >= CD_PRIO_MIN && Prio <= CD_PRIO_MAX);
 
-   /* Check for errors */
+   // Check for errors
    if (S->Flags & SF_IMPORT) {
-      /* The symbol is already marked as imported external symbol */
+      // The symbol is already marked as imported external symbol
       Error("Symbol '%m%p' is already an import", GetSymName(S));
       return;
    }
    if (S->Flags & SF_VAR) {
-      /* Variable symbols cannot be exported or imported */
+      // Variable symbols cannot be exported or imported
       Error("Var symbol '%m%p' cannot be exported", GetSymName(S));
       return;
    }
@@ -513,7 +513,7 @@ void SymConDes(SymEntry *S, unsigned char AddrSize, unsigned Type,
    // exported size.
    if (S->Flags & SF_DEFINED) {
       if (AddrSize == ADDR_SIZE_DEFAULT) {
-         /* Use the real size of the symbol */
+         // Use the real size of the symbol
          AddrSize = S->AddrSize;
       }
       else if (S->AddrSize != AddrSize) {
@@ -541,10 +541,10 @@ void SymConDes(SymEntry *S, unsigned char AddrSize, unsigned Type,
    }
    S->ConDesPrio[Type] = Prio;
 
-   /* Set the symbol data */
+   // Set the symbol data
    S->Flags |= (SF_EXPORT | SF_REFERENCED);
 
-   /* Remember the line info for this reference */
+   // Remember the line info for this reference
    CollAppend(&S->RefLines, GetAsmLineInfo());
 }
 
@@ -554,20 +554,20 @@ void SymGuessedAddrSize(SymEntry *Sym, unsigned char AddrSize)
 // wasn't known. Example: Zero page addressing was not used because symbol
 // is undefined, and absolute addressing was available.
 {
-   /* We must have a valid address size passed */
+   // We must have a valid address size passed
    PRECONDITION(AddrSize != ADDR_SIZE_DEFAULT);
 
-   /* We do not support all address sizes currently */
+   // We do not support all address sizes currently
    if (AddrSize > sizeof(Sym->GuessedUse) / sizeof(Sym->GuessedUse[0])) {
       return;
    }
 
-   /* We can only remember one such occurance */
+   // We can only remember one such occurance
    if (Sym->GuessedUse[AddrSize - 1]) {
       return;
    }
 
-   /* Ok, remember the file position */
+   // Ok, remember the file position
    Sym->GuessedUse[AddrSize - 1] = xdup(&CurTok.Pos, sizeof(CurTok.Pos));
 }
 
@@ -575,7 +575,7 @@ void SymExportFromGlobal(SymEntry *S)
 // Called at the end of assembly. Converts a global symbol that is defined
 // into an export.
 {
-   /* Remove the global flag and make the symbol an export */
+   // Remove the global flag and make the symbol an export
    S->Flags &= ~SF_GLOBAL;
    S->Flags |= SF_EXPORT;
 }
@@ -584,7 +584,7 @@ void SymImportFromGlobal(SymEntry *S)
 // Called at the end of assembly. Converts a global symbol that is undefined
 // into an import.
 {
-   /* Remove the global flag and make it an import */
+   // Remove the global flag and make it an import
    S->Flags &= ~SF_GLOBAL;
    S->Flags |= SF_IMPORT;
 }
@@ -593,7 +593,7 @@ int SymIsConst(const SymEntry *S, long *Val)
 // Return true if the given symbol has a constant value. If Val is not NULL
 // and the symbol has a constant value, store it's value there.
 {
-   /* Check for constness */
+   // Check for constness
    return (SymHasExpr(S) && IsConstExpr(S->Expr, Val));
 }
 
@@ -602,7 +602,7 @@ SymTable *GetSymParentScope(SymEntry *S)
 // NULL if the symbol is a cheap local, or defined on global level.
 {
    if ((S->Flags & SF_LOCAL) != 0) {
-      /* This is a cheap local symbol */
+      // This is a cheap local symbol
       return 0;
    }
    else if (S->Sym.Tab == 0) {
@@ -611,13 +611,13 @@ SymTable *GetSymParentScope(SymEntry *S)
       return 0;
    }
    else {
-      /* This is a global symbol */
+      // This is a global symbol
       return S->Sym.Tab->Parent;
    }
 }
 
 struct ExprNode *GetSymExpr(SymEntry *S)
-/* Get the expression for a non-const symbol */
+// Get the expression for a non-const symbol
 {
    PRECONDITION(S != 0 && SymHasExpr(S));
    return S->Expr;
@@ -640,14 +640,14 @@ long GetSymVal(SymEntry *S)
 }
 
 unsigned GetSymImportId(const SymEntry *S)
-/* Return the import id for the given symbol */
+// Return the import id for the given symbol
 {
    PRECONDITION(S != 0 && (S->Flags & SF_IMPORT) && S->ImportId != ~0U);
    return S->ImportId;
 }
 
 unsigned GetSymExportId(const SymEntry *S)
-/* Return the export id for the given symbol */
+// Return the export id for the given symbol
 {
    PRECONDITION(S != 0 && (S->Flags & SF_EXPORT) && S->ExportId != ~0U);
    return S->ExportId;
@@ -659,7 +659,7 @@ unsigned GetSymInfoFlags(const SymEntry *S, long *ConstVal)
 // of the symbol. The result does not include the condes count.
 // See common/symdefs.h for more information.
 {
-   /* Setup info flags */
+   // Setup info flags
    unsigned Flags = 0;
    Flags |= SymIsConst(S, ConstVal) ? SYM_CONST : SYM_EXPR;
    Flags |= (S->Flags & SF_LABEL) ? SYM_LABEL : SYM_EQUATE;
@@ -671,6 +671,6 @@ unsigned GetSymInfoFlags(const SymEntry *S, long *ConstVal)
       Flags |= SYM_IMPORT;
    }
 
-   /* Return the result */
+   // Return the result
    return Flags;
 }

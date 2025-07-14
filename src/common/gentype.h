@@ -1,34 +1,34 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 gentype.h                                 */
-/*                                                                           */
-/*                        Generic data type encoding                         */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2011,      Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 gentype.h
+//
+//                        Generic data type encoding
+//
+//
+//
+// (C) 2011,      Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 // This module implements a specification for a "generic data type". It is
@@ -50,14 +50,14 @@
 #ifndef GENTYPE_H
 #define GENTYPE_H
 
-/* common */
+// common
 #include "strbuf.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Size of a data type */
+// Size of a data type
 #define GT_SIZE_1 0x00U
 #define GT_SIZE_2 0x01U
 #define GT_SIZE_3 0x02U
@@ -66,14 +66,14 @@
 
 #define GT_GET_SIZE(x) (((x) & GT_SIZE_MASK) + 1U)
 
-/* Sign of the data type */
+// Sign of the data type
 #define GT_UNSIGNED 0x00U
 #define GT_SIGNED 0x08U
 #define GT_SIGN_MASK 0x08U
 
 #define GT_HAS_SIGN(x) (((x) & GT_SIZE_MASK) == GT_SIGNED)
 
-/* Byte order */
+// Byte order
 #define GT_LITTLE_ENDIAN 0x00U
 #define GT_BIG_ENDIAN 0x10U
 #define GT_BYTEORDER_MASK 0x10U
@@ -81,7 +81,7 @@
 #define GT_IS_LITTLE_ENDIAN(x) (((x) & GT_BYTEORDER_MASK) == GT_LITTLE_ENDIAN)
 #define GT_IS_BIG_ENDIAN(x) (((x) & GT_BYTEORDER_MASK) == GT_BIG_ENDIAN)
 
-/* Type of the data. */
+// Type of the data.
 #define GT_TYPE_VOID 0x00U
 #define GT_TYPE_INT 0x20U
 #define GT_TYPE_PTR 0x40U
@@ -101,7 +101,7 @@
 #define GT_IS_STRUCT(x) (GT_GET_TYPE(x) == GT_TYPE_STRUCT)
 #define GT_IS_UNION(x) (GT_GET_TYPE(x) == GT_TYPE_UNION)
 
-/* Combined values for the 6502 family */
+// Combined values for the 6502 family
 #define GT_VOID (GT_TYPE_VOID)
 #define GT_BYTE (GT_TYPE_INT | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_1)
 #define GT_WORD (GT_TYPE_INT | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_2)
@@ -112,7 +112,7 @@
 #define GT_ARRAY(size) (GT_TYPE_ARRAY | ((size) - 1))
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 void GT_AddArray(StrBuf *Type, unsigned ArraySize);
@@ -129,6 +129,6 @@ const char *GT_AsString(const StrBuf *Type, StrBuf *String);
 // Convert the type into a readable representation. The target string buffer
 // will be zero terminated and a pointer to the contents are returned.
 
-/* End of gentype.h */
+// End of gentype.h
 
 #endif

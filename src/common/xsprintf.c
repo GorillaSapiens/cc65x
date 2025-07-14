@@ -1,34 +1,34 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                xsprintf.c                                 */
-/*                                                                           */
-/*                       Replacement sprintf function                        */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                xsprintf.c
+//
+//                       Replacement sprintf function
+//
+//
+//
+// (C) 2000-2004 Ullrich von Bassewitz
+//               Roemerstrasse 52
+//               D-70794 Filderstadt
+// EMail:        uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <inttypes.h>
@@ -37,7 +37,7 @@
 #include <string.h>
 #include <limits.h>
 
-/* common */
+// common
 #include "chartype.h"
 #include "check.h"
 #include "strbuf.h"
@@ -45,7 +45,7 @@
 #include "xsprintf.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                  vsnprintf                                */
+//                                  vsnprintf
 ////////////////////////////////////////////////////////////////////////////////
 
 // The following is a very basic vsnprintf like function called xvsnprintf. It
@@ -57,10 +57,10 @@
 
 typedef struct {
 
-   /* Variable argument list pointer */
+   // Variable argument list pointer
    va_list ap;
 
-   /* Output buffer */
+   // Output buffer
    char *Buf;
    size_t BufSize;
    size_t BufFill;
@@ -71,7 +71,7 @@ typedef struct {
    char ArgBuf[256];
    int ArgLen;
 
-   /* Flags */
+   // Flags
    enum {
       fNone = 0x0000,
       fMinus = 0x0001,
@@ -85,17 +85,17 @@ typedef struct {
       fUpcase = 0x0100
    } Flags;
 
-   /* Conversion base and table */
+   // Conversion base and table
    unsigned Base;
    const char *CharTable;
 
-   /* Field width */
+   // Field width
    int Width;
 
-   /* Precision */
+   // Precision
    int Prec;
 
-   /* Length modifier */
+   // Length modifier
    enum {
       lmChar,
       lmShort,
@@ -106,17 +106,17 @@ typedef struct {
       lmPtrDiffT,
       lmLongDouble,
 
-      /* Unsupported modifiers */
+      // Unsupported modifiers
       lmLongLong = lmLong,
 
-      /* Default length is integer */
+      // Default length is integer
       lmDefault = lmInt
    } LengthMod;
 
 } PrintfCtrl;
 
 static void AddChar(PrintfCtrl *P, char C)
-/* Store one character in the output buffer if there's enough room. */
+// Store one character in the output buffer if there's enough room.
 {
    if (++P->BufFill <= P->BufSize) {
       *P->Buf++ = C;
@@ -124,7 +124,7 @@ static void AddChar(PrintfCtrl *P, char C)
 }
 
 static void AddPadding(PrintfCtrl *P, char C, unsigned Count)
-/* Add some amount of padding */
+// Add some amount of padding
 {
    while (Count--) {
       AddChar(P, C);
@@ -132,7 +132,7 @@ static void AddPadding(PrintfCtrl *P, char C, unsigned Count)
 }
 
 static intmax_t NextIVal(PrintfCtrl *P)
-/* Read the next integer value from the variable argument list */
+// Read the next integer value from the variable argument list
 {
    switch (P->LengthMod) {
       case lmChar:
@@ -156,7 +156,7 @@ static intmax_t NextIVal(PrintfCtrl *P)
 }
 
 static uintmax_t NextUVal(PrintfCtrl *P)
-/* Read the next unsigned integer value from the variable argument list */
+// Read the next unsigned integer value from the variable argument list
 {
    switch (P->LengthMod) {
       case lmChar:
@@ -180,7 +180,7 @@ static uintmax_t NextUVal(PrintfCtrl *P)
 }
 
 static void ToStr(PrintfCtrl *P, uintmax_t Val)
-/* Convert the given value to a (reversed) string */
+// Convert the given value to a (reversed) string
 {
    char *S = P->ArgBuf;
    while (Val) {
@@ -191,7 +191,7 @@ static void ToStr(PrintfCtrl *P, uintmax_t Val)
 }
 
 static void FormatInt(PrintfCtrl *P, uintmax_t Val)
-/* Convert the integer value */
+// Convert the integer value
 {
    char Lead[5];
    unsigned LeadCount = 0;
@@ -199,11 +199,11 @@ static void FormatInt(PrintfCtrl *P, uintmax_t Val)
    unsigned WidthPadding;
    unsigned I;
 
-   /* Determine the translation table */
+   // Determine the translation table
    P->CharTable =
        (P->Flags & fUpcase) ? "0123456789ABCDEF" : "0123456789abcdef";
 
-   /* Check if the value is negative */
+   // Check if the value is negative
    if ((P->Flags & fUnsigned) == 0 && ((intmax_t)Val) < 0) {
       Val = -((intmax_t)Val);
       Lead[LeadCount++] = '-';
@@ -215,7 +215,7 @@ static void FormatInt(PrintfCtrl *P, uintmax_t Val)
       Lead[LeadCount++] = ' ';
    }
 
-   /* Convert the value into a (reversed string). */
+   // Convert the value into a (reversed string).
    ToStr(P, Val);
 
    // The default precision for all integer conversions is one. This means
@@ -226,22 +226,22 @@ static void FormatInt(PrintfCtrl *P, uintmax_t Val)
       P->Prec = 1;
    }
 
-   /* Determine the leaders for alternative forms */
+   // Determine the leaders for alternative forms
    if ((P->Flags & fHash) != 0) {
       if (P->Base == 16) {
-         /* Start with 0x */
+         // Start with 0x
          Lead[LeadCount++] = '0';
          Lead[LeadCount++] = (P->Flags & fUpcase) ? 'X' : 'x';
       }
       else if (P->Base == 8) {
-         /* Alternative form for 'o': always add a leading zero. */
+         // Alternative form for 'o': always add a leading zero.
          if (P->Prec <= P->ArgLen) {
             Lead[LeadCount++] = '0';
          }
       }
    }
 
-   /* Determine the amount of precision padding needed */
+   // Determine the amount of precision padding needed
    if (P->ArgLen < P->Prec) {
       PrecPadding = P->Prec - P->ArgLen;
    }
@@ -249,7 +249,7 @@ static void FormatInt(PrintfCtrl *P, uintmax_t Val)
       PrecPadding = 0;
    }
 
-   /* Determine the width padding needed */
+   // Determine the width padding needed
    if ((P->Flags & fWidth) != 0) {
       int CurWidth = LeadCount + PrecPadding + P->ArgLen;
       if (CurWidth < P->Width) {
@@ -263,41 +263,41 @@ static void FormatInt(PrintfCtrl *P, uintmax_t Val)
       WidthPadding = 0;
    }
 
-   /* Output left space padding if any */
+   // Output left space padding if any
    if ((P->Flags & (fMinus | fZero)) == 0 && WidthPadding > 0) {
       AddPadding(P, ' ', WidthPadding);
       WidthPadding = 0;
    }
 
-   /* Leader */
+   // Leader
    for (I = 0; I < LeadCount; ++I) {
       AddChar(P, Lead[I]);
    }
 
-   /* Left zero padding if any */
+   // Left zero padding if any
    if ((P->Flags & fZero) != 0 && WidthPadding > 0) {
       AddPadding(P, '0', WidthPadding);
       WidthPadding = 0;
    }
 
-   /* Precision padding */
+   // Precision padding
    if (PrecPadding > 0) {
       AddPadding(P, '0', PrecPadding);
    }
 
-   /* The number itself. Beware: It's reversed! */
+   // The number itself. Beware: It's reversed!
    while (P->ArgLen > 0) {
       AddChar(P, P->ArgBuf[--P->ArgLen]);
    }
 
-   /* Right width padding if any */
+   // Right width padding if any
    if (WidthPadding > 0) {
       AddPadding(P, ' ', WidthPadding);
    }
 }
 
 static void FormatStr(PrintfCtrl *P, const char *Val)
-/* Convert the string */
+// Convert the string
 {
    unsigned WidthPadding;
 
@@ -308,11 +308,11 @@ static void FormatStr(PrintfCtrl *P, const char *Val)
    if ((P->Flags & fPrec) != 0) {
       const char *S = memchr(Val, '\0', P->Prec);
       if (S == 0) {
-         /* Not zero terminated */
+         // Not zero terminated
          Len = P->Prec;
       }
       else {
-         /* Terminating zero found */
+         // Terminating zero found
          Len = S - Val;
       }
    }
@@ -320,7 +320,7 @@ static void FormatStr(PrintfCtrl *P, const char *Val)
       Len = strlen(Val);
    }
 
-   /* Determine the width padding needed */
+   // Determine the width padding needed
    if ((P->Flags & fWidth) != 0 && P->Width > Len) {
       WidthPadding = P->Width - Len;
    }
@@ -328,25 +328,25 @@ static void FormatStr(PrintfCtrl *P, const char *Val)
       WidthPadding = 0;
    }
 
-   /* Output left padding */
+   // Output left padding
    if ((P->Flags & fMinus) != 0 && WidthPadding > 0) {
       AddPadding(P, ' ', WidthPadding);
       WidthPadding = 0;
    }
 
-   /* Output the string */
+   // Output the string
    while (Len--) {
       AddChar(P, *Val++);
    }
 
-   /* Output right padding if any */
+   // Output right padding if any
    if (WidthPadding > 0) {
       AddPadding(P, ' ', WidthPadding);
    }
 }
 
 static void StoreOffset(PrintfCtrl *P)
-/* Store the current output offset (%n format spec) */
+// Store the current output offset (%n format spec)
 {
    switch (P->LengthMod) {
       case lmChar:
@@ -386,29 +386,29 @@ int xvsnprintf(char *Buf, size_t Size, const char *Format, va_list ap)
    const char *SPtr;
    int UseStrBuf = 0;
 
-   /* Initialize the control structure */
+   // Initialize the control structure
    va_copy(P.ap, ap);
    P.Buf = Buf;
    P.BufSize = Size;
    P.BufFill = 0;
 
-   /* Parse the format string */
+   // Parse the format string
    while ((F = *Format++) != '\0') {
 
       if (F != '%') {
-         /* Not a format specifier, just copy */
+         // Not a format specifier, just copy
          AddChar(&P, F);
          continue;
       }
 
-      /* Check for %% */
+      // Check for %%
       if (*Format == '%') {
          ++Format;
          AddChar(&P, '%');
          continue;
       }
 
-      /* It's a format specifier. Check for flags. */
+      // It's a format specifier. Check for flags.
       F = *Format++;
       P.Flags = fNone;
       Done = 0;
@@ -439,7 +439,7 @@ int xvsnprintf(char *Buf, size_t Size, const char *Format, va_list ap)
                break;
          }
       }
-      /* Optional field width */
+      // Optional field width
       if (F == '*') {
          P.Width = va_arg(P.ap, int);
          // A negative field width argument is taken as a - flag followed
@@ -463,7 +463,7 @@ int xvsnprintf(char *Buf, size_t Size, const char *Format, va_list ap)
          P.Flags |= fWidth;
       }
 
-      /* Optional precision */
+      // Optional precision
       if (F == '.') {
          F = *Format++;
          P.Flags |= fPrec;
@@ -474,7 +474,7 @@ int xvsnprintf(char *Buf, size_t Size, const char *Format, va_list ap)
             if (P.Prec < 0) {
                P.Flags &= ~fPrec;
             }
-            F = *Format++; /* Skip the '*' */
+            F = *Format++; // Skip the '*'
          }
          else if (IsDigit(F)) {
             P.Prec = F - '0';
@@ -489,7 +489,7 @@ int xvsnprintf(char *Buf, size_t Size, const char *Format, va_list ap)
          else if (F == '-') {
             // A negative precision argument is taken as if the precision
             // were omitted.
-            F = *Format++; /* Skip the minus */
+            F = *Format++; // Skip the minus
             while (IsDigit(F = *Format++))
                ;
             P.Flags &= ~fPrec;
@@ -499,7 +499,7 @@ int xvsnprintf(char *Buf, size_t Size, const char *Format, va_list ap)
          }
       }
 
-      /* Optional length modifier */
+      // Optional length modifier
       P.LengthMod = lmDefault;
       switch (F) {
 
@@ -514,7 +514,7 @@ int xvsnprintf(char *Buf, size_t Size, const char *Format, va_list ap)
             }
             break;
 
-         /* support the MSVC specific I64 for long long */
+         // support the MSVC specific I64 for long long
          case 'I':
             F = *Format++;
             if (F == '6') {
@@ -558,20 +558,20 @@ int xvsnprintf(char *Buf, size_t Size, const char *Format, va_list ap)
             break;
       }
 
-      /* If the space and + flags both appear, the space flag is ignored */
+      // If the space and + flags both appear, the space flag is ignored
       if ((P.Flags & (fSpace | fPlus)) == (fSpace | fPlus)) {
          P.Flags &= ~fSpace;
       }
-      /* If the 0 and - flags both appear, the 0 flag is ignored */
+      // If the 0 and - flags both appear, the 0 flag is ignored
       if ((P.Flags & (fZero | fMinus)) == (fZero | fMinus)) {
          P.Flags &= ~fZero;
       }
-      /* If a precision is specified, the 0 flag is ignored */
+      // If a precision is specified, the 0 flag is ignored
       if (P.Flags & fPrec) {
          P.Flags &= ~fZero;
       }
 
-      /* Conversion specifier */
+      // Conversion specifier
       switch (F) {
 
          case 'd':
@@ -594,7 +594,7 @@ int xvsnprintf(char *Buf, size_t Size, const char *Format, va_list ap)
 
          case 'X':
             P.Flags |= (fUnsigned | fUpcase);
-            /* FALLTHROUGH */
+            // FALLTHROUGH
          case 'x':
             P.Base = 16;
             FormatInt(&P, NextUVal(&P));
@@ -613,12 +613,12 @@ int xvsnprintf(char *Buf, size_t Size, const char *Format, va_list ap)
             break;
 
          case 'p':
-            /* See comment at top of header file */
+            // See comment at top of header file
             if (UseStrBuf) {
-               /* Argument is StrBuf */
+               // Argument is StrBuf
                const StrBuf *S = va_arg(P.ap, const StrBuf *);
                CHECK(S != 0);
-               /* Handle the length by using a precision */
+               // Handle the length by using a precision
                if ((P.Flags & fPrec) != 0) {
                   // Precision already specified, use length of string
                   // if less.
@@ -627,15 +627,15 @@ int xvsnprintf(char *Buf, size_t Size, const char *Format, va_list ap)
                   }
                }
                else {
-                  /* No precision, add it */
+                  // No precision, add it
                   P.Flags |= fPrec;
                   P.Prec = SB_GetLen(S);
                }
                FormatStr(&P, SB_GetConstBuf(S));
-               UseStrBuf = 0; /* Reset flag */
+               UseStrBuf = 0; // Reset flag
             }
             else {
-               /* Use hex format for pointers */
+               // Use hex format for pointers
                P.Flags |= (fUnsigned | fPrec);
                P.Prec = ((sizeof(void *) * CHAR_BIT) + 3) / 4;
                P.Base = 16;
@@ -644,7 +644,7 @@ int xvsnprintf(char *Buf, size_t Size, const char *Format, va_list ap)
             break;
 
          case 'm':
-            /* See comment at top of header file */
+            // See comment at top of header file
             UseStrBuf = 1;
             break;
 
@@ -653,12 +653,12 @@ int xvsnprintf(char *Buf, size_t Size, const char *Format, va_list ap)
             break;
 
          default:
-            /* Invalid format spec */
+            // Invalid format spec
             FAIL("Invalid format specifier in xvsnprintf");
       }
    }
 
-   /* We don't need P.ap any longer */
+   // We don't need P.ap any longer
    va_end(P.ap);
 
    // Terminate the output string and return the number of chars that had
@@ -683,11 +683,11 @@ int xsnprintf(char *Buf, size_t Size, const char *Format, ...)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 int xsprintf(char *Buf, size_t BufSize, const char *Format, ...)
-/* Replacement function for sprintf */
+// Replacement function for sprintf
 {
    int Res;
    va_list ap;
@@ -700,7 +700,7 @@ int xsprintf(char *Buf, size_t BufSize, const char *Format, ...)
 }
 
 int xvsprintf(char *Buf, size_t BufSize, const char *Format, va_list ap)
-/* Replacement function for sprintf */
+// Replacement function for sprintf
 {
    int Res = xvsnprintf(Buf, BufSize, Format, ap);
    CHECK(Res >= 0 && (unsigned)(Res + 1) < BufSize);

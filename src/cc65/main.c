@@ -1,34 +1,34 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                  main.c                                   */
-/*                                                                           */
-/*                             cc65 main program                             */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2015, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                  main.c
+//
+//                             cc65 main program
+//
+//
+//
+// (C) 2000-2015, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
@@ -36,7 +36,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
-/* common */
+// common
 #include "abend.h"
 #include "chartype.h"
 #include "cmdline.h"
@@ -52,7 +52,7 @@
 #include "version.h"
 #include "xmalloc.h"
 
-/* cc65 */
+// cc65
 #include "asmcode.h"
 #include "compile.h"
 #include "codeopt.h"
@@ -67,11 +67,11 @@
 #include "standard.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 static void Usage(void)
-/* Print usage information to stderr */
+// Print usage information to stderr
 {
    printf("Usage: %s [options] file\n"
           "Short options:\n"
@@ -140,14 +140,14 @@ static void Usage(void)
 }
 
 static void cbmsys(const char *sys)
-/* Define a CBM system */
+// Define a CBM system
 {
    DefineNumericMacro("__CBM__", 1);
    DefineNumericMacro(sys, 1);
 }
 
 static void SetSys(const char *Sys)
-/* Define a target system */
+// Define a target system
 {
    switch (Target = FindTarget(Sys)) {
 
@@ -230,7 +230,7 @@ static void SetSys(const char *Sys)
          break;
 
       case TGT_GEOS_CBM:
-         /* Do not handle as a CBM system */
+         // Do not handle as a CBM system
          DefineNumericMacro("__GEOS__", 1);
          DefineNumericMacro("__GEOS_CBM__", 1);
          break;
@@ -316,12 +316,12 @@ static void SetSys(const char *Sys)
          AbEnd("Unknown target system '%s'", Sys);
    }
 
-   /* Initialize the translation tables for the target system */
+   // Initialize the translation tables for the target system
    TgtTranslateInit();
 }
 
 static void DefineCpuMacros(void)
-/* Define macros for the target CPU */
+// Define macros for the target CPU
 {
    const char *CPUName;
 
@@ -409,42 +409,42 @@ static void DefineCpuMacros(void)
 }
 
 static void FileNameOption(const char *Opt, const char *Arg, StrBuf *Name)
-/* Handle an option that remembers a file name for later */
+// Handle an option that remembers a file name for later
 {
-   /* Cannot have the option twice */
+   // Cannot have the option twice
    if (SB_NotEmpty(Name)) {
       AbEnd("Cannot use option '%s' twice", Opt);
    }
-   /* A typo in OptTab[] might allow a NULL Arg */
+   // A typo in OptTab[] might allow a NULL Arg
    if (Arg == 0) {
       Internal("Typo in OptTab[]; option '%s' should require an argument", Opt);
    }
-   /* Remember the file name for later */
+   // Remember the file name for later
    SB_CopyStr(Name, Arg);
    SB_Terminate(Name);
 }
 
 static void DefineSym(const char *Def)
-/* Define a symbol on the command line */
+// Define a symbol on the command line
 {
    const char *P = Def;
 
-   /* The symbol must start with a character or underline */
+   // The symbol must start with a character or underline
    if (Def[0] != '_' && !IsAlpha(Def[0])) {
       InvDef(Def);
    }
 
-   /* Check the symbol name */
+   // Check the symbol name
    while (IsAlNum(*P) || *P == '_') {
       ++P;
    }
 
-   /* Do we have a value given? */
+   // Do we have a value given?
    if (*P != '=') {
       if (*P != '\0') {
          InvDef(Def);
       }
-      /* No value given. Define the macro with the value 1 */
+      // No value given. Define the macro with the value 1
       DefineNumericMacro(Def, 1);
    }
    else {
@@ -458,18 +458,18 @@ static void DefineSym(const char *Def)
       Q = S + (P - Def);
       *Q++ = '\0';
 
-      /* Define this as a macro */
+      // Define this as a macro
       DefineTextMacro(S, Q);
 
-      /* Release the allocated memory */
+      // Release the allocated memory
       xfree(S);
    }
 }
 
 static void CheckSegName(const char *Seg)
-/* Abort if the given name is not a valid segment name */
+// Abort if the given name is not a valid segment name
 {
-   /* Print an error and abort if the name is not ok */
+   // Print an error and abort if the name is not ok
    if (!ValidSegName(Seg)) {
       AbEnd("Segment name '%s' is invalid", Seg);
    }
@@ -477,52 +477,52 @@ static void CheckSegName(const char *Seg)
 
 static void OptAddSource(const char *Opt attribute((unused)),
                          const char *Arg attribute((unused)))
-/* Add source lines as comments in generated assembler file */
+// Add source lines as comments in generated assembler file
 {
    AddSource = 1;
 }
 
 static void OptAllCDecl(const char *Opt attribute((unused)),
                         const char *Arg attribute((unused)))
-/* Make functions default to cdecl instead of fastcall. */
+// Make functions default to cdecl instead of fastcall.
 {
    AutoCDecl = 1;
 }
 
 static void OptBssName(const char *Opt attribute((unused)), const char *Arg)
-/* Handle the --bss-name option */
+// Handle the --bss-name option
 {
-   /* Check for a valid name */
+   // Check for a valid name
    CheckSegName(Arg);
 
-   /* Set the name */
+   // Set the name
    SetSegName(SEG_BSS, Arg);
 }
 
 static void OptCheckStack(const char *Opt attribute((unused)),
                           const char *Arg attribute((unused)))
-/* Handle the --check-stack option */
+// Handle the --check-stack option
 {
    IS_Set(&CheckStack, 1);
 }
 
 static void OptCodeName(const char *Opt attribute((unused)), const char *Arg)
-/* Handle the --code-name option */
+// Handle the --code-name option
 {
-   /* Check for a valid name */
+   // Check for a valid name
    CheckSegName(Arg);
 
-   /* Set the name */
+   // Set the name
    SetSegName(SEG_CODE, Arg);
 }
 
 static void OptCodeSize(const char *Opt, const char *Arg)
-/* Handle the --codesize option */
+// Handle the --codesize option
 {
    unsigned Factor;
    char BoundsCheck;
 
-   /* Numeric argument expected */
+   // Numeric argument expected
    if (sscanf(Arg, "%u%c", &Factor, &BoundsCheck) != 1 || Factor < 10 ||
        Factor > 1000) {
       AbEnd("Argument for %s is invalid", Opt);
@@ -531,20 +531,20 @@ static void OptCodeSize(const char *Opt, const char *Arg)
 }
 
 static void OptCreateDep(const char *Opt, const char *Arg)
-/* Handle the --create-dep option */
+// Handle the --create-dep option
 {
    FileNameOption(Opt, Arg, &DepName);
 }
 
 static void OptCreateFullDep(const char *Opt attribute((unused)),
                              const char *Arg)
-/* Handle the --create-full-dep option */
+// Handle the --create-full-dep option
 {
    FileNameOption(Opt, Arg, &FullDepName);
 }
 
 static void OptCPU(const char *Opt, const char *Arg)
-/* Handle the --cpu option */
+// Handle the --cpu option
 {
    // Find the CPU from the given name. We do only accept a certain number
    // of CPUs. If the list is changed, be sure to adjust SetCpuMacros().
@@ -557,42 +557,42 @@ static void OptCPU(const char *Opt, const char *Arg)
 }
 
 static void OptDataName(const char *Opt attribute((unused)), const char *Arg)
-/* Handle the --data-name option */
+// Handle the --data-name option
 {
-   /* Check for a valid name */
+   // Check for a valid name
    CheckSegName(Arg);
 
-   /* Set the name */
+   // Set the name
    SetSegName(SEG_DATA, Arg);
 }
 
 static void OptDebug(const char *Opt attribute((unused)),
                      const char *Arg attribute((unused)))
-/* Compiler debug mode */
+// Compiler debug mode
 {
    ++Debug;
 }
 
 static void OptDebugTables(const char *Opt, const char *Arg)
-/* Dump tables to file */
+// Dump tables to file
 {
    FileNameOption(Opt, Arg, &DebugTableName);
 }
 
 static void OptDebugInfo(const char *Opt attribute((unused)),
                          const char *Arg attribute((unused)))
-/* Add debug info to the object file */
+// Add debug info to the object file
 {
    DebugInfo = 1;
 }
 
 static void OptDebugOpt(const char *Opt attribute((unused)), const char *Arg)
-/* Debug optimization steps */
+// Debug optimization steps
 {
    char Buf[128];
    char *Line;
 
-   /* Open the file */
+   // Open the file
    FILE *F = fopen(Arg, "r");
    if (F == 0) {
       AbEnd("Cannot open '%s': %s", Arg, strerror(errno));
@@ -610,7 +610,7 @@ static void OptDebugOpt(const char *Opt attribute((unused)), const char *Arg)
       }
       Buf[Len] = '\0';
 
-      /* Get a pointer to the buffer and remove leading white space */
+      // Get a pointer to the buffer and remove leading white space
       Line = Buf;
       while (IsBlank(*Line)) {
          ++Line;
@@ -623,7 +623,7 @@ static void OptDebugOpt(const char *Opt attribute((unused)), const char *Arg)
          case '\0':
          case '#':
          case ';':
-            /* Empty or comment line */
+            // Empty or comment line
             continue;
 
          case '-':
@@ -632,7 +632,7 @@ static void OptDebugOpt(const char *Opt attribute((unused)), const char *Arg)
 
          case '+':
             ++Line;
-            /* FALLTHROUGH */
+            // FALLTHROUGH
 
          default:
             EnableOpt(Line);
@@ -647,47 +647,47 @@ static void OptDebugOpt(const char *Opt attribute((unused)), const char *Arg)
 
 static void OptDebugOptOutput(const char *Opt attribute((unused)),
                               const char *Arg attribute((unused)))
-/* Output optimization steps */
+// Output optimization steps
 {
    DebugOptOutput = 1;
 }
 
 static void OptDepTarget(const char *Opt attribute((unused)), const char *Arg)
-/* Handle the --dep-target option */
+// Handle the --dep-target option
 {
    FileNameOption(Opt, Arg, &DepTarget);
 }
 
 static void OptDisableOpt(const char *Opt attribute((unused)), const char *Arg)
-/* Disable an optimization step */
+// Disable an optimization step
 {
    DisableOpt(Arg);
 }
 
 static void OptEagerlyInlineFuncs(const char *Opt attribute((unused)),
                                   const char *Arg attribute((unused)))
-/* Eagerly inline some known functions */
+// Eagerly inline some known functions
 {
    IS_Set(&InlineStdFuncs, 1);
    IS_Set(&EagerlyInlineFuncs, 1);
 }
 
 static void OptEnableOpt(const char *Opt attribute((unused)), const char *Arg)
-/* Enable an optimization step */
+// Enable an optimization step
 {
    EnableOpt(Arg);
 }
 
 static void OptHelp(const char *Opt attribute((unused)),
                     const char *Arg attribute((unused)))
-/* Print usage information and exit */
+// Print usage information and exit
 {
    Usage();
    exit(EXIT_SUCCESS);
 }
 
 static void OptIncludeDir(const char *Opt attribute((unused)), const char *Arg)
-/* Add an include search path */
+// Add an include search path
 {
    AddSearchPath(SysIncSearchPath, Arg);
    AddSearchPath(UsrIncSearchPath, Arg);
@@ -695,51 +695,51 @@ static void OptIncludeDir(const char *Opt attribute((unused)), const char *Arg)
 
 static void OptInlineStdFuncs(const char *Opt attribute((unused)),
                               const char *Arg attribute((unused)))
-/* Inline some standard functions */
+// Inline some standard functions
 {
    IS_Set(&InlineStdFuncs, 1);
 }
 
 static void OptListOptSteps(const char *Opt attribute((unused)),
                             const char *Arg attribute((unused)))
-/* List all optimizer steps */
+// List all optimizer steps
 {
-   /* List the optimizer steps */
+   // List the optimizer steps
    ListOptSteps(stdout);
 
-   /* Terminate */
+   // Terminate
    exit(EXIT_SUCCESS);
 }
 
 static void OptListWarnings(const char *Opt attribute((unused)),
                             const char *Arg attribute((unused)))
-/* List all warning types */
+// List all warning types
 {
-   /* List the warnings */
+   // List the warnings
    ListWarnings(stdout);
 
-   /* Terminate */
+   // Terminate
    exit(EXIT_SUCCESS);
 }
 
 static void OptLocalStrings(const char *Opt attribute((unused)),
                             const char *Arg attribute((unused)))
-/* Emit string literals immediately */
+// Emit string literals immediately
 {
    IS_Set(&LocalStrings, 1);
 }
 
 static void OptMemoryModel(const char *Opt, const char *Arg)
-/* Set the memory model */
+// Set the memory model
 {
    mmodel_t M;
 
-   /* Check the current memory model */
+   // Check the current memory model
    if (MemoryModel != MMODEL_UNKNOWN) {
       AbEnd("Cannot use option '%s' twice", Opt);
    }
 
-   /* Translate the memory model name and check it */
+   // Translate the memory model name and check it
    M = FindMemoryModel(Arg);
    if (M == MMODEL_UNKNOWN) {
       AbEnd("Unknown memory model: %s", Arg);
@@ -748,14 +748,14 @@ static void OptMemoryModel(const char *Opt, const char *Arg)
       AbEnd("Unsupported memory model: %s", Arg);
    }
 
-   /* Set the memory model */
+   // Set the memory model
    SetMemoryModel(M);
 }
 
 static void OptRegisterSpace(const char *Opt, const char *Arg)
-/* Handle the --register-space option */
+// Handle the --register-space option
 {
-   /* Numeric argument expected */
+   // Numeric argument expected
    if (sscanf(Arg, "%u", &RegisterSpace) != 1 || RegisterSpace > 256) {
       AbEnd("Argument for option %s is invalid", Opt);
    }
@@ -763,32 +763,32 @@ static void OptRegisterSpace(const char *Opt, const char *Arg)
 
 static void OptRegisterVars(const char *Opt attribute((unused)),
                             const char *Arg attribute((unused)))
-/* Handle the --register-vars option */
+// Handle the --register-vars option
 {
    IS_Set(&EnableRegVars, 1);
 }
 
 static void OptRodataName(const char *Opt attribute((unused)), const char *Arg)
-/* Handle the --rodata-name option */
+// Handle the --rodata-name option
 {
-   /* Check for a valid name */
+   // Check for a valid name
    CheckSegName(Arg);
 
-   /* Set the name */
+   // Set the name
    SetSegName(SEG_RODATA, Arg);
 }
 
 static void OptSignedChars(const char *Opt attribute((unused)),
                            const char *Arg attribute((unused)))
-/* Use 'signed char' as the underlying type of 'char' */
+// Use 'signed char' as the underlying type of 'char'
 {
    IS_Set(&SignedChars, 1);
 }
 
 static void OptStandard(const char *Opt, const char *Arg)
-/* Handle the --standard option */
+// Handle the --standard option
 {
-   /* Find the standard from the given name */
+   // Find the standard from the given name
    standard_t Std = FindStandard(Arg);
    if (Std == STD_UNKNOWN) {
       AbEnd("Invalid argument for %s: '%s'", Opt, Arg);
@@ -803,55 +803,55 @@ static void OptStandard(const char *Opt, const char *Arg)
 
 static void OptStaticLocals(const char *Opt attribute((unused)),
                             const char *Arg attribute((unused)))
-/* Place local variables in static storage */
+// Place local variables in static storage
 {
    IS_Set(&StaticLocals, 1);
 }
 
 static void OptTarget(const char *Opt attribute((unused)), const char *Arg)
-/* Set the target system */
+// Set the target system
 {
    SetSys(Arg);
 }
 
 static void OptVerbose(const char *Opt attribute((unused)),
                        const char *Arg attribute((unused)))
-/* Increase verbosity */
+// Increase verbosity
 {
    ++Verbosity;
 }
 
 static void OptVersion(const char *Opt attribute((unused)),
                        const char *Arg attribute((unused)))
-/* Print the compiler version */
+// Print the compiler version
 {
    fprintf(stderr, "%s V%s\n", ProgName, GetVersionAsString());
    exit(EXIT_SUCCESS);
 }
 
 static void OptWarning(const char *Opt attribute((unused)), const char *Arg)
-/* Handle the -W option */
+// Handle the -W option
 {
    StrBuf W = AUTO_STRBUF_INITIALIZER;
 
-   /* Arg is a list of suboptions, separated by commas */
+   // Arg is a list of suboptions, separated by commas
    while (Arg) {
 
       const char *Pos;
       int Enabled = 1;
       IntStack *S;
 
-      /* The suboption may be prefixed with '-' or '+' */
+      // The suboption may be prefixed with '-' or '+'
       if (*Arg == '-') {
          Enabled = 0;
          ++Arg;
       }
       else if (*Arg == '+') {
-         /* This is the default */
+         // This is the default
          ++Arg;
       }
 
-      /* Get the next suboption */
+      // Get the next suboption
       Pos = strchr(Arg, ',');
       if (Pos) {
          SB_CopyBuf(&W, Arg, Pos - Arg);
@@ -863,7 +863,7 @@ static void OptWarning(const char *Opt attribute((unused)), const char *Arg)
       }
       SB_Terminate(&W);
 
-      /* Search for the warning */
+      // Search for the warning
       S = FindWarning(SB_GetConstBuf(&W));
       if (S == 0) {
          InvArg(Opt, SB_GetConstBuf(&W));
@@ -871,19 +871,19 @@ static void OptWarning(const char *Opt attribute((unused)), const char *Arg)
       IS_Set(S, Enabled);
    }
 
-   /* Free allocated memory */
+   // Free allocated memory
    SB_Done(&W);
 }
 
 static void OptWritableStrings(const char *Opt attribute((unused)),
                                const char *Arg attribute((unused)))
-/* Make string literals writable */
+// Make string literals writable
 {
    IS_Set(&WritableStrings, 1);
 }
 
 int main(int argc, char *argv[]) {
-   /* Program long options */
+   // Program long options
    static const LongOpt OptTab[] = {
        {"--add-source", 0, OptAddSource},
        {"--all-cdecl", 0, OptAllCDecl},
@@ -925,31 +925,31 @@ int main(int argc, char *argv[]) {
 
    unsigned I;
 
-   /* Initialize the input file name */
+   // Initialize the input file name
    const char *InputFile = 0;
 
-   /* Initialize the cmdline module */
+   // Initialize the cmdline module
    InitCmdLine(&argc, &argv, "cc65");
 
-   /* Initialize the default segment names */
+   // Initialize the default segment names
    InitSegNames();
 
-   /* Initialize the segment address sizes table */
+   // Initialize the segment address sizes table
    InitSegAddrSizes();
 
-   /* Initialize the include search paths */
+   // Initialize the include search paths
    InitIncludePaths();
 
-   /* Parse the command line */
+   // Parse the command line
    I = 1;
    while (I < ArgCount) {
 
       const char *P;
 
-      /* Get the argument */
+      // Get the argument
       const char *Arg = ArgVec[I];
 
-      /* Check for an option */
+      // Check for an option
       if (Arg[0] == '-') {
 
          switch (Arg[1]) {
@@ -1083,24 +1083,24 @@ int main(int argc, char *argv[]) {
          }
       }
 
-      /* Next argument */
+      // Next argument
       ++I;
    }
 
-   /* Did we have a file spec on the command line? */
+   // Did we have a file spec on the command line?
    if (InputFile == 0) {
       AbEnd("No input files");
    }
 
-   /* The options to output macros can only be used with -E */
+   // The options to output macros can only be used with -E
    if ((DumpPredefMacros || DumpUserMacros) && !PreprocessOnly) {
       AbEnd("Preprocessor macro output can only be used together with -E");
    }
 
-   /* Add the default include search paths. */
+   // Add the default include search paths.
    FinishIncludePaths();
 
-   /* Create the output file name if it was not explicitly given */
+   // Create the output file name if it was not explicitly given
    MakeDefaultOutputName(InputFile);
 
    // If no CPU given, use the default CPU for the target. Define macros that
@@ -1115,48 +1115,48 @@ int main(int argc, char *argv[]) {
    }
    DefineCpuMacros();
 
-   /* If no memory model was given, use the default */
+   // If no memory model was given, use the default
    if (MemoryModel == MMODEL_UNKNOWN) {
       SetMemoryModel(MMODEL_NEAR);
    }
 
-   /* If no language standard was given, use the default one */
+   // If no language standard was given, use the default one
    if (IS_Get(&Standard) == STD_UNKNOWN) {
       IS_Set(&Standard, STD_DEFAULT);
    }
 
-   /* Track string buffer allocation */
+   // Track string buffer allocation
    InitDiagnosticStrBufs();
 
-   /* Go! */
+   // Go!
    Compile(InputFile);
 
-   /* Create the output file if we didn't had any errors */
+   // Create the output file if we didn't had any errors
    if (PreprocessOnly == 0 && (GetTotalErrors() == 0 || Debug)) {
 
-      /* Emit literals, do cleanup and optimizations */
+      // Emit literals, do cleanup and optimizations
       FinishCompile();
 
-      /* Open the file */
+      // Open the file
       OpenOutputFile();
 
-      /* Write the output to the file */
+      // Write the output to the file
       WriteAsmOutput();
       Print(stdout, 1, "Wrote output to '%s'\n", OutputFilename);
 
-      /* Close the file, check for errors */
+      // Close the file, check for errors
       CloseOutputFile();
 
-      /* Create dependencies if requested */
+      // Create dependencies if requested
       CreateDependencies();
    }
 
-   /* Done with tracked string buffer allocation */
+   // Done with tracked string buffer allocation
    DoneDiagnosticStrBufs();
 
-   /* Free up the segment address sizes table */
+   // Free up the segment address sizes table
    DoneSegAddrSizes();
 
-   /* Return an apropriate exit code */
+   // Return an apropriate exit code
    return (GetTotalErrors() > 0) ? EXIT_FAILURE : EXIT_SUCCESS;
 }

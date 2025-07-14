@@ -1,40 +1,40 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 compile.c                                 */
-/*                                                                           */
-/*                       Top level compiler subroutine                       */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2013, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 compile.c
+//
+//                       Top level compiler subroutine
+//
+//
+//
+// (C) 2000-2013, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <stdlib.h>
 #include <time.h>
 
-/* common */
+// common
 #include "addrsize.h"
 #include "debugflag.h"
 #include "segnames.h"
@@ -42,7 +42,7 @@
 #include "xmalloc.h"
 #include "xsprintf.h"
 
-/* cc65 */
+// cc65
 #include "asmlabel.h"
 #include "asmstmt.h"
 #include "codegen.h"
@@ -67,73 +67,73 @@
 #include "symtab.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 static void Parse(void)
-/* Top level parser routine. */
+// Top level parser routine.
 {
    SymEntry *Sym;
    FuncDesc *FuncDef = 0;
 
-   /* Initialization for deferred operations */
+   // Initialization for deferred operations
    InitDeferredOps();
 
-   /* Fill up the next token with a bogus semicolon and start the tokenizer */
+   // Fill up the next token with a bogus semicolon and start the tokenizer
    NextTok.Tok = TOK_SEMI;
    NextToken();
    NextToken();
 
-   /* Parse until end of input */
+   // Parse until end of input
    while (CurTok.Tok != TOK_CEOF) {
 
       DeclSpec Spec;
       int Comma;
       int NeedClean = 0;
 
-      /* Check for empty statements */
+      // Check for empty statements
       if (CurTok.Tok == TOK_SEMI) {
-         /* TODO: warn on this if we have a pedantic mode */
+         // TODO: warn on this if we have a pedantic mode
          NextToken();
          continue;
       }
 
-      /* Disallow ASM statements on global level */
+      // Disallow ASM statements on global level
       if (CurTok.Tok == TOK_ASM) {
          Error("__asm__ is not allowed here");
-         /* Parse and remove the statement for error recovery */
+         // Parse and remove the statement for error recovery
          AsmStatement();
          ConsumeSemi();
          RemoveGlobalCode();
          continue;
       }
 
-      /* Check for a _Static_assert */
+      // Check for a _Static_assert
       if (CurTok.Tok == TOK_STATIC_ASSERT) {
          ParseStaticAssert();
          continue;
       }
 
-      /* Read the declaration specifier */
+      // Read the declaration specifier
       ParseDeclSpec(&Spec, TS_DEFAULT_TYPE_INT | TS_FUNCTION_SPEC, SC_NONE);
 
-      /* Don't accept illegal storage classes */
+      // Don't accept illegal storage classes
       if ((Spec.StorageClass & SC_STORAGEMASK) == SC_AUTO ||
           (Spec.StorageClass & SC_STORAGEMASK) == SC_REGISTER) {
          Error("Illegal storage class");
          Spec.StorageClass &= ~SC_STORAGEMASK;
       }
 
-      /* Check if this is only a type declaration */
+      // Check if this is only a type declaration
       if (CurTok.Tok == TOK_SEMI) {
          CheckEmptyDecl(&Spec);
          NextToken();
          continue;
       }
 
-      /* If we haven't got a type specifier yet, something must be wrong */
+      // If we haven't got a type specifier yet, something must be wrong
       if ((Spec.Flags & DS_TYPE_MASK) == DS_NONE) {
-         /* Avoid extra errors if it was a failed type specifier */
+         // Avoid extra errors if it was a failed type specifier
          if ((Spec.Flags & DS_EXTRA_TYPE) == 0) {
             Error("Declaration specifier expected");
          }
@@ -141,7 +141,7 @@ static void Parse(void)
          goto EndOfDecl;
       }
 
-      /* Read declarations for this type */
+      // Read declarations for this type
       Comma = 0;
       while (1) {
 
@@ -149,15 +149,15 @@ static void Parse(void)
 
          Sym = 0;
 
-         /* Read the next declaration */
+         // Read the next declaration
          NeedClean = ParseDecl(&Spec, &Decl, DM_IDENT_OR_EMPTY);
 
-         /* Bail out if there are errors */
+         // Bail out if there are errors
          if (NeedClean <= 0) {
             break;
          }
 
-         /* The symbol is now visible in the file scope */
+         // The symbol is now visible in the file scope
          if ((Decl.StorageClass & SC_TYPEMASK) != SC_FUNC &&
              (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
             // Check if we must reserve storage for the variable. We do this,
@@ -173,7 +173,7 @@ static void Parse(void)
                 (Decl.StorageClass & SC_STORAGEMASK) == SC_STATIC ||
                 ((Decl.StorageClass & SC_STORAGEMASK) == SC_EXTERN &&
                  CurTok.Tok == TOK_ASSIGN)) {
-               /* We will allocate storage in this translation unit */
+               // We will allocate storage in this translation unit
                Decl.StorageClass |= SC_TU_STORAGE;
             }
          }
@@ -182,7 +182,7 @@ static void Parse(void)
          // or semicolon, it must be followed by a function body.
          if ((Decl.StorageClass & SC_TYPEMASK) == SC_FUNC) {
             if (CurTok.Tok == TOK_LCURLY) {
-               /* A definition */
+               // A definition
                Decl.StorageClass |= SC_DEF;
 
                // Convert an empty parameter list into one accepting no
@@ -193,7 +193,7 @@ static void Parse(void)
                }
             }
             else {
-               /* Just a declaration */
+               // Just a declaration
                FuncDef = GetFuncDesc(Decl.Type);
                if ((FuncDef->Flags & (FD_EMPTY | FD_OLDSTYLE)) == FD_OLDSTYLE) {
                   // A parameter list without types is only allowed in a
@@ -204,22 +204,22 @@ static void Parse(void)
             }
          }
 
-         /* Add an entry to the symbol table */
+         // Add an entry to the symbol table
          Sym = AddGlobalSym(Decl.Ident, Decl.Type, Decl.StorageClass);
 
-         /* Add declaration attributes */
+         // Add declaration attributes
          SymUseAttr(Sym, &Decl);
 
-         /* Reserve storage for the variable if we need to */
+         // Reserve storage for the variable if we need to
          if (Decl.StorageClass & SC_TU_STORAGE) {
 
-            /* Get the size of the variable */
+            // Get the size of the variable
             unsigned Size = SizeOf(Decl.Type);
 
-            /* Allow initialization */
+            // Allow initialization
             if (CurTok.Tok == TOK_ASSIGN) {
 
-               /* This is a definition with storage */
+               // This is a definition with storage
                if (SymIsDef(Sym)) {
                   Error("Global variable '%s' has already been defined",
                         Sym->Name);
@@ -231,13 +231,13 @@ static void Parse(void)
                if (Size == 0) {
                   if (!IsEmptiableObjectType(Decl.Type)) {
                      if (!IsTypeArray(Decl.Type)) {
-                        /* Size is unknown and not an array */
+                        // Size is unknown and not an array
                         Error("Cannot initialize variable '%s' of unknown size",
                               Decl.Ident);
                      }
                   }
                   else if (IS_Get(&Standard) != STD_CC65) {
-                     /* We cannot declare variables of type void */
+                     // We cannot declare variables of type void
                      Error("Illegal type '%s' for variable '%s'",
                            GetFullTypeName(Decl.Type), Decl.Ident);
                   }
@@ -253,26 +253,26 @@ static void Parse(void)
                   g_usedata();
                }
 
-               /* Define a label */
+               // Define a label
                g_defgloblabel(Sym->Name);
 
-               /* Skip the '=' */
+               // Skip the '='
                NextToken();
 
-               /* Parse the initialization */
+               // Parse the initialization
                ParseInit(Sym->Type);
             }
             else {
 
-               /* This is a declaration */
+               // This is a declaration
                if (IsTypeVoid(Decl.Type)) {
-                  /* We cannot declare variables of type void */
+                  // We cannot declare variables of type void
                   Error("Illegal type for variable '%s'", Decl.Ident);
                   Sym->Flags |= SC_DEF;
                }
                else if (Size == 0 && SymIsDef(Sym) &&
                         !IsEmptiableObjectType(Decl.Type)) {
-                  /* Size is unknown. Is it an array? */
+                  // Size is unknown. Is it an array?
                   if (!IsTypeArray(Decl.Type)) {
                      Error("Variable '%s' has unknown size", Decl.Ident);
                      Sym->Flags |= SC_DEF;
@@ -316,7 +316,7 @@ static void Parse(void)
                }
             }
 
-            /* Make the symbol zeropage according to the segment address size */
+            // Make the symbol zeropage according to the segment address size
             if ((Sym->Flags & SC_TYPEMASK) == SC_NONE) {
                if (SymIsGlobal(Sym) ||
                    (Sym->Flags & SC_STORAGEMASK) == SC_STATIC ||
@@ -328,7 +328,7 @@ static void Parse(void)
             }
          }
 
-         /* Check for end of declaration list */
+         // Check for end of declaration list
          if (CurTok.Tok != TOK_COMMA) {
             break;
          }
@@ -337,9 +337,9 @@ static void Parse(void)
          NextToken();
       }
 
-      /* Finish the declaration */
+      // Finish the declaration
       if (Sym && IsTypeFunc(Sym->Type) && CurTok.Tok == TOK_LCURLY) {
-         /* A function definition is not terminated with a semicolon */
+         // A function definition is not terminated with a semicolon
          if (IsTypeFunc(Spec.Type) &&
              TypeCmp(Sym->Type, Spec.Type).C >= TC_EQUAL) {
             // ISO C: The type category in a function definition cannot be
@@ -352,15 +352,15 @@ static void Parse(void)
             Error("';' expected after top level declarator");
          }
 
-         /* Parse the function body anyways */
+         // Parse the function body anyways
          NeedClean = 0;
          NewFunc(Sym, FuncDef);
 
-         /* Make sure we aren't omitting any work */
+         // Make sure we aren't omitting any work
          CheckDeferredOpAllDone();
       }
       else if (NeedClean > 0) {
-         /* Must be followed by a semicolon */
+         // Must be followed by a semicolon
          if (CurTok.Tok != TOK_SEMI) {
             Error("',' or ';' expected after top level declarator");
             NeedClean = -1;
@@ -372,18 +372,18 @@ static void Parse(void)
       }
 
    EndOfDecl:
-      /* Try some smart error recovery */
+      // Try some smart error recovery
       if (NeedClean < 0) {
          SmartErrorSkip(1);
       }
    }
 
-   /* Done with deferred operations */
+   // Done with deferred operations
    DoneDeferredOps();
 }
 
 void Compile(const char *FileName)
-/* Top level compile routine. Will setup things and call the parser. */
+// Top level compile routine. Will setup things and call the parser.
 {
    char DateStr[32];
    char TimeStr[32];
@@ -396,10 +396,10 @@ void Compile(const char *FileName)
                                           "May", "Jun", "Jul", "Aug",
                                           "Sep", "Oct", "Nov", "Dec"};
 
-   /* Add macros that are always defined */
+   // Add macros that are always defined
    DefineNumericMacro("__CC65__", GetVersionAsNumber());
 
-   /* Language standard that is supported */
+   // Language standard that is supported
    DefineNumericMacro("__CC65_STD_C89__", STD_C89);
    DefineNumericMacro("__CC65_STD_C99__", STD_C99);
    DefineNumericMacro("__CC65_STD_CC65__", STD_CC65);
@@ -427,12 +427,12 @@ void Compile(const char *FileName)
       DefineNumericMacro("__EAGERLY_INLINE_FUNCS__", 1);
    }
 
-   /* Placeholders for __FILE__, __LINE__ and __COUNTER__ macros */
+   // Placeholders for __FILE__, __LINE__ and __COUNTER__ macros
    DefineTextMacro("__FILE__", "");
    DefineTextMacro("__LINE__", "");
    DefineTextMacro("__COUNTER__", "");
 
-   /* __TIME__ and __DATE__ macros */
+   // __TIME__ and __DATE__ macros
    Time = time(0);
    TM = localtime(&Time);
    xsprintf(DateStr, sizeof(DateStr), "\"%s %2d %d\"", MonthNames[TM->tm_mon],
@@ -441,11 +441,11 @@ void Compile(const char *FileName)
    DefineTextMacro("__DATE__", DateStr);
    DefineTextMacro("__TIME__", TimeStr);
 
-   /* Other standard macros */
-   /* DefineNumericMacro ("__STDC__", 1);      <- not now */
+   // Other standard macros
+   // DefineNumericMacro ("__STDC__", 1);      <- not now
    DefineNumericMacro("__STDC_HOSTED__", 1);
 
-   /* Stuff unsupported */
+   // Stuff unsupported
    if (IS_Get(&Standard) > STD_C99) {
       DefineNumericMacro("__STDC_NO_ATOMICS__", 1);
       DefineNumericMacro("__STDC_NO_COMPLEX__", 1);
@@ -453,10 +453,10 @@ void Compile(const char *FileName)
       DefineNumericMacro("__STDC_NO_VLA__", 1);
    }
 
-   /* Create the base lexical level */
+   // Create the base lexical level
    EnterGlobalLevel();
 
-   /* Create the global code and data segments */
+   // Create the global code and data segments
    CreateGlobalSegments();
 
    // There shouldn't be needs for local labels outside a function, but the
@@ -464,29 +464,29 @@ void Compile(const char *FileName)
    // code were ill-formed. So just set it up with the global segment list.
    UseLabelPoolFromSegments(GS);
 
-   /* Initialize the literal pool */
+   // Initialize the literal pool
    InitLiteralPool();
 
-   /* Generate the code generator preamble */
+   // Generate the code generator preamble
    g_preamble();
 
-   /* Init preprocessor */
+   // Init preprocessor
    InitPreprocess();
 
-   /* Open the input file */
+   // Open the input file
    OpenMainFile(FileName);
 
-   /* Are we supposed to compile or just preprocess the input? */
+   // Are we supposed to compile or just preprocess the input?
    if (PreprocessOnly) {
 
-      /* Open the file */
+      // Open the file
       OpenOutputFile();
 
-      /* Preprocess each line and write it to the output file */
-      while (PreprocessNextLine()) { /* Nothing */
+      // Preprocess each line and write it to the output file
+      while (PreprocessNextLine()) { // Nothing
       }
 
-      /* Output macros if requested by the user */
+      // Output macros if requested by the user
       if (DumpPredefMacros) {
          OutputPredefMacros();
       }
@@ -494,15 +494,15 @@ void Compile(const char *FileName)
          OutputUserMacros();
       }
 
-      /* Close the output file */
+      // Close the output file
       CloseOutputFile();
    }
    else {
 
-      /* Used for emitting externals */
+      // Used for emitting externals
       SymEntry *Entry;
 
-      /* Ok, start the ball rolling... */
+      // Ok, start the ball rolling...
       Parse();
 
       // Reset the BSS segment name to its default; so that the below strcmp()
@@ -515,13 +515,13 @@ void Compile(const char *FileName)
          // Is it a global (with or without static) tentative declaration of
          // an uninitialized variable?
          if ((Entry->Flags & (SC_TU_STORAGE | SC_DEF)) == SC_TU_STORAGE) {
-            /* Assembly definition of uninitialized global variable */
+            // Assembly definition of uninitialized global variable
             SymEntry *TagSym = GetESUTagSym(Entry->Type);
             unsigned Size = SizeOf(Entry->Type);
 
             if (Size == 0 && IsTypeArray(Entry->Type)) {
                if (GetElementCount(Entry->Type) == UNSPECIFIED) {
-                  /* Assume array size of 1 */
+                  // Assume array size of 1
                   SetElementCount(Entry->Type, 1);
                   Size = SizeOf(Entry->Type);
                   Warning("Incomplete array '%s[]' assumed to have one element",
@@ -531,9 +531,9 @@ void Compile(const char *FileName)
                TagSym = GetESUTagSym(GetElementType(Entry->Type));
             }
 
-            /* For non-ESU types, Size != 0 */
+            // For non-ESU types, Size != 0
             if (Size != 0 || (TagSym != 0 && SymIsDef(TagSym))) {
-               /* Set the segment name only when it changes */
+               // Set the segment name only when it changes
                if (strcmp(GetSegName(SEG_BSS), Entry->V.BssName) != 0) {
                   SetSegName(SEG_BSS, Entry->V.BssName);
                   g_segname(SEG_BSS);
@@ -542,17 +542,17 @@ void Compile(const char *FileName)
                g_defgloblabel(Entry->Name);
                g_res(Size);
 
-               /* Mark as defined; so that it will be exported, not imported */
+               // Mark as defined; so that it will be exported, not imported
                Entry->Flags |= SC_DEF;
             }
             else if (!IsTypeArray(Entry->Type)) {
-               /* Tentative declared variable is still of incomplete type */
+               // Tentative declared variable is still of incomplete type
                Error("Definition of '%s' never has its type '%s' completed",
                      Entry->Name, GetFullTypeName(Entry->Type));
             }
          }
          else if (!SymIsDef(Entry) && (Entry->Flags & SC_TYPEMASK) == SC_FUNC) {
-            /* Check for undefined functions */
+            // Check for undefined functions
             if ((Entry->Flags & SC_STORAGEMASK) == SC_STATIC &&
                 SymIsRef(Entry)) {
                Warning("Static function '%s' used but never defined",
@@ -566,19 +566,19 @@ void Compile(const char *FileName)
       }
    }
 
-   /* Done with preprocessor */
+   // Done with preprocessor
    DonePreprocess();
 
    if (Debug) {
       PrintMacroStats(stdout);
    }
 
-   /* Print an error report */
+   // Print an error report
    ErrorReport();
 }
 
 void FinishCompile(void)
-/* Emit literals, debug info, do cleanup and optimizations */
+// Emit literals, debug info, do cleanup and optimizations
 {
    SymEntry *Entry;
 
@@ -586,25 +586,25 @@ void FinishCompile(void)
    // functions.
    for (Entry = GetGlobalSymTab()->SymHead; Entry; Entry = Entry->NextSym) {
       if (SymIsOutputFunc(Entry)) {
-         /* Continue with previous label numbers */
+         // Continue with previous label numbers
          UseLabelPoolFromSegments(Entry->V.F.Seg);
 
-         /* Function which is defined and referenced or extern */
+         // Function which is defined and referenced or extern
          MoveLiteralPool(Entry->V.F.LitPool);
          CS_MergeLabels(Entry->V.F.Seg->Code);
          RunOpt(Entry->V.F.Seg->Code);
       }
    }
 
-   /* Output the literal pool */
+   // Output the literal pool
    OutputGlobalLiteralPool();
 
-   /* Emit debug infos if enabled */
+   // Emit debug infos if enabled
    EmitDebugInfo();
 
-   /* Write imported/exported symbols */
+   // Write imported/exported symbols
    EmitExternals();
 
-   /* Leave the main lexical level */
+   // Leave the main lexical level
    LeaveGlobalLevel();
 }

@@ -1,44 +1,44 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 swstmt.c                                  */
-/*                                                                           */
-/*                        Parse the switch statement                         */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 swstmt.c
+//
+//                        Parse the switch statement
+//
+//
+//
+// (C) 1998-2008 Ullrich von Bassewitz
+//               Roemerstrasse 52
+//               D-70794 Filderstadt
+// EMail:        uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <stdbool.h>
 #include <limits.h>
 
-/* common */
+// common
 #include "coll.h"
 #include "xmalloc.h"
 
-/* cc65 */
+// cc65
 #include "asmcode.h"
 #include "asmlabel.h"
 #include "casenode.h"
@@ -53,42 +53,42 @@
 #include "swstmt.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
 typedef struct SwitchCtrl SwitchCtrl;
 struct SwitchCtrl {
-   Collection *Nodes;      /* CaseNode tree */
-   const Type *ExprType;   /* Switch controlling expression type */
-   unsigned Depth;         /* Number of bytes the selector type has */
-   unsigned DefaultLabel;  /* Label for the default branch */
-   CodeMark CaseCodeStart; /* Start of code marker */
-   bool CaseCodeStartFlag; /* flag to tell if we've done an override */
+   Collection *Nodes;      // CaseNode tree
+   const Type *ExprType;   // Switch controlling expression type
+   unsigned Depth;         // Number of bytes the selector type has
+   unsigned DefaultLabel;  // Label for the default branch
+   CodeMark CaseCodeStart; // Start of code marker
+   bool CaseCodeStartFlag; // flag to tell if we've done an override
 };
 
-/* Pointer to current switch control struct */
+// Pointer to current switch control struct
 static SwitchCtrl *Switch = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 void SwitchStatement(void)
-/* Handle a switch statement for chars with a cmp cascade for the selector */
+// Handle a switch statement for chars with a cmp cascade for the selector
 {
-   ExprDesc SwitchExpr;        /* Switch statement expression */
-   CodeMark SwitchCodeStart;   /* Start of switch code */
-   CodeMark SwitchCodeEnd;     /* End of switch code */
-   CodeMark OrigCaseCodeStart; /* Unmodified beginning of case code */
+   ExprDesc SwitchExpr;        // Switch statement expression
+   CodeMark SwitchCodeStart;   // Start of switch code
+   CodeMark SwitchCodeEnd;     // End of switch code
+   CodeMark OrigCaseCodeStart; // Unmodified beginning of case code
    CodeMark SaveCodeMark;
-   unsigned ExitLabel;       /* Exit label */
-   unsigned SwitchCodeLabel; /* Label for the switch code */
-   int HaveBreak = 0;        /* True if the last statement had a break */
-   int RCurlyBrace;          /* True if last token is right curly brace */
-   SwitchCtrl *OldSwitch;    /* Pointer to old switch control data */
-   SwitchCtrl SwitchData;    /* New switch data */
+   unsigned ExitLabel;       // Exit label
+   unsigned SwitchCodeLabel; // Label for the switch code
+   int HaveBreak = 0;        // True if the last statement had a break
+   int RCurlyBrace;          // True if last token is right curly brace
+   SwitchCtrl *OldSwitch;    // Pointer to old switch control data
+   SwitchCtrl SwitchData;    // New switch data
 
-   /* Eat the "switch" token */
+   // Eat the "switch" token
    NextToken();
 
    // Read the switch expression and load it into the primary. It must have
@@ -99,7 +99,7 @@ void SwitchStatement(void)
    Expression0(&SwitchExpr);
    if (!IsClassInt(SwitchExpr.Type)) {
       Error("Switch quantity is not an integer");
-      /* To avoid any compiler errors, make the expression a valid int */
+      // To avoid any compiler errors, make the expression a valid int
       ED_MakeConstAbsInt(&SwitchExpr, 1);
    }
    ConsumeRParen();
@@ -113,7 +113,7 @@ void SwitchStatement(void)
    // a label attached to the current code position, and the jump itself
    // will get removed by the optimizer if it is unnecessary.
    SwitchCodeLabel = GetLocalLabel();
-   /* save state for switch logic */
+   // save state for switch logic
    g_switchsave(SizeOf(SwitchExpr.Type));
    GetCodePos(&SaveCodeMark);
 
@@ -124,7 +124,7 @@ void SwitchStatement(void)
    SwitchData.CaseCodeStartFlag = false;
    OrigCaseCodeStart = SwitchData.CaseCodeStart;
 
-   /* Setup the control structure, save the old and activate the new one */
+   // Setup the control structure, save the old and activate the new one
    SwitchData.Nodes = NewCollection();
    SwitchData.ExprType = SwitchExpr.Type;
    SwitchData.Depth = SizeOf(SwitchExpr.Type);
@@ -132,17 +132,17 @@ void SwitchStatement(void)
    OldSwitch = Switch;
    Switch = &SwitchData;
 
-   /* Get the exit label for the switch statement */
+   // Get the exit label for the switch statement
    ExitLabel = GetLocalLabel();
 
-   /* Create a loop so we may use break. */
+   // Create a loop so we may use break.
    AddLoop(ExitLabel, 0);
 
    // Parse the following statement, which may actually be a compound
    // statement if there is a curly brace at the current input position
    HaveBreak = AnyStatement(&RCurlyBrace);
 
-   /* Check if we had any labels */
+   // Check if we had any labels
    if (CollCount(SwitchData.Nodes) == 0 && SwitchData.DefaultLabel == 0) {
       Warning("No reachable case labels for switch");
    }
@@ -157,23 +157,23 @@ void SwitchStatement(void)
       g_jump(ExitLabel);
    }
 
-   /* Remember the current position */
+   // Remember the current position
    GetCodePos(&SwitchCodeStart);
 
-   /* Output the switch code label */
+   // Output the switch code label
    g_defcodelabel(SwitchCodeLabel);
 
-   /* restore state for switch logic */
+   // restore state for switch logic
    g_switchrest(SwitchData.Depth);
 
-   /* Generate code */
+   // Generate code
    if (SwitchData.DefaultLabel == 0) {
-      /* No default label, use switch exit */
+      // No default label, use switch exit
       SwitchData.DefaultLabel = ExitLabel;
    }
    g_switch(SwitchData.Nodes, SwitchData.DefaultLabel, SwitchData.Depth);
 
-   /* Move the code to the front */
+   // Move the code to the front
    GetCodePos(&SwitchCodeEnd);
    MoveCode(&SwitchCodeStart, &SwitchCodeEnd, &SwitchData.CaseCodeStart);
 
@@ -191,16 +191,16 @@ void SwitchStatement(void)
    // producing an error is better than producing incorrect code.
    ErrorOnNonDefinition(&OrigCaseCodeStart, &SwitchData.CaseCodeStart);
 
-   /* Define the exit label */
+   // Define the exit label
    g_defcodelabel(ExitLabel);
 
-   /* Exit the loop */
+   // Exit the loop
    DelLoop();
 
-   /* Switch back to the enclosing switch statement if any */
+   // Switch back to the enclosing switch statement if any
    Switch = OldSwitch;
 
-   /* Free the case value tree */
+   // Free the case value tree
    FreeCaseNodeColl(SwitchData.Nodes);
 
    // If the case statement was terminated by a closing curly
@@ -211,26 +211,26 @@ void SwitchStatement(void)
 }
 
 void CaseLabel(void)
-/* Handle a case label */
+// Handle a case label
 {
-   ExprDesc CaseExpr; /* Case label expression */
+   ExprDesc CaseExpr; // Case label expression
 
-   /* Skip the "case" token */
+   // Skip the "case" token
    NextToken();
 
-   /* Read the selector expression */
+   // Read the selector expression
    CaseExpr = NoCodeConstAbsIntExpr(hie1);
 
-   /* Now check if we're inside a switch statement */
+   // Now check if we're inside a switch statement
    if (Switch != 0) {
 
-      /* Check the range of the expression */
+      // Check the range of the expression
       const Type *CaseT = CaseExpr.Type;
       long CaseVal = CaseExpr.IVal;
       int OutOfRange = 0;
       const char *DiagMsg = 0;
 
-      /* we want switch logic before the first case/default label */
+      // we want switch logic before the first case/default label
       if (!Switch->CaseCodeStartFlag) {
          Switch->CaseCodeStartFlag = true;
          GetCodePos(&Switch->CaseCodeStart);
@@ -252,7 +252,7 @@ void CaseLabel(void)
                  CaseVal, CaseExpr.IVal);
       }
 
-      /* Check the range of the expression */
+      // Check the range of the expression
       if (IsSignSigned(CaseExpr.Type)) {
          if (CaseExpr.IVal < GetIntegerTypeMin(Switch->ExprType)) {
             DiagMsg = "Case value (%ld) out of range for switch condition type";
@@ -277,11 +277,11 @@ void CaseLabel(void)
       if (OutOfRange == 0) {
          unsigned CodeLabel;
 
-         /* Insert the case selector into the selector table */
+         // Insert the case selector into the selector table
          CodeLabel =
              InsertCaseValue(Switch->Nodes, CaseExpr.IVal, Switch->Depth);
 
-         /* Define this label */
+         // Define this label
          g_defcodelabel(CodeLabel);
       }
       else {
@@ -290,47 +290,47 @@ void CaseLabel(void)
    }
    else {
 
-      /* case keyword outside a switch statement */
+      // case keyword outside a switch statement
       Error("Case label not within a switch statement");
    }
 
-   /* Skip the colon */
+   // Skip the colon
    ConsumeColon();
 }
 
 void DefaultLabel(void)
-/* Handle a default label */
+// Handle a default label
 {
-   /* Default case */
+   // Default case
    NextToken();
 
-   /* Now check if we're inside a switch statement */
+   // Now check if we're inside a switch statement
    if (Switch != 0) {
 
-      /* Check if we do already have a default branch */
+      // Check if we do already have a default branch
       if (Switch->DefaultLabel == 0) {
 
-         /* we want switch logic before the first case/default label */
+         // we want switch logic before the first case/default label
          if (!Switch->CaseCodeStartFlag) {
             Switch->CaseCodeStartFlag = true;
             GetCodePos(&Switch->CaseCodeStart);
          }
 
-         /* Generate and emit the default label */
+         // Generate and emit the default label
          Switch->DefaultLabel = GetLocalLabel();
          g_defcodelabel(Switch->DefaultLabel);
       }
       else {
-         /* We had the default label already */
+         // We had the default label already
          Error("Multiple default labels in one switch");
       }
    }
    else {
 
-      /* case keyword outside a switch statement */
+      // case keyword outside a switch statement
       Error("'default' label not within a switch statement");
    }
 
-   /* Skip the colon */
+   // Skip the colon
    ConsumeColon();
 }

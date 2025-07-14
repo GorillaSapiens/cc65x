@@ -1,37 +1,37 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                loadexpr.c                                 */
-/*                                                                           */
-/*               Load an expression into the primary register                */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2004-2009, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                loadexpr.c
+//
+//               Load an expression into the primary register
+//
+//
+//
+// (C) 2004-2009, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
-/* cc65 */
+// cc65
 #include "codegen.h"
 #include "error.h"
 #include "expr.h"
@@ -40,31 +40,31 @@
 #include "loadexpr.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 static void LoadAddress(unsigned Flags, ExprDesc *Expr)
-/* Load the primary register with some address value. */
+// Load the primary register with some address value.
 {
    switch (ED_GetLoc(Expr)) {
 
       case E_LOC_ABS:
-         /* Numberic address */
+         // Numberic address
          g_getimmed(Flags | CF_IMM | CF_CONST, Expr->IVal, 0);
          break;
 
       case E_LOC_GLOBAL:
-         /* Global symbol, load address */
+         // Global symbol, load address
          g_getimmed((Flags | CF_EXTERNAL) & ~CF_CONST, Expr->Name, Expr->IVal);
          break;
 
       case E_LOC_STATIC:
-         /* Static symbol, load address */
+         // Static symbol, load address
          g_getimmed((Flags | CF_STATIC) & ~CF_CONST, Expr->Name, Expr->IVal);
          break;
 
       case E_LOC_LITERAL:
-         /* Literal, load address */
+         // Literal, load address
          g_getimmed((Flags | CF_LITERAL) & ~CF_CONST, Expr->Name, Expr->IVal);
          break;
 
@@ -78,7 +78,7 @@ static void LoadAddress(unsigned Flags, ExprDesc *Expr)
          break;
 
       case E_LOC_CODE:
-         /* Code label, load address */
+         // Code label, load address
          g_getimmed((Flags | CF_CODE) & ~CF_CONST, Expr->Name, Expr->IVal);
          break;
 
@@ -117,7 +117,7 @@ void LoadExpr(unsigned Flags, struct ExprDesc *Expr)
       unsigned BitFieldFullWidthFlags = 0;
       if ((Flags & CF_TYPEMASK) == 0) {
          if (IsTypeFragBitField(Expr->Type)) {
-            /* We need to adjust the bits in this case.  */
+            // We need to adjust the bits in this case.
             AdjustBitField = 1;
 
             /* Flags we need operate on the whole bit-field, without
@@ -137,7 +137,7 @@ void LoadExpr(unsigned Flags, struct ExprDesc *Expr)
             BitFieldFullWidthFlags |= CF_UNSIGNED;
          }
          else {
-            /* If Expr is an incomplete ESY type, bail out */
+            // If Expr is an incomplete ESY type, bail out
             if (IsIncompleteESUType(Expr->Type)) {
                return;
             }
@@ -159,58 +159,58 @@ void LoadExpr(unsigned Flags, struct ExprDesc *Expr)
          }
       }
 
-      /* Load the content of Expr */
+      // Load the content of Expr
       switch (ED_GetLoc(Expr)) {
 
          case E_LOC_NONE:
-            /* Immediate number constant */
+            // Immediate number constant
             g_getimmed(Flags | CF_IMM | CG_TypeOf(Expr->Type) | CF_CONST,
                        Expr->IVal, 0);
             break;
 
          case E_LOC_ABS:
-            /* Absolute numeric addressed variable */
+            // Absolute numeric addressed variable
             g_getstatic(Flags | CF_ABSOLUTE, Expr->IVal, 0);
             break;
 
          case E_LOC_GLOBAL:
-            /* Global variable */
+            // Global variable
             g_getstatic(Flags | CF_EXTERNAL, Expr->Name, Expr->IVal);
             break;
 
          case E_LOC_STATIC:
-            /* Static variable */
+            // Static variable
             g_getstatic(Flags | CF_STATIC, Expr->Name, Expr->IVal);
             break;
 
          case E_LOC_LITERAL:
-            /* Literal in the literal pool */
+            // Literal in the literal pool
             g_getstatic(Flags | CF_LITERAL, Expr->Name, Expr->IVal);
             break;
 
          case E_LOC_REGISTER:
-            /* Register variable */
+            // Register variable
             g_getstatic(Flags | CF_REGVAR, Expr->Name, Expr->IVal);
             break;
 
          case E_LOC_CODE:
-            /* Code label location */
+            // Code label location
             g_getstatic(Flags | CF_CODE, Expr->Name, Expr->IVal);
             break;
 
          case E_LOC_STACK:
-            /* Value on the stack */
+            // Value on the stack
             g_getlocal(Flags, Expr->IVal);
             break;
 
          case E_LOC_PRIMARY:
-            /* The primary register */
+            // The primary register
             if (Expr->IVal != 0) {
                // We have an expression in the primary plus a constant
                // offset. Adjust the value in the primary accordingly.
                g_inc(Flags | CF_CONST, Expr->IVal);
 
-               /* We might want to clear the offset, but we can't */
+               // We might want to clear the offset, but we can't
             }
             if (Flags & CF_TEST) {
                g_test(Flags);
@@ -218,7 +218,7 @@ void LoadExpr(unsigned Flags, struct ExprDesc *Expr)
             break;
 
          case E_LOC_EXPR:
-            /* Reference to address in primary with offset in Expr */
+            // Reference to address in primary with offset in Expr
             g_getind(Flags, Expr->IVal);
 
             // Since the content in primary is now overwritten with the
@@ -249,25 +249,25 @@ void LoadExpr(unsigned Flags, struct ExprDesc *Expr)
          }
       }
 
-      /* Expression was tested */
+      // Expression was tested
       ED_TestDone(Expr);
    }
    else {
-      /* An address */
+      // An address
       Flags |= CF_INT | CF_UNSIGNED;
-      /* Constant of some sort, load it into the primary */
+      // Constant of some sort, load it into the primary
       LoadAddress(Flags, Expr);
 
-      /* Are we testing this value? */
+      // Are we testing this value?
       if (ED_YetToTest(Expr)) {
-         /* Yes, force a test */
+         // Yes, force a test
          g_test(Flags);
          ED_TestDone(Expr);
       }
    }
 
    if (ED_IsLVal(Expr) && IsQualVolatile(Expr->Type)) {
-      /* Expression has had side effects */
+      // Expression has had side effects
       Expr->Flags |= E_SIDE_EFFECTS;
    }
 }

@@ -1,47 +1,47 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 pragma.c                                  */
-/*                                                                           */
-/*                  Pragma handling for the cc65 C compiler                  */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 pragma.c
+//
+//                  Pragma handling for the cc65 C compiler
+//
+//
+//
+// (C) 1998-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <stdlib.h>
 #include <string.h>
 
-/* common */
+// common
 #include "addrsize.h"
 #include "chartype.h"
 #include "segnames.h"
 #include "tgttrans.h"
 #include "xmalloc.h"
 
-/* cc65 */
+// cc65
 #include "codegen.h"
 #include "error.h"
 #include "global.h"
@@ -53,10 +53,10 @@
 #include "wrappedcall.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Tokens for the #pragmas */
+// Tokens for the #pragmas
 typedef enum {
    PRAGMA_ILLEGAL = -1,
    PRAGMA_ALIGN,
@@ -82,13 +82,13 @@ typedef enum {
    PRAGMA_ZPSYM,
 } pragma_t;
 
-/* Pragma table */
-/* CAUTION: table must be sorted for bsearch */
+// Pragma table
+// CAUTION: table must be sorted for bsearch
 static const struct Pragma {
-   const char *Key; /* Keyword */
-   pragma_t Tok;    /* Token */
+   const char *Key; // Keyword
+   pragma_t Tok;    // Token
 } Pragmas[] = {
-    /* BEGIN SORTED.SH */
+    // BEGIN SORTED.SH
     {"align", PRAGMA_ALIGN},
     {"allow-eager-inline", PRAGMA_ALLOW_EAGER_INLINE},
     {"allow_eager_inline", PRAGMA_ALLOW_EAGER_INLINE},
@@ -123,11 +123,11 @@ static const struct Pragma {
     {"writable-strings", PRAGMA_WRITABLE_STRINGS},
     {"writable_strings", PRAGMA_WRITABLE_STRINGS},
     {"zpsym", PRAGMA_ZPSYM},
-    /* END SORTED.SH */
+    // END SORTED.SH
 };
 #define PRAGMA_COUNT (sizeof(Pragmas) / sizeof(Pragmas[0]))
 
-/* Result of ParsePushPop */
+// Result of ParsePushPop
 typedef enum {
    PP_NONE,
    PP_POP,
@@ -140,17 +140,17 @@ typedef enum {
 // even in the middle of an expression, statement or something.
 typedef enum {
    PES_NONE,
-   PES_IMM,   /* No way back */
-   PES_EXPR,  /* Current expression/declarator */
-   PES_STMT,  /* Current statement/declaration */
-   PES_SCOPE, /* Current scope */
-   PES_FUNC,  /* Current function */
-   PES_FILE,  /* Current file */
-   PES_ALL,   /* All */
+   PES_IMM,   // No way back
+   PES_EXPR,  // Current expression/declarator
+   PES_STMT,  // Current statement/declaration
+   PES_SCOPE, // Current scope
+   PES_FUNC,  // Current function
+   PES_FILE,  // Current file
+   PES_ALL,   // All
 } pragma_scope_t;
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                             Helper functions                              */
+//                             Helper functions
 ////////////////////////////////////////////////////////////////////////////////
 
 static void PragmaErrorSkip(void)
@@ -162,7 +162,7 @@ static void PragmaErrorSkip(void)
 }
 
 static int CmpKey(const void *Key, const void *Elem)
-/* Compare function for bsearch */
+// Compare function for bsearch
 {
    return strcmp((const char *)Key, ((const struct Pragma *)Elem)->Key);
 }
@@ -220,32 +220,32 @@ static IntStack *GetWarning(StrBuf *B)
    IntStack *S = 0;
    StrBuf W = AUTO_STRBUF_INITIALIZER;
 
-   /* The warning name is a symbol but the '-' char is allowed within */
+   // The warning name is a symbol but the '-' char is allowed within
    if (SB_GetSym(B, &W, "-")) {
 
-      /* Map the warning name to an IntStack that contains its state */
+      // Map the warning name to an IntStack that contains its state
       S = FindWarning(SB_GetConstBuf(&W));
 
-      /* Handle errors */
+      // Handle errors
       if (S == 0) {
          Error("Pragma expects a warning name as first argument");
       }
    }
 
-   /* Deallocate the string */
+   // Deallocate the string
    SB_Done(&W);
 
-   /* Done */
+   // Done
    return S;
 }
 
 static int HasStr(StrBuf *B, const char *E)
-/* Checks if E follows in B. If so, skips it and returns true */
+// Checks if E follows in B. If so, skips it and returns true
 {
    unsigned Len = strlen(E);
    if (SB_GetLen(B) - SB_GetIndex(B) >= Len) {
       if (strncmp(SB_GetConstBuf(B) + SB_GetIndex(B), E, Len) == 0) {
-         /* Found */
+         // Found
          SB_SkipMultiple(B, Len);
          return 1;
       }
@@ -260,43 +260,43 @@ static PushPopResult ParsePushPop(StrBuf *B)
    StrBuf Ident = AUTO_STRBUF_INITIALIZER;
    PushPopResult Res = PP_NONE;
 
-   /* Remember the current string index, so we can go back in case of errors */
+   // Remember the current string index, so we can go back in case of errors
    unsigned Index = SB_GetIndex(B);
 
-   /* Try to read an identifier */
+   // Try to read an identifier
    if (SB_GetSym(B, &Ident, 0)) {
 
-      /* Check if we have a first argument named "pop" */
+      // Check if we have a first argument named "pop"
       if (SB_CompareStr(&Ident, "pop") == 0) {
 
          Res = PP_POP;
 
-         /* Check if we have a first argument named "push" */
+         // Check if we have a first argument named "push"
       }
       else if (SB_CompareStr(&Ident, "push") == 0) {
 
          Res = PP_PUSH;
 
-         /* Skip the following comma */
+         // Skip the following comma
          if (!GetComma(B)) {
-            /* Error already flagged by GetComma */
+            // Error already flagged by GetComma
             Res = PP_ERROR;
          }
       }
       else {
 
-         /* Unknown keyword, roll back */
+         // Unknown keyword, roll back
          SB_SetIndex(B, Index);
       }
    }
 
-   /* Free the string buffer and return the result */
+   // Free the string buffer and return the result
    SB_Done(&Ident);
    return Res;
 }
 
 static void PopInt(IntStack *S)
-/* Pops an integer from an IntStack. Prints an error if the stack is empty */
+// Pops an integer from an IntStack. Prints an error if the stack is empty
 {
    if (IS_GetCount(S) < 2) {
       Error("Cannot pop, stack is empty");
@@ -307,7 +307,7 @@ static void PopInt(IntStack *S)
 }
 
 static void PushInt(IntStack *S, long Val)
-/* Pushes an integer onto an IntStack. Prints an error if the stack is full */
+// Pushes an integer onto an IntStack. Prints an error if the stack is full
 {
    if (IS_IsFull(S)) {
       Error("Cannot push: stack overflow");
@@ -334,31 +334,31 @@ static int IsBoolKeyword(StrBuf *Ident)
       return 0;
    }
 
-   /* Error */
+   // Error
    Error("Pragma argument must be one of 'on', 'off', 'true' or 'false'");
    return 0;
 }
 
 static void ApplyPragma(int PushPop, IntStack *Stack, long Val)
-/* Apply a pragma immediately */
+// Apply a pragma immediately
 {
    if (PushPop > 0) {
-      /* Push the new value */
+      // Push the new value
       PushInt(Stack, Val);
    }
    else if (PushPop < 0) {
-      /* Pop the old value */
+      // Pop the old value
       PopInt(Stack);
    }
    else {
-      /* Set the new value */
+      // Set the new value
       IS_Set(Stack, Val);
    }
 }
 
 static void ApplySegNamePragma(pragma_t Token, int PushPop, const char *Name,
                                unsigned char AddrSize)
-/* Process a segname pragma */
+// Process a segname pragma
 {
    segment_t Seg = SEG_CODE;
 
@@ -384,7 +384,7 @@ static void ApplySegNamePragma(pragma_t Token, int PushPop, const char *Name,
          break;
    }
 
-   /* Set the new name */
+   // Set the new name
    if (PushPop > 0) {
       PushSegName(Seg, Name);
    }
@@ -395,7 +395,7 @@ static void ApplySegNamePragma(pragma_t Token, int PushPop, const char *Name,
       SetSegName(Seg, Name);
    }
 
-   /* Set the optional address size for the segment if valid */
+   // Set the optional address size for the segment if valid
    if (PushPop >= 0 && AddrSize != ADDR_SIZE_INVALID) {
       SetSegAddrSize(Name, AddrSize);
    }
@@ -404,30 +404,30 @@ static void ApplySegNamePragma(pragma_t Token, int PushPop, const char *Name,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                         Pragma handling functions                         */
+//                         Pragma handling functions
 ////////////////////////////////////////////////////////////////////////////////
 
 static void StringPragma(pragma_scope_t Scope, StrBuf *B,
                          void (*Func)(const char *))
-/* Handle a pragma that expects a string parameter */
+// Handle a pragma that expects a string parameter
 {
    StrBuf S = AUTO_STRBUF_INITIALIZER;
 
-   /* Only PES_IMM is supported */
+   // Only PES_IMM is supported
    CHECK(Scope == PES_IMM);
 
-   /* We expect a string here */
+   // We expect a string here
    if (GetString(B, &S)) {
-      /* Call the given function with the string argument */
+      // Call the given function with the string argument
       Func(SB_GetConstBuf(&S));
    }
 
-   /* Call the string buf destructor */
+   // Call the string buf destructor
    SB_Done(&S);
 }
 
 static void SegNamePragma(pragma_scope_t Scope, pragma_t Token, StrBuf *B)
-/* Handle a pragma that expects a segment name parameter */
+// Handle a pragma that expects a segment name parameter
 {
    const char *Name;
    unsigned char AddrSize = ADDR_SIZE_INVALID;
@@ -435,10 +435,10 @@ static void SegNamePragma(pragma_scope_t Scope, pragma_t Token, StrBuf *B)
    StrBuf A = AUTO_STRBUF_INITIALIZER;
    int PushPop = 0;
 
-   /* Unused at the moment */
+   // Unused at the moment
    (void)Scope;
 
-   /* Check for the "push" or "pop" keywords */
+   // Check for the "push" or "pop" keywords
    switch (ParsePushPop(B)) {
 
       case PP_NONE:
@@ -449,79 +449,79 @@ static void SegNamePragma(pragma_scope_t Scope, pragma_t Token, StrBuf *B)
          break;
 
       case PP_POP:
-         /* Pop the old value and output it */
+         // Pop the old value and output it
          ApplySegNamePragma(Token, -1, 0, 0);
 
-         /* Done */
+         // Done
          goto ExitPoint;
 
       case PP_ERROR:
-         /* Bail out */
+         // Bail out
          goto ExitPoint;
 
       default:
          Internal("Invalid result from ParsePushPop");
    }
 
-   /* A string argument must follow */
+   // A string argument must follow
    if (!GetString(B, &S)) {
       goto ExitPoint;
    }
 
-   /* Get the name string of the segment */
+   // Get the name string of the segment
    Name = SB_GetConstBuf(&S);
 
-   /* Check if the name is valid */
+   // Check if the name is valid
    if (ValidSegName(Name)) {
 
-      /* Skip the following comma */
+      // Skip the following comma
       SB_SkipWhite(B);
       if (SB_Peek(B) == ',') {
          SB_Skip(B);
          SB_SkipWhite(B);
 
-         /* A string argument must follow */
+         // A string argument must follow
          if (!GetString(B, &A)) {
             goto ExitPoint;
          }
 
-         /* Get the address size for the segment */
+         // Get the address size for the segment
          AddrSize = AddrSizeFromStr(SB_GetConstBuf(&A));
 
-         /* Check the address size for the segment */
+         // Check the address size for the segment
          if (AddrSize == ADDR_SIZE_INVALID) {
             Warning("Invalid address size for segment");
          }
       }
 
-      /* Set the new name and optionally address size */
+      // Set the new name and optionally address size
       ApplySegNamePragma(Token, PushPop, Name, AddrSize);
    }
    else {
 
-      /* Segment name is invalid */
+      // Segment name is invalid
       Error("Illegal segment name: '%s'", Name);
    }
 
 ExitPoint:
 
-   /* Call the string buf destructor */
+   // Call the string buf destructor
    SB_Done(&S);
    SB_Done(&A);
 }
 
 static void WrappedCallPragma(pragma_scope_t Scope, StrBuf *B)
-/* Handle the wrapped-call pragma */
+// Handle the wrapped-call pragma
 {
    StrBuf S = AUTO_STRBUF_INITIALIZER;
    const char *Name;
    long Val;
    SymEntry *Entry;
 
-   /* Only PES_IMM is supported */
+   // Only PES_IMM is supported
    CHECK(Scope == PES_IMM);
 
-   /* Check for the "push" or "pop" keywords */
+   // Check for the "push" or "pop" keywords
    switch (ParsePushPop(B)) {
 
       case PP_NONE:
@@ -534,30 +534,30 @@ static void WrappedCallPragma(pragma_scope_t Scope, StrBuf *B)
       case PP_POP:
          PopWrappedCall();
 
-         /* Done */
+         // Done
          goto ExitPoint;
 
       case PP_ERROR:
-         /* Bail out */
+         // Bail out
          goto ExitPoint;
 
       default:
          Internal("Invalid result from ParsePushPop");
    }
 
-   /* A symbol argument must follow */
+   // A symbol argument must follow
    if (!SB_GetSym(B, &S, NULL)) {
       goto ExitPoint;
    }
 
-   /* Skip the following comma */
+   // Skip the following comma
    if (!GetComma(B)) {
-      /* Error already flagged by GetComma */
+      // Error already flagged by GetComma
       Error("Value or the word 'bank' required for wrapped-call identifier");
       goto ExitPoint;
    }
 
-   /* Next must be either a numeric value, or "bank" */
+   // Next must be either a numeric value, or "bank"
    if (HasStr(B, "bank")) {
       Val = WRAPPED_CALL_USE_BANK;
    }
@@ -571,11 +571,11 @@ static void WrappedCallPragma(pragma_scope_t Scope, StrBuf *B)
       goto ExitPoint;
    }
 
-   /* Get the string */
+   // Get the string
    Name = SB_GetConstBuf(&S);
    Entry = FindSym(Name);
 
-   /* Check if the name is valid */
+   // Check if the name is valid
    if (Entry && (Entry->Flags & SC_TYPEMASK) == SC_FUNC) {
 
       PushWrappedCall(Entry, (unsigned int)Val);
@@ -584,24 +584,24 @@ static void WrappedCallPragma(pragma_scope_t Scope, StrBuf *B)
    }
    else {
 
-      /* Segment name is invalid */
+      // Segment name is invalid
       Error("Wrapped-call target does not exist or is not a function");
    }
 
 ExitPoint:
-   /* Call the string buf destructor */
+   // Call the string buf destructor
    SB_Done(&S);
 }
 
 static void CharMapPragma(pragma_scope_t Scope, StrBuf *B)
-/* Change the character map */
+// Change the character map
 {
    long Index, C;
 
-   /* Only PES_IMM is supported */
+   // Only PES_IMM is supported
    CHECK(Scope == PES_IMM);
 
-   /* Read the character index */
+   // Read the character index
    if (!GetNumber(B, &Index)) {
       return;
    }
@@ -610,12 +610,12 @@ static void CharMapPragma(pragma_scope_t Scope, StrBuf *B)
       return;
    }
 
-   /* Comma follows */
+   // Comma follows
    if (!GetComma(B)) {
       return;
    }
 
-   /* Read the character code */
+   // Read the character code
    if (!GetNumber(B, &C)) {
       return;
    }
@@ -635,32 +635,32 @@ static void CharMapPragma(pragma_scope_t Scope, StrBuf *B)
       }
    }
 
-   /* Remap the character */
+   // Remap the character
    TgtTranslateSet((unsigned)Index, (unsigned char)C);
 }
 
 static void WarnPragma(pragma_scope_t Scope, StrBuf *B)
-/* Enable/disable warnings */
+// Enable/disable warnings
 {
    long Val;
    int Push;
 
-   /* A warning name must follow */
+   // A warning name must follow
    IntStack *S = GetWarning(B);
 
-   /* Only PES_IMM is supported */
+   // Only PES_IMM is supported
    CHECK(Scope == PES_IMM);
 
    if (S == 0) {
       return;
    }
 
-   /* Comma follows */
+   // Comma follows
    if (!GetComma(B)) {
       return;
    }
 
-   /* Check for the "push" or "pop" keywords */
+   // Check for the "push" or "pop" keywords
    switch (ParsePushPop(B)) {
 
       case PP_NONE:
@@ -672,19 +672,19 @@ static void WarnPragma(pragma_scope_t Scope, StrBuf *B)
          break;
 
       case PP_POP:
-         /* Pop the old value and bail out */
+         // Pop the old value and bail out
          PopInt(S);
          return;
 
       case PP_ERROR:
-         /* Bail out */
+         // Bail out
          return;
 
       default:
          Internal("Invalid result from ParsePushPop");
    }
 
-   /* Boolean argument follows */
+   // Boolean argument follows
    if (HasStr(B, "true") || HasStr(B, "on")) {
       Val = 1;
    }
@@ -696,7 +696,7 @@ static void WarnPragma(pragma_scope_t Scope, StrBuf *B)
       return;
    }
 
-   /* Set/push the new value */
+   // Set/push the new value
    if (Push) {
       PushInt(S, Val);
    }
@@ -707,29 +707,29 @@ static void WarnPragma(pragma_scope_t Scope, StrBuf *B)
 
 static void FlagPragma(pragma_scope_t Scope, pragma_t Token, StrBuf *B,
                        IntStack *Stack)
-/* Handle a pragma that expects a boolean parameter */
+// Handle a pragma that expects a boolean parameter
 {
    StrBuf Ident = AUTO_STRBUF_INITIALIZER;
    long Val;
    int PushPop = 0;
 
-   /* Unused at the moment */
+   // Unused at the moment
    (void)Scope;
    (void)Token;
 
-   /* Try to read an identifier */
+   // Try to read an identifier
    int IsIdent = SB_GetSym(B, &Ident, 0);
 
-   /* Check if we have a first argument named "pop" */
+   // Check if we have a first argument named "pop"
    if (IsIdent && SB_CompareStr(&Ident, "pop") == 0) {
-      /* Pop the old value and bail out */
+      // Pop the old value and bail out
       ApplyPragma(-1, Stack, 0);
 
-      /* No other arguments allowed */
+      // No other arguments allowed
       return;
    }
 
-   /* Check if we have a first argument named "push" */
+   // Check if we have a first argument named "push"
    if (IsIdent && SB_CompareStr(&Ident, "push") == 0) {
       PushPop = 1;
       if (!GetComma(B)) {
@@ -738,7 +738,7 @@ static void FlagPragma(pragma_scope_t Scope, pragma_t Token, StrBuf *B,
       IsIdent = SB_GetSym(B, &Ident, 0);
    }
 
-   /* Boolean argument follows */
+   // Boolean argument follows
    if (IsIdent) {
       Val = IsBoolKeyword(&Ident);
    }
@@ -746,26 +746,26 @@ static void FlagPragma(pragma_scope_t Scope, pragma_t Token, StrBuf *B,
       goto ExitPoint;
    }
 
-   /* Add this pragma and apply it whenever appropriately */
+   // Add this pragma and apply it whenever appropriately
    ApplyPragma(PushPop, Stack, Val);
 
 ExitPoint:
-   /* Free the identifier */
+   // Free the identifier
    SB_Done(&Ident);
 }
 
 static void IntPragma(pragma_scope_t Scope, pragma_t Token, StrBuf *B,
                       IntStack *Stack, long Low, long High)
-/* Handle a pragma that expects an int parameter */
+// Handle a pragma that expects an int parameter
 {
    long Val;
    int Push;
 
-   /* Unused at the moment */
+   // Unused at the moment
    (void)Scope;
    (void)Token;
 
-   /* Check for the "push" or "pop" keywords */
+   // Check for the "push" or "pop" keywords
    switch (ParsePushPop(B)) {
 
       case PP_NONE:
@@ -777,30 +777,30 @@ static void IntPragma(pragma_scope_t Scope, pragma_t Token, StrBuf *B,
          break;
 
       case PP_POP:
-         /* Pop the old value and bail out */
+         // Pop the old value and bail out
          ApplyPragma(-1, Stack, 0);
          return;
 
       case PP_ERROR:
-         /* Bail out */
+         // Bail out
          return;
 
       default:
          Internal("Invalid result from ParsePushPop");
    }
 
-   /* Integer argument follows */
+   // Integer argument follows
    if (!GetNumber(B, &Val)) {
       return;
    }
 
-   /* Check the argument */
+   // Check the argument
    if (Val < Low || Val > High) {
       Error("Pragma argument out of bounds (%ld-%ld)", Low, High);
       return;
    }
 
-   /* Add this pragma and apply it whenever appropriately */
+   // Add this pragma and apply it whenever appropriately
    ApplyPragma(Push, Stack, Val);
 }
 
@@ -812,30 +812,30 @@ static void NoteMessagePragma(const char *Message)
 }
 
 static void ParsePragmaString(void)
-/* Parse the contents of _Pragma */
+// Parse the contents of _Pragma
 {
    pragma_t Pragma;
    StrBuf Ident = AUTO_STRBUF_INITIALIZER;
 
-   /* Create a string buffer from the string literal */
+   // Create a string buffer from the string literal
    StrBuf B = AUTO_STRBUF_INITIALIZER;
 
    SB_Append(&B, GetLiteralStrBuf(CurTok.SVal));
 
-   /* Skip the string token */
+   // Skip the string token
    NextToken();
 
-   /* Get the pragma name from the string */
+   // Get the pragma name from the string
    SB_SkipWhite(&B);
    if (!SB_GetSym(&B, &Ident, "-")) {
       Error("Invalid pragma");
       goto ExitPoint;
    }
 
-   /* Search for the name */
+   // Search for the name
    Pragma = FindPragma(&Ident);
 
-   /* Do we know this pragma? */
+   // Do we know this pragma?
    if (Pragma == PRAGMA_ILLEGAL) {
       // According to the ANSI standard, we're not allowed to generate errors
       // for unknown pragmas, but warn about them if enabled (the default).
@@ -845,21 +845,21 @@ static void ParsePragmaString(void)
       goto ExitPoint;
    }
 
-   /* Check for an open paren */
+   // Check for an open paren
    SB_SkipWhite(&B);
    if (SB_Get(&B) != '(') {
       Error("'(' expected");
       goto ExitPoint;
    }
 
-   /* Skip white space before the argument */
+   // Skip white space before the argument
    SB_SkipWhite(&B);
 
-   /* Switch for the different pragmas */
+   // Switch for the different pragmas
    switch (Pragma) {
 
       case PRAGMA_ALIGN:
-         /* TODO: PES_EXPR (PES_DECL) */
+         // TODO: PES_EXPR (PES_DECL)
          IntPragma(PES_STMT, Pragma, &B, &DataAlignment, 1, 4096);
          break;
 
@@ -868,7 +868,7 @@ static void ParsePragmaString(void)
          break;
 
       case PRAGMA_BSS_NAME:
-         /* TODO: PES_STMT or even PES_EXPR (PES_DECL) maybe? */
+         // TODO: PES_STMT or even PES_EXPR (PES_DECL) maybe?
          SegNamePragma(PES_FUNC, PRAGMA_BSS_NAME, &B);
          break;
 
@@ -877,87 +877,87 @@ static void ParsePragmaString(void)
          break;
 
       case PRAGMA_CHECK_STACK:
-         /* TODO: PES_SCOPE maybe? */
+         // TODO: PES_SCOPE maybe?
          FlagPragma(PES_FUNC, Pragma, &B, &CheckStack);
          break;
 
       case PRAGMA_CODE_NAME:
-         /* PES_FUNC is the only sensible option so far */
+         // PES_FUNC is the only sensible option so far
          SegNamePragma(PES_FUNC, PRAGMA_CODE_NAME, &B);
          break;
 
       case PRAGMA_CODESIZE:
-         /* PES_EXPR would be optimization nightmare */
+         // PES_EXPR would be optimization nightmare
          IntPragma(PES_STMT, Pragma, &B, &CodeSizeFactor, 10, 1000);
          break;
 
       case PRAGMA_DATA_NAME:
-         /* TODO: PES_STMT or even PES_EXPR (PES_DECL) maybe? */
+         // TODO: PES_STMT or even PES_EXPR (PES_DECL) maybe?
          SegNamePragma(PES_FUNC, PRAGMA_DATA_NAME, &B);
          break;
 
       case PRAGMA_INLINE_STDFUNCS:
-         /* TODO: PES_EXPR maybe? */
+         // TODO: PES_EXPR maybe?
          FlagPragma(PES_STMT, Pragma, &B, &InlineStdFuncs);
          break;
 
       case PRAGMA_LOCAL_STRINGS:
-         /* TODO: PES_STMT or even PES_EXPR */
+         // TODO: PES_STMT or even PES_EXPR
          FlagPragma(PES_FUNC, Pragma, &B, &LocalStrings);
          break;
 
       case PRAGMA_MESSAGE:
-         /* PES_IMM is the only sensible option */
+         // PES_IMM is the only sensible option
          StringPragma(PES_IMM, &B, NoteMessagePragma);
          break;
 
       case PRAGMA_OPTIMIZE:
-         /* TODO: PES_STMT or even PES_EXPR maybe? */
+         // TODO: PES_STMT or even PES_EXPR maybe?
          FlagPragma(PES_STMT, Pragma, &B, &Optimize);
          break;
 
       case PRAGMA_REGVARADDR:
-         /* TODO: PES_STMT or even PES_EXPR maybe? */
+         // TODO: PES_STMT or even PES_EXPR maybe?
          FlagPragma(PES_FUNC, Pragma, &B, &AllowRegVarAddr);
          break;
 
       case PRAGMA_REGISTER_VARS:
-         /* TODO: PES_STMT or even PES_EXPR (PES_DECL) maybe? */
+         // TODO: PES_STMT or even PES_EXPR (PES_DECL) maybe?
          FlagPragma(PES_FUNC, Pragma, &B, &EnableRegVars);
          break;
 
       case PRAGMA_RODATA_NAME:
-         /* TODO: PES_STMT or even PES_EXPR maybe? */
+         // TODO: PES_STMT or even PES_EXPR maybe?
          SegNamePragma(PES_FUNC, PRAGMA_RODATA_NAME, &B);
          break;
 
       case PRAGMA_SIGNED_CHARS:
-         /* TODO: PES_STMT or even PES_EXPR maybe? */
+         // TODO: PES_STMT or even PES_EXPR maybe?
          FlagPragma(PES_FUNC, Pragma, &B, &SignedChars);
          break;
 
       case PRAGMA_STATIC_LOCALS:
-         /* TODO: PES_STMT or even PES_EXPR (PES_DECL) maybe? */
+         // TODO: PES_STMT or even PES_EXPR (PES_DECL) maybe?
          FlagPragma(PES_FUNC, Pragma, &B, &StaticLocals);
          break;
 
       case PRAGMA_WRAPPED_CALL:
-         /* PES_IMM is the only sensible option */
+         // PES_IMM is the only sensible option
          WrappedCallPragma(PES_IMM, &B);
          break;
 
       case PRAGMA_WARN:
-         /* PES_IMM is the only sensible option */
+         // PES_IMM is the only sensible option
          WarnPragma(PES_IMM, &B);
          break;
 
       case PRAGMA_WRITABLE_STRINGS:
-         /* TODO: PES_STMT or even PES_EXPR maybe? */
+         // TODO: PES_STMT or even PES_EXPR maybe?
          FlagPragma(PES_FUNC, Pragma, &B, &WritableStrings);
          break;
 
       case PRAGMA_ZPSYM:
-         /* PES_IMM is the only sensible option */
+         // PES_IMM is the only sensible option
          StringPragma(PES_IMM, &B, MakeZPSym);
          break;
 
@@ -965,7 +965,7 @@ static void ParsePragmaString(void)
          Internal("Invalid pragma");
    }
 
-   /* Closing paren expected */
+   // Closing paren expected
    SB_SkipWhite(&B);
    if (SB_Get(&B) != ')') {
       Error("')' expected");
@@ -973,46 +973,46 @@ static void ParsePragmaString(void)
    }
    SB_SkipWhite(&B);
 
-   /* Allow an optional semicolon to be compatible with the old syntax */
+   // Allow an optional semicolon to be compatible with the old syntax
    if (SB_Peek(&B) == ';') {
       SB_Skip(&B);
       SB_SkipWhite(&B);
    }
 
-   /* Make sure nothing follows */
+   // Make sure nothing follows
    if (SB_Peek(&B) != '\0') {
       Error("Unexpected input following pragma directive");
    }
 
 ExitPoint:
-   /* Release the string buffers */
+   // Release the string buffers
    SB_Done(&B);
    SB_Done(&Ident);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 void ConsumePragma(void)
 // Parse a pragma. The pragma comes always in the form of the new C99 _Pragma()
 // operator.
 {
-   /* Skip the _Pragma token */
+   // Skip the _Pragma token
    NextToken();
 
-   /* Prevent from translating string literals in _Pragma */
+   // Prevent from translating string literals in _Pragma
    ++InPragmaParser;
 
-   /* We expect an opening paren */
+   // We expect an opening paren
    if (!ConsumeLParen()) {
       --InPragmaParser;
       return;
    }
 
-   /* String literal */
+   // String literal
    if (CurTok.Tok != TOK_SCONST) {
-      /* Print a diagnostic */
+      // Print a diagnostic
       Error("String literal expected");
 
       // Try some smart error recovery: Skip tokens until we reach the
@@ -1020,12 +1020,12 @@ void ConsumePragma(void)
       PragmaErrorSkip();
    }
    else {
-      /* Parse the pragma */
+      // Parse the pragma
       ParsePragmaString();
    }
 
    --InPragmaParser;
 
-   /* Closing paren needed */
+   // Closing paren needed
    ConsumeRParen();
 }

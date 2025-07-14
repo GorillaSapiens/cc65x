@@ -1,41 +1,41 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 codeopt.c                                 */
-/*                                                                           */
-/*                           Optimizer subroutines                           */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 codeopt.c
+//
+//                           Optimizer subroutines
+//
+//
+//
+// (C) 2001-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 
-/* common */
+// common
 #include "abend.h"
 #include "chartype.h"
 #include "cpu.h"
@@ -45,7 +45,7 @@
 #include "xmalloc.h"
 #include "xsprintf.h"
 
-/* cc65 */
+// cc65
 #include "codeent.h"
 #include "codeinfo.h"
 #include "codeopt.h"
@@ -72,28 +72,28 @@
 #include "output.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                              struct OptFunc                               */
+//                              struct OptFunc
 ////////////////////////////////////////////////////////////////////////////////
 
 typedef struct OptFunc OptFunc;
 struct OptFunc {
-   unsigned (*Func)(CodeSeg *); /* Optimizer function */
-   const char *Name;            /* Name of the function/group */
-   unsigned CodeSizeFactor;     /* Code size factor for this opt func */
-   unsigned long TotalRuns;     /* Total number of runs */
-   unsigned long LastRuns;      /* Last number of runs */
-   unsigned long TotalChanges;  /* Total number of changes */
-   unsigned long LastChanges;   /* Last number of changes */
-   char Disabled;               /* True if function disabled */
+   unsigned (*Func)(CodeSeg *); // Optimizer function
+   const char *Name;            // Name of the function/group
+   unsigned CodeSizeFactor;     // Code size factor for this opt func
+   unsigned long TotalRuns;     // Total number of runs
+   unsigned long LastRuns;      // Last number of runs
+   unsigned long TotalChanges;  // Total number of changes
+   unsigned long LastChanges;   // Last number of changes
+   char Disabled;               // True if function disabled
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
-/* A list of all the function descriptions */
-/* CAUTION: should be sorted by "name" */
-/* BEGIN DECL SORTED_CODEOPT.SH */
+// A list of all the function descriptions
+// CAUTION: should be sorted by "name"
+// BEGIN DECL SORTED_CODEOPT.SH
 static OptFunc DOpt65C02BitOps = {
     Opt65C02BitOps, "Opt65C02BitOps", 66, 0, 0, 0, 0, 0};
 static OptFunc DOpt65C02Ind = {Opt65C02Ind, "Opt65C02Ind", 100, 0, 0, 0, 0, 0};
@@ -253,12 +253,12 @@ static OptFunc DOptUnusedLoads = {
     OptUnusedLoads, "OptUnusedLoads", 0, 0, 0, 0, 0, 0};
 static OptFunc DOptUnusedStores = {
     OptUnusedStores, "OptUnusedStores", 0, 0, 0, 0, 0, 0};
-/* END DECL SORTED_CODEOPT.SH */
+// END DECL SORTED_CODEOPT.SH
 
-/* Table containing all the steps in alphabetical order */
-/* CAUTION: table must be sorted for bsearch */
+// Table containing all the steps in alphabetical order
+// CAUTION: table must be sorted for bsearch
 static OptFunc *OptFuncs[] = {
-    /* BEGIN SORTED_CODEOPT.SH */
+    // BEGIN SORTED_CODEOPT.SH
     &DOpt65C02BitOps, &DOpt65C02Ind,     &DOpt65C02Stores,   &DOptAdd1,
     &DOptAdd2,        &DOptAdd3,         &DOptAdd4,          &DOptAdd5,
     &DOptAdd6,        &DOptBNegA1,       &DOptBNegA2,        &DOptBNegAX1,
@@ -288,12 +288,12 @@ static OptFunc *OptFuncs[] = {
     &DOptStoreLoad,   &DOptSub1,         &DOptSub2,          &DOptSub3,
     &DOptTest1,       &DOptTest2,        &DOptTransfers1,    &DOptTransfers2,
     &DOptTransfers3,  &DOptTransfers4,   &DOptUnusedLoads,   &DOptUnusedStores,
-    /* END SORTED_CODEOPT.SH */
+    // END SORTED_CODEOPT.SH
 };
 #define OPTFUNC_COUNT (sizeof(OptFuncs) / sizeof(OptFuncs[0]))
 
 static int CmpOptStep(const void *Key, const void *Func)
-/* Compare function for bsearch */
+// Compare function for bsearch
 {
    return strcmp(Key, (*(const OptFunc **)Func)->Name);
 }
@@ -302,7 +302,7 @@ static OptFunc *FindOptFunc(const char *Name)
 // Find an optimizer step by name in the table and return a pointer. Return
 // NULL if no such step is found.
 {
-   /* Search for the function in the list */
+   // Search for the function in the list
    OptFunc **O =
        bsearch(Name, OptFuncs, OPTFUNC_COUNT, sizeof(OptFuncs[0]), CmpOptStep);
    return O ? *O : 0;
@@ -312,17 +312,17 @@ static OptFunc *GetOptFunc(const char *Name)
 // Find an optimizer step by name in the table and return a pointer. Print an
 // error and call AbEnd if not found.
 {
-   /* Search for the function in the list */
+   // Search for the function in the list
    OptFunc *F = FindOptFunc(Name);
    if (F == 0) {
-      /* Not found */
+      // Not found
       AbEnd("Optimization step '%s' not found", Name);
    }
    return F;
 }
 
 void DisableOpt(const char *Name)
-/* Disable the optimization with the given name */
+// Disable the optimization with the given name
 {
    if (strcmp(Name, "any") == 0) {
       unsigned I;
@@ -336,7 +336,7 @@ void DisableOpt(const char *Name)
 }
 
 void EnableOpt(const char *Name)
-/* Enable the optimization with the given name */
+// Enable the optimization with the given name
 {
    if (strcmp(Name, "any") == 0) {
       unsigned I;
@@ -350,7 +350,7 @@ void EnableOpt(const char *Name)
 }
 
 void ListOptSteps(FILE *F)
-/* List all optimization steps */
+// List all optimization steps
 {
    unsigned I;
 
@@ -363,30 +363,30 @@ void ListOptSteps(FILE *F)
 }
 
 static void ReadOptStats(const char *Name)
-/* Read the optimizer statistics file */
+// Read the optimizer statistics file
 {
    char Buf[256];
 
-   /* Try to open the file */
+   // Try to open the file
    FILE *F = fopen(Name, "r");
    if (F == 0) {
-      /* Ignore the error */
+      // Ignore the error
       return;
    }
 
-   /* Read and parse the lines */
+   // Read and parse the lines
    while (fgets(Buf, sizeof(Buf), F) != 0) {
 
       char *B;
       unsigned Len;
       OptFunc *Func;
 
-      /* Fields */
+      // Fields
       char Name[32];
       unsigned long TotalRuns;
       unsigned long TotalChanges;
 
-      /* Remove trailing white space including the line terminator */
+      // Remove trailing white space including the line terminator
       B = Buf;
       Len = strlen(B);
       while (Len > 0 && IsSpace(B[Len - 1])) {
@@ -394,69 +394,69 @@ static void ReadOptStats(const char *Name)
       }
       B[Len] = '\0';
 
-      /* Remove leading whitespace */
+      // Remove leading whitespace
       while (IsSpace(*B)) {
          ++B;
       }
 
-      /* Check for empty and comment lines */
+      // Check for empty and comment lines
       if (*B == '\0' || *B == ';' || *B == '#') {
          continue;
       }
 
-      /* Parse the line */
+      // Parse the line
       if (sscanf(B, "%31s %lu %*u %lu %*u", Name, &TotalRuns, &TotalChanges) !=
           3) {
-         /* Syntax error */
+         // Syntax error
          continue;
       }
 
-      /* Search for the optimizer step. */
+      // Search for the optimizer step.
       Func = FindOptFunc(Name);
       if (Func == 0) {
-         /* Not found */
+         // Not found
          continue;
       }
 
-      /* Found the step, set the fields */
+      // Found the step, set the fields
       Func->TotalRuns = TotalRuns;
       Func->TotalChanges = TotalChanges;
    }
 
-   /* Close the file, ignore errors here. */
+   // Close the file, ignore errors here.
    fclose(F);
 }
 
 static void WriteOptStats(const char *Name)
-/* Write the optimizer statistics file */
+// Write the optimizer statistics file
 {
    unsigned I;
 
-   /* Try to open the file */
+   // Try to open the file
    FILE *F = fopen(Name, "w");
    if (F == 0) {
-      /* Ignore the error */
+      // Ignore the error
       return;
    }
 
-   /* Write a header */
+   // Write a header
    fprintf(F,
            "; Optimizer               Total      Last       Total      Last\n"
            ";   Step                  Runs       Runs        Chg       Chg\n");
 
-   /* Write the data */
+   // Write the data
    for (I = 0; I < OPTFUNC_COUNT; ++I) {
       const OptFunc *O = OptFuncs[I];
       fprintf(F, "%-20s %10lu %10lu %10lu %10lu\n", O->Name, O->TotalRuns,
               O->LastRuns, O->TotalChanges, O->LastChanges);
    }
 
-   /* Close the file, ignore errors here. */
+   // Close the file, ignore errors here.
    fclose(F);
 }
 
 static void OpenDebugFile(const CodeSeg *S)
-/* Open the debug file for the given segment if the flag is on */
+// Open the debug file for the given segment if the flag is on
 {
    if (DebugOptOutput) {
       StrBuf Name = AUTO_STRBUF_INITIALIZER;
@@ -474,16 +474,16 @@ static void OpenDebugFile(const CodeSeg *S)
 }
 
 static void WriteDebugOutput(CodeSeg *S, const char *Step)
-/* Write a separator line into the debug file if the flag is on */
+// Write a separator line into the debug file if the flag is on
 {
    if (DebugOptOutput) {
-      /* Output a separator */
+      // Output a separator
       WriteOutput("============================================================"
                   "=============\n");
 
-      /* Output a header line */
+      // Output a header line
       if (Step == 0) {
-         /* Initial output */
+         // Initial output
          WriteOutput("Initial code for function '%s':\n",
                      S->Func ? S->Func->Name : "<global>");
       }
@@ -491,13 +491,13 @@ static void WriteDebugOutput(CodeSeg *S, const char *Step)
          WriteOutput("Code after applying '%s':\n", Step);
       }
 
-      /* Output the code segment */
+      // Output the code segment
       CS_Output(S);
    }
 }
 
 static unsigned RunOptFunc(CodeSeg *S, OptFunc *F, unsigned Max)
-/* Run one optimizer function Max times or until there are no more changes */
+// Run one optimizer function Max times or until there are no more changes
 {
    unsigned Changes, C;
 
@@ -507,21 +507,21 @@ static unsigned RunOptFunc(CodeSeg *S, OptFunc *F, unsigned Max)
       return 0;
    }
 
-   /* Run this until there are no more changes */
+   // Run this until there are no more changes
    Changes = 0;
    do {
 
-      /* Run the function */
+      // Run the function
       C = F->Func(S);
       Changes += C;
 
-      /* Do statistics */
+      // Do statistics
       ++F->TotalRuns;
       ++F->LastRuns;
       F->TotalChanges += C;
       F->LastChanges += C;
 
-      /* If we had changes, output stuff and regenerate register info */
+      // If we had changes, output stuff and regenerate register info
       if (C) {
          if (Debug) {
             printf("Applied %s: %u changes\n", F->Name, C);
@@ -532,7 +532,7 @@ static unsigned RunOptFunc(CodeSeg *S, OptFunc *F, unsigned Max)
 
    } while (--Max && C > 0);
 
-   /* Return the number of changes */
+   // Return the number of changes
    return Changes;
 }
 
@@ -546,7 +546,7 @@ static unsigned RunOptGroup1(CodeSeg *S)
 
    Changes += RunOptFunc(S, &DOptGotoSPAdj, 1);
    Changes += RunOptFunc(S, &DOptStackPtrOps, 5);
-   Changes += RunOptFunc(S, &DOptAdd3, 1); /* Before OptPtrLoad5! */
+   Changes += RunOptFunc(S, &DOptAdd3, 1); // Before OptPtrLoad5!
    Changes += RunOptFunc(S, &DOptPtrStore1, 1);
    Changes += RunOptFunc(S, &DOptPtrStore2, 1);
    Changes += RunOptFunc(S, &DOptPtrStore3, 1);
@@ -556,8 +556,8 @@ static unsigned RunOptGroup1(CodeSeg *S)
    Changes += RunOptFunc(S, &DOptPtrLoad4, 1);
    Changes += RunOptFunc(S, &DOptPtrLoad5, 1);
    Changes += RunOptFunc(S, &DOptPtrLoad6, 1);
-   Changes += RunOptFunc(S, &DOptPtrLoad18, 1); /* Before OptPtrLoad7 */
-   Changes += RunOptFunc(S, &DOptPtrLoad19, 1); /* Before OptPtrLoad7 */
+   Changes += RunOptFunc(S, &DOptPtrLoad18, 1); // Before OptPtrLoad7
+   Changes += RunOptFunc(S, &DOptPtrLoad19, 1); // Before OptPtrLoad7
    Changes += RunOptFunc(S, &DOptPtrLoad7, 1);
    Changes += RunOptFunc(S, &DOptPtrLoad11, 1);
    Changes += RunOptFunc(S, &DOptPtrLoad12, 1);
@@ -586,7 +586,7 @@ static unsigned RunOptGroup1(CodeSeg *S)
    Changes += RunOptFunc(S, &DOptStore3, 5);
    Changes += RunOptFunc(S, &DOptLongCopy, 1);
 
-   /* Return the number of changes */
+   // Return the number of changes
    return Changes;
 }
 
@@ -600,7 +600,7 @@ static unsigned RunOptGroup2(CodeSeg *S)
 
    Changes += RunOptFunc(S, &DOptDecouple, 1);
 
-   /* Return the number of changes */
+   // Return the number of changes
    return Changes;
 }
 
@@ -617,13 +617,13 @@ static unsigned RunOptGroup3(CodeSeg *S)
 
       C += RunOptFunc(S, &DOptNegAX1, 1);
       C += RunOptFunc(S, &DOptNegAX2, 1);
-      C += RunOptFunc(S, &DOptStackOps, 3); /* Before OptBoolUnary1 */
-      C += RunOptFunc(S, &DOptCmp8, 1);     /* Before OptBoolUnary1 */
+      C += RunOptFunc(S, &DOptStackOps, 3); // Before OptBoolUnary1
+      C += RunOptFunc(S, &DOptCmp8, 1);     // Before OptBoolUnary1
       C += RunOptFunc(S, &DOptBoolUnary1, 3);
       C += RunOptFunc(S, &DOptBoolUnary2, 3);
       C += RunOptFunc(S, &DOptBoolUnary3, 1);
       C += RunOptFunc(S, &DOptBNegA1, 1);
-      C += RunOptFunc(S, &DOptBNegAX1, 1); /* After OptBoolUnary2 */
+      C += RunOptFunc(S, &DOptBNegAX1, 1); // After OptBoolUnary2
       C += RunOptFunc(S, &DOptShift1, 1);
       C += RunOptFunc(S, &DOptShift4, 1);
       C += RunOptFunc(S, &DOptComplAX1, 1);
@@ -642,16 +642,16 @@ static unsigned RunOptGroup3(CodeSeg *S)
       C += RunOptFunc(S, &DOptCondBranch3, 1);
       C += RunOptFunc(S, &DOptCondBranchC, 1);
       C += RunOptFunc(S, &DOptRTSJumps1, 1);
-      C += RunOptFunc(S, &DOptCmp6, 1); /* After OptRTSJumps1 */
+      C += RunOptFunc(S, &DOptCmp6, 1); // After OptRTSJumps1
       C += RunOptFunc(S, &DOptBoolCmp, 1);
       C += RunOptFunc(S, &DOptBoolTrans, 1);
-      C += RunOptFunc(S, &DOptBNegA2, 1);  /* After OptCondBranch's */
-      C += RunOptFunc(S, &DOptBNegAX2, 1); /* After OptCondBranch's */
-      C += RunOptFunc(S, &DOptBNegAX3, 1); /* After OptCondBranch's */
-      C += RunOptFunc(S, &DOptBNegAX4, 1); /* After OptCondBranch's */
+      C += RunOptFunc(S, &DOptBNegA2, 1);  // After OptCondBranch's
+      C += RunOptFunc(S, &DOptBNegAX2, 1); // After OptCondBranch's
+      C += RunOptFunc(S, &DOptBNegAX3, 1); // After OptCondBranch's
+      C += RunOptFunc(S, &DOptBNegAX4, 1); // After OptCondBranch's
       C += RunOptFunc(S, &DOptCmp1, 1);
       C += RunOptFunc(S, &DOptCmp2, 1);
-      C += RunOptFunc(S, &DOptCmp8, 1); /* Must run before OptCmp3 */
+      C += RunOptFunc(S, &DOptCmp8, 1); // Must run before OptCmp3
       C += RunOptFunc(S, &DOptCmp3, 1);
       C += RunOptFunc(S, &DOptCmp4, 1);
       C += RunOptFunc(S, &DOptCmp5, 1);
@@ -659,7 +659,7 @@ static unsigned RunOptGroup3(CodeSeg *S)
       C += RunOptFunc(S, &DOptCmp9, 1);
       C += RunOptFunc(S, &DOptTest1, 1);
       C += RunOptFunc(S, &DOptLoad1, 1);
-      C += RunOptFunc(S, &DOptJumpTarget3, 1); /* After OptCondBranches2 */
+      C += RunOptFunc(S, &DOptJumpTarget3, 1); // After OptCondBranches2
       C += RunOptFunc(S, &DOptUnusedLoads, 1);
       C += RunOptFunc(S, &DOptUnusedStores, 1);
       C += RunOptFunc(S, &DOptStoreLoad, 1);
@@ -684,7 +684,7 @@ static unsigned RunOptGroup3(CodeSeg *S)
 
    } while (C);
 
-   /* Return the number of changes */
+   // Return the number of changes
    return Changes;
 }
 
@@ -694,7 +694,7 @@ static unsigned RunOptGroup4(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Repeat some of the steps here */
+   // Repeat some of the steps here
    Changes += RunOptFunc(S, &DOptShift3, 1);
    Changes += RunOptFunc(S, &DOptPush1, 1);
    Changes += RunOptFunc(S, &DOptPush2, 1);
@@ -705,12 +705,12 @@ static unsigned RunOptGroup4(CodeSeg *S)
    Changes += RunOptFunc(S, &DOptLoad3, 1);
    Changes += RunOptFunc(S, &DOptDupLoads, 1);
 
-   /* Return the number of changes */
+   // Return the number of changes
    return Changes;
 }
 
 static unsigned RunOptGroup5(CodeSeg *S)
-/* 65C02 specific optimizations. */
+// 65C02 specific optimizations.
 {
    unsigned Changes = 0;
 
@@ -726,7 +726,7 @@ static unsigned RunOptGroup5(CodeSeg *S)
       }
    }
 
-   /* Return the number of changes */
+   // Return the number of changes
    return Changes;
 }
 
@@ -748,7 +748,7 @@ static unsigned RunOptGroup6(CodeSeg *S)
       Changes += RunOptFunc(S, &DOptIndLoads2, 1);
    }
 
-   /* Return the number of changes */
+   // Return the number of changes
    return Changes;
 }
 
@@ -785,16 +785,16 @@ static unsigned RunOptGroup7(CodeSeg *S)
       Changes += RunOptFunc(S, &DOptTransfers3, 1);
    }
 
-   /* Adjust branch distances */
+   // Adjust branch distances
    Changes += RunOptFunc(S, &DOptBranchDist, 3);
 
-   /* Replace conditional branches to RTS */
+   // Replace conditional branches to RTS
    C = RunOptFunc(S, &DOptRTSJumps2, 1);
 
-   /* Replace JSR followed by RTS to JMP */
+   // Replace JSR followed by RTS to JMP
    C += RunOptFunc(S, &DOptRTS, 1);
 
-   /* Replace JMP/BRA to JMP by direct JMP */
+   // Replace JMP/BRA to JMP by direct JMP
    C += RunOptFunc(S, &DOptJumpCascades, 1);
    C += RunOptFunc(S, &DOptBranchDist2, 1);
 
@@ -809,27 +809,27 @@ static unsigned RunOptGroup7(CodeSeg *S)
       Changes += RunOptFunc(S, &DOptDeadCode, 1);
    }
 
-   /* Return the number of changes */
+   // Return the number of changes
    return Changes;
 }
 
 void RunOpt(CodeSeg *S)
-/* Run the optimizer */
+// Run the optimizer
 {
    const char *StatFileName;
 
-   /* If we shouldn't run the optimizer, bail out */
+   // If we shouldn't run the optimizer, bail out
    if (!S->Optimize) {
       return;
    }
 
-   /* Check if we are requested to write optimizer statistics */
+   // Check if we are requested to write optimizer statistics
    StatFileName = getenv("CC65_OPTSTATS");
    if (StatFileName) {
       ReadOptStats(StatFileName);
    }
 
-   /* Print the name of the function we are working on */
+   // Print the name of the function we are working on
    if (S->Func) {
       Print(stdout, 1, "Running optimizer for function '%s'\n", S->Func->Name);
    }
@@ -837,14 +837,14 @@ void RunOpt(CodeSeg *S)
       Print(stdout, 1, "Running optimizer for global code segment\n");
    }
 
-   /* If requested, open an output file */
+   // If requested, open an output file
    OpenDebugFile(S);
    WriteDebugOutput(S, 0);
 
-   /* Generate register info for all instructions */
+   // Generate register info for all instructions
    CS_GenRegInfo(S);
 
-   /* Run groups of optimizations */
+   // Run groups of optimizations
    RunOptGroup1(S);
    RunOptGroup2(S);
    RunOptGroup3(S);
@@ -853,15 +853,15 @@ void RunOpt(CodeSeg *S)
    RunOptGroup6(S);
    RunOptGroup7(S);
 
-   /* Free register info */
+   // Free register info
    CS_FreeRegInfo(S);
 
-   /* Close output file if necessary */
+   // Close output file if necessary
    if (DebugOptOutput) {
       CloseOutputFile();
    }
 
-   /* Write statistics */
+   // Write statistics
    if (StatFileName) {
       WriteOptStats(StatFileName);
    }

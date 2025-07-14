@@ -1,44 +1,44 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                coptbool.h                                 */
-/*                                                                           */
-/*                        Optimize boolean sequences                         */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                coptbool.h
+//
+//                        Optimize boolean sequences
+//
+//
+//
+// (C) 2001-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef COPTBOOL_H
 #define COPTBOOL_H
 
-/* cc65 */
+// cc65
 #include "codeseg.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*           Optimize bool comparison and transformer subroutines            */
+//           Optimize bool comparison and transformer subroutines
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptBoolCmp(CodeSeg *S);
@@ -52,11 +52,11 @@ unsigned OptBoolTrans(CodeSeg *S);
 // not really needed and change following branch condition accordingly.
 
 ////////////////////////////////////////////////////////////////////////////////
-/*           Remove calls to the boolean cast/negation subroutines           */
+//           Remove calls to the boolean cast/negation subroutines
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptBoolUnary1(CodeSeg *S);
-/* Search for and remove bcastax adjacent to bnegax */
+// Search for and remove bcastax adjacent to bnegax
 
 unsigned OptBoolUnary2(CodeSeg *S);
 // Search for and remove bcastax/bnegax following a boolean transformer.
@@ -76,7 +76,7 @@ unsigned OptBoolUnary3(CodeSeg *S);
 // if X == 0.
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                            bnega optimizations                            */
+//                            bnega optimizations
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptBNegA1(CodeSeg *S);
@@ -98,7 +98,7 @@ unsigned OptBNegA2(CodeSeg *S);
 // Adjust the conditional branch and remove the call to the subroutine.
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                            bnegax optimizations                           */
+//                            bnegax optimizations
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptBNegAX1(CodeSeg *S);
@@ -150,6 +150,6 @@ unsigned OptBNegAX4(CodeSeg *S);
 // <boolean test>
 // jne/jeq ...
 
-/* End of coptbool.h */
+// End of coptbool.h
 
 #endif

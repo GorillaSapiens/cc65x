@@ -1,48 +1,48 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 codeent.c                                 */
-/*                                                                           */
-/*                            Code segment entry                             */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2009, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 codeent.c
+//
+//                            Code segment entry
+//
+//
+//
+// (C) 2001-2009, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <errno.h>
 #include <limits.h>
 #include <stdlib.h>
 
-/* common */
+// common
 #include "chartype.h"
 #include "check.h"
 #include "debugflag.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
 
-/* cc65 */
+// cc65
 #include "asmlabel.h"
 #include "codeent.h"
 #include "codeinfo.h"
@@ -55,18 +55,18 @@
 #include "reginfo.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Empty argument */
+// Empty argument
 static char EmptyArg[] = "";
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                             Helper functions                              */
+//                             Helper functions
 ////////////////////////////////////////////////////////////////////////////////
 
 static void FreeArg(char *Arg)
-/* Free a code entry argument */
+// Free a code entry argument
 {
    if (Arg != EmptyArg) {
       xfree(Arg);
@@ -74,20 +74,20 @@ static void FreeArg(char *Arg)
 }
 
 static char *GetArgCopy(const char *Arg)
-/* Create an argument copy for assignment */
+// Create an argument copy for assignment
 {
    if (Arg && Arg[0] != '\0') {
-      /* Create a copy */
+      // Create a copy
       return xstrdup(Arg);
    }
    else {
-      /* Use the empty argument string */
+      // Use the empty argument string
       return EmptyArg;
    }
 }
 
 static void FreeParsedArg(char *ArgBase)
-/* Free a code entry parsed argument */
+// Free a code entry parsed argument
 {
    if (ArgBase != 0 && ArgBase != EmptyArg) {
       xfree(ArgBase);
@@ -95,7 +95,7 @@ static void FreeParsedArg(char *ArgBase)
 }
 
 static void SetUseChgInfo(CodeEntry *E, const OPCDesc *D)
-/* Set the Use and Chg in E */
+// Set the Use and Chg in E
 {
    const ZPInfo *Info;
 
@@ -103,7 +103,7 @@ static void SetUseChgInfo(CodeEntry *E, const OPCDesc *D)
    // lookup the information about this function and use it. The jump itself
    // does not change any registers, so we don't need to use the data from D.
    if ((E->Info & (OF_UBRA | OF_CALL)) != 0 && E->JumpTo == 0) {
-      /* A subroutine call or jump to external symbol (function exit) */
+      // A subroutine call or jump to external symbol (function exit)
       GetFuncInfo(E->Arg, &E->Use, &E->Chg);
    }
    else {
@@ -112,21 +112,21 @@ static void SetUseChgInfo(CodeEntry *E, const OPCDesc *D)
       E->Use = D->Use | GetAMUseInfo(E->AM);
       E->Chg = D->Chg;
 
-      /* Check for special zero page registers used */
+      // Check for special zero page registers used
       switch (E->AM) {
 
          case AM65_ACC:
             if (E->OPC == OP65_ASL || E->OPC == OP65_DEC ||
                 E->OPC == OP65_INC || E->OPC == OP65_LSR ||
                 E->OPC == OP65_ROL || E->OPC == OP65_ROR) {
-               /* A is changed by these insns */
+               // A is changed by these insns
                E->Chg |= REG_A;
             }
             break;
 
          case AM65_ZP:
          case AM65_ABS:
-         /* Be conservative: */
+         // Be conservative:
          case AM65_ZPX:
          case AM65_ABSX:
          case AM65_ABSY:
@@ -136,16 +136,16 @@ static void SetUseChgInfo(CodeEntry *E, const OPCDesc *D)
                    E->OPC == OP65_INC || E->OPC == OP65_LSR ||
                    E->OPC == OP65_ROL || E->OPC == OP65_ROR ||
                    E->OPC == OP65_TRB || E->OPC == OP65_TSB) {
-                  /* The zp loc is both, input and output */
+                  // The zp loc is both, input and output
                   E->Chg |= Info->ByteUse;
                   E->Use |= Info->ByteUse;
                }
                else if ((E->Info & OF_STORE) != 0) {
-                  /* Just output */
+                  // Just output
                   E->Chg |= Info->ByteUse;
                }
                else {
-                  /* Input only */
+                  // Input only
                   E->Use |= Info->ByteUse;
                }
             }
@@ -156,7 +156,7 @@ static void SetUseChgInfo(CodeEntry *E, const OPCDesc *D)
          case AM65_ZP_IND:
             Info = GetZPInfo(E->Arg);
             if (Info && Info->ByteUse != REG_NONE) {
-               /* These addressing modes will never change the zp loc */
+               // These addressing modes will never change the zp loc
                E->Use |= Info->WordUse;
 
                if ((E->Use & REG_SP) != 0) {
@@ -166,11 +166,11 @@ static void SetUseChgInfo(CodeEntry *E, const OPCDesc *D)
             break;
 
          default:
-            /* Keep gcc silent */
+            // Keep gcc silent
             break;
       }
 
-      /* Append processor flags as well as special usages */
+      // Append processor flags as well as special usages
       switch (E->OPC) {
 
          case OP65_ADC:
@@ -312,7 +312,7 @@ static void SetUseChgInfo(CodeEntry *E, const OPCDesc *D)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
@@ -329,7 +329,7 @@ int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
    int Parentheses = 0;
    unsigned long NumVal = 0;
    long long AccOffset = 0;
-   char *End; /* Used for checking errors */
+   char *End; // Used for checking errors
 
    if (ArgInfo != 0) {
       *ArgInfo = 0;
@@ -339,13 +339,13 @@ int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
    /* A numeric address is treated as an unnamed address with the numeric part
     * as the offset */
    if (IsDigit(Arg[0]) || Arg[0] == '$') {
-      /* A call to a numeric address */
+      // A call to a numeric address
       SB_Clear(Name);
       SB_Terminate(Name);
       OffsetPart = Arg;
    }
    else {
-      /* <, >, ^ */
+      // <, >, ^
       if (Arg[0] == '<') {
          Flags |= AIF_LOBYTE;
       }
@@ -357,23 +357,23 @@ int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
       }
 
       if ((Flags & (AIF_FAR)) != 0) {
-         /* Skip this char */
+         // Skip this char
          ++Arg;
       }
 
-      /* Skip spaces */
+      // Skip spaces
       while (Arg[0] == ' ') {
          ++Arg;
       }
 
-      /* Strip parentheses off if exist */
+      // Strip parentheses off if exist
       if (Arg[0] == '(') {
-         /* Skip this char */
+         // Skip this char
          ++Arg;
 
          End = strchr(Arg, ')');
          if (End == 0 || End[1] != '\0') {
-            /* Not closed at the end, bail out */
+            // Not closed at the end, bail out
             *Offset = 0;
             if (ArgInfo != 0) {
                *ArgInfo = Flags | AIF_FAILURE;
@@ -381,10 +381,10 @@ int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
             return 0;
          }
 
-         /* Found */
+         // Found
          Parentheses = 1;
 
-         /* Skip spaces */
+         // Skip spaces
          while (Arg[0] == ' ') {
             ++Arg;
          }
@@ -400,14 +400,14 @@ int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
          Flags |= AIF_BUILTIN;
       }
 
-      /* Rip off the offset if present. */
+      // Rip off the offset if present.
       OffsetPart = strchr(Arg, '+');
       if (OffsetPart == 0) {
          OffsetPart = strchr(Arg, '-');
       }
 
       if (OffsetPart != 0) {
-         /* Get the real arg name */
+         // Get the real arg name
          NameEnd = strchr(Arg, ' ');
          if (NameEnd == 0 || NameEnd > OffsetPart) {
             NameEnd = OffsetPart;
@@ -416,7 +416,7 @@ int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
          SB_Terminate(Name);
       }
       else {
-         /* No offset */
+         // No offset
          if (Parentheses == 0) {
             SB_CopyStr(Name, Arg);
          }
@@ -430,7 +430,7 @@ int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
          if (SB_GetLen(Name) > 0) {
             Flags |= AIF_HAS_NAME;
 
-            /* See if the name is a local label */
+            // See if the name is a local label
             if (IsLocalLabelName(SB_GetConstBuf(Name))) {
                Flags |= AIF_LOCAL;
             }
@@ -438,7 +438,7 @@ int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
       }
       else {
          if (SB_GetLen(Name) <= 0) {
-            /* Invalid external name */
+            // Invalid external name
             Flags &= ~AIF_EXTERNAL;
             *Offset = 0;
             if (ArgInfo != 0) {
@@ -453,7 +453,7 @@ int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
       // handled correctly for now, so just bail out in such cases.
       if ((Flags & AIF_FAR) != 0 && Parentheses == 0 && OffsetPart != 0 &&
           OffsetPart[0] != '\0') {
-         /* Bail out */
+         // Bail out
          *Offset = 0;
          if (ArgInfo != 0) {
             *ArgInfo = Flags | AIF_FAILURE;
@@ -462,9 +462,9 @@ int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
       }
    }
 
-   /* Get the offset */
+   // Get the offset
    while (OffsetPart != 0 && OffsetPart[0] != '\0' && OffsetPart[0] != ')') {
-      /* Skip spaces */
+      // Skip spaces
       while (OffsetPart[0] == ' ') {
          ++OffsetPart;
       }
@@ -478,7 +478,7 @@ int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
          ++OffsetPart;
       }
 
-      /* Skip spaces */
+      // Skip spaces
       while (OffsetPart[0] == ' ') {
          ++OffsetPart;
       }
@@ -487,22 +487,22 @@ int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
       // exactly what we want here, but it's cheap and may be replaced by
       // something fancier later.
       if (OffsetPart[0] == '$') {
-         /* Base 16 hexedemical */
+         // Base 16 hexedemical
          NumVal = strtoul(OffsetPart + 1, &End, 16);
       }
       else if (OffsetPart[0] != '%') {
-         /* Base 10 decimal */
+         // Base 10 decimal
          NumVal = strtoul(OffsetPart, &End, 10);
       }
       else {
-         /* Base 2 binary */
+         // Base 2 binary
          NumVal = strtoul(OffsetPart + 1, &End, 2);
       }
 
-      /* Check if the conversion was successful */
+      // Check if the conversion was successful
       if (*End != '\0' && *End != ' ' && *End != '+' && *End != '-' &&
           *End != ')') {
-         /* Could not convert */
+         // Could not convert
          *Offset = 0;
          if (ArgInfo != 0) {
             *ArgInfo = Flags | AIF_FAILURE;
@@ -510,9 +510,9 @@ int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
          return 0;
       }
 
-      /* Check for out of range result */
+      // Check for out of range result
       if (NumVal == ULONG_MAX && errno == ERANGE) {
-         /* Could not convert */
+         // Could not convert
          *Offset = 0;
          if (ArgInfo != 0) {
             *ArgInfo = Flags | AIF_FAILURE;
@@ -520,7 +520,7 @@ int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
          return 0;
       }
 
-      /* This argument does have an offset */
+      // This argument does have an offset
       Flags |= AIF_HAS_OFFSET;
 
       if (Negative) {
@@ -530,7 +530,7 @@ int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
          AccOffset += (long long)NumVal;
       }
 
-      /* See if there are more */
+      // See if there are more
       Arg = OffsetPart;
       OffsetPart = strchr(Arg, '+');
       if (OffsetPart == 0) {
@@ -539,7 +539,7 @@ int ParseOpcArgStr(const char *Arg, unsigned short *ArgInfo,
    }
 
    if (AccOffset > LONG_MAX || AccOffset < LONG_MIN) {
-      /* Could not convert */
+      // Could not convert
       *Offset = 0;
       if (ArgInfo != 0) {
          *ArgInfo = Flags | AIF_FAILURE;
@@ -567,18 +567,18 @@ const char *MakeHexArg(unsigned Num)
 }
 
 void PreparseArg(CodeEntry *E)
-/* Parse the argument string and memorize the result for the code entry */
+// Parse the argument string and memorize the result for the code entry
 {
    StrBuf B = AUTO_STRBUF_INITIALIZER;
 
-   /* Parse the argument string */
+   // Parse the argument string
    if (ParseOpcArgStr(E->Arg, &E->ArgInfo, &B, &E->ArgOff)) {
       E->ArgBase = SB_GetBuf(&B);
 
       if ((E->ArgInfo & (AIF_HAS_NAME | AIF_HAS_OFFSET)) == AIF_HAS_OFFSET) {
          E->Flags |= CEF_NUMARG;
 
-         /* Use the new numerical value */
+         // Use the new numerical value
          E->Num = E->ArgOff;
       }
    }
@@ -595,15 +595,15 @@ void PreparseArg(CodeEntry *E)
 
 CodeEntry *NewCodeEntry(opc_t OPC, am_t AM, const char *Arg, CodeLabel *JumpTo,
                         LineInfo *LI)
-/* Create a new code entry, initialize and return it */
+// Create a new code entry, initialize and return it
 {
-   /* Get the opcode description */
+   // Get the opcode description
    const OPCDesc *D = GetOPCDesc(OPC);
 
-   /* Allocate memory */
+   // Allocate memory
    CodeEntry *E = xmalloc(sizeof(CodeEntry));
 
-   /* Initialize the fields */
+   // Initialize the fields
    E->OPC = D->OPC;
    E->AM = AM;
    E->Size = GetInsnSize(E->OPC, E->AM);
@@ -615,7 +615,7 @@ CodeEntry *NewCodeEntry(opc_t OPC, am_t AM, const char *Arg, CodeLabel *JumpTo,
    E->LI = UseLineInfo(LI);
    E->RI = 0;
 
-   /* Parse the argument string if it's given */
+   // Parse the argument string if it's given
    if (Arg == 0 || Arg[0] == '\0') {
       E->ArgBase = EmptyArg;
    }
@@ -626,34 +626,34 @@ CodeEntry *NewCodeEntry(opc_t OPC, am_t AM, const char *Arg, CodeLabel *JumpTo,
    SetUseChgInfo(E, D);
    InitCollection(&E->Labels);
 
-   /* If we have a label given, add this entry to the label */
+   // If we have a label given, add this entry to the label
    if (JumpTo) {
       CollAppend(&JumpTo->JumpFrom, E);
    }
 
-   /* Return the initialized struct */
+   // Return the initialized struct
    return E;
 }
 
 void FreeCodeEntry(CodeEntry *E)
-/* Free the given code entry */
+// Free the given code entry
 {
-   /* Free the argument base string if we have one */
+   // Free the argument base string if we have one
    FreeParsedArg(E->ArgBase);
 
-   /* Free the string argument if we have one */
+   // Free the string argument if we have one
    FreeArg(E->Arg);
 
-   /* Cleanup the collection */
+   // Cleanup the collection
    DoneCollection(&E->Labels);
 
-   /* Release the line info */
+   // Release the line info
    ReleaseLineInfo(E->LI);
 
-   /* Delete the register info */
+   // Delete the register info
    CE_FreeRegInfo(E);
 
-   /* Free the entry */
+   // Free the entry
    xfree(E);
 }
 
@@ -661,10 +661,10 @@ void CE_ReplaceOPC(CodeEntry *E, opc_t OPC)
 // Replace the opcode of the instruction. This will also replace related info,
 // Size, Use and Chg, but it will NOT update any arguments or labels.
 {
-   /* Get the opcode descriptor */
+   // Get the opcode descriptor
    const OPCDesc *D = GetOPCDesc(OPC);
 
-   /* Replace the opcode */
+   // Replace the opcode
    E->OPC = OPC;
    E->Info = D->Info;
    E->Size = GetInsnSize(E->OPC, E->AM);
@@ -672,19 +672,19 @@ void CE_ReplaceOPC(CodeEntry *E, opc_t OPC)
 }
 
 int CodeEntriesAreEqual(const CodeEntry *E1, const CodeEntry *E2)
-/* Check if both code entries are equal */
+// Check if both code entries are equal
 {
    return (E1->OPC == E2->OPC && E1->AM == E2->AM &&
            strcmp(E1->Arg, E2->Arg) == 0);
 }
 
 void CE_AttachLabel(CodeEntry *E, CodeLabel *L)
-/* Attach the label to the entry */
+// Attach the label to the entry
 {
-   /* Add it to the entries label list */
+   // Add it to the entries label list
    CollAppend(&E->Labels, L);
 
-   /* Tell the label about it's owner */
+   // Tell the label about it's owner
    L->Owner = E;
 }
 
@@ -693,40 +693,40 @@ void CE_ClearJumpTo(CodeEntry *E)
 // label). Note: The function will not clear the backpointer from the label,
 // so use it with care.
 {
-   /* Clear the JumpTo entry */
+   // Clear the JumpTo entry
    E->JumpTo = 0;
 
-   /* Clear the argument */
+   // Clear the argument
    CE_SetArg(E, 0);
 }
 
 void CE_MoveLabel(CodeLabel *L, CodeEntry *E)
-/* Move the code label L from it's former owner to the code entry E. */
+// Move the code label L from it's former owner to the code entry E.
 {
-   /* Delete the label from the owner */
+   // Delete the label from the owner
    CollDeleteItem(&L->Owner->Labels, L);
 
-   /* Set the new owner */
+   // Set the new owner
    CollAppend(&E->Labels, L);
    L->Owner = E;
 }
 
 void CE_SetArg(CodeEntry *E, const char *Arg)
-/* Replace the whole argument by the new one. */
+// Replace the whole argument by the new one.
 {
-   /* Free the old parsed argument base */
+   // Free the old parsed argument base
    FreeParsedArg(E->ArgBase);
 
-   /* Free the old argument */
+   // Free the old argument
    FreeArg(E->Arg);
 
-   /* Assign the new one */
+   // Assign the new one
    E->Arg = GetArgCopy(Arg);
 
-   /* Parse the new argument string */
+   // Parse the new argument string
    PreparseArg(E);
 
-   /* Update the Use and Chg in E */
+   // Update the Use and Chg in E
    SetUseChgInfo(E, GetOPCDesc(E->OPC));
 }
 
@@ -736,7 +736,7 @@ void CE_SetArgBaseAndOff(CodeEntry *E, const char *ArgBase, long ArgOff)
 {
    if (ArgBase != 0 && ArgBase[0] != '\0') {
 
-      /* The argument base is not blank */
+      // The argument base is not blank
       char Buf[IDENTSIZE + 16];
       char *Str = Buf;
       size_t Len = strlen(ArgBase) + 16;
@@ -754,7 +754,7 @@ void CE_SetArgBaseAndOff(CodeEntry *E, const char *ArgBase, long ArgOff)
          CE_SetArg(E, Str);
       }
       else {
-         /* A byte expression */
+         // A byte expression
          const char *Expr = "";
          if ((E->ArgInfo & AIF_FAR) == AIF_LOBYTE) {
             Expr = "<";
@@ -784,14 +784,14 @@ void CE_SetArgBaseAndOff(CodeEntry *E, const char *ArgBase, long ArgOff)
       }
    }
    else {
-      /* The argument has no base */
+      // The argument has no base
       if ((E->ArgInfo & AIF_HAS_OFFSET) != 0) {
-         /* This is a numeric argument */
+         // This is a numeric argument
          E->Flags |= CEF_NUMARG;
          CE_SetNumArg(E, ArgOff);
       }
       else {
-         /* Empty argument */
+         // Empty argument
          CE_SetArg(E, EmptyArg);
       }
    }
@@ -801,14 +801,14 @@ void CE_SetArgBase(CodeEntry *E, const char *ArgBase)
 // Replace the argument base by the new one.
 // The entry must have an existing base.
 {
-   /* Check that the entry has a base name */
+   // Check that the entry has a base name
    CHECK(CE_HasArgBase(E));
 
    CE_SetArgBaseAndOff(E, ArgBase, E->ArgOff);
 }
 
 void CE_SetArgOffset(CodeEntry *E, long ArgOff)
-/* Replace the argument offset by the new one */
+// Replace the argument offset by the new one
 {
    CE_SetArgBaseAndOff(E, E->ArgBase, ArgOff);
 }
@@ -819,10 +819,10 @@ void CE_SetNumArg(CodeEntry *E, long Num)
 {
    char Buf[16];
 
-   /* Check that the entry has a numerical argument */
+   // Check that the entry has a numerical argument
    CHECK(CE_HasNumArg(E));
 
-   /* Make the new argument string */
+   // Make the new argument string
    if (E->Size == 2) {
       Num &= 0xFF;
       xsprintf(Buf, sizeof(Buf), "$%02X", (unsigned)Num);
@@ -835,30 +835,30 @@ void CE_SetNumArg(CodeEntry *E, long Num)
       Internal("Invalid instruction size in CE_SetNumArg");
    }
 
-   /* Replace the whole argument by the new one */
+   // Replace the whole argument by the new one
    CE_SetArg(E, Buf);
 }
 
 int CE_IsArgStrParsed(const CodeEntry *E)
-/* Return true if the argument of E was successfully parsed last time */
+// Return true if the argument of E was successfully parsed last time
 {
    return (E->ArgInfo & AIF_FAILURE) == 0;
 }
 
 int CE_HasArgBase(const CodeEntry *E)
-/* Return true if the argument of E has a non-blank base name */
+// Return true if the argument of E has a non-blank base name
 {
    return (E->ArgInfo & AIF_HAS_NAME) != 0 && E->ArgBase[0] != '\0';
 }
 
 int CE_HasArgOffset(const CodeEntry *E)
-/* Return true if the argument of E has a non-zero offset */
+// Return true if the argument of E has a non-zero offset
 {
    return (E->ArgInfo & AIF_HAS_OFFSET) != 0 && E->ArgOff != 0;
 }
 
 int CE_IsConstImm(const CodeEntry *E)
-/* Return true if the argument of E is a constant immediate value */
+// Return true if the argument of E is a constant immediate value
 {
    return (E->AM == AM65_IMM && CE_HasNumArg(E));
 }
@@ -879,35 +879,35 @@ int CE_UseLoadFlags(CodeEntry *E)
    if (E->Info & OF_UBRA) {
       Collection C = AUTO_COLLECTION_INITIALIZER;
 
-      /* Follow the chain */
+      // Follow the chain
       while (E->Info & OF_UBRA) {
 
-         /* Remember the entry so we can detect loops */
+         // Remember the entry so we can detect loops
          CollAppend(&C, E);
 
-         /* Check the target */
+         // Check the target
          if (E->JumpTo == 0 || CollIndex(&C, E->JumpTo->Owner) >= 0) {
-            /* Unconditional jump to external symbol, or endless loop. */
+            // Unconditional jump to external symbol, or endless loop.
             DoneCollection(&C);
-            return 0; /* Flags not used */
+            return 0; // Flags not used
          }
 
-         /* Follow the chain */
+         // Follow the chain
          E = E->JumpTo->Owner;
       }
 
-      /* Delete the collection */
+      // Delete the collection
       DoneCollection(&C);
    }
 
-   /* A branch will use the flags */
+   // A branch will use the flags
    if (E->Info & OF_FBRA) {
       return 1;
    }
 
-   /* Call of a boolean transformer routine will also use the flags */
+   // Call of a boolean transformer routine will also use the flags
    if (E->OPC == OP65_JSR) {
-      /* Get the condition that is evaluated and check it */
+      // Get the condition that is evaluated and check it
       switch (FindBoolCmpCond(E->Arg)) {
          case CMP_EQ:
          case CMP_NE:
@@ -917,27 +917,27 @@ int CE_UseLoadFlags(CodeEntry *E)
          case CMP_LE:
          case CMP_UGT:
          case CMP_ULE:
-            /* Will use the N or Z flags */
+            // Will use the N or Z flags
             return 1;
 
-         case CMP_UGE: /* Uses only carry */
-         case CMP_ULT: /* Dito */
-         default:      /* No bool transformer subroutine */
+         case CMP_UGE: // Uses only carry
+         case CMP_ULT: // Dito
+         default:      // No bool transformer subroutine
             return 0;
       }
    }
 
-   /* PHP will use all flags */
+   // PHP will use all flags
    if (E->OPC == OP65_PHP) {
       return 1;
    }
 
-   /* Anything else */
+   // Anything else
    return 0;
 }
 
 void CE_FreeRegInfo(CodeEntry *E)
-/* Free an existing register info struct */
+// Free an existing register info struct
 {
    if (E->RI) {
       FreeRegInfo(E->RI);
@@ -946,7 +946,7 @@ void CE_FreeRegInfo(CodeEntry *E)
 }
 
 static void DeduceZ(RegContents *C, short Val)
-/* Auto-set Z flag */
+// Auto-set Z flag
 {
    if (RegValIsUnknown(Val)) {
       C->PFlags |= UNKNOWN_PFVAL_Z;
@@ -960,7 +960,7 @@ static void DeduceZ(RegContents *C, short Val)
 }
 
 static void DeduceZN(RegContents *C, short Val)
-/* Auto-set Z/N flags */
+// Auto-set Z/N flags
 {
    if (RegValIsUnknown(Val)) {
       C->PFlags |= UNKNOWN_PFVAL_ZN;
@@ -1044,7 +1044,7 @@ static short KnownOpCmpDeduceCZN(RegContents *C, short Lhs, short Rhs)
 }
 
 static short AnyOpASLDeduceCZN(RegContents *C, short Shiftee)
-/* Do the ASL and auto-set C/Z/N flags */
+// Do the ASL and auto-set C/Z/N flags
 {
    if (RegValIsKnown(Shiftee)) {
       C->PFlags &= ~UNKNOWN_PFVAL_C;
@@ -1059,7 +1059,7 @@ static short AnyOpASLDeduceCZN(RegContents *C, short Shiftee)
 }
 
 static short AnyOpLSRDeduceCZN(RegContents *C, short Shiftee)
-/* Do the LSR and auto-set C/Z/N flags */
+// Do the LSR and auto-set C/Z/N flags
 {
    if (RegValIsKnown(Shiftee)) {
       C->PFlags &= ~UNKNOWN_PFVAL_C;
@@ -1074,7 +1074,7 @@ static short AnyOpLSRDeduceCZN(RegContents *C, short Shiftee)
 }
 
 static short AnyOpROLDeduceCZN(RegContents *C, short PFlags, short Shiftee)
-/* Do the ROL and auto-set C/Z/N flags */
+// Do the ROL and auto-set C/Z/N flags
 {
    if (RegValIsKnown(Shiftee) && PStatesAreKnown(PFlags, PSTATE_C)) {
       C->PFlags &= ~UNKNOWN_PFVAL_C;
@@ -1095,7 +1095,7 @@ static short AnyOpROLDeduceCZN(RegContents *C, short PFlags, short Shiftee)
 }
 
 static short AnyOpRORDeduceCZN(RegContents *C, short PFlags, short Shiftee)
-/* Do the ROR and auto-set C/Z/N flags */
+// Do the ROR and auto-set C/Z/N flags
 {
    if (RegValIsKnown(Shiftee) && PStatesAreKnown(PFlags, PSTATE_C)) {
       C->PFlags &= ~UNKNOWN_PFVAL_C;
@@ -1158,18 +1158,18 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
 // Generate register info for this instruction. If an old info exists, it is
 // overwritten.
 {
-   /* Pointers to the register contents */
+   // Pointers to the register contents
    RegContents *In;
    RegContents *Out;
    RegContents *BranchOut;
 
-   /* Function register usage */
+   // Function register usage
    unsigned Use, Chg;
 
-   /* Value in question */
+   // Value in question
    short Val = UNKNOWN_REGVAL;
 
-   /* If we don't have a register info struct, allocate one. */
+   // If we don't have a register info struct, allocate one.
    if (E->RI == 0) {
       E->RI = NewRegInfo(InputRegs);
    }
@@ -1183,12 +1183,12 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
       E->RI->Out2 = E->RI->Out = E->RI->In;
    }
 
-   /* Get pointers to the register contents */
+   // Get pointers to the register contents
    In = &E->RI->In;
    Out = &E->RI->Out;
    BranchOut = &E->RI->Out2;
 
-   /* Handle the different instructions */
+   // Handle the different instructions
    switch (E->OPC) {
 
       case OP65_ADC:
@@ -1253,7 +1253,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
             }
          }
          else if (CE_IsKnownImm(E, 0)) {
-            /* A and $00 does always give zero */
+            // A and $00 does always give zero
             Out->RegA = 0;
          }
          DeduceZN(Out, Out->RegA);
@@ -1291,7 +1291,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
             }
          }
          else if (MightAffectKnownZP(E, In)) {
-            /* Invalidates all ZP registers */
+            // Invalidates all ZP registers
             RC_InvalidateZP(Out);
          }
          break;
@@ -1330,7 +1330,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
             }
          }
          else if (CE_IsConstImm(E)) {
-            /* 65C02 special */
+            // 65C02 special
             Val = (short)E->Num;
          }
 
@@ -1543,7 +1543,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
             }
          }
          else if (MightAffectKnownZP(E, In)) {
-            /* Invalidates all ZP registers */
+            // Invalidates all ZP registers
             RC_InvalidateZP(Out);
          }
          DeduceZN(Out, Val);
@@ -1638,7 +1638,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
             }
          }
          else if (MightAffectKnownZP(E, In)) {
-            /* Invalidates all ZP registers */
+            // Invalidates all ZP registers
             RC_InvalidateZP(Out);
          }
          DeduceZN(Out, Val);
@@ -1690,7 +1690,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
       case OP65_JSR:
          Out->ZNRegs = ZNREG_NONE;
 
-         /* Get the code info for the function */
+         // Get the code info for the function
          GetFuncInfo(E->Arg, &Use, &Chg);
          if (Chg & REG_A) {
             Out->RegA = UNKNOWN_REGVAL;
@@ -1716,10 +1716,10 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
          if (Chg & REG_SREG_HI) {
             Out->SRegHi = UNKNOWN_REGVAL;
          }
-         /* FIXME: Quick hack to set flags on process status: */
+         // FIXME: Quick hack to set flags on process status:
          Out->PFlags |= ((Chg & PSTATE_ALL) >> PSTATE_BITS_SHIFT) * 0x0101U;
 
-         /* ## FIXME: Quick hack for some known functions: */
+         // ## FIXME: Quick hack for some known functions:
          if (strcmp(E->Arg, "complax") == 0) {
             if (RegValIsKnown(In->RegA)) {
                Out->RegA = (In->RegA ^ 0xFF);
@@ -1771,7 +1771,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
                   strcmp(E->Arg, "bnegax") == 0 ||
                   FindBoolCmpCond(E->Arg) != CMP_INV ||
                   FindTosCmpCond(E->Arg) != CMP_INV) {
-            /* Result is boolean value, so X is zero on output */
+            // Result is boolean value, so X is zero on output
             Out->RegX = 0;
          }
          break;
@@ -1906,7 +1906,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
             }
          }
          else if (MightAffectKnownZP(E, In)) {
-            /* Invalidates all ZP registers */
+            // Invalidates all ZP registers
             RC_InvalidateZP(Out);
          }
          break;
@@ -1944,7 +1944,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
             }
          }
          else if (CE_IsKnownImm(E, 0xFF)) {
-            /* ORA with 0xFF does always give 0xFF */
+            // ORA with 0xFF does always give 0xFF
             Out->RegA = 0xFF;
          }
          DeduceZN(Out, Out->RegA);
@@ -2017,7 +2017,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
             }
          }
          else if (MightAffectKnownZP(E, In)) {
-            /* Invalidates all ZP registers */
+            // Invalidates all ZP registers
             RC_InvalidateZP(Out);
          }
          break;
@@ -2054,7 +2054,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
             }
          }
          else if (MightAffectKnownZP(E, In)) {
-            /* Invalidates all ZP registers */
+            // Invalidates all ZP registers
             RC_InvalidateZP(Out);
          }
          break;
@@ -2134,7 +2134,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
             }
          }
          else if (MightAffectKnownZP(E, In)) {
-            /* Invalidates all ZP registers */
+            // Invalidates all ZP registers
             RC_InvalidateZP(Out);
          }
          break;
@@ -2163,7 +2163,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
             }
          }
          else if (MightAffectKnownZP(E, In)) {
-            /* Invalidates all ZP registers */
+            // Invalidates all ZP registers
             RC_InvalidateZP(Out);
          }
          break;
@@ -2189,7 +2189,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
             }
          }
          else if (MightAffectKnownZP(E, In)) {
-            /* Invalidates all ZP registers */
+            // Invalidates all ZP registers
             RC_InvalidateZP(Out);
          }
          break;
@@ -2215,7 +2215,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
             }
          }
          else if (MightAffectKnownZP(E, In)) {
-            /* Invalidates all ZP registers */
+            // Invalidates all ZP registers
             RC_InvalidateZP(Out);
          }
          break;
@@ -2280,7 +2280,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
             }
          }
          else if (MightAffectKnownZP(E, In)) {
-            /* Invalidates all ZP registers */
+            // Invalidates all ZP registers
             RC_InvalidateZP(Out);
          }
          DeduceZ(Out, Val);
@@ -2334,7 +2334,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
             }
          }
          else if (MightAffectKnownZP(E, In)) {
-            /* Invalidates all ZP registers */
+            // Invalidates all ZP registers
             RC_InvalidateZP(Out);
          }
          DeduceZ(Out, Val);
@@ -2369,7 +2369,7 @@ void CE_GenRegInfo(CodeEntry *E, RegContents *InputRegs)
 }
 
 static char *RegInfoDesc(unsigned U, char *Buf)
-/* Return a string containing register info */
+// Return a string containing register info
 {
    Buf[0] = '\0';
 
@@ -2389,7 +2389,7 @@ static char *RegInfoDesc(unsigned U, char *Buf)
 }
 
 static char *RegContentDesc(const RegContents *RC, char *Buf)
-/* Return a string containing register contents */
+// Return a string containing register contents
 {
    char *B = Buf;
 
@@ -2496,80 +2496,80 @@ static char *RegContentDesc(const RegContents *RC, char *Buf)
 }
 
 void CE_Output(const CodeEntry *E)
-/* Output the code entry to the output file */
+// Output the code entry to the output file
 {
    const OPCDesc *D;
    unsigned Chars;
    int Space;
    const char *Target;
 
-   /* If we have a label, print that */
+   // If we have a label, print that
    unsigned LabelCount = CollCount(&E->Labels);
    unsigned I;
    for (I = 0; I < LabelCount; ++I) {
       CL_Output(CollConstAt(&E->Labels, I));
    }
 
-   /* Get the opcode description */
+   // Get the opcode description
    D = GetOPCDesc(E->OPC);
 
-   /* Print the mnemonic */
+   // Print the mnemonic
    Chars = WriteOutput("\t%s", D->Mnemo);
 
-   /* Space to leave before the operand */
+   // Space to leave before the operand
    Space = 9 - Chars;
 
-   /* Print the operand */
+   // Print the operand
    switch (E->AM) {
 
       case AM65_IMP:
-         /* implicit */
+         // implicit
          break;
 
       case AM65_ACC:
-         /* accumulator */
+         // accumulator
          Chars += WriteOutput("%*sa", Space, "");
          break;
 
       case AM65_IMM:
-         /* immidiate */
+         // immidiate
          Chars += WriteOutput("%*s#%s", Space, "", E->Arg);
          break;
 
       case AM65_ZP:
       case AM65_ABS:
-         /* zeropage and absolute */
+         // zeropage and absolute
          Chars += WriteOutput("%*s%s", Space, "", E->Arg);
          break;
 
       case AM65_ZPX:
       case AM65_ABSX:
-         /* zeropage,X and absolute,X */
+         // zeropage,X and absolute,X
          Chars += WriteOutput("%*s%s,x", Space, "", E->Arg);
          break;
 
       case AM65_ABSY:
-         /* absolute,Y */
+         // absolute,Y
          Chars += WriteOutput("%*s%s,y", Space, "", E->Arg);
          break;
 
       case AM65_ZPX_IND:
-         /* (zeropage,x) */
+         // (zeropage,x)
          Chars += WriteOutput("%*s(%s,x)", Space, "", E->Arg);
          break;
 
       case AM65_ZP_INDY:
-         /* (zeropage),y */
+         // (zeropage),y
          Chars += WriteOutput("%*s(%s),y", Space, "", E->Arg);
          break;
 
       case AM65_ZP_IND:
-         /* (zeropage) */
+         // (zeropage)
          Chars += WriteOutput("%*s(%s)", Space, "", E->Arg);
          break;
 
       case AM65_BRA:
-         /* branch */
+         // branch
          Target = E->JumpTo ? E->JumpTo->Name : E->Arg;
          Chars += WriteOutput("%*s%s", Space, "", Target);
          break;
@@ -2578,7 +2578,7 @@ void CE_Output(const CodeEntry *E)
          Internal("Invalid addressing mode");
    }
 
-   /* Print usage info if requested by the debugging flag */
+   // Print usage info if requested by the debugging flag
    if (Debug) {
       char Use[128];
       char Chg[128];
@@ -2593,6 +2593,6 @@ void CE_Output(const CodeEntry *E)
       }
    }
 
-   /* Terminate the line */
+   // Terminate the line
    WriteOutput("\n");
 }

@@ -1,34 +1,34 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                filestat.c                                 */
-/*                                                                           */
-/*                       Replacement for Windows code                        */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2012,      Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                filestat.c
+//
+//                       Replacement for Windows code
+//
+//
+//
+// (C) 2012,      Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 // This module works around bugs in the time conversion code supplied by
@@ -46,11 +46,11 @@
 #include <windows.h>
 #endif
 
-/* common */
+// common
 #include "filestat.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 #if defined(_WIN32)
@@ -71,13 +71,13 @@ static time_t FileTimeToUnixTime(const FILETIME *T)
 }
 
 int FileStat(const char *Path, struct stat *Buf)
-/* Replacement function for stat() */
+// Replacement function for stat()
 {
 
    HANDLE H;
    BY_HANDLE_FILE_INFORMATION Info;
 
-   /* First call stat() */
+   // First call stat()
    int Error = stat(Path, Buf);
    if (Error != 0) {
       return Error;
@@ -88,8 +88,8 @@ int FileStat(const char *Path, struct stat *Buf)
    // EACCES in case of errors to avoid the hassle of translating windows
    // error codes to standard ones.
    H = CreateFile(
-       Path, GENERIC_READ, FILE_SHARE_READ, 0,        /* Security attributes */
-       OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0); /* Template file */
+       Path, GENERIC_READ, FILE_SHARE_READ, 0,        // Security attributes
+       OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0); // Template file
    if (H != INVALID_HANDLE_VALUE) {
       if (GetFileInformationByHandle(H, &Info)) {
          Buf->st_ctime = FileTimeToUnixTime(&Info.ftCreationTime);
@@ -105,16 +105,16 @@ int FileStat(const char *Path, struct stat *Buf)
       Error = EACCES;
    }
 
-   /* Done */
+   // Done
    return Error;
 }
 
 #else
 
 int FileStat(const char *Path, struct stat *Buf)
-/* Replacement function for stat() */
+// Replacement function for stat()
 {
-   /* Just call the function which works without errors */
+   // Just call the function which works without errors
    return stat(Path, Buf);
 }
 

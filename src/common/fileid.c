@@ -1,49 +1,49 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 fileid.c                                  */
-/*                                                                           */
-/*               Determine the id of a file type by extension                */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2003-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 fileid.c
+//
+//               Determine the id of a file type by extension
+//
+//
+//
+// (C) 2003-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <stdlib.h>
 #include <string.h>
 
-/* common */
+// common
 #include "fileid.h"
 #include "fname.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 int CompareFileId(const void *Key, const void *Id)
-/* Compare function used when calling bsearch with a table of FileIds */
+// Compare function used when calling bsearch with a table of FileIds
 {
    return strcmp(Key, ((const FileId *)Id)->Ext);
 }
@@ -54,14 +54,14 @@ const FileId *GetFileId(const char *Name, const FileId *Table, unsigned Count)
 // extension is found, a pointer to the matching table entry is returned. If
 // no matching table entry was found, the function returns NULL.
 {
-   /* Determine the file type by the extension */
+   // Determine the file type by the extension
    const char *Ext = FindExt(Name);
 
-   /* Do we have an extension? */
+   // Do we have an extension?
    if (Ext == 0) {
       return 0;
    }
 
-   /* Search for a table entry and return it */
+   // Search for a table entry and return it
    return bsearch(Ext + 1, Table, Count, sizeof(FileId), CompareFileId);
 }

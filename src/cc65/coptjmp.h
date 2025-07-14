@@ -1,60 +1,60 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 coptjmp.h                                 */
-/*                                                                           */
-/*           Low level optimizations regarding branches and jumps            */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2009, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 coptjmp.h
+//
+//           Low level optimizations regarding branches and jumps
+//
+//
+//
+// (C) 2001-2009, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef COPTJMP_H
 #define COPTJMP_H
 
-/* cc65 */
+// cc65
 #include "codeseg.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptBranchDist(CodeSeg *S);
-/* Change branches for the distance needed. */
+// Change branches for the distance needed.
 
 unsigned OptBranchDist2(CodeSeg *S);
-/* If BRA points to an external symbol, change it to JMP */
+// If BRA points to an external symbol, change it to JMP
 
 unsigned OptRTSJumps1(CodeSeg *S);
-/* Replace jumps to RTS by RTS */
+// Replace jumps to RTS by RTS
 
 unsigned OptRTSJumps2(CodeSeg *S);
-/* Replace long conditional jumps to RTS */
+// Replace long conditional jumps to RTS
 
 unsigned OptDeadJumps(CodeSeg *S);
-/* Remove dead jumps (jumps to the next instruction) */
+// Remove dead jumps (jumps to the next instruction)
 
 unsigned OptDeadCode(CodeSeg *S);
 // Remove dead code (code that follows an unconditional jump or an rts/rti
@@ -108,6 +108,6 @@ unsigned OptCondBranchC(CodeSeg *S);
 // If on entry to a "rol a" instruction the accu is zero, and a beq/bne follows,
 // we can remove the rol and branch on the state of the carry.
 
-/* End of coptjmp.h */
+// End of coptjmp.h
 
 #endif

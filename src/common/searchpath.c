@@ -1,34 +1,34 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                               searchpath.h                                */
-/*                                                                           */
-/*                         Handling of search paths                          */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2013, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                               searchpath.h
+//
+//                         Handling of search paths
+//
+//
+//
+// (C) 2000-2013, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <stdlib.h>
@@ -37,10 +37,10 @@
 #include <windows.h>
 #endif
 #if defined(_MSC_VER)
-/* Microsoft compiler */
+// Microsoft compiler
 #include <io.h>
 #else
-/* Anyone else */
+// Anyone else
 #include <unistd.h>
 #include <stdio.h>
 #include <limits.h>
@@ -50,56 +50,56 @@
 #include "cmdline.h"
 #endif
 
-/* common */
+// common
 #include "coll.h"
 #include "searchpath.h"
 #include "strbuf.h"
 #include "xmalloc.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 static char *CleanupPath(const char *Path)
-/* Prepare and return a clean copy of Path */
+// Prepare and return a clean copy of Path
 {
    unsigned Len;
    char *NewPath;
 
-   /* Get the length of the path */
+   // Get the length of the path
    Len = strlen(Path);
 
-   /* Check for a trailing path separator and remove it */
+   // Check for a trailing path separator and remove it
    if (Len > 0 && (Path[Len - 1] == '\\' || Path[Len - 1] == '/')) {
       --Len;
    }
 
-   /* Allocate memory for the new string */
+   // Allocate memory for the new string
    NewPath = (char *)xmalloc(Len + 1);
 
-   /* Copy the path and terminate it, then return the copy */
+   // Copy the path and terminate it, then return the copy
    memcpy(NewPath, Path, Len);
    NewPath[Len] = '\0';
    return NewPath;
 }
 
 static void Add(SearchPaths *P, const char *New)
-/* Cleanup a new search path and add it to the list */
+// Cleanup a new search path and add it to the list
 {
-   /* Add a clean copy of the path to the collection */
+   // Add a clean copy of the path to the collection
    CollAppend(P, CleanupPath(New));
 }
 
 SearchPaths *NewSearchPath(void)
-/* Create a new, empty search path list */
+// Create a new, empty search path list
 {
    return NewCollection();
 }
 
 void AddSearchPath(SearchPaths *P, const char *NewPath)
-/* Add a new search path to the end of an existing list */
+// Add a new search path to the end of an existing list
 {
-   /* Allow a NULL path */
+   // Allow a NULL path
    if (NewPath) {
       Add(P, NewPath);
    }
@@ -121,28 +121,28 @@ void AddSubSearchPathFromEnv(SearchPaths *P, const char *EnvVar,
 
    const char *EnvVal = getenv(EnvVar);
    if (EnvVal == 0) {
-      /* Not found */
+      // Not found
       return;
    }
 
-   /* Copy the environment variable to the buffer */
+   // Copy the environment variable to the buffer
    SB_CopyStr(&Dir, EnvVal);
 
-   /* Add a path separator if necessary */
+   // Add a path separator if necessary
    if (SB_NotEmpty(&Dir)) {
       if (SB_LookAtLast(&Dir) != '\\' && SB_LookAtLast(&Dir) != '/') {
          SB_AppendChar(&Dir, '/');
       }
    }
 
-   /* Add the subdirectory and terminate the string */
+   // Add the subdirectory and terminate the string
    SB_AppendStr(&Dir, SubDir);
    SB_Terminate(&Dir);
 
-   /* Add the search path */
+   // Add the search path
    AddSearchPath(P, SB_GetConstBuf(&Dir));
 
-   /* Free the temp buffer */
+   // Free the temp buffer
    SB_Done(&Dir);
 }
 
@@ -255,20 +255,20 @@ void AddSubSearchPathFromBin(SearchPaths *P, const char *SubDir)
       return;
    }
 
-#else /* POSIX */
+#else // POSIX
 
    GetProgPath(Dir, ArgVec[0]);
 
 #endif
 
-   /* Remove binary name */
+   // Remove binary name
    Ptr = strrchr(Dir, PATHSEP[0]);
    if (Ptr == 0) {
       return;
    }
    *Ptr = '\0';
 
-   /* Check for 'bin' directory */
+   // Check for 'bin' directory
    Ptr = strrchr(Dir, PATHSEP[0]);
    if (Ptr == 0) {
       return;
@@ -277,10 +277,10 @@ void AddSubSearchPathFromBin(SearchPaths *P, const char *SubDir)
       return;
    }
 
-   /* Append SubDir */
+   // Append SubDir
    strcpy(Ptr, SubDir);
 
-   /* Add the search path */
+   // Add the search path
    AddSearchPath(P, Dir);
 }
 
@@ -289,25 +289,25 @@ int PushSearchPath(SearchPaths *P, const char *NewPath)
 // that it's not already there. If the path is already at the first position,
 // return zero, otherwise return a non zero value.
 {
-   /* Generate a clean copy of NewPath */
+   // Generate a clean copy of NewPath
    char *Path = CleanupPath(NewPath);
 
-   /* If we have paths, check if Path is already at position zero */
+   // If we have paths, check if Path is already at position zero
    if (CollCount(P) > 0 && strcmp(CollConstAt(P, 0), Path) == 0) {
-      /* Match. Delete the copy and return to the caller */
+      // Match. Delete the copy and return to the caller
       xfree(Path);
       return 0;
    }
 
-   /* Insert a clean copy of the path at position 0, return success */
+   // Insert a clean copy of the path at position 0, return success
    CollInsert(P, Path, 0);
    return 1;
 }
 
 void PopSearchPath(SearchPaths *P)
-/* Remove a search path from the head of an existing search path list */
+// Remove a search path from the head of an existing search path list
 {
-   /* Remove the path at position 0 */
+   // Remove the path at position 0
    xfree(CollAt(P, 0));
    CollDelete(P, 0);
 }
@@ -328,29 +328,29 @@ char *SearchFile(const SearchPaths *P, const char *File)
    char *Name = 0;
    StrBuf PathName = AUTO_STRBUF_INITIALIZER;
 
-   /* Start the search */
+   // Start the search
    unsigned I;
    for (I = 0; I < CollCount(P); ++I) {
 
-      /* Copy the next path element into the buffer */
+      // Copy the next path element into the buffer
       SB_CopyStr(&PathName, CollConstAt(P, I));
 
-      /* Add a path separator and the filename */
+      // Add a path separator and the filename
       if (SB_NotEmpty(&PathName)) {
          SB_AppendChar(&PathName, '/');
       }
       SB_AppendStr(&PathName, File);
       SB_Terminate(&PathName);
 
-      /* Check if this file exists */
+      // Check if this file exists
       if (access(SB_GetBuf(&PathName), 0) == 0) {
-         /* The file exists, we're done */
+         // The file exists, we're done
          Name = xstrdup(SB_GetBuf(&PathName));
          break;
       }
    }
 
-   /* Cleanup and return the result of the search */
+   // Cleanup and return the result of the search
    SB_Done(&PathName);
    return Name;
 }

@@ -1,62 +1,62 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                   pcx.c                                   */
-/*                                                                           */
-/*                              Read PCX files                               */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2012,      Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                   pcx.c
+//
+//                              Read PCX files
+//
+//
+//
+// (C) 2012,      Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
 
-/* common */
+// common
 #include "print.h"
 #include "xmalloc.h"
 
-/* sp65 */
+// sp65
 #include "attr.h"
 #include "error.h"
 #include "fileio.h"
 #include "pcx.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                  Macros                                   */
+//                                  Macros
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Some PCX constants */
+// Some PCX constants
 #define PCX_MAGIC_ID 0x0A
 #define PCX_MAX_PLANES 4
 
-/* A raw PCX header is just a block of bytes */
+// A raw PCX header is just a block of bytes
 typedef unsigned char RawPCXHeader[128];
 
-/* Structured PCX header */
+// Structured PCX header
 typedef struct PCXHeader PCXHeader;
 struct PCXHeader {
    unsigned Id;
@@ -75,43 +75,43 @@ struct PCXHeader {
    unsigned ScreenWidth;
    unsigned ScreenHeight;
 
-   /* Calculated data */
+   // Calculated data
    unsigned Width;
    unsigned Height;
 };
 
-/* Read a little endian word from a byte array at offset O */
+// Read a little endian word from a byte array at offset O
 #define WORD(H, O) ((H)[O] | ((H)[O + 1] << 8))
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 static PCXHeader *NewPCXHeader(void)
-/* Allocate a new PCX header and return it */
+// Allocate a new PCX header and return it
 {
-   /* No initialization here */
+   // No initialization here
    return xmalloc(sizeof(PCXHeader));
 }
 
 static void FreePCXHeader(PCXHeader *H)
-/* Free a PCX header structure */
+// Free a PCX header structure
 {
    xfree(H);
 }
 
 static PCXHeader *ReadPCXHeader(FILE *F, const char *Name)
-/* Read a structured PCX header from the given file and return it */
+// Read a structured PCX header from the given file and return it
 {
    RawPCXHeader H;
 
-   /* Allocate a new PCXHeader structure */
+   // Allocate a new PCXHeader structure
    PCXHeader *P = NewPCXHeader();
 
-   /* Read the raw header */
+   // Read the raw header
    ReadData(F, H, sizeof(H));
 
-   /* Convert the data into structured form */
+   // Convert the data into structured form
    P->Id = H[0];
    P->FileVersion = H[1];
    P->Compressed = H[2];
@@ -130,7 +130,7 @@ static PCXHeader *ReadPCXHeader(FILE *F, const char *Name)
    P->Width = P->XMax - P->XMin + 1;
    P->Height = P->YMax - P->YMin + 1;
 
-   /* Check the header data */
+   // Check the header data
    if (P->Id != PCX_MAGIC_ID || P->FileVersion == 1 || P->FileVersion > 5) {
       Error("'%s' is not a PCX file", Name);
    }
@@ -145,7 +145,7 @@ static PCXHeader *ReadPCXHeader(FILE *F, const char *Name)
    if (!((P->BPP == 1 && P->Planes == 1) || (P->BPP == 4 && P->Planes == 1) ||
          (P->BPP == 8 &&
           (P->Planes == 1 || P->Planes == 3 || P->Planes == 4)))) {
-      /* We could support others, but currently we don't */
+      // We could support others, but currently we don't
       Error("Unsupported PCX format: %u planes, %u bpp in PCX file '%s'",
             P->Planes, P->BPP, Name);
    }
@@ -157,12 +157,12 @@ static PCXHeader *ReadPCXHeader(FILE *F, const char *Name)
             P->Width, P->Height);
    }
 
-   /* Return the structured header */
+   // Return the structured header
    return P;
 }
 
 static void DumpPCXHeader(const PCXHeader *P, const char *Name)
-/* Dump the header of the PCX file in readable form to stdout */
+// Dump the header of the PCX file in readable form to stdout
 {
    printf("File name:       %s\n", Name);
    printf("PCX Version:     ");
@@ -194,12 +194,12 @@ static void DumpPCXHeader(const PCXHeader *P, const char *Name)
 }
 
 static void ReadPlane(FILE *F, PCXHeader *P, unsigned char *L)
-/* Read one (possibly compressed) plane from the file */
+// Read one (possibly compressed) plane from the file
 {
    unsigned i;
 
    if (P->Compressed) {
-      /* Uncompress RLE data */
+      // Uncompress RLE data
       signed Remaining = P->BytesPerPlane;
       signed WidthCounter = P->Width;
 
@@ -207,19 +207,19 @@ static void ReadPlane(FILE *F, PCXHeader *P, unsigned char *L)
 
          unsigned char C;
 
-         /* Read the next byte */
+         // Read the next byte
          unsigned char B = Read8(F);
 
-         /* Check for a run length */
+         // Check for a run length
          if ((B & 0xC0) == 0xC0) {
-            C = (B & 0x3F); /* Count */
-            B = Read8(F);   /* Value */
+            C = (B & 0x3F); // Count
+            B = Read8(F);   // Value
          }
          else {
             C = 1;
          }
 
-         /* Write the data to the buffer */
+         // Write the data to the buffer
          switch (P->BPP) {
             default:
                for (i = 0; i < C; i++) {
@@ -320,7 +320,7 @@ static void ReadPlane(FILE *F, PCXHeader *P, unsigned char *L)
       }
    }
    else {
-      /* Just read one line */
+      // Just read one line
       if (P->BPP == 4) {
          printf("Not implemented\n");
       }
@@ -331,7 +331,7 @@ static void ReadPlane(FILE *F, PCXHeader *P, unsigned char *L)
 }
 
 Bitmap *ReadPCXFile(const Collection *A)
-/* Read a bitmap from a PCX file */
+// Read a bitmap from a PCX file
 {
    PCXHeader *P;
    Bitmap *B;
@@ -340,48 +340,48 @@ Bitmap *ReadPCXFile(const Collection *A)
    unsigned MaxIdx = 0;
    unsigned X, Y;
 
-   /* Get the file name */
+   // Get the file name
    const char *Name = NeedAttrVal(A, "name", "read pcx file");
 
-   /* Open the file */
+   // Open the file
    FILE *F = fopen(Name, "rb");
    if (F == 0) {
       Error("Cannot open PCX file '%s': %s", Name, strerror(errno));
    }
 
-   /* Read the PCX header */
+   // Read the PCX header
    P = ReadPCXHeader(F, Name);
 
-   /* Dump the header if requested */
+   // Dump the header if requested
    if (Verbosity > 0) {
       DumpPCXHeader(P, Name);
    }
 
-   /* Create the bitmap */
+   // Create the bitmap
    B = NewBitmap(P->Width, P->Height);
 
-   /* Copy the name */
+   // Copy the name
    SB_CopyStr(&B->Name, Name);
 
-   /* Allocate memory for the scan line */
+   // Allocate memory for the scan line
    L = xmalloc(P->Width);
 
-   /* Read the pixel data */
+   // Read the pixel data
    Px = B->Data;
    if (P->Planes == 1) {
 
-      /* This is either monochrome or indexed */
+      // This is either monochrome or indexed
       if (P->BPP == 1) {
-         /* Monochrome */
+         // Monochrome
          for (Y = 0, Px = B->Data; Y < P->Height; ++Y) {
 
             unsigned I;
             unsigned char Mask;
 
-            /* Read the plane */
+            // Read the plane
             ReadPlane(F, P, L);
 
-            /* Create pixels */
+            // Create pixels
             for (X = 0, I = 0, Mask = 0x01; X < P->Width; ++Px) {
                Px->Index = (L[I] & Mask) != 0;
                if (Mask == 0x80) {
@@ -395,13 +395,13 @@ Bitmap *ReadPCXFile(const Collection *A)
          }
       }
       else {
-         /* One plane with 8bpp is indexed */
+         // One plane with 8bpp is indexed
          for (Y = 0, Px = B->Data; Y < P->Height; ++Y) {
 
-            /* Read the plane */
+            // Read the plane
             ReadPlane(F, P, L);
 
-            /* Create pixels */
+            // Create pixels
             for (X = 0; X < P->Width; ++X, ++Px) {
                if (L[X] > MaxIdx) {
                   MaxIdx = L[X];
@@ -415,7 +415,7 @@ Bitmap *ReadPCXFile(const Collection *A)
       // or follows.
       if (P->PalInfo == 0) {
 
-         /* Create the monochrome palette */
+         // Create the monochrome palette
          B->Pal = NewMonochromePalette();
       }
       else {
@@ -425,32 +425,32 @@ Bitmap *ReadPCXFile(const Collection *A)
          unsigned char Palette[256][3];
          unsigned long EndPos;
 
-         /* Determine the current file position */
+         // Determine the current file position
          unsigned long CurPos = FileGetPos(F);
 
-         /* Seek to the end of the file */
+         // Seek to the end of the file
          (void)fseek(F, 0, SEEK_END);
 
-         /* Get this position */
+         // Get this position
          EndPos = FileGetPos(F);
 
-         /* There's a palette if the old location is 769 bytes from the end */
+         // There's a palette if the old location is 769 bytes from the end
          if (EndPos - CurPos == sizeof(Palette) + 1) {
 
-            /* Seek back */
+            // Seek back
             FileSetPos(F, CurPos);
 
-            /* Check for palette marker */
+            // Check for palette marker
             if (Read8(F) != 0x0C) {
                Error("Invalid palette marker in PCX file '%s'", Name);
             }
          }
          else if (EndPos == CurPos) {
 
-            /* The palette is in the header */
+            // The palette is in the header
             FileSetPos(F, 16);
 
-            /* Check the maximum index for safety */
+            // Check the maximum index for safety
             if (MaxIdx > 15) {
                Error("PCX file '%s' contains more than 16 indexed colors "
                      "but no extra palette",
@@ -462,11 +462,11 @@ Bitmap *ReadPCXFile(const Collection *A)
                   Name, EndPos - CurPos);
          }
 
-         /* Read the palette. We will just read what we need. */
+         // Read the palette. We will just read what we need.
          Count = MaxIdx + 1;
          ReadData(F, Palette, Count * sizeof(Palette[0]));
 
-         /* Create the palette from the data */
+         // Create the palette from the data
          B->Pal = NewPalette(Count);
          for (I = 0; I < Count; ++I) {
             B->Pal->Entries[I].R = Palette[I][0];
@@ -478,28 +478,28 @@ Bitmap *ReadPCXFile(const Collection *A)
    }
    else {
 
-      /* 3 or 4 planes are RGB or RGBA (don't know if this exists) */
+      // 3 or 4 planes are RGB or RGBA (don't know if this exists)
       for (Y = 0, Px = B->Data; Y < P->Height; ++Y) {
 
-         /* Read the R plane and move the data */
+         // Read the R plane and move the data
          ReadPlane(F, P, L);
          for (X = 0; X < P->Width; ++X, ++Px) {
             Px->C.R = L[X];
          }
 
-         /* Read the G plane and move the data */
+         // Read the G plane and move the data
          ReadPlane(F, P, L);
          for (X = 0; X < P->Width; ++X, ++Px) {
             Px->C.G = L[X];
          }
 
-         /* Read the B plane and move the data */
+         // Read the B plane and move the data
          ReadPlane(F, P, L);
          for (X = 0; X < P->Width; ++X, ++Px) {
             Px->C.B = L[X];
          }
 
-         /* Either read the A plane or clear it */
+         // Either read the A plane or clear it
          if (P->Planes == 4) {
             ReadPlane(F, P, L);
             for (X = 0; X < P->Width; ++X, ++Px) {
@@ -514,15 +514,15 @@ Bitmap *ReadPCXFile(const Collection *A)
       }
    }
 
-   /* Close the file */
+   // Close the file
    fclose(F);
 
-   /* Free memory for the scan line */
+   // Free memory for the scan line
    xfree(L);
 
-   /* Free the PCX header */
+   // Free the PCX header
    FreePCXHeader(P);
 
-   /* Return the bitmap */
+   // Return the bitmap
    return B;
 }

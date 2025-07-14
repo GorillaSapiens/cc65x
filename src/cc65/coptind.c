@@ -1,40 +1,40 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 coptind.c                                 */
-/*                                                                           */
-/*              Environment independent low level optimizations              */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2009, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 coptind.c
+//
+//              Environment independent low level optimizations
+//
+//
+//
+// (C) 2001-2009, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
-/* common */
+// common
 #include "cpu.h"
 
-/* cc65 */
+// cc65
 #include "codeent.h"
 #include "coptind.h"
 #include "codeinfo.h"
@@ -42,20 +42,20 @@
 #include "error.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                             Helper functions                              */
+//                             Helper functions
 ////////////////////////////////////////////////////////////////////////////////
 
 static int MemAccess(CodeSeg *S, unsigned From, unsigned To, const CodeEntry *N)
-/* Checks a range of code entries if there are any memory accesses to N->Arg */
+// Checks a range of code entries if there are any memory accesses to N->Arg
 {
-   /* Get the length of the argument */
+   // Get the length of the argument
    unsigned NLen = strlen(N->Arg);
 
-   /* What to check for? */
+   // What to check for?
    enum {
       None = 0x00,
-      Base = 0x01, /* Check for location without "+1" */
-      Word = 0x02, /* Check for location with "+1" added */
+      Base = 0x01, // Check for location without "+1"
+      Word = 0x02, // Check for location with "+1" added
    } What = None;
 
    // If the argument of N is a zero page location that ends with "+1", we
@@ -70,10 +70,10 @@ static int MemAccess(CodeSeg *S, unsigned From, unsigned To, const CodeEntry *N)
       What |= Word;
    }
 
-   /* Walk over all code entries */
+   // Walk over all code entries
    while (From <= To) {
 
-      /* Get the next entry */
+      // Get the next entry
       CodeEntry *E = CS_GetEntry(S, From);
 
       // Check if there is an argument and if this argument equals Arg in
@@ -83,14 +83,14 @@ static int MemAccess(CodeSeg *S, unsigned From, unsigned To, const CodeEntry *N)
          unsigned ELen;
 
          if (strcmp(E->Arg, N->Arg) == 0) {
-            /* Found an access */
+            // Found an access
             return 1;
          }
 
          ELen = strlen(E->Arg);
          if ((What & Base) != 0) {
             if (ELen == NLen - 2 && strncmp(E->Arg, N->Arg, NLen - 2) == 0) {
-               /* Found an access */
+               // Found an access
                return 1;
             }
          }
@@ -98,22 +98,22 @@ static int MemAccess(CodeSeg *S, unsigned From, unsigned To, const CodeEntry *N)
          if ((What & Word) != 0) {
             if (ELen == NLen + 2 && strncmp(E->Arg, N->Arg, NLen) == 0 &&
                 E->Arg[NLen] == '+' && E->Arg[NLen + 1] == '1') {
-               /* Found an access */
+               // Found an access
                return 1;
             }
          }
       }
 
-      /* Next entry */
+      // Next entry
       ++From;
    }
 
-   /* Nothing found */
+   // Nothing found
    return 0;
 }
 
 static short ZPRegVal(unsigned short Use, const RegContents *RC)
-/* Return the contents of the given zeropage register */
+// Return the contents of the given zeropage register
 {
    if ((Use & REG_TMP1) != 0) {
       return RC->Tmp1;
@@ -136,7 +136,7 @@ static short ZPRegVal(unsigned short Use, const RegContents *RC)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                      Remove unused loads and stores                       */
+//                      Remove unused loads and stores
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned OptUnusedLoads(CodeSeg *S)
@@ -145,24 +145,24 @@ unsigned OptUnusedLoads(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *N;
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Check if this is one of the instruction we can operate on */
+      // Check if this is one of the instruction we can operate on
       int IsOp = (E->Info & (OF_LOAD | OF_XFR | OF_REG_INCDEC)) != 0 ||
                  E->OPC == OP65_AND || E->OPC == OP65_EOR || E->OPC == OP65_ORA;
 
-      /* Check for the necessary preconditions */
+      // Check for the necessary preconditions
       if (IsOp && (N = CS_GetNextEntry(S, I)) != 0 &&
           !LoadFlagsUsed(S, I + 1)) {
 
-         /* Check which sort of load or transfer it is */
+         // Check which sort of load or transfer it is
          unsigned R;
          switch (E->OPC) {
             case OP65_AND:
@@ -188,43 +188,43 @@ unsigned OptUnusedLoads(CodeSeg *S)
                R = REG_Y;
                break;
             default:
-               goto NextEntry; /* OOPS */
+               goto NextEntry; // OOPS
          }
 
-         /* Get register usage and check if the register value is used later */
+         // Get register usage and check if the register value is used later
          if ((GetRegInfo(S, I + 1, R) & R) == 0) {
 
-            /* Register value is not used, remove the load */
+            // Register value is not used, remove the load
             CS_DelEntry(S, I);
 
-            /* Remember, we had changes. Account the deleted entry in I. */
+            // Remember, we had changes. Account the deleted entry in I.
             ++Changes;
             --I;
          }
       }
 
    NextEntry:
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
 unsigned OptUnusedStores(CodeSeg *S)
-/* Remove stores into zero page registers that aren't used later */
+// Remove stores into zero page registers that aren't used later
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Check if it's a register load or transfer insn */
+      // Check if it's a register load or transfer insn
       if ((E->Info & OF_STORE) != 0 && E->AM == AM65_ZP &&
           (E->Chg & REG_ZP) != 0) {
 
@@ -232,47 +232,47 @@ unsigned OptUnusedStores(CodeSeg *S)
          // more than one zero page location involved in the store.
          unsigned R = E->Chg & REG_ZP;
 
-         /* Get register usage and check if the register value is used later */
+         // Get register usage and check if the register value is used later
          if ((GetRegInfo(S, I + 1, R) & R) == 0) {
 
-            /* Register value is not used, remove the load */
+            // Register value is not used, remove the load
             CS_DelEntry(S, I);
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
 
-            /* Continue with next insn */
+            // Continue with next insn
             continue;
          }
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
 unsigned OptLoad3(CodeSeg *S)
-/* Remove repeated loads from one and the same memory location */
+// Remove repeated loads from one and the same memory location
 {
    unsigned Changes = 0;
    CodeEntry *Load = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Forget a preceeding load if we have a label */
+      // Forget a preceeding load if we have a label
       if (Load && CE_HasLabel(E)) {
          Load = 0;
       }
 
-      /* Check if this insn is a load */
+      // Check if this insn is a load
       if (E->Info & OF_LOAD) {
 
          CodeEntry *N;
@@ -284,13 +284,13 @@ unsigned OptLoad3(CodeSeg *S)
               strcmp(E->Arg, Load->Arg) == 0) &&
              (N = CS_GetNextEntry(S, I)) != 0 && (N->Info & OF_CBRA) == 0) {
 
-            /* Now remove the call to the subroutine */
+            // Now remove the call to the subroutine
             CS_DelEntry(S, I);
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
 
-            /* Next insn */
+            // Next insn
             continue;
          }
          else {
@@ -299,15 +299,15 @@ unsigned OptLoad3(CodeSeg *S)
          }
       }
       else if ((E->Info & OF_CMP) == 0 && (E->Info & OF_CBRA) == 0) {
-         /* Forget the first load on occurance of any insn we don't like */
+         // Forget the first load on occurance of any insn we don't like
          Load = 0;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -318,48 +318,48 @@ unsigned OptDupLoads(CodeSeg *S)
    unsigned Changes = 0;
    unsigned I;
 
-   /* Walk over the entries */
+   // Walk over the entries
    I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *N;
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Assume we won't delete or replace the entry */
+      // Assume we won't delete or replace the entry
       int Delete = 0;
       opc_t NewOPC = OP65_INVALID;
 
-      /* Get a pointer to the input registers of the insn */
+      // Get a pointer to the input registers of the insn
       const RegContents *In = &E->RI->In;
 
-      /* Handle the different instructions */
+      // Handle the different instructions
       switch (E->OPC) {
 
          case OP65_LDA:
-            if (RegValIsKnown(In->RegA) &&    /* Value of A is known */
-                CE_IsKnownImm(E, In->RegA) && /* Value to be loaded is known */
-                (N = CS_GetNextEntry(S, I)) != 0 && /* There is a next entry */
-                !CE_UseLoadFlags(N)) { /* Which does not use the flags */
+            if (RegValIsKnown(In->RegA) &&    // Value of A is known
+                CE_IsKnownImm(E, In->RegA) && // Value to be loaded is known
+                (N = CS_GetNextEntry(S, I)) != 0 && // There is a next entry
+                !CE_UseLoadFlags(N)) { // Which does not use the flags
                Delete = 1;
             }
             break;
 
          case OP65_LDX:
-            if (RegValIsKnown(In->RegX) &&    /* Value of X is known */
-                CE_IsKnownImm(E, In->RegX) && /* Value to be loaded is known */
-                (N = CS_GetNextEntry(S, I)) != 0 && /* There is a next entry */
-                !CE_UseLoadFlags(N)) { /* Which does not use the flags */
+            if (RegValIsKnown(In->RegX) &&    // Value of X is known
+                CE_IsKnownImm(E, In->RegX) && // Value to be loaded is known
+                (N = CS_GetNextEntry(S, I)) != 0 && // There is a next entry
+                !CE_UseLoadFlags(N)) { // Which does not use the flags
                Delete = 1;
             }
             break;
 
          case OP65_LDY:
-            if (RegValIsKnown(In->RegY) &&    /* Value of Y is known */
-                CE_IsKnownImm(E, In->RegY) && /* Value to be loaded is known */
-                (N = CS_GetNextEntry(S, I)) != 0 && /* There is a next entry */
-                !CE_UseLoadFlags(N)) { /* Which does not use the flags */
+            if (RegValIsKnown(In->RegY) &&    // Value of Y is known
+                CE_IsKnownImm(E, In->RegY) && // Value to be loaded is known
+                (N = CS_GetNextEntry(S, I)) != 0 && // There is a next entry
+                !CE_UseLoadFlags(N)) { // Which does not use the flags
                Delete = 1;
             }
             break;
@@ -368,9 +368,9 @@ unsigned OptDupLoads(CodeSeg *S)
             // If we store into a known zero page location, and this
             // location does already contain the value to be stored,
             // remove the store.
-            if (RegValIsKnown(In->RegA) &&          /* Value of A is known */
-                E->AM == AM65_ZP &&                 /* Store into zp */
-                In->RegA == ZPRegVal(E->Chg, In)) { /* Value identical */
+            if (RegValIsKnown(In->RegA) &&          // Value of A is known
+                E->AM == AM65_ZP &&                 // Store into zp
+                In->RegA == ZPRegVal(E->Chg, In)) { // Value identical
 
                Delete = 1;
             }
@@ -380,9 +380,9 @@ unsigned OptDupLoads(CodeSeg *S)
             // If we store into a known zero page location, and this
             // location does already contain the value to be stored,
             // remove the store.
-            if (RegValIsKnown(In->RegX) &&          /* Value of A is known */
-                E->AM == AM65_ZP &&                 /* Store into zp */
-                In->RegX == ZPRegVal(E->Chg, In)) { /* Value identical */
+            if (RegValIsKnown(In->RegX) &&          // Value of A is known
+                E->AM == AM65_ZP &&                 // Store into zp
+                In->RegX == ZPRegVal(E->Chg, In)) { // Value identical
 
                Delete = 1;
 
@@ -394,7 +394,7 @@ unsigned OptDupLoads(CodeSeg *S)
             }
             else if (RegValIsKnown(In->RegX) && In->RegX == In->RegA &&
                      E->AM != AM65_ABSY && E->AM != AM65_ZPY) {
-               /* Use the A register instead */
+               // Use the A register instead
                NewOPC = OP65_STA;
             }
             break;
@@ -403,9 +403,9 @@ unsigned OptDupLoads(CodeSeg *S)
             // If we store into a known zero page location, and this
             // location does already contain the value to be stored,
             // remove the store.
-            if (RegValIsKnown(In->RegY) &&          /* Value of Y is known */
-                E->AM == AM65_ZP &&                 /* Store into zp */
-                In->RegY == ZPRegVal(E->Chg, In)) { /* Value identical */
+            if (RegValIsKnown(In->RegY) &&          // Value of Y is known
+                E->AM == AM65_ZP &&                 // Store into zp
+                In->RegY == ZPRegVal(E->Chg, In)) { // Value identical
 
                Delete = 1;
 
@@ -441,7 +441,7 @@ unsigned OptDupLoads(CodeSeg *S)
          case OP65_TAX:
             if (RegValIsKnown(In->RegA) && In->RegA == In->RegX &&
                 (N = CS_GetNextEntry(S, I)) != 0 && !CE_UseLoadFlags(N)) {
-               /* Value is identical and not followed by a branch */
+               // Value is identical and not followed by a branch
                Delete = 1;
             }
             break;
@@ -449,7 +449,7 @@ unsigned OptDupLoads(CodeSeg *S)
          case OP65_TAY:
             if (RegValIsKnown(In->RegA) && In->RegA == In->RegY &&
                 (N = CS_GetNextEntry(S, I)) != 0 && !CE_UseLoadFlags(N)) {
-               /* Value is identical and not followed by a branch */
+               // Value is identical and not followed by a branch
                Delete = 1;
             }
             break;
@@ -457,7 +457,7 @@ unsigned OptDupLoads(CodeSeg *S)
          case OP65_TXA:
             if (RegValIsKnown(In->RegX) && In->RegX == In->RegA &&
                 (N = CS_GetNextEntry(S, I)) != 0 && !CE_UseLoadFlags(N)) {
-               /* Value is identical and not followed by a branch */
+               // Value is identical and not followed by a branch
                Delete = 1;
             }
             break;
@@ -465,7 +465,7 @@ unsigned OptDupLoads(CodeSeg *S)
          case OP65_TYA:
             if (RegValIsKnown(In->RegY) && In->RegY == In->RegA &&
                 (N = CS_GetNextEntry(S, I)) != 0 && !CE_UseLoadFlags(N)) {
-               /* Value is identical and not followed by a branch */
+               // Value is identical and not followed by a branch
                Delete = 1;
             }
             break;
@@ -474,47 +474,47 @@ unsigned OptDupLoads(CodeSeg *S)
             break;
       }
 
-      /* Delete the entry if requested */
+      // Delete the entry if requested
       if (Delete) {
 
-         /* Register value is not used, remove the load */
+         // Register value is not used, remove the load
          CS_DelEntry(S, I);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
       else {
 
          if (NewOPC != OP65_INVALID) {
-            /* Replace the opcode */
+            // Replace the opcode
             CE_ReplaceOPC(E, NewOPC);
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
          }
 
-         /* Next entry */
+         // Next entry
          ++I;
       }
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
 unsigned OptStoreLoad(CodeSeg *S)
-/* Remove a store followed by a load from the same location. */
+// Remove a store followed by a load from the same location.
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *N;
       CodeEntry *X;
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
       // Check if it is a store instruction followed by a load from the
@@ -527,33 +527,33 @@ unsigned OptStoreLoad(CodeSeg *S)
           strcmp(E->Arg, N->Arg) == 0 && (X = CS_GetNextEntry(S, I + 1)) != 0 &&
           !CE_UseLoadFlags(X)) {
 
-         /* Register has already the correct value, remove the load */
+         // Register has already the correct value, remove the load
          CS_DelEntry(S, I + 1);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
 unsigned OptLoadStore1(CodeSeg *S)
-/* Remove an 8 bit load followed by a store into the same location. */
+// Remove an 8 bit load followed by a store into the same location.
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *N;
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
       // Check if it is a load instruction followed by a store into the
@@ -565,18 +565,18 @@ unsigned OptLoadStore1(CodeSeg *S)
            (E->OPC == OP65_LDY && N->OPC == OP65_STY)) &&
           strcmp(E->Arg, N->Arg) == 0) {
 
-         /* Memory cell has already the correct value, remove the store */
+         // Memory cell has already the correct value, remove the store
          CS_DelEntry(S, I + 1);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -591,16 +591,16 @@ unsigned OptLoadStoreLoad(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[3];
 
-      /* Get next entry */
+      // Get next entry
       L[0] = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if ((L[0]->OPC == OP65_LDA || L[0]->OPC == OP65_LDX ||
            L[0]->OPC == OP65_LDY) &&
           (L[0]->AM == AM65_ABS || L[0]->AM == AM65_ZP) &&
@@ -610,27 +610,27 @@ unsigned OptLoadStoreLoad(CodeSeg *S)
           L[2]->OPC == L[0]->OPC && L[2]->AM == L[0]->AM &&
           strcmp(L[0]->Arg, L[2]->Arg) == 0) {
 
-         /* Remove the second load */
+         // Remove the second load
          CS_DelEntry(S, I + 2);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
 unsigned OptTransfers1(CodeSeg *S)
-/* Remove transfers from one register to another and back */
+// Remove transfers from one register to another and back
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
@@ -638,14 +638,14 @@ unsigned OptTransfers1(CodeSeg *S)
       CodeEntry *X;
       CodeEntry *P;
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Check if we have two transfer instructions */
+      // Check if we have two transfer instructions
       if ((E->Info & OF_XFR) != 0 && (N = CS_GetNextEntry(S, I)) != 0 &&
           !CE_HasLabel(N) && (N->Info & OF_XFR) != 0) {
 
-         /* Check if it's a transfer and back */
+         // Check if it's a transfer and back
          if ((E->OPC == OP65_TAX && N->OPC == OP65_TXA &&
               !RegXUsed(S, I + 2)) ||
              (E->OPC == OP65_TAY && N->OPC == OP65_TYA &&
@@ -663,31 +663,31 @@ unsigned OptTransfers1(CodeSeg *S)
             }
             if (CE_UseLoadFlags(X)) {
                if (I == 0) {
-                  /* No preceeding entry */
+                  // No preceeding entry
                   goto NextEntry;
                }
                P = CS_GetEntry(S, I - 1);
                if ((P->Info & OF_SETF) == 0) {
-                  /* Does not set the flags */
+                  // Does not set the flags
                   goto NextEntry;
                }
             }
 
-            /* Remove both transfers */
+            // Remove both transfers
             CS_DelEntry(S, I + 1);
             CS_DelEntry(S, I);
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
          }
       }
 
    NextEntry:
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -697,13 +697,13 @@ unsigned OptTransfers2(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *N;
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
       // Check if we have a load followed by a transfer where the loaded
@@ -715,23 +715,23 @@ unsigned OptTransfers2(CodeSeg *S)
          CodeEntry *X = 0;
 
          if (E->OPC == OP65_LDA && N->OPC == OP65_TAX) {
-            /* LDA/TAX - check for the right addressing modes */
+            // LDA/TAX - check for the right addressing modes
             if (E->AM == AM65_IMM || E->AM == AM65_ZP || E->AM == AM65_ABS ||
                 E->AM == AM65_ABSY) {
-               /* Replace */
+               // Replace
                X = NewCodeEntry(OP65_LDX, E->AM, E->Arg, 0, N->LI);
             }
          }
          else if (E->OPC == OP65_LDA && N->OPC == OP65_TAY) {
-            /* LDA/TAY - check for the right addressing modes */
+            // LDA/TAY - check for the right addressing modes
             if (E->AM == AM65_IMM || E->AM == AM65_ZP || E->AM == AM65_ZPX ||
                 E->AM == AM65_ABS || E->AM == AM65_ABSX) {
-               /* Replace */
+               // Replace
                X = NewCodeEntry(OP65_LDY, E->AM, E->Arg, 0, N->LI);
             }
          }
          else if (E->OPC == OP65_LDY && N->OPC == OP65_TYA) {
-            /* LDY/TYA. LDA supports all addressing modes LDY does */
+            // LDY/TYA. LDA supports all addressing modes LDY does
             X = NewCodeEntry(OP65_LDA, E->AM, E->Arg, 0, N->LI);
          }
          else if (E->OPC == OP65_LDX && N->OPC == OP65_TXA) {
@@ -741,20 +741,20 @@ unsigned OptTransfers2(CodeSeg *S)
             X = NewCodeEntry(OP65_LDA, AM, E->Arg, 0, N->LI);
          }
 
-         /* If we have a load entry, add it and remove the old stuff */
+         // If we have a load entry, add it and remove the old stuff
          if (X) {
             CS_InsertEntry(S, X, I + 2);
             CS_DelEntries(S, I, 2);
             ++Changes;
-            --I; /* Correct for one entry less */
+            --I; // Correct for one entry less
          }
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -763,11 +763,11 @@ unsigned OptTransfers3(CodeSeg *S)
 // store of the first register if this is possible.
 {
    unsigned Changes = 0;
-   unsigned UsedRegs = REG_NONE; /* Track used registers */
-   unsigned Xfer = 0;            /* Index of transfer insn */
-   unsigned Store = 0;           /* Index of store insn */
-   CodeEntry *XferEntry = 0;     /* Pointer to xfer insn */
-   CodeEntry *StoreEntry = 0;    /* Pointer to store insn */
+   unsigned UsedRegs = REG_NONE; // Track used registers
+   unsigned Xfer = 0;            // Index of transfer insn
+   unsigned Store = 0;           // Index of store insn
+   CodeEntry *XferEntry = 0;     // Pointer to xfer insn
+   CodeEntry *StoreEntry = 0;    // Pointer to store insn
 
    enum { Initialize, Search, FoundXfer, FoundStore } State = Initialize;
 
@@ -776,19 +776,19 @@ unsigned OptTransfers3(CodeSeg *S)
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
       switch (State) {
 
          case Initialize:
-            /* Clear the list of used registers */
+            // Clear the list of used registers
             UsedRegs = REG_NONE;
-            /* FALLTHROUGH */
+            // FALLTHROUGH
 
          case Search:
             if (E->Info & OF_XFR) {
-               /* Found start of sequence */
+               // Found start of sequence
                Xfer = I;
                XferEntry = E;
                State = FoundXfer;
@@ -800,11 +800,11 @@ unsigned OptTransfers3(CodeSeg *S)
             // handling them makes things really complicated.
             if (E->Info & OF_CBRA) {
 
-               /* Switch back to searching */
+               // Switch back to searching
                I = Xfer;
                State = Initialize;
 
-               /* Does this insn use the target register of the transfer? */
+               // Does this insn use the target register of the transfer?
             }
             else if ((E->Use & XferEntry->Chg) != 0) {
 
@@ -820,7 +820,7 @@ unsigned OptTransfers3(CodeSeg *S)
                   State = Initialize;
                }
 
-               /* Does this insn change the target register of the transfer? */
+               // Does this insn change the target register of the transfer?
             }
             else if (E->Chg & XferEntry->Chg & ~PSTATE_ZN) {
 
@@ -830,16 +830,16 @@ unsigned OptTransfers3(CodeSeg *S)
                I = Xfer;
                State = Initialize;
 
-               /* Does this insn have a label? */
+               // Does this insn have a label?
             }
             else if (CE_HasLabel(E)) {
 
-               /* Too complex to handle - bail out */
+               // Too complex to handle - bail out
                I = Xfer;
                State = Initialize;
             }
             else {
-               /* Track used registers */
+               // Track used registers
                UsedRegs |= E->Use;
             }
             break;
@@ -855,7 +855,7 @@ unsigned OptTransfers3(CodeSeg *S)
                  (StoreEntry->Chg & UsedRegs) == 0) &&
                 !MemAccess(S, Xfer + 1, Store - 1, StoreEntry)) {
 
-               /* Generate the replacement store insn */
+               // Generate the replacement store insn
                CodeEntry *X = 0;
                switch (XferEntry->OPC) {
 
@@ -883,41 +883,41 @@ unsigned OptTransfers3(CodeSeg *S)
                      break;
                }
 
-               /* If we have a replacement store, change the code */
+               // If we have a replacement store, change the code
                if (X) {
-                  /* Insert after the xfer insn */
+                  // Insert after the xfer insn
                   CS_InsertEntry(S, X, Xfer + 1);
 
-                  /* Remove the xfer instead */
+                  // Remove the xfer instead
                   CS_DelEntry(S, Xfer);
 
-                  /* Remove the final store */
+                  // Remove the final store
                   CS_DelEntry(S, Store);
 
-                  /* Correct I so we continue with the next insn */
+                  // Correct I so we continue with the next insn
                   I -= 2;
 
-                  /* Remember we had changes */
+                  // Remember we had changes
                   ++Changes;
                }
                else {
-                  /* Restart after last xfer insn */
+                  // Restart after last xfer insn
                   I = Xfer;
                }
             }
             else {
-               /* Restart after last xfer insn */
+               // Restart after last xfer insn
                I = Xfer;
             }
             State = Initialize;
             break;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -926,10 +926,10 @@ unsigned OptTransfers4(CodeSeg *S)
 // by a load of the second register if possible.
 {
    unsigned Changes = 0;
-   unsigned Load = 0;        /* Index of load insn */
-   unsigned Xfer = 0;        /* Index of transfer insn */
-   CodeEntry *LoadEntry = 0; /* Pointer to load insn */
-   CodeEntry *XferEntry = 0; /* Pointer to xfer insn */
+   unsigned Load = 0;        // Index of load insn
+   unsigned Xfer = 0;        // Index of transfer insn
+   CodeEntry *LoadEntry = 0; // Pointer to load insn
+   CodeEntry *XferEntry = 0; // Pointer to xfer insn
 
    enum { Search, FoundLoad, FoundXfer } State = Search;
 
@@ -938,14 +938,14 @@ unsigned OptTransfers4(CodeSeg *S)
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
       switch (State) {
 
          case Search:
             if (E->Info & OF_LOAD) {
-               /* Found start of sequence */
+               // Found start of sequence
                Load = I;
                LoadEntry = E;
                State = FoundLoad;
@@ -957,11 +957,11 @@ unsigned OptTransfers4(CodeSeg *S)
             // handling them makes things really complicated.
             if (E->Info & OF_CBRA) {
 
-               /* Switch back to searching */
+               // Switch back to searching
                I = Load;
                State = Search;
 
-               /* Does this insn use the target register of the load? */
+               // Does this insn use the target register of the load?
             }
             else if ((E->Use & LoadEntry->Chg) != 0) {
 
@@ -977,7 +977,7 @@ unsigned OptTransfers4(CodeSeg *S)
                   State = Search;
                }
 
-               /* Does this insn change the target register of the load? */
+               // Does this insn change the target register of the load?
             }
             else if (E->Chg & LoadEntry->Chg & ~PSTATE_ZN) {
 
@@ -999,7 +999,7 @@ unsigned OptTransfers4(CodeSeg *S)
                  LoadEntry->AM == AM65_IMM) &&
                 !MemAccess(S, Load + 1, Xfer - 1, LoadEntry)) {
 
-               /* Generate the replacement load insn */
+               // Generate the replacement load insn
                CodeEntry *X = 0;
                switch (XferEntry->OPC) {
 
@@ -1023,51 +1023,51 @@ unsigned OptTransfers4(CodeSeg *S)
                      break;
                }
 
-               /* If we have a replacement load, change the code */
+               // If we have a replacement load, change the code
                if (X) {
-                  /* Insert after the xfer insn */
+                  // Insert after the xfer insn
                   CS_InsertEntry(S, X, Xfer + 1);
 
-                  /* Remove the xfer instead */
+                  // Remove the xfer instead
                   CS_DelEntry(S, Xfer);
 
-                  /* Remove the initial load */
+                  // Remove the initial load
                   CS_DelEntry(S, Load);
 
-                  /* Correct I so we continue with the next insn */
+                  // Correct I so we continue with the next insn
                   I -= 2;
 
-                  /* Remember we had changes */
+                  // Remember we had changes
                   ++Changes;
                }
                else {
-                  /* Restart after last xfer insn */
+                  // Restart after last xfer insn
                   I = Xfer;
                }
             }
             else {
-               /* Restart after last xfer insn */
+               // Restart after last xfer insn
                I = Xfer;
             }
             State = Search;
             break;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
 unsigned OptPushPop1(CodeSeg *S)
-/* Remove a PHA/PLA sequence were A not used later */
+// Remove a PHA/PLA sequence were A not used later
 {
    unsigned Changes = 0;
-   unsigned Push = 0; /* Index of push insn */
-   unsigned Pop = 0;  /* Index of pop insn */
-   unsigned ChgA = 0; /* Flag for A changed */
+   unsigned Push = 0; // Index of push insn
+   unsigned Pop = 0;  // Index of pop insn
+   unsigned ChgA = 0; // Flag for A changed
    enum { Searching, FoundPush, FoundPop } State = Searching;
 
    // Walk over the entries. Look for a push instruction that is followed by
@@ -1084,14 +1084,14 @@ unsigned OptPushPop1(CodeSeg *S)
       CodeEntry *X;
       CodeEntry *N;
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
       switch (State) {
 
          case Searching:
             if (E->OPC == OP65_PHA) {
-               /* Found start of sequence */
+               // Found start of sequence
                Push = I;
                ChgA = 0;
                State = FoundPush;
@@ -1100,12 +1100,12 @@ unsigned OptPushPop1(CodeSeg *S)
 
          case FoundPush:
             if (E->OPC == OP65_PHA) {
-               /* Inner push/pop, restart */
+               // Inner push/pop, restart
                Push = I;
                ChgA = 0;
             }
             else if (E->OPC == OP65_PLA) {
-               /* Found a matching pop */
+               // Found a matching pop
                Pop = I;
                // Check that the block between Push and Pop is a basic
                // block (one entry, one exit). Otherwise ignore it.
@@ -1113,7 +1113,7 @@ unsigned OptPushPop1(CodeSeg *S)
                   State = FoundPop;
                }
                else {
-                  /* Go into searching mode again */
+                  // Go into searching mode again
                   State = Searching;
                }
             }
@@ -1139,53 +1139,53 @@ unsigned OptPushPop1(CodeSeg *S)
                  (!CE_UseLoadFlags(N) && !RegAUsed(S, I + 1))) &&
                 !MemAccess(S, Push + 1, Pop - 1, E)) {
 
-               /* Insert a STA after the PHA */
+               // Insert a STA after the PHA
                X = NewCodeEntry(OP65_STA, E->AM, E->Arg, E->JumpTo, E->LI);
                CS_InsertEntry(S, X, Push + 1);
 
-               /* Remove the PHA instead */
+               // Remove the PHA instead
                CS_DelEntry(S, Push);
 
-               /* Remove the PLA/STA sequence */
+               // Remove the PLA/STA sequence
                CS_DelEntries(S, Pop, 2);
 
-               /* Correct I so we continue with the next insn */
+               // Correct I so we continue with the next insn
                I -= 2;
 
-               /* Remember we had changes */
+               // Remember we had changes
                ++Changes;
             }
             else if (!CE_UseLoadFlags(E) && (!RegAUsed(S, I) || !ChgA)) {
 
-               /* We can remove the PHA and PLA instructions */
+               // We can remove the PHA and PLA instructions
                CS_DelEntry(S, Pop);
                CS_DelEntry(S, Push);
 
-               /* Correct I so we continue with the next insn */
+               // Correct I so we continue with the next insn
                I -= 2;
 
-               /* Remember we had changes */
+               // Remember we had changes
                ++Changes;
             }
-            /* Go into search mode again */
+            // Go into search mode again
             State = Searching;
             break;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
 unsigned OptPushPop2(CodeSeg *S)
-/* Remove a PHP/PLP sequence were no processor flags changed inside */
+// Remove a PHP/PLP sequence were no processor flags changed inside
 {
    unsigned Changes = 0;
-   unsigned Push = 0; /* Index of push insn */
-   unsigned Pop = 0;  /* Index of pop insn */
+   unsigned Push = 0; // Index of push insn
+   unsigned Pop = 0;  // Index of pop insn
    enum { Searching, FoundPush, FoundPop } State = Searching;
 
    // Walk over the entries. Look for a push instruction that is followed by
@@ -1199,14 +1199,14 @@ unsigned OptPushPop2(CodeSeg *S)
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
       switch (State) {
 
          case Searching:
             if (E->OPC == OP65_PHP) {
-               /* Found start of sequence */
+               // Found start of sequence
                Push = I;
                State = FoundPush;
             }
@@ -1214,11 +1214,11 @@ unsigned OptPushPop2(CodeSeg *S)
 
          case FoundPush:
             if (E->OPC == OP65_PHP) {
-               /* Inner push/pop, restart */
+               // Inner push/pop, restart
                Push = I;
             }
             else if (E->OPC == OP65_PLP) {
-               /* Found a matching pop */
+               // Found a matching pop
                Pop = I;
                // Check that the block between Push and Pop is a basic
                // block (one entry, one exit). Otherwise ignore it.
@@ -1226,48 +1226,48 @@ unsigned OptPushPop2(CodeSeg *S)
                   State = FoundPop;
                }
                else {
-                  /* Go into searching mode again */
+                  // Go into searching mode again
                   State = Searching;
                }
             }
             else if ((E->Info & OF_BRA) == 0 && (E->Info & OF_STORE) == 0 &&
                      E->OPC != OP65_NOP && E->OPC != OP65_TSX) {
-               /* Don't bother skipping dead code */
+               // Don't bother skipping dead code
                State = Searching;
             }
             break;
 
          case FoundPop:
-            /* We can remove the PHP and PLP instructions */
+            // We can remove the PHP and PLP instructions
             CS_DelEntry(S, Pop);
             CS_DelEntry(S, Push);
 
-            /* Correct I so we continue with THIS insn */
+            // Correct I so we continue with THIS insn
             I -= 3;
 
-            /* Remember we had changes */
+            // Remember we had changes
             ++Changes;
 
-            /* Go into search mode again */
+            // Go into search mode again
             State = Searching;
             break;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
 unsigned OptPushPop3(CodeSeg *S)
-/* Remove a pha/pla sequence where the contents of A are known */
+// Remove a pha/pla sequence where the contents of A are known
 {
    unsigned Changes = 0;
-   unsigned Pha = 0;        /* Index of PHA insn */
-   unsigned Pla = 0;        /* Index of PLA insn */
-   CodeEntry *PhaEntry = 0; /* Pointer to PHA */
+   unsigned Pha = 0;        // Index of PHA insn
+   unsigned Pla = 0;        // Index of PLA insn
+   CodeEntry *PhaEntry = 0; // Pointer to PHA
 
    enum { Searching, FoundPha, FoundPla } State = Searching;
 
@@ -1276,10 +1276,10 @@ unsigned OptPushPop3(CodeSeg *S)
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Get the input registers */
+      // Get the input registers
       const RegInfo *RI = E->RI;
 
       const char *Arg;
@@ -1288,7 +1288,7 @@ unsigned OptPushPop3(CodeSeg *S)
 
          case Searching:
             if (E->OPC == OP65_PHA && RegValIsKnown(RI->In.RegA)) {
-               /* Found start of sequence */
+               // Found start of sequence
                Pha = I;
                PhaEntry = E;
                State = FoundPha;
@@ -1302,18 +1302,18 @@ unsigned OptPushPop3(CodeSeg *S)
             // If we find something that aborts the sequence, start over
             // searching for the next PHA.
             if (CE_HasLabel(E)) {
-               /* Switch back to searching at this instruction */
+               // Switch back to searching at this instruction
                State = Searching;
                continue;
             }
             if (E->OPC == OP65_PHA) {
-               /* Start over at this instruction */
+               // Start over at this instruction
                State = Searching;
                continue;
             }
             if (E->OPC == OP65_PHP || E->OPC == OP65_PLP ||
                 E->OPC == OP65_TXS) {
-               /* Start over at the next instruction */
+               // Start over at the next instruction
                State = Searching;
             }
             else if (E->OPC == OP65_PLA) {
@@ -1325,7 +1325,7 @@ unsigned OptPushPop3(CodeSeg *S)
             break;
 
          case FoundPla:
-            /* We found the sequence we were looking for. Replace it. */
+            // We found the sequence we were looking for. Replace it.
             Arg = MakeHexArg(PhaEntry->RI->In.RegA);
             X = NewCodeEntry(OP65_LDA, AM65_IMM, Arg, 0, E->LI);
             CS_InsertEntry(S, X, Pla + 1);
@@ -1336,11 +1336,11 @@ unsigned OptPushPop3(CodeSeg *S)
             break;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -1351,34 +1351,34 @@ unsigned OptPrecalc(CodeSeg *S)
    unsigned Changes = 0;
    unsigned I;
 
-   /* Walk over the entries */
+   // Walk over the entries
    I = 0;
    while (I < CS_GetEntryCount(S)) {
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Get pointers to the input and output registers of the insn */
+      // Get pointers to the input and output registers of the insn
       const RegContents *Out = &E->RI->Out;
       const RegContents *In = &E->RI->In;
 
-      /* Argument for LDn and flag */
+      // Argument for LDn and flag
       const char *Arg = 0;
       opc_t OPC = OP65_LDA;
 
-      /* Handle the different instructions */
+      // Handle the different instructions
       switch (E->OPC) {
 
          case OP65_LDA:
             if (E->AM != AM65_IMM && RegValIsKnown(Out->RegA)) {
-               /* Result of load is known */
+               // Result of load is known
                Arg = MakeHexArg(Out->RegA);
             }
             break;
 
          case OP65_LDX:
             if (E->AM != AM65_IMM && RegValIsKnown(Out->RegX)) {
-               /* Result of load is known but register is X */
+               // Result of load is known but register is X
                Arg = MakeHexArg(Out->RegX);
                OPC = OP65_LDX;
             }
@@ -1386,7 +1386,7 @@ unsigned OptPrecalc(CodeSeg *S)
 
          case OP65_LDY:
             if (E->AM != AM65_IMM && RegValIsKnown(Out->RegY)) {
-               /* Result of load is known but register is Y */
+               // Result of load is known but register is Y
                Arg = MakeHexArg(Out->RegY);
                OPC = OP65_LDY;
             }
@@ -1422,7 +1422,7 @@ unsigned OptPrecalc(CodeSeg *S)
                   R = REG_A | PSTATE_CZVN;
                }
                if (R != 0) {
-                  /* Collect info on all flags in one round to save time */
+                  // Collect info on all flags in one round to save time
                   R = GetRegInfo(S, I + 1, R);
                }
                CondV = (CondC && CondV) || (R & PSTATE_V) == 0;
@@ -1431,7 +1431,7 @@ unsigned OptPrecalc(CodeSeg *S)
                 * above */
                CondC = CondC || (R & (REG_A | PSTATE_C)) == 0;
                if (CondC && CondV && CondZN) {
-                  /* ?+0, ?-0 or result unused -> remove */
+                  // ?+0, ?-0 or result unused -> remove
                   CS_DelEntry(S, I);
                   ++Changes;
                }
@@ -1449,7 +1449,7 @@ unsigned OptPrecalc(CodeSeg *S)
                CondV = (CondC && CondV) || (R & PSTATE_V) == 0;
                CondC = CondC || (R & (REG_A | PSTATE_C)) == 0;
                if (CondC && CondV) {
-                  /* 0 + arg -> replace with lda arg */
+                  // 0 + arg -> replace with lda arg
                   CE_ReplaceOPC(E, OP65_LDA);
                   ++Changes;
                }
@@ -1460,20 +1460,20 @@ unsigned OptPrecalc(CodeSeg *S)
             if (CE_IsKnownImm(E, 0xFF) &&
                 ((In->ZNRegs & ZNREG_A) != 0 ||
                  (GetRegInfo(S, I + 1, PSTATE_ZN) & PSTATE_ZN) == 0)) {
-               /* AND with 0xFF, remove */
+               // AND with 0xFF, remove
                CS_DelEntry(S, I);
                ++Changes;
             }
             else if (CE_IsKnownImm(E, 0x00)) {
-               /* AND with 0x00, replace by lda #$00 */
+               // AND with 0x00, replace by lda #$00
                Arg = MakeHexArg(0x00);
             }
             else if (RegValIsKnown(Out->RegA)) {
-               /* Accu AND zp with known contents */
+               // Accu AND zp with known contents
                Arg = MakeHexArg(Out->RegA);
             }
             else if (In->RegA == 0xFF) {
-               /* AND but A contains 0xFF - replace by lda */
+               // AND but A contains 0xFF - replace by lda
                CE_ReplaceOPC(E, OP65_LDA);
                ++Changes;
             }
@@ -1483,20 +1483,20 @@ unsigned OptPrecalc(CodeSeg *S)
             if (CE_IsKnownImm(E, 0x00) &&
                 ((In->ZNRegs & ZNREG_A) != 0 ||
                  (GetRegInfo(S, I + 1, PSTATE_ZN) & PSTATE_ZN) == 0)) {
-               /* ORA with zero, remove */
+               // ORA with zero, remove
                CS_DelEntry(S, I);
                ++Changes;
             }
             else if (CE_IsKnownImm(E, 0xFF)) {
-               /* ORA with 0xFF, replace by lda #$ff */
+               // ORA with 0xFF, replace by lda #$ff
                Arg = MakeHexArg(0xFF);
             }
             else if (RegValIsKnown(Out->RegA)) {
-               /* Accu AND zp with known contents */
+               // Accu AND zp with known contents
                Arg = MakeHexArg(Out->RegA);
             }
             else if (In->RegA == 0) {
-               /* ORA but A contains 0x00 - replace by lda */
+               // ORA but A contains 0x00 - replace by lda
                CE_ReplaceOPC(E, OP65_LDA);
                ++Changes;
             }
@@ -1506,16 +1506,16 @@ unsigned OptPrecalc(CodeSeg *S)
             if (CE_IsKnownImm(E, 0x00) &&
                 ((In->ZNRegs & ZNREG_A) != 0 ||
                  (GetRegInfo(S, I + 1, PSTATE_ZN) & PSTATE_ZN) == 0)) {
-               /* EOR with zero, remove */
+               // EOR with zero, remove
                CS_DelEntry(S, I);
                ++Changes;
             }
             else if (RegValIsKnown(Out->RegA)) {
-               /* Accu op zp with known contents */
+               // Accu op zp with known contents
                Arg = MakeHexArg(Out->RegA);
             }
             else if (In->RegA == 0) {
-               /* EOR but A contains 0x00 - replace by lda */
+               // EOR but A contains 0x00 - replace by lda
                CE_ReplaceOPC(E, OP65_LDA);
                ++Changes;
             }
@@ -1525,7 +1525,7 @@ unsigned OptPrecalc(CodeSeg *S)
             break;
       }
 
-      /* Check if we have to replace the insn by LDA */
+      // Check if we have to replace the insn by LDA
       if (Arg) {
          CodeEntry *X = NewCodeEntry(OPC, AM65_IMM, Arg, 0, E->LI);
          CS_InsertEntry(S, X, I + 1);
@@ -1533,11 +1533,11 @@ unsigned OptPrecalc(CodeSeg *S)
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -1550,14 +1550,14 @@ unsigned OptShiftBack(CodeSeg *S)
    CodeEntry *N;
    unsigned CheckStates;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
-      /* Get next entry */
+      // Get next entry
       E = CS_GetEntry(S, I);
 
-      /* Check if it's a register load or transfer insn */
+      // Check if it's a register load or transfer insn
       if (E->OPC == OP65_ROL && (N = CS_GetNextEntry(S, I)) != 0 &&
           (N->OPC == OP65_LSR || N->OPC == OP65_ROR) && !CE_HasLabel(N)) {
          CheckStates = PSTATE_ZN;
@@ -1567,22 +1567,22 @@ unsigned OptShiftBack(CodeSeg *S)
          }
          if ((GetRegInfo(S, I + 2, CheckStates) & CheckStates) == 0) {
 
-            /* Remove the shifts */
+            // Remove the shifts
             CS_DelEntries(S, I, 2);
 
-            /* Remember, we had changes */
+            // Remember, we had changes
             ++Changes;
 
-            /* Continue with next insn */
+            // Continue with next insn
             continue;
          }
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -1615,14 +1615,14 @@ unsigned OptSignExtended(CodeSeg *S)
    CodeEntry *X;
    unsigned CheckStates;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
-      /* Get next entry */
+      // Get next entry
       L[0] = CS_GetEntry(S, I);
 
-      /* Check if it's a register load or transfer insn */
+      // Check if it's a register load or transfer insn
       if (L[0]->OPC == OP65_LDA && CS_GetEntries(S, L + 1, I + 1, 4) &&
           !CS_RangeHasLabel(S, I + 1, 2) && CE_GetLabelCount(L[3]) == 1 &&
           L[1]->JumpTo == CE_GetLabel(L[3], 0) && (L[1]->Info & OF_CBRA) != 0 &&
@@ -1630,7 +1630,7 @@ unsigned OptSignExtended(CodeSeg *S)
           RegValIsKnown(L[2]->RI->Out.RegX) && L[2]->RI->Out.RegX == 0xFF &&
           L[2]->OPC != OP65_JSR && (L[2]->Chg & REG_AXY) == REG_X) {
 
-         /* We find a sign extention */
+         // We find a sign extention
          CheckStates = PSTATE_CZN;
          if (L[3]->OPC == OP65_CPX && CE_IsConstImm(L[3]) &&
              (L[4]->Info & OF_CBRA) != 0 &&
@@ -1638,31 +1638,31 @@ unsigned OptSignExtended(CodeSeg *S)
               ((L[3]->Num == 0x80 && GetBranchCond(L[4]->OPC) == BC_CC &&
                 GetBranchCond(L[4]->OPC) == BC_MI)))) {
 
-            /* Check if the processor states set by the CPX are unused later */
+            // Check if the processor states set by the CPX are unused later
             if ((GetRegInfo(S, I + 5, CheckStates) & CheckStates) == 0) {
 
-               /* Change the target of the sign extention branch */
+               // Change the target of the sign extention branch
                X = NewCodeEntry(OP65_JPL, L[4]->AM, L[4]->Arg, L[4]->JumpTo,
                                 L[4]->LI);
                CS_InsertEntry(S, X, I + 1);
                CS_DelEntry(S, I + 2);
 
-               /* Remove the old conditional branch */
+               // Remove the old conditional branch
                CS_DelEntries(S, I + 3, 2);
 
-               /* Remember, we had changes */
+               // Remember, we had changes
                ++Changes;
 
-               /* Continue with the current insn */
+               // Continue with the current insn
                continue;
             }
          }
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }

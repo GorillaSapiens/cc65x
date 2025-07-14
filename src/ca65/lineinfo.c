@@ -1,45 +1,45 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                lineinfo.c                                 */
-/*                                                                           */
-/*                      Source file line info structure                      */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2001-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                70794 Filderstadt                                          */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                lineinfo.c
+//
+//                      Source file line info structure
+//
+//
+//
+// (C) 2001-2011, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
 #include <string.h>
 
-/* common */
+// common
 #include "coll.h"
 #include "hashfunc.h"
 #include "xmalloc.h"
 
-/* ca65 */
+// ca65
 #include "filetab.h"
 #include "global.h"
 #include "lineinfo.h"
@@ -48,14 +48,14 @@
 #include "span.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                 Forwards                                  */
+//                                 Forwards
 ////////////////////////////////////////////////////////////////////////////////
 
 static unsigned HT_GenHash(const void *Key);
-/* Generate the hash over a key. */
+// Generate the hash over a key.
 
 static const void *HT_GetKey(const void *Entry);
-/* Given a pointer to the user entry data, return a pointer to the key */
+// Given a pointer to the user entry data, return a pointer to the key
 
 static int HT_Compare(const void *Key1, const void *Key2);
 // Compare two keys. The function must return a value less than zero if
@@ -63,57 +63,57 @@ static int HT_Compare(const void *Key1, const void *Key2);
 // than zero if Key1 is greater then Key2.
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Structure that holds the key for a line info */
+// Structure that holds the key for a line info
 typedef struct LineInfoKey LineInfoKey;
 struct LineInfoKey {
-   FilePos Pos;   /* File position */
-   unsigned Type; /* Type/count of line info */
+   FilePos Pos;   // File position
+   unsigned Type; // Type/count of line info
 };
 
-/* Structure that holds line info */
+// Structure that holds line info
 struct LineInfo {
-   HashNode Node;        /* Hash table node */
-   unsigned Id;          /* Index */
-   LineInfoKey Key;      /* Key for this line info */
-   unsigned RefCount;    /* Reference counter */
-   Collection Spans;     /* Segment spans for this line info */
-   Collection OpenSpans; /* List of currently open spans */
+   HashNode Node;        // Hash table node
+   unsigned Id;          // Index
+   LineInfoKey Key;      // Key for this line info
+   unsigned RefCount;    // Reference counter
+   Collection Spans;     // Segment spans for this line info
+   Collection OpenSpans; // List of currently open spans
 };
 
-/* Collection containing all line infos */
+// Collection containing all line infos
 static Collection LineInfoList = STATIC_COLLECTION_INITIALIZER;
 
-/* Collection with currently active line infos */
+// Collection with currently active line infos
 static Collection CurLineInfo = STATIC_COLLECTION_INITIALIZER;
 
-/* Hash table functions */
+// Hash table functions
 static const HashFunctions HashFunc = {HT_GenHash, HT_GetKey, HT_Compare};
 
-/* Line info hash table */
+// Line info hash table
 static HashTable LineInfoTab = STATIC_HASHTABLE_INITIALIZER(1051, &HashFunc);
 
-/* The current assembler input line */
+// The current assembler input line
 static LineInfo *AsmLineInfo = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                           Hash table functions                            */
+//                           Hash table functions
 ////////////////////////////////////////////////////////////////////////////////
 
 static unsigned HT_GenHash(const void *Key)
-/* Generate the hash over a key. */
+// Generate the hash over a key.
 {
-   /* Key is a LineInfoKey pointer */
+   // Key is a LineInfoKey pointer
    const LineInfoKey *K = Key;
 
-   /* Hash over a combination of type, file and line */
+   // Hash over a combination of type, file and line
    return HashInt((K->Type << 21) ^ (K->Pos.Name << 14) ^ K->Pos.Line);
 }
 
 static const void *HT_GetKey(const void *Entry)
-/* Given a pointer to the user entry data, return a pointer to the key */
+// Given a pointer to the user entry data, return a pointer to the key
 {
    return &((const LineInfo *)Entry)->Key;
 }
@@ -123,11 +123,11 @@ static int HT_Compare(const void *Key1, const void *Key2)
 // Key1 is smaller than Key2, zero if both are equal, and a value greater
 // than zero if Key1 is greater then Key2.
 {
-   /* Convert both parameters to FileInfoKey pointers */
+   // Convert both parameters to FileInfoKey pointers
    const LineInfoKey *K1 = Key1;
    const LineInfoKey *K2 = Key2;
 
-   /* Compare line number, then file and type */
+   // Compare line number, then file and type
    int Res = (int)K2->Pos.Line - (int)K1->Pos.Line;
    if (Res == 0) {
       Res = (int)K2->Pos.Name - (int)K1->Pos.Name;
@@ -136,21 +136,21 @@ static int HT_Compare(const void *Key1, const void *Key2)
       }
    }
 
-   /* Done */
+   // Done
    return Res;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                              struct LineInfo                              */
+//                              struct LineInfo
 ////////////////////////////////////////////////////////////////////////////////
 
 static LineInfo *NewLineInfo(const LineInfoKey *Key)
-/* Create and return a new line info. Usage will be zero. */
+// Create and return a new line info. Usage will be zero.
 {
-   /* Allocate memory */
+   // Allocate memory
    LineInfo *LI = xmalloc(sizeof(LineInfo));
 
-   /* Initialize the fields */
+   // Initialize the fields
    InitHashNode(&LI->Node);
    LI->Id = ~0U;
    LI->Key = *Key;
@@ -158,50 +158,50 @@ static LineInfo *NewLineInfo(const LineInfoKey *Key)
    InitCollection(&LI->Spans);
    InitCollection(&LI->OpenSpans);
 
-   /* Add it to the hash table, so we will find it if necessary */
+   // Add it to the hash table, so we will find it if necessary
    HT_Insert(&LineInfoTab, LI);
 
-   /* Return the new struct */
+   // Return the new struct
    return LI;
 }
 
 static void FreeLineInfo(LineInfo *LI)
-/* Free a LineInfo structure */
+// Free a LineInfo structure
 {
-   /* Free the Spans collection. It is supposed to be empty */
+   // Free the Spans collection. It is supposed to be empty
    CHECK(CollCount(&LI->Spans) == 0);
    DoneCollection(&LI->Spans);
    DoneCollection(&LI->OpenSpans);
 
-   /* Free the structure itself */
+   // Free the structure itself
    xfree(LI);
 }
 
 static int CheckLineInfo(void *Entry, void *Data attribute((unused)))
-/* Called from HT_Walk. Remembers used line infos and assigns them an id */
+// Called from HT_Walk. Remembers used line infos and assigns them an id
 {
-   /* Entry is actually a line info */
+   // Entry is actually a line info
    LineInfo *LI = Entry;
 
-   /* The entry is used if there are spans or the ref counter is non zero */
+   // The entry is used if there are spans or the ref counter is non zero
    if (LI->RefCount > 0 || CollCount(&LI->Spans) > 0) {
       LI->Id = CollCount(&LineInfoList);
       CollAppend(&LineInfoList, LI);
-      return 0; /* Keep the entry */
+      return 0; // Keep the entry
    }
    else {
       FreeLineInfo(LI);
-      return 1; /* Remove entry from table */
+      return 1; // Remove entry from table
    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 #if 0
 static void DumpLineInfos (const char* Title, const Collection* C)
-/* Dump line infos from the given collection */
+// Dump line infos from the given collection
 {
     unsigned I;
     fprintf (stderr, "%s:\n", Title);
@@ -225,11 +225,11 @@ static void DumpLineInfos (const char* Title, const Collection* C)
 #endif
 
 void InitLineInfo(void)
-/* Initialize the line infos */
+// Initialize the line infos
 {
    static const FilePos DefaultPos = STATIC_FILEPOS_INITIALIZER;
 
-   /* Increase the initial count of the line info collection */
+   // Increase the initial count of the line info collection
    CollGrow(&LineInfoList, 200);
 
    // Create a LineInfo for the default source. This is necessary to allow
@@ -238,9 +238,9 @@ void InitLineInfo(void)
 }
 
 void DoneLineInfo(void)
-/* Close down line infos */
+// Close down line infos
 {
-   /* Close all current line infos */
+   // Close all current line infos
    unsigned Count = CollCount(&CurLineInfo);
    while (Count) {
       EndLine(CollAt(&CurLineInfo, --Count));
@@ -253,9 +253,9 @@ void DoneLineInfo(void)
 }
 
 void EndLine(LineInfo *LI)
-/* End a line that is tracked by the given LineInfo structure */
+// End a line that is tracked by the given LineInfo structure
 {
-   /* Close the spans for the line */
+   // Close the spans for the line
    CloseSpanList(&LI->OpenSpans);
 
    // Move the spans to the list of all spans for this line, then clear the
@@ -269,12 +269,12 @@ void EndLine(LineInfo *LI)
 }
 
 LineInfo *StartLine(const FilePos *Pos, unsigned Type, unsigned Count)
-/* Start line info for a new line */
+// Start line info for a new line
 {
    LineInfoKey Key;
    LineInfo *LI;
 
-   /* Prepare the key struct */
+   // Prepare the key struct
    Key.Pos = *Pos;
    Key.Type = LI_MAKE_TYPE(Type, Count);
 
@@ -282,17 +282,17 @@ LineInfo *StartLine(const FilePos *Pos, unsigned Type, unsigned Count)
    // If so, reuse it. Otherwise create a new one.
    LI = HT_Find(&LineInfoTab, &Key);
    if (LI == 0) {
-      /* Allocate a new LineInfo */
+      // Allocate a new LineInfo
       LI = NewLineInfo(&Key);
    }
 
-   /* Open the spans for this line info */
+   // Open the spans for this line info
    OpenSpanList(&LI->OpenSpans);
 
-   /* Add the line info to the list of current line infos */
+   // Add the line info to the list of current line infos
    CollAppend(&CurLineInfo, LI);
 
-   /* Return the new info */
+   // Return the new info
    return LI;
 }
 
@@ -301,19 +301,19 @@ void NewAsmLine(void)
 // line of LI_TYPE_ASM. It will check if line and/or file have actually
 // changed, end the old and start the new line as necessary.
 {
-   /* Check if we can reuse the old line */
+   // Check if we can reuse the old line
    if (AsmLineInfo) {
       if (AsmLineInfo->Key.Pos.Line == CurTok.Pos.Line &&
           AsmLineInfo->Key.Pos.Name == CurTok.Pos.Name) {
-         /* We do already have line info for this line */
+         // We do already have line info for this line
          return;
       }
 
-      /* Line has changed -> end the old line */
+      // Line has changed -> end the old line
       EndLine(AsmLineInfo);
    }
 
-   /* Start a new line using the current line info */
+   // Start a new line using the current line info
    AsmLineInfo = StartLine(&CurTok.Pos, LI_TYPE_ASM, 0);
 
    // If the first LineInfo in the list came from a .dbg line, then we want
@@ -333,9 +333,9 @@ LineInfo *GetAsmLineInfo(void)
 }
 
 void ReleaseLineInfo(LineInfo *LI)
-/* Decrease the reference count for a line info */
+// Decrease the reference count for a line info
 {
-   /* Decrease the reference counter */
+   // Decrease the reference counter
    CHECK(LI->RefCount > 0);
    ++LI->RefCount;
 }
@@ -347,12 +347,12 @@ void GetFullLineInfo(Collection *LineInfos)
 {
    unsigned I;
 
-   /* Bum the reference counter for all active line infos */
+   // Bum the reference counter for all active line infos
    for (I = 0; I < CollCount(&CurLineInfo); ++I) {
       ++((LineInfo *)CollAt(&CurLineInfo, I))->RefCount;
    }
 
-   /* Copy all line infos over */
+   // Copy all line infos over
    CollTransfer(LineInfos, &CurLineInfo);
 }
 
@@ -362,77 +362,77 @@ void ReleaseFullLineInfo(Collection *LineInfos)
 {
    unsigned I;
 
-   /* Walk over all entries */
+   // Walk over all entries
    for (I = 0; I < CollCount(LineInfos); ++I) {
-      /* Release the line info */
+      // Release the line info
       ReleaseLineInfo(CollAt(LineInfos, I));
    }
 
-   /* Delete all entries */
+   // Delete all entries
    CollDeleteAll(LineInfos);
 }
 
 const FilePos *GetSourcePos(const LineInfo *LI)
-/* Return the source file position from the given line info */
+// Return the source file position from the given line info
 {
    return &LI->Key.Pos;
 }
 
 unsigned GetLineInfoType(const LineInfo *LI)
-/* Return the type of a line info */
+// Return the type of a line info
 {
    return LI_GET_TYPE(LI->Key.Type);
 }
 
 void WriteLineInfo(const Collection *LineInfos)
-/* Write a list of line infos to the object file. */
+// Write a list of line infos to the object file.
 {
    unsigned I;
 
-   /* Write the count */
+   // Write the count
    ObjWriteVar(CollCount(LineInfos));
 
-   /* Write the line info indices */
+   // Write the line info indices
    for (I = 0; I < CollCount(LineInfos); ++I) {
 
-      /* Get a pointer to the line info */
+      // Get a pointer to the line info
       const LineInfo *LI = CollConstAt(LineInfos, I);
 
-      /* Safety */
+      // Safety
       CHECK(LI->Id != ~0U);
 
-      /* Write the index to the file */
+      // Write the index to the file
       ObjWriteVar(LI->Id);
    }
 }
 
 void WriteLineInfos(void)
-/* Write a list of all line infos to the object file. */
+// Write a list of all line infos to the object file.
 {
    unsigned I;
 
-   /* Tell the object file module that we're about to write line infos */
+   // Tell the object file module that we're about to write line infos
    ObjStartLineInfos();
 
-   /* Write the line info count to the list */
+   // Write the line info count to the list
    ObjWriteVar(CollCount(&LineInfoList));
 
-   /* Walk over the list and write all line infos */
+   // Walk over the list and write all line infos
    for (I = 0; I < CollCount(&LineInfoList); ++I) {
 
-      /* Get a pointer to this line info */
+      // Get a pointer to this line info
       LineInfo *LI = CollAt(&LineInfoList, I);
 
-      /* Write the source file position */
+      // Write the source file position
       ObjWritePos(&LI->Key.Pos);
 
-      /* Write the type and count of the line info */
+      // Write the type and count of the line info
       ObjWriteVar(LI->Key.Type);
 
-      /* Write the ids of the spans for this line */
+      // Write the ids of the spans for this line
       WriteSpanList(&LI->Spans);
    }
 
-   /* End of line infos */
+   // End of line infos
    ObjEndLineInfos();
 }

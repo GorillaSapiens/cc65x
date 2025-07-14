@@ -1,43 +1,43 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                  coptstore.c                              */
-/*                                                                           */
-/*                                Optimize stores                            */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2002-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                  coptstore.c
+//
+//                                Optimize stores
+//
+//
+//
+// (C) 2002-2012, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
-/* cc65 */
+// cc65
 #include "codeent.h"
 #include "codeinfo.h"
 #include "coptstore.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 static void InsertStore(CodeSeg *S, unsigned *IP, LineInfo *LI) {
@@ -57,33 +57,33 @@ unsigned OptStore1(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[4];
 
-      /* Get next entry */
+      // Get next entry
       L[0] = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if (L[0]->OPC == OP65_LDY && CE_IsConstImm(L[0]) && L[0]->Num < 0xFF &&
           !CS_RangeHasLabel(S, I + 1, 3) && CS_GetEntries(S, L + 1, I + 1, 3) &&
           CE_IsCallTo(L[1], "staxysp") && L[2]->OPC == OP65_LDY &&
           CE_IsKnownImm(L[2], L[0]->Num + 1) && CE_IsCallTo(L[3], "ldaxysp")) {
 
-         /* Register has already the correct value, remove the loads */
+         // Register has already the correct value, remove the loads
          CS_DelEntries(S, I + 2, 2);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -95,29 +95,29 @@ unsigned OptStore2(CodeSeg *S)
    unsigned I;
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    I = 0;
    while (I < CS_GetEntryCount(S)) {
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Get the input registers */
+      // Get the input registers
       const RegInfo *RI = E->RI;
 
-      /* Check for the call */
+      // Check for the call
       if (CE_IsCallTo(E, "staxysp") && RegValIsKnown(RI->In.RegA) &&
           RegValIsKnown(RI->In.RegX) && RegValIsKnown(RI->In.RegY) &&
           !RegAXUsed(S, I + 1)) {
 
-         /* Get the register values */
+         // Get the register values
          unsigned char A = (unsigned char)RI->In.RegA;
          unsigned char X = (unsigned char)RI->In.RegX;
          unsigned char Y = (unsigned char)RI->In.RegY;
 
-         /* Setup other variables */
+         // Setup other variables
          CodeEntry *N;
-         unsigned IP = I + 1; /* Insertion point */
+         unsigned IP = I + 1; // Insertion point
 
          // Replace the store. We will not remove the loads, since this is
          // too complex and will be done by other optimizer steps.
@@ -125,7 +125,7 @@ unsigned OptStore2(CodeSeg *S)
          CS_InsertEntry(S, N, IP++);
          InsertStore(S, &IP, E->LI);
 
-         /* Check if we can store one of the other bytes */
+         // Check if we can store one of the other bytes
          if (A != X) {
             N = NewCodeEntry(OP65_LDA, AM65_IMM, MakeHexArg(X), 0, E->LI);
             CS_InsertEntry(S, N, IP++);
@@ -134,18 +134,18 @@ unsigned OptStore2(CodeSeg *S)
          CS_InsertEntry(S, N, IP++);
          InsertStore(S, &IP, E->LI);
 
-         /* Remove the call */
+         // Remove the call
          CS_DelEntry(S, I);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -157,33 +157,33 @@ unsigned OptStore3(CodeSeg *S)
    unsigned I;
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    I = 0;
    while (I < CS_GetEntryCount(S)) {
 
-      /* Get next entry */
+      // Get next entry
       CodeEntry *E = CS_GetEntry(S, I);
 
-      /* Get the input registers */
+      // Get the input registers
       const RegInfo *RI = E->RI;
 
-      /* Check for the call */
+      // Check for the call
       if (CE_IsCallTo(E, "steaxysp") && RegValIsKnown(RI->In.RegA) &&
           RegValIsKnown(RI->In.RegX) && RegValIsKnown(RI->In.RegY) &&
           RegValIsKnown(RI->In.SRegLo) && RegValIsKnown(RI->In.SRegHi) &&
           !RegEAXUsed(S, I + 1)) {
 
-         /* Get the register values */
+         // Get the register values
          unsigned char A = (unsigned char)RI->In.RegA;
          unsigned char X = (unsigned char)RI->In.RegX;
          unsigned char Y = (unsigned char)RI->In.RegY;
          unsigned char L = (unsigned char)RI->In.SRegLo;
          unsigned char H = (unsigned char)RI->In.SRegHi;
 
-         /* Setup other variables */
+         // Setup other variables
          unsigned Done = 0;
          CodeEntry *N;
-         unsigned IP = I + 1; /* Insertion point */
+         unsigned IP = I + 1; // Insertion point
 
          // Replace the store. We will not remove the loads, since this is
          // too complex and will be done by other optimizer steps.
@@ -192,7 +192,7 @@ unsigned OptStore3(CodeSeg *S)
          InsertStore(S, &IP, E->LI);
          Done |= 0x01;
 
-         /* Check if we can store one of the other bytes */
+         // Check if we can store one of the other bytes
          if (A == X && (Done & 0x02) == 0) {
             N = NewCodeEntry(OP65_LDY, AM65_IMM, MakeHexArg(Y + 1), 0, E->LI);
             CS_InsertEntry(S, N, IP++);
@@ -212,7 +212,7 @@ unsigned OptStore3(CodeSeg *S)
             Done |= 0x08;
          }
 
-         /* Store the second byte */
+         // Store the second byte
          if ((Done & 0x02) == 0) {
             N = NewCodeEntry(OP65_LDA, AM65_IMM, MakeHexArg(X), 0, E->LI);
             CS_InsertEntry(S, N, IP++);
@@ -222,7 +222,7 @@ unsigned OptStore3(CodeSeg *S)
             Done |= 0x02;
          }
 
-         /* Check if we can store one of the other bytes */
+         // Check if we can store one of the other bytes
          if (X == L && (Done & 0x04) == 0) {
             N = NewCodeEntry(OP65_LDY, AM65_IMM, MakeHexArg(Y + 2), 0, E->LI);
             CS_InsertEntry(S, N, IP++);
@@ -236,7 +236,7 @@ unsigned OptStore3(CodeSeg *S)
             Done |= 0x08;
          }
 
-         /* Store the third byte */
+         // Store the third byte
          if ((Done & 0x04) == 0) {
             N = NewCodeEntry(OP65_LDA, AM65_IMM, MakeHexArg(L), 0, E->LI);
             CS_InsertEntry(S, N, IP++);
@@ -246,7 +246,7 @@ unsigned OptStore3(CodeSeg *S)
             Done |= 0x04;
          }
 
-         /* Check if we can store one of the other bytes */
+         // Check if we can store one of the other bytes
          if (L == H && (Done & 0x08) == 0) {
             N = NewCodeEntry(OP65_LDY, AM65_IMM, MakeHexArg(Y + 3), 0, E->LI);
             CS_InsertEntry(S, N, IP++);
@@ -254,7 +254,7 @@ unsigned OptStore3(CodeSeg *S)
             Done |= 0x08;
          }
 
-         /* Store the fourth byte */
+         // Store the fourth byte
          if ((Done & 0x08) == 0) {
             N = NewCodeEntry(OP65_LDA, AM65_IMM, MakeHexArg(H), 0, E->LI);
             CS_InsertEntry(S, N, IP++);
@@ -264,18 +264,18 @@ unsigned OptStore3(CodeSeg *S)
             Done |= 0x08;
          }
 
-         /* Remove the call */
+         // Remove the call
          CS_DelEntry(S, I);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -292,16 +292,16 @@ unsigned OptStore4(CodeSeg *S)
 {
    unsigned Changes = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    unsigned I = 0;
    while (I < CS_GetEntryCount(S)) {
 
       CodeEntry *L[5];
 
-      /* Get next entry */
+      // Get next entry
       L[0] = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if (L[0]->OPC == OP65_STA &&
           (L[0]->AM == AM65_ABS || L[0]->AM == AM65_ZP) &&
           !CS_RangeHasLabel(S, I + 1, 3) && CS_GetEntries(S, L + 1, I + 1, 4) &&
@@ -311,18 +311,18 @@ unsigned OptStore4(CodeSeg *S)
           strcmp(L[0]->Arg, L[2]->Arg) == 0 &&
           strcmp(L[1]->Arg, L[3]->Arg) == 0 && !CE_UseLoadFlags(L[4])) {
 
-         /* Register has already the correct value, remove the loads */
+         // Register has already the correct value, remove the loads
          CS_DelEntries(S, I + 2, 2);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }
 
@@ -347,14 +347,14 @@ unsigned OptStore5(CodeSeg *S)
    unsigned Changes = 0;
    unsigned I = 0;
 
-   /* Walk over the entries */
+   // Walk over the entries
    while (I < CS_GetEntryCount(S)) {
       CodeEntry *L[4];
 
-      /* Get next entry */
+      // Get next entry
       L[0] = CS_GetEntry(S, I);
 
-      /* Check for the sequence */
+      // Check for the sequence
       if (L[0]->OPC == OP65_LDA && !CS_RangeHasLabel(S, I + 1, 3) &&
           CS_GetEntries(S, L + 1, I + 1, 3) && L[1]->OPC == OP65_LDX &&
           L[2]->OPC == OP65_STA && L[3]->OPC == OP65_STX &&
@@ -362,25 +362,25 @@ unsigned OptStore5(CodeSeg *S)
 
          CodeEntry *E = CS_GetEntry(S, I + 1);
 
-         /* Move the high-byte code to the beginning of the sequence */
+         // Move the high-byte code to the beginning of the sequence
          CS_MoveEntry(S, I + 1, I);
          CS_MoveEntry(S, I + 3, I + 1);
 
-         /* Change from the X register to the A register */
+         // Change from the X register to the A register
          CE_ReplaceOPC(E, OP65_LDA);
          CE_ReplaceOPC(CS_GetEntry(S, I + 1), OP65_STA);
 
-         /* Move labels from the old first entry to the new first entry */
+         // Move labels from the old first entry to the new first entry
          CS_MoveLabels(S, CS_GetEntry(S, I + 2), E);
 
-         /* Remember, we had changes */
+         // Remember, we had changes
          ++Changes;
       }
 
-      /* Next entry */
+      // Next entry
       ++I;
    }
 
-   /* Return the number of changes made */
+   // Return the number of changes made
    return Changes;
 }

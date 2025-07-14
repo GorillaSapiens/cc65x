@@ -1,53 +1,53 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 fileio.c                                  */
-/*                                                                           */
-/*                       File I/O for the ld65 linker                        */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 fileio.c
+//
+//                       File I/O for the ld65 linker
+//
+//
+//
+// (C) 1998-2008 Ullrich von Bassewitz
+//               Roemerstrasse 52
+//               D-70794 Filderstadt
+// EMail:        uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <string.h>
 #include <errno.h>
 
-/* common */
+// common
 #include "xmalloc.h"
 
-/* ld65 */
+// ld65
 #include "error.h"
 #include "fileio.h"
 #include "spool.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 void FileSetPos(FILE *F, unsigned long Pos)
-/* Seek to the given absolute position, fail on errors */
+// Seek to the given absolute position, fail on errors
 {
    if (fseek(F, Pos, SEEK_SET) != 0) {
       Error("Cannot seek: %s", strerror(errno));
@@ -55,7 +55,7 @@ void FileSetPos(FILE *F, unsigned long Pos)
 }
 
 unsigned long FileGetPos(FILE *F)
-/* Return the current file position, fail on errors */
+// Return the current file position, fail on errors
 {
    long Pos = ftell(F);
    if (Pos < 0) {
@@ -65,7 +65,7 @@ unsigned long FileGetPos(FILE *F)
 }
 
 void Write8(FILE *F, unsigned Val)
-/* Write an 8 bit value to the file */
+// Write an 8 bit value to the file
 {
    if (putc(Val, F) == EOF) {
       Error("Write error (disk full?)");
@@ -73,14 +73,14 @@ void Write8(FILE *F, unsigned Val)
 }
 
 void Write16(FILE *F, unsigned Val)
-/* Write a 16 bit value to the file */
+// Write a 16 bit value to the file
 {
    Write8(F, (unsigned char)Val);
    Write8(F, (unsigned char)(Val >> 8));
 }
 
 void Write24(FILE *F, unsigned long Val)
-/* Write a 24 bit value to the file */
+// Write a 24 bit value to the file
 {
    Write8(F, (unsigned char)Val);
    Write8(F, (unsigned char)(Val >> 8));
@@ -88,7 +88,7 @@ void Write24(FILE *F, unsigned long Val)
 }
 
 void Write32(FILE *F, unsigned long Val)
-/* Write a 32 bit value to the file */
+// Write a 32 bit value to the file
 {
    Write8(F, (unsigned char)Val);
    Write8(F, (unsigned char)(Val >> 8));
@@ -97,7 +97,7 @@ void Write32(FILE *F, unsigned long Val)
 }
 
 void WriteVal(FILE *F, unsigned long Val, unsigned Size)
-/* Write a value of the given size to the output file */
+// Write a value of the given size to the output file
 {
    switch (Size) {
 
@@ -123,7 +123,7 @@ void WriteVal(FILE *F, unsigned long Val, unsigned Size)
 }
 
 void WriteVar(FILE *F, unsigned long V)
-/* Write a variable sized value to the file in special encoding */
+// Write a variable sized value to the file in special encoding
 {
    // We will write the value to the file in 7 bit chunks. If the 8th bit
    // is clear, we're done, if it is set, another chunk follows. This will
@@ -140,7 +140,7 @@ void WriteVar(FILE *F, unsigned long V)
 }
 
 void WriteStr(FILE *F, const char *S)
-/* Write a string to the file */
+// Write a string to the file
 {
    unsigned Len = strlen(S);
    WriteVar(F, Len);
@@ -148,7 +148,7 @@ void WriteStr(FILE *F, const char *S)
 }
 
 void WriteData(FILE *F, const void *Data, unsigned Size)
-/* Write data to the file */
+// Write data to the file
 {
    if (fwrite(Data, 1, Size, F) != Size) {
       Error("Write error (disk full?)");
@@ -156,7 +156,7 @@ void WriteData(FILE *F, const void *Data, unsigned Size)
 }
 
 void WriteMult(FILE *F, unsigned char Val, unsigned long Count)
-/* Write one byte several times to the file */
+// Write one byte several times to the file
 {
    while (Count--) {
       Write8(F, Val);
@@ -164,7 +164,7 @@ void WriteMult(FILE *F, unsigned char Val, unsigned long Count)
 }
 
 unsigned Read8(FILE *F)
-/* Read an 8 bit value from the file */
+// Read an 8 bit value from the file
 {
    int C = getc(F);
    if (C == EOF) {
@@ -175,7 +175,7 @@ unsigned Read8(FILE *F)
 }
 
 unsigned Read16(FILE *F)
-/* Read a 16 bit value from the file */
+// Read a 16 bit value from the file
 {
    unsigned Lo = Read8(F);
    unsigned Hi = Read8(F);
@@ -183,7 +183,7 @@ unsigned Read16(FILE *F)
 }
 
 unsigned long Read24(FILE *F)
-/* Read a 24 bit value from the file */
+// Read a 24 bit value from the file
 {
    unsigned long Lo = Read16(F);
    unsigned long Hi = Read8(F);
@@ -191,7 +191,7 @@ unsigned long Read24(FILE *F)
 }
 
 unsigned long Read32(FILE *F)
-/* Read a 32 bit value from the file */
+// Read a 32 bit value from the file
 {
    unsigned long Lo = Read16(F);
    unsigned long Hi = Read16(F);
@@ -199,23 +199,23 @@ unsigned long Read32(FILE *F)
 }
 
 long Read32Signed(FILE *F)
-/* Read a 32 bit value from the file. Sign extend the value. */
+// Read a 32 bit value from the file. Sign extend the value.
 {
-   /* Read a 32 bit value */
+   // Read a 32 bit value
    unsigned long V = Read32(F);
 
-   /* Sign extend the value */
+   // Sign extend the value
    if (V & 0x80000000UL) {
-      /* Signed value */
+      // Signed value
       V |= ~0xFFFFFFFFUL;
    }
 
-   /* Return it as a long */
+   // Return it as a long
    return (long)V;
 }
 
 unsigned long ReadVar(FILE *F)
-/* Read a variable size value from the file */
+// Read a variable size value from the file
 {
    // The value was written to the file in 7 bit chunks LSB first. If there
    // are more bytes, bit 8 is set, otherwise it is clear.
@@ -223,15 +223,15 @@ unsigned long ReadVar(FILE *F)
    unsigned long V = 0;
    unsigned Shift = 0;
    do {
-      /* Read one byte */
+      // Read one byte
       C = Read8(F);
-      /* Encode it into the target value */
+      // Encode it into the target value
       V |= ((unsigned long)(C & 0x7F)) << Shift;
-      /* Next value */
+      // Next value
       Shift += 7;
    } while (C & 0x80);
 
-   /* Return the value read */
+   // Return the value read
    return V;
 }
 
@@ -242,30 +242,30 @@ unsigned ReadStr(FILE *F)
    unsigned Id;
    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
 
-   /* Read the length */
+   // Read the length
    unsigned Len = ReadVar(F);
 
-   /* Expand the string buffer memory */
+   // Expand the string buffer memory
    SB_Realloc(&Buf, Len);
 
-   /* Read the string */
+   // Read the string
    ReadData(F, SB_GetBuf(&Buf), Len);
    Buf.Len = Len;
 
-   /* Insert it into the string pool and remember the id */
+   // Insert it into the string pool and remember the id
    Id = GetStrBufId(&Buf);
 
-   /* Free the memory buffer */
+   // Free the memory buffer
    SB_Done(&Buf);
 
-   /* Return the string id */
+   // Return the string id
    return Id;
 }
 
 FilePos *ReadFilePos(FILE *F, FilePos *Pos)
-/* Read a file position from the file */
+// Read a file position from the file
 {
-   /* Read the data fields */
+   // Read the data fields
    Pos->Line = ReadVar(F);
    Pos->Col = ReadVar(F);
    Pos->Name = ReadVar(F);
@@ -273,9 +273,9 @@ FilePos *ReadFilePos(FILE *F, FilePos *Pos)
 }
 
 void *ReadData(FILE *F, void *Data, unsigned Size)
-/* Read data from the file */
+// Read data from the file
 {
-   /* Explicitly allow reading zero bytes */
+   // Explicitly allow reading zero bytes
    if (Size > 0) {
       if (fread(Data, 1, Size, F) != Size) {
          long Pos = ftell(F);

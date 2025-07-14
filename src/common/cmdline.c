@@ -1,41 +1,41 @@
 ////////////////////////////////////////////////////////////////////////////////
-/*                                                                           */
-/*                                 cmdline.c                                 */
-/*                                                                           */
-/*                 Helper functions for command line parsing                 */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
-/*                                                                           */
-/*                                                                           */
-/* This software is provided 'as-is', without any expressed or implied       */
-/* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.                                    */
-/*                                                                           */
-/* Permission is granted to anyone to use this software for any purpose,     */
-/* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:                            */
-/*                                                                           */
-/* 1. The origin of this software must not be misrepresented; you must not   */
-/*    claim that you wrote the original software. If you use this software   */
-/*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.                                       */
-/* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.                      */
-/* 3. This notice may not be removed or altered from any source              */
-/*    distribution.                                                          */
-/*                                                                           */
+//
+//                                 cmdline.c
+//
+//                 Helper functions for command line parsing
+//
+//
+//
+// (C) 2000-2009, Ullrich von Bassewitz
+//                Roemerstrasse 52
+//                D-70794 Filderstadt
+// EMail:         uz@cc65.org
+//
+//
+// This software is provided 'as-is', without any expressed or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
 
-/* common */
+// common
 #include "abend.h"
 #include "chartype.h"
 #include "fname.h"
@@ -43,41 +43,41 @@
 #include "cmdline.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Data                                    */
+//                                   Data
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Program name - is set after call to InitCmdLine */
+// Program name - is set after call to InitCmdLine
 const char *ProgName;
 
-/* The program argument vector */
+// The program argument vector
 char **ArgVec = 0;
 unsigned ArgCount = 0;
 
-/* Struct to pass the command line */
+// Struct to pass the command line
 typedef struct {
-   char **Vec;     /* The argument vector */
-   unsigned Count; /* Actual number of arguments */
-   unsigned Size;  /* Number of argument allocated */
+   char **Vec;     // The argument vector
+   unsigned Count; // Actual number of arguments
+   unsigned Size;  // Number of argument allocated
 } CmdLine;
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                             Helper functions                              */
+//                             Helper functions
 ////////////////////////////////////////////////////////////////////////////////
 
 static void NewCmdLine(CmdLine *L)
-/* Initialize a CmdLine struct */
+// Initialize a CmdLine struct
 {
-   /* Initialize the struct */
+   // Initialize the struct
    L->Size = 8;
    L->Count = 0;
    L->Vec = xmalloc(L->Size * sizeof(L->Vec[0]));
 }
 
 static void AddArg(CmdLine *L, char *Arg)
-/* Add one argument to the list */
+// Add one argument to the list
 {
    if (L->Size <= L->Count) {
-      /* No space left, reallocate */
+      // No space left, reallocate
       unsigned NewSize = L->Size * 2;
       char **NewVec = xmalloc(NewSize * sizeof(L->Vec[0]));
       memcpy(NewVec, L->Vec, L->Count * sizeof(L->Vec[0]));
@@ -86,7 +86,7 @@ static void AddArg(CmdLine *L, char *Arg)
       L->Size = NewSize;
    }
 
-   /* We have space left, add a copy of the argument */
+   // We have space left, add a copy of the argument
    L->Vec[L->Count++] = Arg;
 }
 
@@ -96,16 +96,16 @@ static void ExpandFile(CmdLine *L, const char *Name)
 {
    char Buf[256];
 
-   /* Try to open the file for reading */
+   // Try to open the file for reading
    FILE *F = fopen(Name, "r");
    if (F == 0) {
       AbEnd("Cannot open \"%s\": %s", Name, strerror(errno));
    }
 
-   /* File is open, read all lines */
+   // File is open, read all lines
    while (fgets(Buf, sizeof(Buf), F) != 0) {
 
-      /* Get a pointer to the buffer */
+      // Get a pointer to the buffer
       const char *B = Buf;
 
       // Skip trailing whitespace (this will also kill the newline that is
@@ -116,17 +116,17 @@ static void ExpandFile(CmdLine *L, const char *Name)
       }
       Buf[Len] = '\0';
 
-      /* Skip leading spaces */
+      // Skip leading spaces
       while (IsSpace(*B)) {
          ++B;
       }
 
-      /* Skip empty lines to work around problems with some editors */
+      // Skip empty lines to work around problems with some editors
       if (*B == '\0') {
          continue;
       }
 
-      /* Add anything not empty to the command line */
+      // Add anything not empty to the command line
       AddArg(L, xstrdup(B));
    }
 
@@ -136,7 +136,7 @@ static void ExpandFile(CmdLine *L, const char *Name)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*                                   Code                                    */
+//                                   Code
 ////////////////////////////////////////////////////////////////////////////////
 
 void InitCmdLine(int *aArgCount, char ***aArgVec, const char *aProgName)
@@ -147,16 +147,16 @@ void InitCmdLine(int *aArgCount, char ***aArgVec, const char *aProgName)
    CmdLine L;
    int I;
 
-   /* Get the program name from argv[0] but strip a path */
+   // Get the program name from argv[0] but strip a path
    if ((*aArgVec)[0] == 0) {
-      /* Use the default name given */
+      // Use the default name given
       ProgName = aProgName;
    }
    else {
-      /* Strip a path */
+      // Strip a path
       ProgName = FindName((*aArgVec)[0]);
       if (ProgName[0] == '\0') {
-         /* Use the default */
+         // Use the default
          ProgName = aProgName;
       }
       else {
@@ -171,7 +171,7 @@ void InitCmdLine(int *aArgCount, char ***aArgVec, const char *aProgName)
       }
    }
 
-   /* Make a CmdLine struct */
+   // Make a CmdLine struct
    NewCmdLine(&L);
 
    // Walk over the parameters and add them to the CmdLine struct. Add a
@@ -179,51 +179,51 @@ void InitCmdLine(int *aArgCount, char ***aArgVec, const char *aProgName)
    // actually files containing arguments.
    for (I = 0; I <= *aArgCount; ++I) {
 
-      /* Get the next argument */
+      // Get the next argument
       char *Arg = (*aArgVec)[I];
 
-      /* Is this a file argument? */
+      // Is this a file argument?
       if (Arg && Arg[0] == '@') {
 
-         /* Expand the file */
+         // Expand the file
          ExpandFile(&L, Arg + 1);
       }
       else {
 
-         /* No file, just add a copy */
+         // No file, just add a copy
          AddArg(&L, Arg);
       }
    }
 
-   /* Store the new argument list in a safe place... */
+   // Store the new argument list in a safe place...
    ArgCount = L.Count - 1;
    ArgVec = L.Vec;
 
-   /* ...and pass back the changed data also */
+   // ...and pass back the changed data also
    *aArgCount = L.Count - 1;
    *aArgVec = L.Vec;
 }
 
 void UnknownOption(const char *Opt)
-/* Print an error about an unknown option and die. */
+// Print an error about an unknown option and die.
 {
    AbEnd("Unknown option: %s", Opt);
 }
 
 void NeedArg(const char *Opt)
-/* Print an error about a missing option argument and exit. */
+// Print an error about a missing option argument and exit.
 {
    AbEnd("Option requires an argument: %s", Opt);
 }
 
 void InvArg(const char *Opt, const char *Arg)
-/* Print an error about an invalid option argument and exit. */
+// Print an error about an invalid option argument and exit.
 {
    AbEnd("Invalid argument for %s: '%s'", Opt, Arg);
 }
 
 void InvDef(const char *Def)
-/* Print an error about an invalid definition and die */
+// Print an error about an invalid definition and die
 {
    AbEnd("Invalid definition: '%s'", Def);
 }
@@ -234,14 +234,14 @@ const char *GetArg(unsigned *ArgNum, unsigned Len)
 {
    const char *Arg = ArgVec[*ArgNum];
    if (Arg[Len] != '\0') {
-      /* Argument appended */
+      // Argument appended
       return Arg + Len;
    }
    else {
-      /* Separate argument */
+      // Separate argument
       Arg = ArgVec[*ArgNum + 1];
       if (Arg == 0) {
-         /* End of arguments */
+         // End of arguments
          NeedArg(ArgVec[*ArgNum]);
       }
       ++(*ArgNum);
@@ -250,17 +250,17 @@ const char *GetArg(unsigned *ArgNum, unsigned Len)
 }
 
 void LongOption(unsigned *ArgNum, const LongOpt *OptTab, unsigned OptCount)
-/* Handle a long command line option */
+// Handle a long command line option
 {
-   /* Get the option and the argument (which may be zero) */
+   // Get the option and the argument (which may be zero)
    const char *Opt = ArgVec[*ArgNum];
 
-   /* Search the table for a match */
+   // Search the table for a match
    while (OptCount) {
       if (strcmp(Opt, OptTab->Option) == 0) {
-         /* Found, call the function */
+         // Found, call the function
          if (OptTab->ArgCount > 0) {
-            /* We need an argument, check if we have one */
+            // We need an argument, check if we have one
             const char *Arg = ArgVec[++(*ArgNum)];
             if (Arg == 0) {
                NeedArg(Opt);
@@ -270,15 +270,15 @@ void LongOption(unsigned *ArgNum, const LongOpt *OptTab, unsigned OptCount)
          else {
             OptTab->Func(Opt, 0);
          }
-         /* Done */
+         // Done
          return;
       }
 
-      /* Next table entry */
+      // Next table entry
       --OptCount;
       ++OptTab;
    }
 
-   /* Invalid option */
+   // Invalid option
    UnknownOption(Opt);
 }
