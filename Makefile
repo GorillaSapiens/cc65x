@@ -17,7 +17,7 @@ endif
 
 
 
-.PHONY: all mostlyclean clean install zip avail unavail bin lib doc html info samples test util checkstyle check checkprefix
+.PHONY: all mostlyclean clean install zip avail unavail bin lib doc html info samples test util checkstyle check checkprefix indent
 .SUFFIXES:
 
 all:
@@ -66,6 +66,9 @@ avail unavail:
 bin:
 	@$(MAKE) -C src         --no-print-directory $@
 	@$(MAKE) checkprefix    --no-print-directory
+
+indent:
+	find src/ -type f \( -name "*.c" -o -name "*.h" \) -exec clang-format -i {} \;
 
 lib libtest:
 	@$(MAKE) -C libsrc     --no-print-directory $@
