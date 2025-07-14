@@ -89,9 +89,8 @@ mmodel_t FindMemoryModel (const char* Name)
 
 
 void SetMemoryModel (mmodel_t Model)
-/* Set the memory model updating the MemoryModel variables and the address
-** sizes for the segments.
-*/
+// Set the memory model updating the MemoryModel variables and the address
+// sizes for the segments.
 {
     /* Remember the memory model */
     MemoryModel = Model;

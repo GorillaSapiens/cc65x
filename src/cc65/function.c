@@ -107,10 +107,9 @@ static void FreeFunction (Function* F)
 
 
 int F_CheckParamList (FuncDesc* D, int RequireAll)
-/* Check and set the parameter sizes.
-** If RequireAll is true, emit errors on parameters of incomplete types.
-** Return true if all parameters have complete types.
-*/
+// Check and set the parameter sizes.
+// If RequireAll is true, emit errors on parameters of incomplete types.
+// Return true if all parameters have complete types.
 {
     unsigned    I = 0;
     unsigned    Offs;
@@ -123,9 +122,8 @@ int F_CheckParamList (FuncDesc* D, int RequireAll)
         return 1;
     }
 
-    /* Assign offsets. If the function has a variable parameter list,
-    ** there's one additional byte (the arg size).
-    */
+    // Assign offsets. If the function has a variable parameter list,
+    // there's one additional byte (the arg size).
     Offs  = (D->Flags & FD_VARIADIC) ? 1 : 0;
     Param = D->LastParam;
     while (Param) {
@@ -153,9 +151,8 @@ int F_CheckParamList (FuncDesc* D, int RequireAll)
         ++I;
     }
 
-    /* If all parameters have complete types, set the total size description,
-    ** clear the FD_INCOMPLETE_PARAM flag and return true.
-    */
+    // If all parameters have complete types, set the total size description,
+    // clear the FD_INCOMPLETE_PARAM flag and return true.
     if (IncompleteCount == 0) {
         D->ParamSize = ParamSize;
         D->Flags &= ~FD_INCOMPLETE_PARAM;
@@ -281,9 +278,8 @@ int F_GetTopLevelSP (const Function* F)
 
 
 int F_ReserveLocalSpace (Function* F, unsigned Size)
-/* Reserve (but don't allocate) the given local space and return the stack
-** offset.
-*/
+// Reserve (but don't allocate) the given local space and return the stack
+// offset.
 {
     F->Reserved += Size;
     return StackPtr - F->Reserved;
@@ -292,9 +288,8 @@ int F_ReserveLocalSpace (Function* F, unsigned Size)
 
 
 int F_GetStackPtr (const Function* F)
-/* Return the current stack pointer including reserved (but not allocated)
-** space on the stack.
-*/
+// Return the current stack pointer including reserved (but not allocated)
+// space on the stack.
 {
     return StackPtr - F->Reserved;
 }
@@ -302,9 +297,8 @@ int F_GetStackPtr (const Function* F)
 
 
 void F_AllocLocalSpace (Function* F)
-/* Allocate any local space previously reserved. The function will do
-** nothing if there is no reserved local space.
-*/
+// Allocate any local space previously reserved. The function will do
+// nothing if there is no reserved local space.
 {
     if (F->Reserved > 0) {
 
@@ -322,10 +316,9 @@ void F_AllocLocalSpace (Function* F)
 
 
 int F_AllocRegVar (Function* F, const Type* Type)
-/* Allocate a register variable for the given variable type. If the allocation
-** was successful, return the offset of the register variable in the register
-** bank (zero page storage). If there is no register space left, return -1.
-*/
+// Allocate a register variable for the given variable type. If the allocation
+// was successful, return the offset of the register variable in the register
+// bank (zero page storage). If there is no register space left, return -1.
 {
     /* Allow register variables only on top level and if enabled */
     if (IS_Get (&EnableRegVars) && GetLexicalLevel () == LEX_LEVEL_FUNCTION) {
@@ -335,10 +328,9 @@ int F_AllocRegVar (Function* F, const Type* Type)
 
         /* Do we have space left? */
         if (F->RegOffs >= Size) {
-            /* Space left. We allocate the variables from high to low addresses,
-            ** so the addressing is compatible with the saved values on stack.
-            ** This allows shorter code when saving/restoring the variables.
-            */
+            // Space left. We allocate the variables from high to low addresses,
+            // so the addressing is compatible with the saved values on stack.
+            // This allows shorter code when saving/restoring the variables.
             F->RegOffs -= Size;
             return F->RegOffs;
         }
@@ -477,22 +469,19 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
         }
     }
 
-    /* Check and set the parameter sizes. All parameter must have complete
-    ** types now.
-    */
+    // Check and set the parameter sizes. All parameter must have complete
+    // types now.
     ParamComplete = F_CheckParamList (D, 1);
 
-    /* Check if the function header contains unnamed parameters. These are
-    ** only allowed in cc65 mode.
-    */
+    // Check if the function header contains unnamed parameters. These are
+    // only allowed in cc65 mode.
     if ((D->Flags & FD_UNNAMED_PARAMS) != 0 && (IS_Get (&Standard) != STD_CC65)) {
         Error ("Parameter name omitted");
     }
 
-    /* Declare two special functions symbols: __fixargs__ and __argsize__.
-    ** The latter is different depending on the type of the function (variadic
-    ** or not).
-    */
+    // Declare two special functions symbols: __fixargs__ and __argsize__.
+    // The latter is different depending on the type of the function (variadic
+    // or not).
     AddConstSym ("__fixargs__", type_uint, SC_DEF | SC_CONST, D->ParamSize);
     if (D->Flags & FD_VARIADIC) {
         /* Variadic function. The variable must be const. */
@@ -512,15 +501,13 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
         /* Mark this as the main function */
         CurrentFunc->Flags |= FF_IS_MAIN;
 
-        /* Add a forced import of a symbol that is contained in the startup
-        ** code. This will force the startup code to be linked in.
-        */
+        // Add a forced import of a symbol that is contained in the startup
+        // code. This will force the startup code to be linked in.
         g_importstartup ();
 
-        /* If main() takes parameters, generate a forced import to a function
-        ** that will setup these parameters. This way, programs that do not
-        ** need the additional code will not get it.
-        */
+        // If main() takes parameters, generate a forced import to a function
+        // that will setup these parameters. This way, programs that do not
+        // need the additional code will not get it.
         if (D->ParamCount > 0 || (D->Flags & FD_VARIADIC) != 0) {
             g_importmainargs ();
 
@@ -568,10 +555,9 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
 
     /* Emit code to handle the parameters if all of them have complete types */
     if (ParamComplete) {
-        /* Walk through the parameter list and allocate register variable space
-        ** for parameters declared as register. Generate code to swap the contents
-        ** of the register bank with the save area on the stack.
-        */
+        // Walk through the parameter list and allocate register variable space
+        // for parameters declared as register. Generate code to swap the contents
+        // of the register bank with the save area on the stack.
         Param = D->SymTab->SymHead;
         while (Param && (Param->Flags & SC_PARAM) != 0) {
 
@@ -580,9 +566,8 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
             if (IsClassStruct (RType)) {
                 RType = GetStructReplacementType (RType);
 
-                /* If there is no replacement type, then it is just the address.
-                ** We don't currently support this case.
-                */
+                // If there is no replacement type, then it is just the address.
+                // We don't currently support this case.
                 if (RType == Param->Type) {
                     Error ("Passing '%s' of this size (%d) by value is not supported", GetFullTypeName (Param->Type), SizeOf (RType));
                 }
@@ -621,9 +606,8 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     /* Parse local variable declarations if any */
     DeclareLocals ();
 
-    /* Remember the current stack pointer. All variables allocated elsewhere
-    ** must be dropped when doing a return from an inner block.
-    */
+    // Remember the current stack pointer. All variables allocated elsewhere
+    // must be dropped when doing a return from an inner block.
     CurrentFunc->TopLevelSP = StackPtr;
 
     /* Now process statements in this block */
@@ -633,9 +617,8 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
 
     /* Check if this function is missing a return value */
     if (!F_HasVoidReturn (CurrentFunc) && !F_HasReturn (CurrentFunc)) {
-        /* If this is the main function in a C99 environment returning an int,
-        ** let it always return zero. Otherwise output a warning.
-        */
+        // If this is the main function in a C99 environment returning an int,
+        // let it always return zero. Otherwise output a warning.
         if (F_IsMainFunc (CurrentFunc) &&
             IS_Get (&Standard) >= STD_C99 &&
             GetUnqualRawTypeCode (ReturnType) == T_INT) {
@@ -648,9 +631,8 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     /* Output the function exit code label */
     g_defcodelabel (F_GetRetLab (CurrentFunc));
 
-    /* Restore the register variables (not necessary for the main function in
-    ** cc65 mode)
-    */
+    // Restore the register variables (not necessary for the main function in
+    // cc65 mode)
     int CleanupOnExit = (IS_Get (&Standard) != STD_CC65) ||
                         !F_IsMainFunc (CurrentFunc);
     if (CleanupOnExit) {
@@ -681,10 +663,9 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     /* Switch back to the old segments */
     PopSegContext ();
 
-    /* Eat the closing brace after we've done everything with the function
-    ** definition. This way we won't have troubles with pragmas right after
-    ** the closing brace.
-    */
+    // Eat the closing brace after we've done everything with the function
+    // definition. This way we won't have troubles with pragmas right after
+    // the closing brace.
     ConsumeRCurly();
 
     /* Reset the current function pointer */

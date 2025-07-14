@@ -68,9 +68,8 @@ void DefLabel (const char* Name);
 /* Define a label with the given name */
 
 void DefForward (const char* Name, const char* Comment, unsigned Offs);
-/* Define a label as "* + x", where x is the offset relative to the
-** current PC.
-*/
+// Define a label as "* + x", where x is the offset relative to the
+// current PC.
 
 void DefConst (const char* Name, const char* Comment, uint32_t Addr);
 /* Define an address constant */

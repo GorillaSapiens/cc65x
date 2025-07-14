@@ -119,13 +119,11 @@ void PopInput (void)
 
 
 int InputFromStack (void)
-/* Try to get input from the input stack. Return true if we had such input,
-** return false otherwise.
-*/
+// Try to get input from the input stack. Return true if we had such input,
+// return false otherwise.
 {
-    /* Repeatedly call the TOS routine until we have a token or if run out of
-    ** routines.
-    */
+    // Repeatedly call the TOS routine until we have a token or if run out of
+    // routines.
     while (IStack) {
         if (IStack->Func (IStack->Data) != 0) {
             /* We have a token */
@@ -148,9 +146,8 @@ int HavePushedInput (void)
 
 
 void CheckInputStack (void)
-/* Called from the scanner before closing an input file. Will check for any
-** stuff on the input stack.
-*/
+// Called from the scanner before closing an input file. Will check for any
+// stuff on the input stack.
 {
     if (IStack) {
         Error ("Open %s", IStack->Desc);
@@ -160,14 +157,12 @@ void CheckInputStack (void)
 
 
 InputStack RetrieveInputStack (void)
-/* Retrieve the current input stack. This will also clear it. Used when
-** including a file. The current input stack is stored together with the old
-** input file and restored when the file is closed.
- */
+// Retrieve the current input stack. This will also clear it. Used when
+// including a file. The current input stack is stored together with the old
+// input file and restored when the file is closed.
 {
-    /* We do not touch the counter so input sources are counted across
-    ** includes.
-     */
+    // We do not touch the counter so input sources are counted across
+    // includes.
     InputStack S = IStack;
     IStack = 0;
     return S;

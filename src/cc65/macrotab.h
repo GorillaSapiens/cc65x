@@ -72,20 +72,17 @@ struct Macro {
 
 
 Macro* NewMacro (const char* Name, unsigned char Predefined);
-/* Allocate a macro structure with the given name. The structure is not
-** inserted into the macro table.
-*/
+// Allocate a macro structure with the given name. The structure is not
+// inserted into the macro table.
 
 void FreeMacro (Macro* M);
-/* Delete a macro definition. The function will NOT remove the macro from the
-** table, use UndefineMacro for that.
-*/
+// Delete a macro definition. The function will NOT remove the macro from the
+// table, use UndefineMacro for that.
 
 Macro* CloneMacro (const Macro* M);
-/* Clone a macro definition. The function is not insert the macro into the
-** macro table, thus the cloned instance cannot be freed with UndefineMacro.
-** Use FreeMacro for that.
-*/
+// Clone a macro definition. The function is not insert the macro into the
+// macro table, thus the cloned instance cannot be freed with UndefineMacro.
+// Use FreeMacro for that.
 
 void DefineNumericMacro (const char* Name, long Val);
 /* Define a predefined macro for a numeric constant */
@@ -97,11 +94,10 @@ void InsertMacro (Macro* M);
 /* Insert the given macro into the macro table. */
 
 Macro* UndefineMacro (const char* Name);
-/* Search for the macro with the given name, if it exists, remove it from
-** the defined macro table and insert it to a list for pending deletion.
-** Return the macro if it was found and removed, return 0 otherwise.
-** To safely free the removed macro, use FreeUndefinedMacros().
-*/
+// Search for the macro with the given name, if it exists, remove it from
+// the defined macro table and insert it to a list for pending deletion.
+// Return the macro if it was found and removed, return 0 otherwise.
+// To safely free the removed macro, use FreeUndefinedMacros().
 
 void FreeUndefinedMacros (void);
 /* Free all undefined macros */
@@ -120,9 +116,8 @@ INLINE int IsMacro (const char* Name)
 #endif
 
 int FindMacroParam (const Macro* M, const char* Param);
-/* Search for a macro parameter. If found, return the index of the parameter.
-** If the parameter was not found, return -1.
-*/
+// Search for a macro parameter. If found, return the index of the parameter.
+// If the parameter was not found, return -1.
 
 void AddMacroParam (Macro* M, const char* Param);
 /* Add a macro parameter. */

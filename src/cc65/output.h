@@ -69,25 +69,22 @@ void SetOutputName (const char* Name);
 /* Sets the name of the output file. */
 
 void MakeDefaultOutputName (const char* InputFilename);
-/* If the name of the output file is empty or NULL, the name of the output
-** file is derived from the input file by adjusting the file name extension.
-*/
+// If the name of the output file is empty or NULL, the name of the output
+// file is derived from the input file by adjusting the file name extension.
 
 void OpenOutputFile ();
 /* Open the output file. Will call Fatal() in case of failures. */
 
 void OpenDebugOutputFile (const char* Name);
-/* Open an output file for debugging purposes. Will call Fatal() in case of
-** failures.
-*/
+// Open an output file for debugging purposes. Will call Fatal() in case of
+// failures.
 
 void CloseOutputFile ();
 /* Close the output file. Will call Fatal() in case of failures. */
 
 int WriteOutput (const char* Format, ...) attribute ((format (printf, 1, 2)));
-/* Write to the output file using printf like formatting. Returns the number
-** of chars written.
-*/
+// Write to the output file using printf like formatting. Returns the number
+// of chars written.
 
 
 /* End of output.h */

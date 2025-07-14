@@ -50,11 +50,10 @@
 
 
 
-/* Hash table node. NOTE: This structure must be the first member of a struct
-** that is hashed by the module. Having it first allows to omit a pointer to
-** the entry itself, because the C standard guarantees that a pointer to a
-** struct can be converted to its first member.
-*/
+// Hash table node. NOTE: This structure must be the first member of a struct
+// that is hashed by the module. Having it first allows to omit a pointer to
+// the entry itself, because the C standard guarantees that a pointer to a
+// struct can be converted to its first member.
 typedef struct HashNode HashNode;
 struct HashNode {
     HashNode*           Next;           /* Next entry in hash list */
@@ -74,10 +73,9 @@ struct HashFunctions {
     /* Given a pointer to the user entry data, return a pointer to the key */
 
     int (*Compare) (const void* Key1, const void* Key2);
-    /* Compare two keys. The function must return a value less than zero if
-    ** Key1 is smaller than Key2, zero if both are equal, and a value greater
-    ** than zero if Key1 is greater then Key2.
-    */
+    // Compare two keys. The function must return a value less than zero if
+    // Key1 is smaller than Key2, zero if both are equal, and a value greater
+    // than zero if Key1 is greater then Key2.
 };
 
 /* Hash table */
@@ -121,9 +119,8 @@ HashTable* InitHashTable (HashTable* T, unsigned Slots, const HashFunctions* Fun
 /* Initialize a hash table and return it */
 
 void DoneHashTable (HashTable* T);
-/* Destroy the contents of a hash table. Note: This will not free the entries
-** in the table!
-*/
+// Destroy the contents of a hash table. Note: This will not free the entries
+// in the table!
 
 #if defined(HAVE_INLINE)
 INLINE HashTable* NewHashTable (unsigned Slots, const HashFunctions* Func)
@@ -150,9 +147,8 @@ INLINE unsigned HT_GetCount (const HashTable* T)
 #endif
 
 HashNode* HT_FindHash (const HashTable* T, const void* Key, unsigned Hash);
-/* Find the node with the given key. Differs from HT_Find in that the hash
-** for the key is precalculated and passed to the function.
-*/
+// Find the node with the given key. Differs from HT_Find in that the hash
+// for the key is precalculated and passed to the function.
 
 void* HT_Find (const HashTable* T, const void* Key);
 /* Find the entry with the given key and return it */
@@ -164,13 +160,12 @@ void HT_Remove (HashTable* T, void* Entry);
 /* Remove an entry from the given hash table */
 
 void HT_Walk (HashTable* T, int (*F) (void* Entry, void* Data), void* Data);
-/* Walk over all nodes of a hash table, optionally deleting entries from the
-** table. For each node, the user supplied function F is called, passing a
-** pointer to the entry, and the data pointer passed to HT_Walk by the caller.
-** If F returns true, the node is deleted from the hash table otherwise it's
-** left in place. While deleting the node, the node is not accessed, so it is
-** safe for F to free the memory associcated with the entry.
-*/
+// Walk over all nodes of a hash table, optionally deleting entries from the
+// table. For each node, the user supplied function F is called, passing a
+// pointer to the entry, and the data pointer passed to HT_Walk by the caller.
+// If F returns true, the node is deleted from the hash table otherwise it's
+// left in place. While deleting the node, the node is not accessed, so it is
+// safe for F to free the memory associcated with the entry.
 
 
 

@@ -104,9 +104,8 @@ void SwitchStatement (void)
     /* Eat the "switch" token */
     NextToken ();
 
-    /* Read the switch expression and load it into the primary. It must have
-    ** integer type.
-    */
+    // Read the switch expression and load it into the primary. It must have
+    // integer type.
     ConsumeLParen ();
 
     ED_Init (&SwitchExpr);
@@ -118,24 +117,22 @@ void SwitchStatement (void)
     }
     ConsumeRParen ();
 
-    /* Add a jump to the switch code. This jump is usually unnecessary,
-    ** because the switch code will moved up just behind the switch
-    ** expression. However, in rare cases, there's a label at the end of
-    ** the switch expression. This label will not get moved, so the code
-    ** jumps around the switch code, and after moving the switch code,
-    ** things look really weird. If we add a jump here, we will never have
-    ** a label attached to the current code position, and the jump itself
-    ** will get removed by the optimizer if it is unnecessary.
-    */
+    // Add a jump to the switch code. This jump is usually unnecessary,
+    // because the switch code will moved up just behind the switch
+    // expression. However, in rare cases, there's a label at the end of
+    // the switch expression. This label will not get moved, so the code
+    // jumps around the switch code, and after moving the switch code,
+    // things look really weird. If we add a jump here, we will never have
+    // a label attached to the current code position, and the jump itself
+    // will get removed by the optimizer if it is unnecessary.
     SwitchCodeLabel = GetLocalLabel ();
     /* save state for switch logic */
     g_switchsave (SizeOf (SwitchExpr.Type));
     GetCodePos (&SaveCodeMark);
 
-    /* Remember the current code position. We will move the switch code
-    ** to this position later.  This will get overwritten if we actually
-    ** find a "case" or "default" label.
-    */
+    // Remember the current code position. We will move the switch code
+    // to this position later.  This will get overwritten if we actually
+    // find a "case" or "default" label.
     GetCodePos (&SwitchData.CaseCodeStart);
     SwitchData.CaseCodeStartFlag = false;
     OrigCaseCodeStart = SwitchData.CaseCodeStart;
@@ -154,9 +151,8 @@ void SwitchStatement (void)
     /* Create a loop so we may use break. */
     AddLoop (ExitLabel, 0);
 
-    /* Parse the following statement, which may actually be a compound
-    ** statement if there is a curly brace at the current input position
-    */
+    // Parse the following statement, which may actually be a compound
+    // statement if there is a curly brace at the current input position
     HaveBreak = AnyStatement (&RCurlyBrace);
 
     /* Check if we had any labels */
@@ -164,13 +160,12 @@ void SwitchStatement (void)
         Warning ("No reachable case labels for switch");
     }
 
-    /* If the last statement did not have a break, we may have an open
-    ** label (maybe from an if or similar). Emitting code and then moving
-    ** this code to the top will also move the label to the top which is
-    ** wrong. So if the last statement did not have a break (which would
-    ** carry the label), add a jump to the exit. If it is useless, the
-    ** optimizer will remove it later.
-    */
+    // If the last statement did not have a break, we may have an open
+    // label (maybe from an if or similar). Emitting code and then moving
+    // this code to the top will also move the label to the top which is
+    // wrong. So if the last statement did not have a break (which would
+    // carry the label), add a jump to the exit. If it is useless, the
+    // optimizer will remove it later.
     if (!HaveBreak) {
         g_jump (ExitLabel);
     }
@@ -197,17 +192,16 @@ void SwitchStatement (void)
 
     CleanupSwitch(&SaveCodeMark);
 
-    /* Error on "unreachable" code before the switch code
-    ** (only variable definitions are allowed)
-    **
-    ** originally i wanted to detect and remove/replace the instructions
-    ** related to this unreachable code.
-    ** detection is easy, but it turns out that remove/replace is way too
-    ** complicated in the general case.
-    **
-    ** so instead we'll just detect and produce an error.
-    ** producing an error is better than producing incorrect code.
-    */
+    // Error on "unreachable" code before the switch code
+    // (only variable definitions are allowed)
+    // 
+    // originally i wanted to detect and remove/replace the instructions
+    // related to this unreachable code.
+    // detection is easy, but it turns out that remove/replace is way too
+    // complicated in the general case.
+    // 
+    // so instead we'll just detect and produce an error.
+    // producing an error is better than producing incorrect code.
     ErrorOnNonDefinition(&OrigCaseCodeStart, &SwitchData.CaseCodeStart);
 
     /* Define the exit label */
@@ -222,9 +216,8 @@ void SwitchStatement (void)
     /* Free the case value tree */
     FreeCaseNodeColl (SwitchData.Nodes);
 
-    /* If the case statement was terminated by a closing curly
-    ** brace, skip it now.
-    */
+    // If the case statement was terminated by a closing curly
+    // brace, skip it now.
     if (RCurlyBrace) {
         NextToken ();
     }

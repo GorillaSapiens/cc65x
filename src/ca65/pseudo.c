@@ -111,13 +111,12 @@ static void DoUnexpected (void);
 /* Got an unexpected keyword */
 
 static void DoInvalid (void);
-/* Handle a token that is invalid here, since it should have been handled on
-** a much lower level of the expression hierarchy. Getting this sort of token
-** means that the lower level code has bugs.
-** This function differs to DoUnexpected in that the latter may be triggered
-** by the user by using keywords in the wrong location. DoUnexpected is not
-** an error in the assembler itself, while DoInvalid is.
-*/
+// Handle a token that is invalid here, since it should have been handled on
+// a much lower level of the expression hierarchy. Getting this sort of token
+// means that the lower level code has bugs.
+// This function differs to DoUnexpected in that the latter may be triggered
+// by the user by using keywords in the wrong location. DoUnexpected is not
+// an error in the assembler itself, while DoInvalid is.
 
 
 
@@ -128,9 +127,8 @@ static void DoInvalid (void);
 
 
 static unsigned char OptionalAddrSize (void)
-/* If a colon follows, parse an optional address size spec and return it.
-** Otherwise return ADDR_SIZE_DEFAULT.
-*/
+// If a colon follows, parse an optional address size spec and return it.
+// Otherwise return ADDR_SIZE_DEFAULT.
 {
     unsigned AddrSize = ADDR_SIZE_DEFAULT;
     if (CurTok.Tok == TOK_COLON) {
@@ -182,9 +180,8 @@ static void SetBoolOption (unsigned char* Flag)
 static void ExportWithAssign (SymEntry* Sym, unsigned char AddrSize, unsigned Flags)
 /* Allow to assign the value of an export in an .export statement */
 {
-    /* The name and optional address size spec may be followed by an assignment
-    ** or equal token.
-    */
+    // The name and optional address size spec may be followed by an assignment
+    // or equal token.
     if (CurTok.Tok == TOK_ASSIGN || CurTok.Tok == TOK_EQ) {
 
         /* Assignment means the symbol is a label */
@@ -248,9 +245,8 @@ static void ExportImport (void (*Func) (SymEntry*, unsigned char, unsigned),
 
 
 static long IntArg (long Min, long Max)
-/* Read an integer argument and check a range. Accept the token "unlimited"
-** and return -1 in this case.
-*/
+// Read an integer argument and check a range. Accept the token "unlimited"
+// and return -1 in this case.
 {
     if (CurTok.Tok == TOK_IDENT && SB_CompareStr (&CurTok.SVal, "unlimited") == 0) {
         NextTok ();
@@ -300,10 +296,9 @@ static void ConDes (const StrBuf* Name, unsigned Type)
 static StrBuf* GenArrayType (StrBuf* Type, unsigned SpanSize,
                              const char* ElementType,
                              unsigned ElementTypeLen)
-/* Create an array (or single data) of the given type. SpanSize is the size
-** of the span, ElementType is a string that encodes the element data type.
-** The function returns Type.
-*/
+// Create an array (or single data) of the given type. SpanSize is the size
+// of the span, ElementType is a string that encodes the element data type.
+// The function returns Type.
 {
     /* Get the size of the element type */
     unsigned ElementSize = GT_GET_SIZE (ElementType[0]);
@@ -503,9 +498,8 @@ static void DoAssert (void)
     }
     NextTok ();
 
-    /* We can have an optional message. If no message is present, use
-    ** "Assertion failed".
-    */
+    // We can have an optional message. If no message is present, use
+    // "Assertion failed".
     if (CurTok.Tok == TOK_COMMA) {
 
         /* Skip the comma */
@@ -517,9 +511,8 @@ static void DoAssert (void)
             return;
         }
 
-        /* Translate the message into a string id. We can then skip the input
-        ** string.
-        */
+        // Translate the message into a string id. We can then skip the input
+        // string.
         Msg = GetStrBufId (&CurTok.SVal);
         NextTok ();
 
@@ -579,8 +572,8 @@ static void DoByteBase (int EnableTranslation)
     /* Parse arguments */
     while (1) {
         if (CurTok.Tok == TOK_STRCON) {
-            /* A string, translate into target charset
-               if appropriate */
+            // A string, translate into target charset
+            // if appropriate 
             if (EnableTranslation) {
                 TgtTranslateStrBuf (&CurTok.SVal);
             }
@@ -602,10 +595,9 @@ static void DoByteBase (int EnableTranslation)
         }
     }
 
-    /* Close the span, then add type information to it.
-    ** Note: empty string operands emit nothing;
-    ** so, add a type only if there's a span.
-    */
+    // Close the span, then add type information to it.
+    // Note: empty string operands emit nothing;
+    // so, add a type only if there's a span.
     S = CloseSpan (S);
     if (S != 0) {
         SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), EType, sizeof (EType)));
@@ -835,11 +827,10 @@ static void DoDebugInfo (void)
 static void DoDefine (void)
 /* Define a one-line macro */
 {
-    /* The function is called with the .DEFINE token in place, because we need
-    ** to disable .define macro expansions before reading the next token.
-    ** Otherwise, the name of the macro might be expanded; therefore,
-    ** we never would see it.
-    */
+    // The function is called with the .DEFINE token in place, because we need
+    // to disable .define macro expansions before reading the next token.
+    // Otherwise, the name of the macro might be expanded; therefore,
+    // we never would see it.
     DisableDefineStyleMacros ();
     NextTok ();
     EnableDefineStyleMacros ();
@@ -1293,14 +1284,13 @@ static void DoIncBin (void)
     fseek (F, 0, SEEK_END);
     Size = ftell (F);
 
-    /* Stat the file and remember the values. There's a race condition here,
-    ** since we cannot use fileno() (non-standard identifier in standard
-    ** header file), and therefore not fstat. When using stat with the
-    ** file name, there's a risk that the file was deleted and recreated
-    ** while it was open. Since mtime and size are only used to check
-    ** if a file has changed in the debugger, we will ignore this problem
-    ** here.
-    */
+    // Stat the file and remember the values. There's a race condition here,
+    // since we cannot use fileno() (non-standard identifier in standard
+    // header file), and therefore not fstat. When using stat with the
+    // file name, there's a risk that the file was deleted and recreated
+    // while it was open. Since mtime and size are only used to check
+    // if a file has changed in the debugger, we will ignore this problem
+    // here.
     SB_Terminate (&Name);
     if (FileStat (SB_GetConstBuf (&Name), &StatBuf) != 0) {
         Fatal ("Cannot stat input file '%m%p': %s", &Name, strerror (errno));
@@ -1403,13 +1393,12 @@ static void DoInterruptor (void)
 
 
 static void DoInvalid (void)
-/* Handle a token that is invalid here, since it should have been handled on
-** a much lower level of the expression hierarchy. Getting this sort of token
-** means that the lower level code has bugs.
-** This function differs to DoUnexpected in that the latter may be triggered
-** by the user by using keywords in the wrong location. DoUnexpected is not
-** an error in the assembler itself, while DoInvalid is.
-*/
+// Handle a token that is invalid here, since it should have been handled on
+// a much lower level of the expression hierarchy. Getting this sort of token
+// means that the lower level code has bugs.
+// This function differs to DoUnexpected in that the latter may be triggered
+// by the user by using keywords in the wrong location. DoUnexpected is not
+// an error in the assembler itself, while DoInvalid is.
 {
     Internal ("Unexpected token: %m%p", &Keyword);
 }
@@ -1541,9 +1530,8 @@ static void DoOut (void)
     if (CurTok.Tok != TOK_STRCON) {
         ErrorSkip ("String constant expected");
     } else {
-        /* Output the string and be sure to flush the output to keep it in
-        ** sync with any error messages if the output is redirected to a file.
-        */
+        // Output the string and be sure to flush the output to keep it in
+        // sync with any error messages if the output is redirected to a file.
         printf ("%.*s\n",
                 (int) SB_GetLen (&CurTok.SVal),
                 SB_GetConstBuf (&CurTok.SVal));
@@ -1947,9 +1935,8 @@ static void DoSetCPU (void)
         /* Switch to the new CPU */
         SetCPU (CPU);
 
-        /* Skip the identifier. If the CPU switch was successful, the scanner
-        ** will treat the input now correctly for the new CPU.
-        */
+        // Skip the identifier. If the CPU switch was successful, the scanner
+        // will treat the input now correctly for the new CPU.
         NextTok ();
     }
 }
@@ -2014,11 +2001,10 @@ static void DoTag (void)
 static void DoUnDef (void)
 /* Undefine a define-style macro */
 {
-    /* The function is called with the .UNDEF token in place, because we need
-    ** to disable .define macro expansions before reading the next token.
-    ** Otherwise, the name of the macro would be expanded; therefore,
-    ** we never would see it.
-    */
+    // The function is called with the .UNDEF token in place, because we need
+    // to disable .define macro expansions before reading the next token.
+    // Otherwise, the name of the macro would be expanded; therefore,
+    // we never would see it.
     DisableDefineStyleMacros ();
     NextTok ();
     EnableDefineStyleMacros ();
@@ -2113,8 +2099,8 @@ struct CtrlDesc {
     void        (*Handler) (void);      /* Command handler */
 };
 
-/* NOTE: .AND, .BITAND, .BITNOT, .BITOR, .BITXOR, .MOD, .NOT, .OR, .SHL, .SHR
-         and .XOR do NOT go into this table */
+// NOTE: .AND, .BITAND, .BITNOT, .BITOR, .BITXOR, .MOD, .NOT, .OR, .SHL, .SHR
+// and .XOR do NOT go into this table 
 #define PSEUDO_COUNT    (sizeof (CtrlCmdTab) / sizeof (CtrlCmdTab [0]))
 static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoA16           },      /* .A16 */

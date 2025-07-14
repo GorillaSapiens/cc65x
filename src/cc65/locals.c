@@ -99,9 +99,8 @@ static void AllocStorage (unsigned DataLabel, void (*UseSeg) (), unsigned Size)
 
 
 static void ParseRegisterDecl (Declarator* Decl, int Reg)
-/* Parse the declarator of a register variable. Reg is the offset of the
-** variable in the register bank.
-*/
+// Parse the declarator of a register variable. Reg is the offset of the
+// variable in the register bank.
 {
     SymEntry* Sym;
 
@@ -111,10 +110,9 @@ static void ParseRegisterDecl (Declarator* Decl, int Reg)
     /* Get the size of the variable */
     unsigned Size = SizeOf (Decl->Type);
 
-    /* Check if this is the main function and we are in cc65 mode. If so, we
-    ** won't save the old contents of the register variables since in cc65
-    ** mode main() may not be called recursively.
-    */
+    // Check if this is the main function and we are in cc65 mode. If so, we
+    // won't save the old contents of the register variables since in cc65
+    // mode main() may not be called recursively.
     int SaveRegVars = (IS_Get (&Standard) != STD_CC65) ||
                       !F_IsMainFunc (CurrentFunc);
 
@@ -124,41 +122,36 @@ static void ParseRegisterDecl (Declarator* Decl, int Reg)
         /* Skip the '=' */
         NextToken ();
 
-        /* If the register variable is initialized, the initialization code may
-        ** access other already declared variables. This means that we have to
-        ** allocate them now.
-        */
+        // If the register variable is initialized, the initialization code may
+        // access other already declared variables. This means that we have to
+        // allocate them now.
         F_AllocLocalSpace (CurrentFunc);
 
-        /* Save the current contents of the register variable on stack. This is
-        ** not necessary for the main function.
-        */
+        // Save the current contents of the register variable on stack. This is
+        // not necessary for the main function.
         if (SaveRegVars) {
             g_save_regvars (Reg, Size);
         }
 
-        /* Add the symbol to the symbol table. We do that now, because for
-        ** register variables the current stack pointer is implicitly used
-        ** as location for the save area (maybe unused in case of main()).
-        */
+        // Add the symbol to the symbol table. We do that now, because for
+        // register variables the current stack pointer is implicitly used
+        // as location for the save area (maybe unused in case of main()).
         Sym = AddLocalSym (Decl->Ident, Decl->Type, Decl->StorageClass, Reg);
 
         /* Special handling for compound types */
         if (IsCompound) {
 
-            /* Switch to read only data and define a label for the
-            ** initialization data.
-            */
+            // Switch to read only data and define a label for the
+            // initialization data.
             unsigned InitLabel = AllocLabel (g_userodata);
 
-            /* Parse the initialization generating a memory image of the
-            ** data in the RODATA segment. The function does return the size
-            ** of the initialization data, which may be greater than the
-            ** actual size of the type, if the type is a structure with a
-            ** flexible array member that has been initialized. Since we must
-            ** know the size of the data in advance for register variables,
-            ** we cannot allow that here.
-            */
+            // Parse the initialization generating a memory image of the
+            // data in the RODATA segment. The function does return the size
+            // of the initialization data, which may be greater than the
+            // actual size of the type, if the type is a structure with a
+            // flexible array member that has been initialized. Since we must
+            // know the size of the data in advance for register variables,
+            // we cannot allow that here.
             if (ParseInit (Sym->Type) != Size) {
                 Error ("Cannot initialize flexible array members of storage class 'register'");
             }
@@ -191,18 +184,16 @@ static void ParseRegisterDecl (Declarator* Decl, int Reg)
         Sym->Flags |= SC_REF;
     } else {
 
-        /* Save the current contents of the register variable on stack. This is
-        ** not necessary for the main function.
-        */
+        // Save the current contents of the register variable on stack. This is
+        // not necessary for the main function.
         if (SaveRegVars) {
             F_AllocLocalSpace (CurrentFunc);
             g_save_regvars (Reg, Size);
         }
 
-        /* Add the symbol to the symbol table. We do that now, because for
-        ** register variables the current stack pointer is implicitly used
-        ** as location for the save area (maybe unused in case of main()).
-        */
+        // Add the symbol to the symbol table. We do that now, because for
+        // register variables the current stack pointer is implicitly used
+        // as location for the save area (maybe unused in case of main()).
         Sym = AddLocalSym (Decl->Ident, Decl->Type, Decl->StorageClass, Reg);
     }
 
@@ -233,9 +224,8 @@ static void ParseAutoDecl (Declarator* Decl)
     /* Check if this is a variable on the stack or in static memory */
     if (IS_Get (&StaticLocals) == 0) {
 
-        /* Add the symbol to the symbol table. The stack offset we use here
-        ** may get corrected later.
-        */
+        // Add the symbol to the symbol table. The stack offset we use here
+        // may get corrected later.
         Sym = AddLocalSym (Decl->Ident, Decl->Type,
                            Decl->StorageClass,
                            F_GetStackPtr (CurrentFunc) - (int) Size);
@@ -249,33 +239,28 @@ static void ParseAutoDecl (Declarator* Decl)
             /* Special handling for compound types */
             if (IsCompound) {
 
-                /* Switch to read only data and define a label for the
-                ** initialization data.
-                */
+                // Switch to read only data and define a label for the
+                // initialization data.
                 unsigned InitLabel = AllocLabel (g_userodata);
 
-                /* Parse the initialization generating a memory image of the
-                ** data in the RODATA segment. The function will return the
-                ** actual size of the initialization data, which may be
-                ** greater than the size of the variable if it is a struct
-                ** that contains a flexible array member and we're not in
-                ** ANSI mode.
-                */
+                // Parse the initialization generating a memory image of the
+                // data in the RODATA segment. The function will return the
+                // actual size of the initialization data, which may be
+                // greater than the size of the variable if it is a struct
+                // that contains a flexible array member and we're not in
+                // ANSI mode.
                 Size = ParseInit (Sym->Type);
 
-                /* Now reserve space for the variable on the stack and correct
-                ** the offset in the symbol table entry.
-                */
+                // Now reserve space for the variable on the stack and correct
+                // the offset in the symbol table entry.
                 Sym->V.Offs = F_ReserveLocalSpace (CurrentFunc, Size);
 
-                /* Next, allocate the space on the stack. This means that the
-                ** variable is now located at offset 0 from the current c_sp.
-                */
+                // Next, allocate the space on the stack. This means that the
+                // variable is now located at offset 0 from the current c_sp.
                 F_AllocLocalSpace (CurrentFunc);
 
-                /* Generate code to copy the initialization data into the
-                ** variable space
-                */
+                // Generate code to copy the initialization data into the
+                // variable space
                 g_initauto (InitLabel, Size);
 
             } else {
@@ -295,9 +280,8 @@ static void ParseAutoDecl (Declarator* Decl)
                 /* Convert it to the target type */
                 TypeConversion (&Expr, Sym->Type);
 
-                /* If the value is not const, load it into the primary.
-                ** Otherwise pass the information to the code generator.
-                */
+                // If the value is not const, load it into the primary.
+                // Otherwise pass the information to the code generator.
                 if (ED_IsConstAbsInt (&Expr)) {
                     Flags |= CF_CONST;
                 } else {
@@ -315,17 +299,15 @@ static void ParseAutoDecl (Declarator* Decl)
             /* Mark the variable as referenced */
             Sym->Flags |= SC_REF;
 
-            /* Make note of auto variables initialized in current block.
-            ** We abuse the Collection somewhat by using it to store line
-            ** numbers.
-            */
+            // Make note of auto variables initialized in current block.
+            // We abuse the Collection somewhat by using it to store line
+            // numbers.
             CollReplace (&CurrentFunc->LocalsBlockStack, (void *)(size_t)GetCurrentLineNum (),
                 CollCount (&CurrentFunc->LocalsBlockStack) - 1);
 
         } else {
-            /* Non-initialized local variable. Just keep track of
-            ** the space needed.
-            */
+            // Non-initialized local variable. Just keep track of
+            // the space needed.
             F_ReserveLocalSpace (CurrentFunc, Size);
         }
 
@@ -351,14 +333,12 @@ static void ParseAutoDecl (Declarator* Decl)
 
             if (IsCompound) {
 
-                /* Switch to read only data and define a label for the
-                ** initialization data.
-                */
+                // Switch to read only data and define a label for the
+                // initialization data.
                 unsigned InitLabel = AllocLabel (g_userodata);
 
-                /* Parse the initialization generating a memory image of the
-                ** data in the RODATA segment.
-                */
+                // Parse the initialization generating a memory image of the
+                // data in the RODATA segment.
                 Size = ParseInit (Sym->Type);
 
                 /* Allocate space for the variable */
@@ -430,10 +410,9 @@ static void ParseStaticDecl (Declarator* Decl)
     /* Static data */
     if (CurTok.Tok == TOK_ASSIGN) {
 
-        /* Initialization ahead, switch to data segment and define the label.
-        ** For arrays, we need to check the elements of the array for
-        ** constness, not the array itself.
-        */
+        // Initialization ahead, switch to data segment and define the label.
+        // For arrays, we need to check the elements of the array for
+        // constness, not the array itself.
         if (IsQualConst (GetBaseElementType (Sym->Type))) {
             g_userodata ();
         } else {
@@ -482,16 +461,14 @@ static int ParseOneDecl (DeclSpec* Spec)
     /* Read the declarator */
     NeedClean = ParseDecl (Spec, &Decl, DM_IDENT_OR_EMPTY);
 
-    /* Check if there are explicitly specified non-external storage classes
-    ** for function declarations.
-    */
+    // Check if there are explicitly specified non-external storage classes
+    // for function declarations.
     if ((Decl.StorageClass & SC_TYPEMASK) == SC_FUNC) {
-        /* Function can only be declared inside functions with the 'extern'
-        ** storage class specifier or no storage class specifier at all.
-        ** Note: this declaration is always checked for compatibility with
-        ** other declarations of the same symbol, but does not necessarily
-        ** make the symbol globally visible. This is tricky.
-        */
+        // Function can only be declared inside functions with the 'extern'
+        // storage class specifier or no storage class specifier at all.
+        // Note: this declaration is always checked for compatibility with
+        // other declarations of the same symbol, but does not necessarily
+        // make the symbol globally visible. This is tricky.
         if ((Spec->Flags & DS_DEF_STORAGE) != DS_DEF_STORAGE    &&
             (Decl.StorageClass & SC_STORAGEMASK) != SC_EXTERN   &&
             (Decl.StorageClass & SC_STORAGEMASK) != 0) {
@@ -505,9 +482,8 @@ static int ParseOneDecl (DeclSpec* Spec)
         Decl.StorageClass |= SC_DEF;
     }
 
-    /* If we don't have a name, this was flagged as an error earlier.
-    ** To avoid problems later, use an anonymous name here.
-    */
+    // If we don't have a name, this was flagged as an error earlier.
+    // To avoid problems later, use an anonymous name here.
     if (Decl.Ident[0] == '\0') {
         AnonName (Decl.Ident, "param");
     }
@@ -516,9 +492,8 @@ static int ParseOneDecl (DeclSpec* Spec)
     if ((Decl.StorageClass & SC_DEF) == SC_DEF &&
         (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
 
-        /* If we have a register variable, try to allocate a register and
-        ** convert the declaration to "auto" if this is not possible.
-        */
+        // If we have a register variable, try to allocate a register and
+        // convert the declaration to "auto" if this is not possible.
         int Reg = 0;    /* Initialize to avoid gcc complains */
         if ((Decl.StorageClass & SC_STORAGEMASK) == SC_REGISTER &&
             (Reg = F_AllocRegVar (CurrentFunc, Decl.Type)) < 0) {
@@ -554,9 +529,8 @@ static int ParseOneDecl (DeclSpec* Spec)
 
         if ((Decl.StorageClass & SC_STORAGEMASK) == SC_EXTERN ||
             (Decl.StorageClass & SC_TYPEMASK) == SC_FUNC) {
-            /* Add the global symbol to both of the global and local symbol
-            ** tables.
-            */
+            // Add the global symbol to both of the global and local symbol
+            // tables.
             AddGlobalSym (Decl.Ident, Decl.Type, Decl.StorageClass);
         } else {
             /* Add the local symbol to the local symbol table */
@@ -582,9 +556,8 @@ void DeclareLocals (void)
     /* A place to store info about potential initializations of auto variables */
     CollAppend (&CurrentFunc->LocalsBlockStack, 0);
 
-    /* Loop until we don't find any more variables. EOF is handled in the loop
-    ** as well.
-    */
+    // Loop until we don't find any more variables. EOF is handled in the loop
+    // as well.
     while (1) {
         DeclSpec Spec;
         int      NeedClean;
@@ -598,12 +571,11 @@ void DeclareLocals (void)
         /* Read the declaration specifier */
         ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT | TS_FUNCTION_SPEC, SC_AUTO);
 
-        /* Check variable declarations. We need distinguish between a default
-        ** int type and the end of variable declarations. So we will do the
-        ** following: If there is no explicit storage class specifier *and* no
-        ** explicit type given, *and* no type qualifiers have been read, it is
-        ** assumed that we have reached the end of declarations.
-        */
+        // Check variable declarations. We need distinguish between a default
+        // int type and the end of variable declarations. So we will do the
+        // following: If there is no explicit storage class specifier *and* no
+        // explicit type given, *and* no type qualifiers have been read, it is
+        // assumed that we have reached the end of declarations.
         if ((Spec.Flags & DS_DEF_STORAGE) != 0          &&  /* No storage spec */
             (Spec.Flags & DS_TYPE_MASK) == DS_DEF_TYPE  &&  /* No type given */
             GetQualifier (Spec.Type) == T_QUAL_NONE) {      /* No type qualifier */
@@ -671,9 +643,8 @@ EndOfDecl:
         CollPop (&CurrentFunc->LocalsBlockStack);
     }
 
-    /* In case we've allocated local variables in this block, emit a call to
-    ** the stack checking routine if stack checks are enabled.
-    */
+    // In case we've allocated local variables in this block, emit a call to
+    // the stack checking routine if stack checks are enabled.
     if (IS_Get (&CheckStack) && InitialStack != StackPtr) {
         g_cstackcheck ();
     }

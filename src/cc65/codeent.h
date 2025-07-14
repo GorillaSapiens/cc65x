@@ -108,20 +108,18 @@ struct CodeEntry {
 
 
 int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Name, long* Offset);
-/* Break the opcode argument string into a symbol name/label part plus an offset.
-** Both parts are optional, but if there are any characters in the string that
-** can't be parsed, it's an failure.
-** The caller is responsible for managing the StrBuf.
-** Return whether parsing succeeds or not.
-*/
+// Break the opcode argument string into a symbol name/label part plus an offset.
+// Both parts are optional, but if there are any characters in the string that
+// can't be parsed, it's an failure.
+// The caller is responsible for managing the StrBuf.
+// Return whether parsing succeeds or not.
 
 const char* MakeHexArg (unsigned Num);
-/* Convert Num into a string in the form $XY, suitable for passing it as an
-** argument to NewCodeEntry, and return a pointer to the string.
-** BEWARE: The function returns a pointer to a static buffer, so the value is
-** gone if you call it twice (and apart from that it's not thread and signal
-** safe).
-*/
+// Convert Num into a string in the form $XY, suitable for passing it as an
+// argument to NewCodeEntry, and return a pointer to the string.
+// BEWARE: The function returns a pointer to a static buffer, so the value is
+// gone if you call it twice (and apart from that it's not thread and signal
+// safe).
 
 void PreparseArg (CodeEntry* E);
 /* Parse the argument string and memorize the result for the code entry */
@@ -134,9 +132,8 @@ void FreeCodeEntry (CodeEntry* E);
 /* Free the given code entry */
 
 void CE_ReplaceOPC (CodeEntry* E, opc_t OPC);
-/* Replace the opcode of the instruction. This will also replace related info,
-** Size, Use and Chg, but it will NOT update any arguments or labels.
-*/
+// Replace the opcode of the instruction. This will also replace related info,
+// Size, Use and Chg, but it will NOT update any arguments or labels.
 
 int CodeEntriesAreEqual (const CodeEntry* E1, const CodeEntry* E2);
 /* Check if both code entries are equal */
@@ -145,10 +142,9 @@ void CE_AttachLabel (CodeEntry* E, CodeLabel* L);
 /* Attach the label to the entry */
 
 void CE_ClearJumpTo (CodeEntry* E);
-/* Clear the JumpTo entry and the argument (which contained the name of the
-** label). Note: The function will not clear the backpointer from the label,
-** so use it with care.
-*/
+// Clear the JumpTo entry and the argument (which contained the name of the
+// label). Note: The function will not clear the backpointer from the label,
+// so use it with care.
 
 #if defined(HAVE_INLINE)
 INLINE int CE_HasLabel (const CodeEntry* E)
@@ -237,22 +233,19 @@ void CE_SetArg (CodeEntry* E, const char* Arg);
 /* Replace the argument by the new one. */
 
 void CE_SetArgBaseAndOff (CodeEntry* E, const char* ArgBase, long ArgOff);
-/* Replace the new argument base and offset. Argument base is always applied.
-** Argument offset is applied if and only if E has the AIF_HAS_OFFSET flag set.
-*/
+// Replace the new argument base and offset. Argument base is always applied.
+// Argument offset is applied if and only if E has the AIF_HAS_OFFSET flag set.
 
 void CE_SetArgBase (CodeEntry* E, const char* ArgBase);
-/* Replace the argument base by the new one.
-** The entry must have an existing base.
-*/
+// Replace the argument base by the new one.
+// The entry must have an existing base.
 
 void CE_SetArgOffset (CodeEntry* E, long ArgOff);
 /* Replace the argument offset by the new one */
 
 void CE_SetNumArg (CodeEntry* E, long Num);
-/* Set a new numeric argument for the given code entry that must already
-** have a numeric argument.
-*/
+// Set a new numeric argument for the given code entry that must already
+// have a numeric argument.
 
 int CE_IsArgStrParsed (const CodeEntry* E);
 /* Return true if the argument of E was successfully parsed last time */
@@ -267,9 +260,8 @@ int CE_IsConstImm (const CodeEntry* E);
 /* Return true if the argument of E is a constant immediate value */
 
 int CE_IsKnownImm (const CodeEntry* E, unsigned long Num);
-/* Return true if the argument of E is a constant immediate value that is
-** equal to Num.
-*/
+// Return true if the argument of E is a constant immediate value that is
+// equal to Num.
 
 #if defined(HAVE_INLINE)
 INLINE int CE_IsCallTo (const CodeEntry* E, const char* Name)
@@ -282,17 +274,15 @@ INLINE int CE_IsCallTo (const CodeEntry* E, const char* Name)
 #endif
 
 int CE_UseLoadFlags (CodeEntry* E);
-/* Return true if the instruction uses any flags that are set by a load of
-** a register (N and Z).
-*/
+// Return true if the instruction uses any flags that are set by a load of
+// a register (N and Z).
 
 void CE_FreeRegInfo (CodeEntry* E);
 /* Free an existing register info struct */
 
 void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs);
-/* Generate register info for this instruction. If an old info exists, it is
-** overwritten.
-*/
+// Generate register info for this instruction. If an old info exists, it is
+// overwritten.
 
 void CE_Output (const CodeEntry* E);
 /* Output the code entry to the output file */

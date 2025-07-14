@@ -56,10 +56,9 @@ static uint32_t GetSpan (attr_t Style)
     /* Get the number of bytes still available */
     uint32_t RemainingBytes = GetRemainingBytes ();
 
-    /* Count how many bytes are available. This number is limited by the
-    ** number of remaining bytes, a label, a segment change, or the end of
-    ** the given Style attribute.
-    */
+    // Count how many bytes are available. This number is limited by the
+    // number of remaining bytes, a label, a segment change, or the end of
+    // the given Style attribute.
     uint32_t Count = 1;
     while (Count < RemainingBytes) {
         attr_t Attr;
@@ -90,10 +89,9 @@ static unsigned DoTable (attr_t Style, unsigned MemberSize, void (*TableFunc) (u
     /* Count how many bytes may be output. */
     uint32_t Count = GetSpan (Style);
 
-    /* If the count is less than the member size, print a row of Count data
-    ** bytes. We assume here that there is no member with a size that is less
-    ** than BytesPerLine.
-    */
+    // If the count is less than the member size, print a row of Count data
+    // bytes. We assume here that there is no member with a size that is less
+    // than BytesPerLine.
     if (Count < MemberSize) {
         DataByteLine (Count);
         PC += Count;
@@ -171,9 +169,8 @@ uint32_t AddrTable (void)
     uint32_t BytesLeft = GetRemainingBytes ();
     uint32_t Start = PC;
 
-    /* Loop while table bytes left and we don't need to create a label at the
-    ** current position.
-    */
+    // Loop while table bytes left and we don't need to create a label at the
+    // current position.
     while (BytesLeft && GetStyleAttr (PC) == atAddrTab) {
 
         uint32_t Addr;
@@ -237,9 +234,8 @@ uint32_t RtsTable (void)
     uint32_t BytesLeft = GetRemainingBytes ();
     uint32_t Start = PC;
 
-    /* Loop while table bytes left and we don't need to create a label at the
-    ** current position.
-    */
+    // Loop while table bytes left and we don't need to create a label at the
+    // current position.
     while (BytesLeft && GetStyleAttr (PC) == atRtsTab) {
 
         uint32_t Addr;

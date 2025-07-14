@@ -59,9 +59,8 @@ struct ObjData;
 
 
 void ObjReadData (FILE* F, struct ObjData* O);
-/* Read object file data from the given file. The function expects the Name
-** and Start fields to be valid. Header and basic data are read.
-*/
+// Read object file data from the given file. The function expects the Name
+// and Start fields to be valid. Header and basic data are read.
 
 void ObjAdd (const char* Name);
 /* Add an object file to the library */

@@ -113,9 +113,8 @@ void RC_Dump (FILE* F, const RegContents* RC)
 
 #if !defined(HAVE_INLINE)
 int PStatesAreKnown (unsigned short PFlags, unsigned WhatStates)
-/* Return true if all queried processor states are known.
-** Note: WhatStates takes PSTATE_* rather than PFVAL_*.
-*/
+// Return true if all queried processor states are known.
+// Note: WhatStates takes PSTATE_* rather than PFVAL_*.
 {
     return ((PFlags << (PSTATE_BITS_SHIFT - 8)) & WhatStates & PSTATE_BITS_MASK) == 0;
 }
@@ -125,9 +124,8 @@ int PStatesAreKnown (unsigned short PFlags, unsigned WhatStates)
 
 #if !defined(HAVE_INLINE)
 int PStatesAreSet (unsigned short PFlags, unsigned WhatStates)
-/* Return true if all queried processor states are known to be set.
-** Note: WhatStates takes PSTATE_* rather than PFVAL_*.
-*/
+// Return true if all queried processor states are known to be set.
+// Note: WhatStates takes PSTATE_* rather than PFVAL_*.
 {
     return (PFlags & (WhatStates >> (PSTATE_BITS_SHIFT - 8))) == 0 &&
            (PFlags & (WhatStates >> PSTATE_BITS_SHIFT)) == WhatStates >> PSTATE_BITS_SHIFT;
@@ -138,9 +136,8 @@ int PStatesAreSet (unsigned short PFlags, unsigned WhatStates)
 
 #if !defined(HAVE_INLINE)
 int PStatesAreClear (unsigned short PFlags, unsigned WhatStates)
-/* Return true if all queried processor states are known to be cleared.
-** Note: WhatStates takes PSTATE_* rather than PFVAL_*.
-*/
+// Return true if all queried processor states are known to be cleared.
+// Note: WhatStates takes PSTATE_* rather than PFVAL_*.
 {
     return (PFlags & (WhatStates >> (PSTATE_BITS_SHIFT - 8))) == 0 &&
            (PFlags & (WhatStates >> PSTATE_BITS_SHIFT)) == 0;
@@ -150,10 +147,9 @@ int PStatesAreClear (unsigned short PFlags, unsigned WhatStates)
 
 
 RegInfo* NewRegInfo (const RegContents* RC)
-/* Allocate a new register info, initialize and return it. If RC is not
-** a NULL pointer, it is used to initialize both, the input and output
-** registers. If the pointer is NULL, all registers are set to unknown.
-*/
+// Allocate a new register info, initialize and return it. If RC is not
+// a NULL pointer, it is used to initialize both, the input and output
+// registers. If the pointer is NULL, all registers are set to unknown.
 {
     /* Allocate memory */
     RegInfo* RI = xmalloc (sizeof (RegInfo));

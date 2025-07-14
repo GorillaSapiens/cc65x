@@ -50,30 +50,29 @@
 /*****************************************************************************/
 
 unsigned OptLongAssign (CodeSeg* S)
-/* Simplify long assignments.
-** Recognize
-**      lda     #IMM      0
-**      sta     sreg+1    1
-**      lda     #IMM      2
-**      sta     sreg      3
-**      lda     #IMM      4
-**      ldx     #IMM      5
-**      sta     YYY       6
-**      stx     YYY+1     7
-**      ldy     sreg      8
-**      sty     YYY+2     9
-**      ldy     sreg+1    10
-**      sty     YYY+3     11
-** and simplify, if not used right after and no branching occurs, to
-**      lda    XXX+3
-**      sta    YYY+3
-**      lda    XXX+2
-**      sta    YYY+2
-**      ldx    XXX
-**      lda    XXX+1
-**      sta    YYY
-**      stx    YYY+1
-*/
+// Simplify long assignments.
+// Recognize
+// lda     #IMM      0
+// sta     sreg+1    1
+// lda     #IMM      2
+// sta     sreg      3
+// lda     #IMM      4
+// ldx     #IMM      5
+// sta     YYY       6
+// stx     YYY+1     7
+// ldy     sreg      8
+// sty     YYY+2     9
+// ldy     sreg+1    10
+// sty     YYY+3     11
+// and simplify, if not used right after and no branching occurs, to
+// lda    XXX+3
+// sta    YYY+3
+// lda    XXX+2
+// sta    YYY+2
+// ldx    XXX
+// lda    XXX+1
+// sta    YYY
+// stx    YYY+1
 {
     unsigned Changes = 0;
 
@@ -145,30 +144,29 @@ unsigned OptLongAssign (CodeSeg* S)
 }
 
 unsigned OptLongCopy (CodeSeg* S)
-/* Simplify long copies.
-** Recognize
-**      lda     XXX+3       0
-**      sta     sreg+1      1
-**      lda     XXX+2       2
-**      sta     sreg        3
-**      ldx     XXX+1       4
-**      lda     XXX         5
-**      sta     YYY         6
-**      stx     YYY+1       7
-**      ldy     sreg        8
-**      sty     YYY+2       9
-**      ldy     sreg+1      10
-**      sty     YYY+3       11
-** and simplify, if not used right after and no branching occurs, to
-**      lda    XXX+3
-**      sta    YYY+3
-**      lda    XXX+2
-**      sta    YYY+2
-**      ldx    XXX
-**      lda    XXX+1
-**      sta    YYY
-**      stx    YYY+1
-*/
+// Simplify long copies.
+// Recognize
+// lda     XXX+3       0
+// sta     sreg+1      1
+// lda     XXX+2       2
+// sta     sreg        3
+// ldx     XXX+1       4
+// lda     XXX         5
+// sta     YYY         6
+// stx     YYY+1       7
+// ldy     sreg        8
+// sty     YYY+2       9
+// ldy     sreg+1      10
+// sty     YYY+3       11
+// and simplify, if not used right after and no branching occurs, to
+// lda    XXX+3
+// sta    YYY+3
+// lda    XXX+2
+// sta    YYY+2
+// ldx    XXX
+// lda    XXX+1
+// sta    YYY
+// stx    YYY+1
 {
     unsigned Changes = 0;
 

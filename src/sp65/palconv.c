@@ -80,11 +80,10 @@ static int Compare (const void* Key, const void* MapEntry)
 
 
 StrBuf* PaletteTo (const Bitmap* B, const Collection* A)
-/* Convert the palette of bitmap B into some sort of other binary format.
-** The output is stored in a string buffer (which is actually a dynamic
-** char array) and returned. The actual output format is taken from the
-** "format" attribute in the attribute collection A.
-*/
+// Convert the palette of bitmap B into some sort of other binary format.
+// The output is stored in a string buffer (which is actually a dynamic
+// char array) and returned. The actual output format is taken from the
+// "format" attribute in the attribute collection A.
 {
     const PaletteMapEntry* E;
 

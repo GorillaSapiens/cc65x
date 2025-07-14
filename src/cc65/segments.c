@@ -81,11 +81,10 @@ static StrStack SegmentNames[SEG_COUNT];
 /* Address size for the segments */
 static Collection SegmentAddrSizes;
 
-/* We're using a collection for the stack instead of a linked list. Since
-** functions may not be nested (at least in the current implementation), the
-** maximum stack depth is 2, so there is not really a need for a better
-** implementation.
-*/
+// We're using a collection for the stack instead of a linked list. Since
+// functions may not be nested (at least in the current implementation), the
+// maximum stack depth is 2, so there is not really a need for a better
+// implementation.
 static Collection SegContextStack = STATIC_COLLECTION_INITIALIZER;
 
 
@@ -120,9 +119,8 @@ void DoneSegAddrSizes (void)
 
 
 static SegAddrSize_t* FindSegAddrSize (const char* Name)
-/* Find already specified address size for a segment by name.
-** Return the found struct or 0 if not found.
-*/
+// Find already specified address size for a segment by name.
+// Return the found struct or 0 if not found.
 {
     SegAddrSize_t* A;
     int I;
@@ -162,9 +160,8 @@ void SetSegAddrSize (const char* Name, unsigned char AddrSize)
 
 
 unsigned char GetSegAddrSize (const char* Name)
-/* Get the address size of the given segment.
-** Return ADDR_SIZE_INVALID if not found.
-*/
+// Get the address size of the given segment.
+// Return ADDR_SIZE_INVALID if not found.
 {
     SegAddrSize_t* A = FindSegAddrSize (Name);
     if (A) {

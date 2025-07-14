@@ -367,10 +367,9 @@ static const CmdEntry* FindCmd (const char* Cmd, const CmdEntry* Tab, unsigned C
 
 
 static void ExecCmd (Collection* Args, const CmdEntry* Tab, unsigned Count)
-/* Search for the command in slot 0 of the given collection. If found, check
-** the argument count, then execute it. If there are problems, output a
-** diagnostic.
-*/
+// Search for the command in slot 0 of the given collection. If found, check
+// the argument count, then execute it. If there are problems, output a
+// diagnostic.
 {
     /* Search for the command, check number of args, then execute it */
     const char* Cmd = CollAt (Args, 0);
@@ -380,12 +379,11 @@ static void ExecCmd (Collection* Args, const CmdEntry* Tab, unsigned Count)
         return;
     }
 
-    /* Check the number of arguments. Zero means that the function will check
-    ** itself. A negative count means that the function needs at least
-    ** abs(count) arguments. A positive count means that the function needs
-    ** exactly this number of arguments.
-    ** Note: The number includes the command itself.
-    */
+    // Check the number of arguments. Zero means that the function will check
+    // itself. A negative count means that the function needs at least
+    // abs(count) arguments. A positive count means that the function needs
+    // exactly this number of arguments.
+    // Note: The number includes the command itself.
     if (E->ArgCount > 0 && (int)CollCount (Args) != E->ArgCount) {
         /* Argument number mismatch */
         switch (E->ArgCount) {
@@ -478,11 +476,10 @@ static unsigned FindIdType (const char* TypeName)
 
 
 static int GetId (const char* S, unsigned* Id, unsigned* IdType)
-/* Parse a string for an id. If a valid id is found, it is placed in Id and
-** the function returns true. If an optional type is found, it is placed in
-** IdType, otherwise IdType is left unchanged. If no id is found, the
-** function returns false.
-*/
+// Parse a string for an id. If a valid id is found, it is placed in Id and
+// the function returns true. If an optional type is found, it is placed in
+// IdType, otherwise IdType is left unchanged. If no id is found, the
+// function returns false.
 {
     char TypeBuf[20];
     char C;
@@ -924,9 +921,8 @@ static void UnloadFile (void)
 
 
 static int FileIsLoaded (void)
-/* Return true if the file is open and has loaded without errors: If not,
-** print an error message and return false.
-*/
+// Return true if the file is open and has loaded without errors: If not,
+// print an error message and return false.
 {
     /* File open? */
     if (Info == 0) {
@@ -1810,9 +1806,8 @@ static void CmdUnload (Collection* Args attribute ((unused)))
 
 
 static int Parse (char* CmdLine, Collection* Args)
-/* Parse the command line and store the arguments in Args. Return true if ok,
-** false on error.
-*/
+// Parse the command line and store the arguments in Args. Return true if ok,
+// false on error.
 {
     char* End;
 

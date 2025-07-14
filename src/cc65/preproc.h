@@ -87,9 +87,8 @@ void PreprocessBegin (struct IFile* Input);
 /* Initialize the preprocessor for a new input file */
 
 void PreprocessEnd (struct IFile* Input);
-/* Preprocessor done with current file. The parameter is the file we're
-** switching back to.
-*/
+// Preprocessor done with current file. The parameter is the file we're
+// switching back to.
 
 
 

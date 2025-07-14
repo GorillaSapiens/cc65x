@@ -86,9 +86,8 @@ const char* FindExt (const char* Name)
 
 
 const char* FindName (const char* Path)
-/* Return a pointer to the file name in Path. If there is no path leading to
-** the file, the function returns Path as name.
-*/
+// Return a pointer to the file name in Path. If there is no path leading to
+// the file, the function returns Path as name.
 {
     /* Get the length of the name */
     int Len = strlen (Path);
@@ -126,11 +125,10 @@ char *GetFileDirectory (const char* File)
 }
 
 char* MakeFilename (const char* Origin, const char* Ext)
-/* Make a new file name from Origin and Ext. If Origin has an extension, it
-** is removed and Ext is appended. If Origin has no extension, Ext is simply
-** appended. The result is placed in a malloc'ed buffer and returned.
-** The function may be used to create "foo.o" from "foo.s".
-*/
+// Make a new file name from Origin and Ext. If Origin has an extension, it
+// is removed and Ext is appended. If Origin has no extension, Ext is simply
+// appended. The result is placed in a malloc'ed buffer and returned.
+// The function may be used to create "foo.o" from "foo.s".
 {
     char* Out;
     const char* P = FindExt (Origin);
@@ -150,9 +148,8 @@ char* MakeFilename (const char* Origin, const char* Ext)
 
 
 char* MakeTmpFilename (const char *Directory, const char *Origin, const char* Ext)
-/* Make a new temporary file name from Origin and Ext.
-** The result is placed in a malloc'ed buffer and returned.
-*/
+// Make a new temporary file name from Origin and Ext.
+// The result is placed in a malloc'ed buffer and returned.
 {
     char* Out;
     size_t Len = 0;
@@ -163,9 +160,8 @@ char* MakeTmpFilename (const char *Directory, const char *Origin, const char* Ex
       Len = strlen (Directory);
     }
 
-    /* ... plus the the original name, the maximum length of the PID, the
-     * maximum length of the counter, the extension, and the terminator.
-     */
+    // ... plus the the original name, the maximum length of the PID, the
+    // maximum length of the counter, the extension, and the terminator.
     Len += strlen (Origin) + (strlen (".2147483648") * 2) + strlen (Ext) + 1;
     Out = xmalloc (Len);
 

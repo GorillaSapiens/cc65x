@@ -103,10 +103,9 @@ int ValidBitmapSize (unsigned Width, unsigned Height)
 
 Bitmap* SliceBitmap (const Bitmap* O, unsigned OrigX, unsigned OrigY,
                      unsigned Width, unsigned Height)
-/* Create a slice of the given bitmap. The slice starts at position X/Y of
-** the original and has the given width and height. Location 0/0 is at the
-** upper left corner.
-*/
+// Create a slice of the given bitmap. The slice starts at position X/Y of
+// the original and has the given width and height. Location 0/0 is at the
+// upper left corner.
 {
     Bitmap*  B;
     unsigned Y;
@@ -139,16 +138,14 @@ Bitmap* SliceBitmap (const Bitmap* O, unsigned OrigX, unsigned OrigY,
 
 
 Color GetPixelColor (const Bitmap* B, unsigned X, unsigned Y)
-/* Get the color for a given pixel. For indexed bitmaps, the palette entry
-** is returned.
-*/
+// Get the color for a given pixel. For indexed bitmaps, the palette entry
+// is returned.
 {
     /* Get the pixel at the given coordinates */
     Pixel P = GetPixel (B, X, Y);
 
-    /* If the bitmap has a palette, return the color from the palette. For
-    ** simplicity, we will only check the palette, not the type.
-    */
+    // If the bitmap has a palette, return the color from the palette. For
+    // simplicity, we will only check the palette, not the type.
     if (B->Pal) {
         if (P.Index >= B->Pal->Count) {
             /* Palette index is invalid */
@@ -165,9 +162,8 @@ Color GetPixelColor (const Bitmap* B, unsigned X, unsigned Y)
 
 
 Pixel GetPixel (const Bitmap* B, unsigned X, unsigned Y)
-/* Return a pixel from the bitmap. The returned value may either be a color
-** or a palette index, depending on the type of the bitmap.
-*/
+// Return a pixel from the bitmap. The returned value may either be a color
+// or a palette index, depending on the type of the bitmap.
 {
     /* Check the coordinates */
     PRECONDITION (X < B->Width && Y < B->Height);

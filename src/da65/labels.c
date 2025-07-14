@@ -67,10 +67,9 @@ struct Label {
     char                Name[1];        /* Symbol name, dynamically allocated */
 };
 
-/* Labels use a hash table and a linear list for collision resolution. The
-** hash function is easy and effective. It evaluates just the lower bits of
-** the address.
-*/
+// Labels use a hash table and a linear list for collision resolution. The
+// hash function is easy and effective. It evaluates just the lower bits of
+// the address.
 #define LABEL_HASH_SIZE         4096u   /* Must be power of two */
 static Label* LabelTab[LABEL_HASH_SIZE];
 
@@ -114,9 +113,8 @@ static uint32_t GetLabelHash (uint32_t Addr)
 
 
 static Label* FindLabel (uint32_t Addr)
-/* Search for a label for the given address and return it. Returns NULL if
-** no label exists for the address.
-*/
+// Search for a label for the given address and return it. Returns NULL if
+// no label exists for the address.
 {
     Label* L = LabelTab[GetLabelHash (Addr)];
     while (L) {
@@ -148,9 +146,8 @@ static void InsertLabel (Label* L)
 
 
 static const char* MakeLabelName (uint32_t Addr)
-/* Make the default label name from the given address and return it in a
-** static buffer.
-*/
+// Make the default label name from the given address and return it in a
+// static buffer.
 {
     static char LabelBuf [32];
     xsprintf (LabelBuf, sizeof (LabelBuf), "L%04" PRIX32, Addr);
@@ -167,9 +164,8 @@ static void AddLabel (uint32_t Addr, attr_t Attr, const char* Name)
 
     /* Must not have two symbols for one address */
     if (ExistingAttr != atNoLabel) {
-        /* Allow redefinition if identical. Beware: Unnamed labels do not
-        ** have an entry in the label table.
-        */
+        // Allow redefinition if identical. Beware: Unnamed labels do not
+        // have an entry in the label table.
         Label* L = FindLabel (Addr);
         if (ExistingAttr == Attr &&
             ((Name == 0 && L == 0) ||
@@ -181,9 +177,8 @@ static void AddLabel (uint32_t Addr, attr_t Attr, const char* Name)
                Name? Name : "<unnamed label>");
     }
 
-    /* If this is not an unnamed label, create a new label entry and
-    ** insert it.
-    */
+    // If this is not an unnamed label, create a new label entry and
+    // insert it.
     if (Name != 0) {
         InsertLabel (NewLabel (Addr, Name));
     }
@@ -222,9 +217,8 @@ void AddUnnamedLabel (uint32_t Addr)
 
 
 void AddDepLabel (uint32_t Addr, attr_t Attr, const char* BaseName, unsigned Offs)
-/* Add a dependent label at the given address using "basename+Offs" as the new
-** name.
-*/
+// Add a dependent label at the given address using "basename+Offs" as the new
+// name.
 {
     /* Create the new name in the buffer */
     StrBuf Name = AUTO_STRBUF_INITIALIZER;
@@ -264,9 +258,8 @@ void AddDepLabel (uint32_t Addr, attr_t Attr, const char* BaseName, unsigned Off
 
 static void AddLabelRange (uint32_t Addr, attr_t Attr,
                            const char* Name, unsigned Count)
-/* Add a label for a range. The first entry gets the label "Name" while the
-** others get "Name+offs".
-*/
+// Add a label for a range. The first entry gets the label "Name" while the
+// others get "Name+offs".
 {
     /* Define the label */
     AddLabel (Addr, Attr, Name);
@@ -301,9 +294,8 @@ static void AddLabelRange (uint32_t Addr, attr_t Attr,
 
 
 void AddIntLabelRange (uint32_t Addr, const char* Name, unsigned Count)
-/* Add an internal label for a range. The first entry gets the label "Name"
-** while the others get "Name+offs".
-*/
+// Add an internal label for a range. The first entry gets the label "Name"
+// while the others get "Name+offs".
 {
     /* Define the label range */
     AddLabelRange (Addr, atIntLabel, Name, Count);
@@ -312,9 +304,8 @@ void AddIntLabelRange (uint32_t Addr, const char* Name, unsigned Count)
 
 
 void AddExtLabelRange (uint32_t Addr, const char* Name, unsigned Count)
-/* Add an external label for a range. The first entry gets the label "Name"
-** while the others get "Name+offs".
-*/
+// Add an external label for a range. The first entry gets the label "Name"
+// while the others get "Name+offs".
 {
     /* Define the label range */
     AddLabelRange (Addr, atExtLabel, Name, Count);
@@ -332,9 +323,8 @@ int HaveLabel (uint32_t Addr)
 
 
 int MustDefLabel (uint32_t Addr)
-/* Return true if we must define a label for this address, that is, if there
-** is a label at this address, and it is an external or internal label.
-*/
+// Return true if we must define a label for this address, that is, if there
+// is a label at this address, and it is an external or internal label.
 {
     /* Get the label attribute */
     attr_t A = GetLabelAttr (Addr);
@@ -351,9 +341,8 @@ const char* GetLabelName (uint32_t Addr)
     /* Get the label attribute */
     attr_t A = GetLabelAttr (Addr);
 
-    /* Special case unnamed labels, because these don't have a named stored in
-    ** the symbol table to save space.
-    */
+    // Special case unnamed labels, because these don't have a named stored in
+    // the symbol table to save space.
     if (A == atUnnamedLabel) {
         return "";
     } else {
@@ -366,10 +355,9 @@ const char* GetLabelName (uint32_t Addr)
 
 
 const char* GetLabel (uint32_t Addr, uint32_t RefFrom)
-/* Return the label name for an address, as it is used in a label reference.
-** RefFrom is the address the label is referenced from. This is needed in case
-** of unnamed labels, to determine the name.
-*/
+// Return the label name for an address, as it is used in a label reference.
+// RefFrom is the address the label is referenced from. This is needed in case
+// of unnamed labels, to determine the name.
 {
     static const char* const FwdLabels[] = {
         ":+", ":++", ":+++", ":++++", ":+++++", ":++++++", ":+++++++",
@@ -383,16 +371,14 @@ const char* GetLabel (uint32_t Addr, uint32_t RefFrom)
     /* Get the label attribute */
     attr_t A = GetLabelAttr (Addr);
 
-    /* Special case unnamed labels, because these don't have a named stored in
-    ** the symbol table to save space.
-    */
+    // Special case unnamed labels, because these don't have a named stored in
+    // the symbol table to save space.
     if (A == atUnnamedLabel) {
 
         unsigned Count = 0;
 
-        /* Search forward or backward depending in which direction the label
-        ** is.
-        */
+        // Search forward or backward depending in which direction the label
+        // is.
         if (Addr <= RefFrom) {
             /* Search backwards */
             uint32_t I = RefFrom;
@@ -439,9 +425,8 @@ const char* GetLabel (uint32_t Addr, uint32_t RefFrom)
 
 
 void ForwardLabel (uint32_t Offs)
-/* If necessary, output a forward label, one that is within the next few
-** bytes and is therefore output as "label = * + x".
-*/
+// If necessary, output a forward label, one that is within the next few
+// bytes and is therefore output as "label = * + x".
 {
     /* Calculate the actual address */
     uint32_t Addr = PC + Offs;
@@ -454,9 +439,8 @@ void ForwardLabel (uint32_t Offs)
         return;
     }
 
-    /* An unnamed label cannot be output as a forward declaration, so this is
-    ** an error.
-    */
+    // An unnamed label cannot be output as a forward declaration, so this is
+    // an error.
     if (A == atUnnamedLabel) {
         Error ("Cannot define unnamed label at address $%04" PRIX32, Addr);
     }
@@ -509,14 +493,13 @@ void DefOutOfRangeLabels (void)
 {
     unsigned I;
 
-    /* This requires somewhat more effort since the labels output should be
-    ** sorted by address for better readability. This is not directly
-    ** possible when using a hash table, so an intermediate data structure
-    ** is required. It is not possible to collect out-of-range labels while
-    ** generating them, since they may come from an info file and are added
-    ** while no input file was read. Which means it cannot be determined at
-    ** that point if they're out-of-range or not.
-    */
+    // This requires somewhat more effort since the labels output should be
+    // sorted by address for better readability. This is not directly
+    // possible when using a hash table, so an intermediate data structure
+    // is required. It is not possible to collect out-of-range labels while
+    // generating them, since they may come from an info file and are added
+    // while no input file was read. Which means it cannot be determined at
+    // that point if they're out-of-range or not.
     Collection Labels = AUTO_COLLECTION_INITIALIZER;
     CollGrow (&Labels, 128);
 

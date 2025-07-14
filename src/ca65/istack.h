@@ -62,23 +62,20 @@ void PopInput (void);
 /* Pop the current input function from the input stack */
 
 int InputFromStack (void);
-/* Try to get input from the input stack. Return true if we had such input,
-** return false otherwise.
-*/
+// Try to get input from the input stack. Return true if we had such input,
+// return false otherwise.
 
 int HavePushedInput (void);
 /* Return true if we have stacked input available, return false if not */
 
 void CheckInputStack (void);
-/* Called from the scanner before closing an input file. Will check for any
-** stuff on the input stack.
-*/
+// Called from the scanner before closing an input file. Will check for any
+// stuff on the input stack.
 
 InputStack RetrieveInputStack (void);
-/* Retrieve the current input stack. This will also clear it. Used when
-** including a file. The current input stack is stored together with the old
-** input file and restored when the file is closed.
- */
+// Retrieve the current input stack. This will also clear it. Used when
+// including a file. The current input stack is stored together with the old
+// input file and restored when the file is closed.
 
 void RestoreInputStack (InputStack S);
 /* Restore an old input stack that was retrieved by RetrieveInputStack(). */

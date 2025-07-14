@@ -251,9 +251,8 @@ Type* TypeDup (const Type* T);
 /* Create a copy of the given type on the heap */
 
 Type* TypeAlloc (unsigned Len);
-/* Allocate memory for a type string of length Len. Len *must* include the
-** trailing T_END.
-*/
+// Allocate memory for a type string of length Len. Len *must* include the
+// trailing T_END.
 
 void TypeFree (Type* T);
 /* Free a type string */
@@ -280,14 +279,12 @@ int SignExtendChar (int C);
 /* Do correct sign extension of a character to an int */
 
 long GetIntegerTypeMin (const Type* Type);
-/* Get the smallest possible value of the integer type.
-** The type must have a known size.
-*/
+// Get the smallest possible value of the integer type.
+// The type must have a known size.
 
 unsigned long GetIntegerTypeMax (const Type* Type);
-/* Get the largest possible value of the integer type.
-** The type must have a known size.
-*/
+// Get the largest possible value of the integer type.
+// The type must have a known size.
 
 unsigned BitSizeOf (const Type* T);
 /* Return the size (in bit-width) of a data type */
@@ -299,28 +296,24 @@ unsigned PSizeOf (const Type* T);
 /* Compute size (in bytes) of pointee object */
 
 unsigned CheckedBitSizeOf (const Type* T);
-/* Return the size (in bit-width) of a data type. If the size is zero, emit an
-** error and return some valid size instead (so the rest of the compiler
-** doesn't have to work with invalid sizes).
-*/
+// Return the size (in bit-width) of a data type. If the size is zero, emit an
+// error and return some valid size instead (so the rest of the compiler
+// doesn't have to work with invalid sizes).
 
 unsigned CheckedSizeOf (const Type* T);
-/* Return the size (in bytes) of a data type. If the size is zero, emit an
-** error and return some valid size instead (so the rest of the compiler
-** doesn't have to work with invalid sizes).
-*/
+// Return the size (in bytes) of a data type. If the size is zero, emit an
+// error and return some valid size instead (so the rest of the compiler
+// doesn't have to work with invalid sizes).
 
 unsigned CheckedPSizeOf (const Type* T);
-/* Return the size (in bytes) of a data type that is pointed to by a pointer.
-** If the size is zero, emit an error and return some valid size instead (so
-** the rest of the compiler doesn't have to work with invalid sizes).
-*/
+// Return the size (in bytes) of a data type that is pointed to by a pointer.
+// If the size is zero, emit an error and return some valid size instead (so
+// the rest of the compiler doesn't have to work with invalid sizes).
 
 #if defined(HAVE_INLINE)
 INLINE TypeCode GetQualifier (const Type* T)
-/* Get the qualifier from the given type. This doesn't have a "raw" version
-** since an underlying type can never be qualified.
-*/
+// Get the qualifier from the given type. This doesn't have a "raw" version
+// since an underlying type can never be qualified.
 {
     return (T->C & T_MASK_QUAL);
 }
@@ -329,9 +322,8 @@ INLINE TypeCode GetQualifier (const Type* T)
 #endif
 
 TypeCode GetUnderlyingTypeCode (const Type* Type);
-/* Get the type code of the unqualified underlying type of Type.
-** Return GetUnqualRawTypeCode (Type) if Type is not scalar.
-*/
+// Get the type code of the unqualified underlying type of Type.
+// Return GetUnqualRawTypeCode (Type) if Type is not scalar.
 
 #if defined(HAVE_INLINE)
 INLINE TypeCode GetUnqualRawTypeCode (const Type* T)
@@ -345,9 +337,8 @@ INLINE TypeCode GetUnqualRawTypeCode (const Type* T)
 
 #if defined(HAVE_INLINE)
 INLINE TypeCode GetTypeClass (const Type* T)
-/* Get the class of a type. This doesn't have a "raw" version since an
-** underlying type can never be in a different class.
-*/
+// Get the class of a type. This doesn't have a "raw" version since an
+// underlying type can never be in a different class.
 {
     return (T->C & T_MASK_CLASS);
 }
@@ -430,44 +421,37 @@ Type* GetCharArrayType (unsigned Len);
 /* Return the type for a char array of the given length */
 
 Type* NewPointerTo (const Type* T);
-/* Return a type string that is "pointer to T". The type string is allocated
-** on the heap and may be freed after use.
-*/
+// Return a type string that is "pointer to T". The type string is allocated
+// on the heap and may be freed after use.
 
 Type* NewBitFieldOf (const Type* T, unsigned BitOffs, unsigned BitWidth);
-/* Return a type string that is "unqualified T : BitWidth" aligned on BitOffs.
-** The type string is allocated on the heap and may be freed after use.
-*/
+// Return a type string that is "unqualified T : BitWidth" aligned on BitOffs.
+// The type string is allocated on the heap and may be freed after use.
 
 const Type* AddressOf (const Type* T);
-/* Return a type string that is "address of T". The type string is allocated
-** on the heap and may be freed after use.
-*/
+// Return a type string that is "address of T". The type string is allocated
+// on the heap and may be freed after use.
 
 const Type* Indirect (const Type* T);
-/* Do one indirection for the given type, that is, return the type where the
-** given type points to.
-*/
+// Do one indirection for the given type, that is, return the type where the
+// given type points to.
 
 Type* ArrayToPtr (const Type* T);
 /* Convert an array to a pointer to it's first element */
 
 const Type* PtrConversion (const Type* T);
-/* If the type is a function, convert it to pointer to function. If the
-** expression is an array, convert it to pointer to first element. Otherwise
-** return T.
-*/
+// If the type is a function, convert it to pointer to function. If the
+// expression is an array, convert it to pointer to first element. Otherwise
+// return T.
 
 const Type* StdConversion (const Type* T);
-/* If the type is a function, convert it to pointer to function. If the
-** expression is an array, convert it to pointer to first element. If the
-** type is an integer, do integeral promotion. Otherwise return T.
-*/
+// If the type is a function, convert it to pointer to function. If the
+// expression is an array, convert it to pointer to first element. If the
+// type is an integer, do integeral promotion. Otherwise return T.
 
 const Type* IntPromotion (const Type* T);
-/* Apply the integer promotions to T and return the result. The returned type
-** string may be T if there is no need to change it.
-*/
+// Apply the integer promotions to T and return the result. The returned type
+// string may be T if there is no need to change it.
 
 const Type* ArithmeticConvert (const Type* lhst, const Type* rhst);
 /* Perform the usual arithmetic conversions for binary operators. */
@@ -540,9 +524,8 @@ INLINE int IsRankLong (const Type* T)
 
 #if defined(HAVE_INLINE)
 INLINE int IsDeclTypeChar (const Type* T)
-/* Return true if this is declared as a char type (without signed/unsigned).
-** This function is to exclude enums whose underlying type is char.
-*/
+// Return true if this is declared as a char type (without signed/unsigned).
+// This function is to exclude enums whose underlying type is char.
 {
     return (GetUnqualRawTypeCode (T) == T_CHAR);
 }
@@ -552,9 +535,8 @@ INLINE int IsDeclTypeChar (const Type* T)
 
 #if defined(HAVE_INLINE)
 INLINE int IsDeclRankChar (const Type* T)
-/* Return true if this is declared as a character type (including signed/unsigned).
-** This function is to exclude enums whose underlying types are character types.
-*/
+// Return true if this is declared as a character type (including signed/unsigned).
+// This function is to exclude enums whose underlying types are character types.
 {
     return (GetRawTypeRank (T) == T_RANK_CHAR);
 }
@@ -799,10 +781,9 @@ int IsAnonStructClass (const Type* T);
 /* Return true if this is an anonymous struct or union type */
 
 int IsPassByRefType (const Type* T);
-/* Return true if this is a large struct/union type that doesn't fit in the
-** primary. This returns false for the void value extension type since it is
-** not passable at all.
-*/
+// Return true if this is a large struct/union type that doesn't fit in the
+// primary. This returns false for the void value extension type since it is
+// not passable at all.
 
 int IsEmptiableObjectType (const Type* T);
 /* Return true if this is a struct/union/void type that can have zero size */
@@ -973,16 +954,14 @@ INLINE TypeCode DataAddrSizeQualifier (void)
 
 
 int IsVariadicFunc (const Type* T) attribute ((const));
-/* Return true if this is a function type or pointer to function type with
-** variable parameter list.
-** Check fails if the type is not a function or a pointer to function.
-*/
+// Return true if this is a function type or pointer to function type with
+// variable parameter list.
+// Check fails if the type is not a function or a pointer to function.
 
 int IsFastcallFunc (const Type* T) attribute ((const));
-/* Return true if this is a function type or pointer to function type with
-** __fastcall__ calling convention.
-** Check fails if the type is not a function or a pointer to function.
-*/
+// Return true if this is a function type or pointer to function type with
+// __fastcall__ calling convention.
+// Check fails if the type is not a function or a pointer to function.
 
 FuncDesc* GetFuncDesc (const Type* T) attribute ((const));
 /* Get the FuncDesc pointer from a function or pointer-to-function type */
@@ -1008,14 +987,12 @@ const FuncDesc* GetFuncDefinitionDesc (const Type* T) attribute ((const));
 
 
 long GetElementCount (const Type* T);
-/* Get the element count of the array specified in T (which must be of
-** array type).
-*/
+// Get the element count of the array specified in T (which must be of
+// array type).
 
 void SetElementCount (Type* T, long Count);
-/* Set the element count of the array specified in T (which must be of
-** array type).
-*/
+// Set the element count of the array specified in T (which must be of
+// array type).
 
 const Type* GetElementType (const Type* T);
 /* Return the element type of the given array type */
@@ -1024,10 +1001,9 @@ Type* GetElementTypeModifiable (Type* T);
 /* Return the element type of the given array type */
 
 const Type* GetBaseElementType (const Type* T);
-/* Return the base element type of a given type. If T is not an array, this
-** will return. Otherwise it will return the base element type, which means
-** the element type that is not an array.
-*/
+// Return the base element type of a given type. If T is not an array, this
+// will return. Otherwise it will return the base element type, which means
+// the element type that is not an array.
 
 
 
@@ -1038,9 +1014,8 @@ const Type* GetBaseElementType (const Type* T);
 
 
 struct SymEntry* GetESUTagSym (const Type* T) attribute ((const));
-/* Get the tag symbol entry of the enum/struct/union type.
-** Return 0 if it is not an enum/struct/union.
-*/
+// Get the tag symbol entry of the enum/struct/union type.
+// Return 0 if it is not an enum/struct/union.
 
 void SetESUTagSym (Type* T, struct SymEntry* S);
 /* Set the tag symbol entry of the enum/struct/union type */
@@ -1054,9 +1029,8 @@ void SetESUTagSym (Type* T, struct SymEntry* S);
 
 
 const char* GetBasicTypeName (const Type* T);
-/* Return a const name string of the basic type.
-** Return "<type>" for unknown basic types.
-*/
+// Return a const name string of the basic type.
+// Return "<type>" for unknown basic types.
 
 const char* GetFullTypeName (const Type* T);
 /* Return the full name string of the given type */
@@ -1065,10 +1039,9 @@ struct StrBuf* GetFullTypeNameBuf (struct StrBuf* S, const Type* T);
 /* Return the full name string of the given type */
 
 int GetQualifierTypeCodeNameBuf (struct StrBuf* S, TypeCode Qual, TypeCode IgnoredQual);
-/* Return the names of the qualifiers of the type.
-** Qualifiers to be ignored can be specified with the IgnoredQual flags.
-** Return the count of added qualifier names.
-*/
+// Return the names of the qualifiers of the type.
+// Qualifiers to be ignored can be specified with the IgnoredQual flags.
+// Return the count of added qualifier names.
 
 void PrintType (FILE* F, const Type* T);
 /* Print fulle name of the type */

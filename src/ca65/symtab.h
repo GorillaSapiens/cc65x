@@ -111,29 +111,25 @@ SymTable* SymFindScope (SymTable* Parent, const StrBuf* Name, SymFindAction Acti
 /* Find a scope in the given enclosing scope */
 
 SymTable* SymFindAnyScope (SymTable* Parent, const StrBuf* Name);
-/* Find a scope in the given or any of its parent scopes. The function will
-** never create a new symbol, since this can only be done in one specific
-** scope.
-*/
+// Find a scope in the given or any of its parent scopes. The function will
+// never create a new symbol, since this can only be done in one specific
+// scope.
 
 SymEntry* SymFindLocal (SymEntry* Parent, const StrBuf* Name, SymFindAction Action);
-/* Find a cheap local symbol. If Action contains SYM_ALLOC_NEW and the entry is
-** not found, create a new one. Return the entry found, or the new entry
-** created, or - in case Action is SYM_FIND_EXISTING - return 0.
-*/
+// Find a cheap local symbol. If Action contains SYM_ALLOC_NEW and the entry is
+// not found, create a new one. Return the entry found, or the new entry
+// created, or - in case Action is SYM_FIND_EXISTING - return 0.
 
 SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, SymFindAction Action);
-/* Find a new symbol table entry in the given table. If Action contains
-** SYM_ALLOC_NEW and the entry is not found, create a new one. Return the
-** entry found, or the new entry created, or - in case Action is
-** SYM_FIND_EXISTING - return 0.
-*/
+// Find a new symbol table entry in the given table. If Action contains
+// SYM_ALLOC_NEW and the entry is not found, create a new one. Return the
+// entry found, or the new entry created, or - in case Action is
+// SYM_FIND_EXISTING - return 0.
 
 SymEntry* SymFindAny (SymTable* Scope, const StrBuf* Name);
-/* Find a symbol in the given or any of its parent scopes. The function will
-** never create a new symbol, since this can only be done in one specific
-** scope.
-*/
+// Find a symbol in the given or any of its parent scopes. The function will
+// never create a new symbol, since this can only be done in one specific
+// scope.
 
 #if defined(HAVE_INLINE)
 INLINE unsigned char GetSymTabType (const SymTable* S)

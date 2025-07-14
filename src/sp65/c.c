@@ -168,9 +168,8 @@ void WriteCFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
              GetBitmapColors (B),
              BitmapIsIndexed (B)? ", indexed" : "");
 
-    /* If an identifier was given, output #defines for width, height, the
-    ** number of colors and declare a variable for the data.
-    */
+    // If an identifier was given, output #defines for width, height, the
+    // number of colors and declare a variable for the data.
     if (Ident) {
         fprintf (F,
                  "#define %s_COLORS       %u\n"

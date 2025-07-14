@@ -142,9 +142,8 @@ LineInfo* ReadLineInfo (FILE* F, ObjData* O)
 
 
 void ReadLineInfoList (FILE* F, ObjData* O, Collection* LineInfos)
-/* Read a list of line infos stored as a list of indices in the object file,
-** make real line infos from them and place them into the passed collection.
-*/
+// Read a list of line infos stored as a list of indices in the object file,
+// make real line infos from them and place them into the passed collection.
 {
     /* Read the number of line info indices that follow */
     unsigned LineInfoCount = ReadVar (F);
@@ -158,9 +157,8 @@ void ReadLineInfoList (FILE* F, ObjData* O, Collection* LineInfos)
         /* Read an index */
         unsigned LineInfoIndex = ReadVar (F);
 
-        /* The line info index was written by the assembler and must
-        ** therefore be part of the line infos read from the object file.
-        */
+        // The line info index was written by the assembler and must
+        // therefore be part of the line infos read from the object file.
         if (LineInfoIndex >= CollCount (&O->LineInfos)) {
             Internal ("Invalid line info index %u in module '%s' - max is %u",
                       LineInfoIndex,
@@ -176,9 +174,8 @@ void ReadLineInfoList (FILE* F, ObjData* O, Collection* LineInfos)
 
 
 const LineInfo* GetAsmLineInfo (const Collection* LineInfos)
-/* Find a line info of type LI_TYPE_ASM and count zero in the given collection
-** and return it. Return NULL if no such line info was found.
-*/
+// Find a line info of type LI_TYPE_ASM and count zero in the given collection
+// and return it. Return NULL if no such line info was found.
 {
     unsigned I;
 

@@ -63,9 +63,8 @@ struct Segment {
     char                Name[1];        /* Name, dynamically allocated */
 };
 
-/* Table containing the segments. A segment is inserted using its hash
-** value. Collisions are handled by single-linked lists.
-*/
+// Table containing the segments. A segment is inserted using its hash
+// value. Collisions are handled by single-linked lists.
 static Segment* StartTab[HASH_SIZE];    /* Table containing segment starts */
 
 

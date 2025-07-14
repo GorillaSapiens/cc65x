@@ -50,10 +50,9 @@
 
 
 StrBuf* AnonName (StrBuf* Buf, const char* Spec);
-/* Get a name for an anonymous scope, variable or type. Size is the size of
-** the buffer passed to the function, Spec will be used as part of the
-** identifier if given. A pointer to the buffer is returned.
-*/
+// Get a name for an anonymous scope, variable or type. Size is the size of
+// the buffer passed to the function, Spec will be used as part of the
+// identifier if given. A pointer to the buffer is returned.
 
 int IsAnonName (const StrBuf* Name);
 /* Check if the given symbol name is that of an anonymous symbol */

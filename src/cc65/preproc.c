@@ -158,22 +158,19 @@ struct HiddenMacro {
 
 
 static void TranslationPhase3 (StrBuf* Source, StrBuf* Target);
-/* Mimic Translation Phase 3. Handle old and new style comments. Collapse
-** non-newline whitespace sequences.
-*/
+// Mimic Translation Phase 3. Handle old and new style comments. Collapse
+// non-newline whitespace sequences.
 
 static void PreprocessDirective (StrBuf* Source, StrBuf* Target, unsigned ModeFlags);
-/* Preprocess a single line. Handle specified tokens and operators, remove
-** whitespace and comments, then do macro replacement.
-*/
+// Preprocess a single line. Handle specified tokens and operators, remove
+// whitespace and comments, then do macro replacement.
 
 static int ParseDirectives (unsigned ModeFlags);
 /* Handle directives. Return 1 if any whitespace or newlines are parsed. */
 
 static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsigned ModeFlags);
-/* Scan for and perform macro replacement. Return the count of identifiers and
-** right parentheses in the replacement result.
-*/
+// Scan for and perform macro replacement. Return the count of identifiers and
+// right parentheses in the replacement result.
 
 static MacroExp* InitMacroExp (MacroExp* E);
 /* Initialize a MacroExp structure */
@@ -182,14 +179,12 @@ static void DoneMacroExp (MacroExp* E);
 /* Cleanup after use of a MacroExp structure */
 
 static int CheckPastePPTok (StrBuf* Target, unsigned TokLen, char Next);
-/* Return 1 if the last pp-tokens from Source could be concatenated with any
-** characters from Appended to form a new valid one.
-*/
+// Return 1 if the last pp-tokens from Source could be concatenated with any
+// characters from Appended to form a new valid one.
 
 static void LazyCheckNextPPTok (const StrBuf* Prev, unsigned LastTokLen);
-/* Memorize the previous pp-token(s) to later check for potential pp-token
-** concatenation.
-*/
+// Memorize the previous pp-token(s) to later check for potential pp-token
+// concatenation.
 
 
 
@@ -256,9 +251,8 @@ static int CmpToken (const void* Key, const void* Elem)
 
 
 static ppdirective_t FindPPDirectiveType (const char* Ident)
-/* Find a preprocessor directive type and return it. Return PPD_ILLEGAL if the
-** identifier is not a valid preprocessor directive token.
-*/
+// Find a preprocessor directive type and return it. Return PPD_ILLEGAL if the
+// identifier is not a valid preprocessor directive token.
 {
     struct PPDType* P;
     P = bsearch (Ident, PPDTypes, PPDTOKEN_COUNT, sizeof (PPDTypes[0]), CmpToken);
@@ -426,9 +420,8 @@ static int ME_CanExpand (unsigned Idx, const MacroExp* E, const Macro* M)
             /* Check if the macro is hidden from this identifier */
             HideRange* HS = MHS->HS;
             while (HS != 0) {
-                /* If the macro name overlaps with the range where the macro is hidden,
-                ** the macro cannot be expanded.
-                */
+                // If the macro name overlaps with the range where the macro is hidden,
+                // the macro cannot be expanded.
                 if (Idx >= HS->Start && Idx < HS->End) {
                     return 0;
                 }
@@ -443,9 +436,8 @@ static int ME_CanExpand (unsigned Idx, const MacroExp* E, const Macro* M)
 
 
 static void ME_OffsetHideSets (unsigned Idx, unsigned Offs, MacroExp* E)
-/* Adjust all macro hide set ranges for the macro expansion when the identifier
-** at Idx is replaced with a count of Offs + 1 (if Offs > 0) of identifiers.
-*/
+// Adjust all macro hide set ranges for the macro expansion when the identifier
+// at Idx is replaced with a count of Offs + 1 (if Offs > 0) of identifiers.
 {
     if (Offs != 0) {
         unsigned I;
@@ -469,9 +461,8 @@ static void ME_OffsetHideSets (unsigned Idx, unsigned Offs, MacroExp* E)
 
 
 static void ME_RemoveToken (unsigned Idx, unsigned Count, MacroExp* E)
-/* Remove the Idx'th identifier token from tracking and offset all hidden
-** ranges accordingly.
-*/
+// Remove the Idx'th identifier token from tracking and offset all hidden
+// ranges accordingly.
 {
     unsigned I;
 
@@ -519,10 +510,9 @@ static void ME_RemoveToken (unsigned Idx, unsigned Count, MacroExp* E)
 
 
 static void ME_HandleSemiNestedMacro (unsigned NameIdx, unsigned LastIdx, MacroExp* E)
-/* Unhide the macro name from all hidesets if it was expanded with an unhidden
-** right parenthesis. This is unspecified but allowed behavior according to
-** ISO/IEC 9899:2018, 6.10.3.4ff.
-*/
+// Unhide the macro name from all hidesets if it was expanded with an unhidden
+// right parenthesis. This is unspecified but allowed behavior according to
+// ISO/IEC 9899:2018, 6.10.3.4ff.
 {
     unsigned I;
 
@@ -553,9 +543,8 @@ static void ME_HandleSemiNestedMacro (unsigned NameIdx, unsigned LastIdx, MacroE
 
 
 static void ME_AddArgHideSets (unsigned Idx, const MacroExp* A, MacroExp* Parent)
-/* Propagate the macro hide sets of the substituted argument starting as the
-** Idx'th identifier of the result.
-*/
+// Propagate the macro hide sets of the substituted argument starting as the
+// Idx'th identifier of the result.
 {
     unsigned I;
 
@@ -644,9 +633,8 @@ static MacroExp* ME_GetReplacedArg (const MacroExp* E, unsigned Index)
 
 
 static MacroExp* ME_AppendArg (MacroExp* E, MacroExp* Arg)
-/* Add a copy of Arg to the list of actual macro arguments.
-** NOTE: This function will clear the token sequence of Arg!
-*/
+// Add a copy of Arg to the list of actual macro arguments.
+// NOTE: This function will clear the token sequence of Arg!
 {
     MacroExp* A = xmalloc (sizeof (MacroExp));
 
@@ -679,9 +667,8 @@ static void ME_ClearArgs (MacroExp* E)
     for (I = 0; I < CollCount (&E->Args); ++I) {
         MacroExp* A = CollAtUnchecked (&E->Args, I);
 
-        /* Destroy the macro expansion structure and then free memory allocated
-        ** for it.
-        */
+        // Destroy the macro expansion structure and then free memory allocated
+        // for it.
         DoneMacroExp (A);
         xfree (A);
     }
@@ -795,9 +782,8 @@ static void DoneRescanInputStack (RescanInputStack* RIS)
 
 
 static int MacName (char* Ident)
-/* Get a macro symbol name into Ident.  If we have an error, print a
-** diagnostic message and clear the line.
-*/
+// Get a macro symbol name into Ident.  If we have an error, print a
+// diagnostic message and clear the line.
 {
     if (IsSym (Ident) == 0) {
         if (CurC != '\0') {
@@ -820,9 +806,8 @@ static void CheckForBadIdent (const char* Ident, int Std, const Macro* M)
     if (Std >= STD_C99              &&
         (M == 0 || !M->Variadic)    &&
         strcmp (Ident, "__VA_ARGS__") == 0) {
-        /* __VA_ARGS__ cannot be used as a macro parameter name in post-C89
-        ** mode.
-        */
+        // __VA_ARGS__ cannot be used as a macro parameter name in post-C89
+        // mode.
         PPWarning ("__VA_ARGS__ can only appear in the expansion of a C99 variadic macro");
     }
 }
@@ -877,18 +862,16 @@ static void AppendIndent (StrBuf* Str, int Count)
 
 
 static void Stringize (StrBuf* Source, StrBuf* Target)
-/* Stringize the given string: Add double quotes at start and end and preceed
-** each occurance of " and \ by a backslash.
-*/
+// Stringize the given string: Add double quotes at start and end and preceed
+// each occurance of " and \ by a backslash.
 {
     char C;
 
     /* Add a starting quote */
     SB_AppendChar (Target, '\"');
 
-    /* Replace any characters inside the string may not be part of a string
-    ** unescaped.
-    */
+    // Replace any characters inside the string may not be part of a string
+    // unescaped.
     while ((C = SB_Get (Source)) != '\0') {
         switch (C) {
             case '\"':
@@ -910,9 +893,8 @@ static void Stringize (StrBuf* Source, StrBuf* Target)
 static void OldStyleComment (void)
 /* Remove an old style C comment from line */
 {
-    /* Remember the current line number, so we can output better error
-    ** messages if the comment is not terminated in the current file.
-    */
+    // Remember the current line number, so we can output better error
+    // messages if the comment is not terminated in the current file.
     unsigned StartingLine = GetCurrentLineNum ();
 
     /* Skip the start of comment chars */
@@ -953,11 +935,10 @@ static void NewStyleComment (void)
         AllowNewComments = 1;
     }
 
-    /* Beware: Because line continuation chars are handled when reading
-    ** lines, we may only skip until the end of the source line, which
-    ** may not be the same as the end of the input line. The end of the
-    ** source line is denoted by a lf (\n) character.
-    */
+    // Beware: Because line continuation chars are handled when reading
+    // lines, we may only skip until the end of the source line, which
+    // may not be the same as the end of the input line. The end of the
+    // source line is denoted by a lf (\n) character.
     do {
         NextChar ();
     } while (CurC != '\n' && CurC != '\0');
@@ -969,12 +950,11 @@ static void NewStyleComment (void)
 
 
 static int SkipWhitespace (int SkipLines)
-/* Skip white space and comments in the input stream. If skipLines is true,
-** also skip newlines and add that count to global PendingNewLines. Return 1
-** if the last skipped character was a white space other than a newline '\n',
-** otherwise return -1 if there were any newline characters skipped, otherwise
-** return 0 if nothing was skipped.
-*/
+// Skip white space and comments in the input stream. If skipLines is true,
+// also skip newlines and add that count to global PendingNewLines. Return 1
+// if the last skipped character was a white space other than a newline '\n',
+// otherwise return -1 if there were any newline characters skipped, otherwise
+// return 0 if nothing was skipped.
 {
     int Skipped = 0;
     int NewLine = 0;
@@ -1005,17 +985,15 @@ static int SkipWhitespace (int SkipLines)
                                                     CollCount (&CurRescanStack->Lines) - 2);
                     char    C    = SB_Peek (Next);
 
-                    /* We cannot check right now if the next pp-token may be a
-                    ** macro.
-                    */
+                    // We cannot check right now if the next pp-token may be a
+                    // macro.
                     if (IsIdent (C)) {
                         /* Memorize the previous pp-token and check it later */
                         LazyCheckNextPPTok (Line, LastTokLen);
                     } else if (C != '\0' && !IsSpace (C)) {
-                        /* If the two adjacent pp-tokens could be put together
-                        ** to form a new one, we have to separate them with an
-                        ** additional space.
-                        */
+                        // If the two adjacent pp-tokens could be put together
+                        // to form a new one, we have to separate them with an
+                        // additional space.
                         Skipped = CheckPastePPTok (Line, LastTokLen, SB_Peek (Next));
                     }
 
@@ -1078,9 +1056,8 @@ static void CopyHeaderNameToken (StrBuf* Target)
 
 
 static int IsQuotedString (void)
-/* Retrun 1 if the incoming characters indicate a string literal or character
-** constant, otherwise return 0.
-*/
+// Retrun 1 if the incoming characters indicate a string literal or character
+// constant, otherwise return 0.
 {
     return IsQuote (CurC) || IsWideQuoted (CurC, NextC);
 }
@@ -1126,9 +1103,8 @@ static void CopyQuotedString (StrBuf* Target)
 
 
 static int GetPunc (char* S)
-/* Parse a punctuator token. Return 1 and store the parsed token string into S
-** on success, otherwise just return 0.
-*/
+// Parse a punctuator token. Return 1 and store the parsed token string into S
+// on success, otherwise just return 0.
 {
     char C;
     switch (CurC) {
@@ -1244,9 +1220,8 @@ static int GetPunc (char* S)
 
 
 static int CheckPastePPTok (StrBuf* Source, unsigned TokLen, char Next)
-/* Return 1 if the last pp-tokens from Source could be concatenated with any
-** characters from Appended to form a new valid one.
-*/
+// Return 1 if the last pp-tokens from Source could be concatenated with any
+// characters from Appended to form a new valid one.
 {
     char        C;
     unsigned    NewTokLen;
@@ -1260,9 +1235,8 @@ static int CheckPastePPTok (StrBuf* Source, unsigned TokLen, char Next)
 
     PRECONDITION (SB_GetLen (Source) >= TokLen);
 
-    /* Special casing "..", "/ /" and "/ *" that are not pp-tokens but still
-    ** need be separated.
-    */
+    // Special casing "..", "/ /" and "/ *" that are not pp-tokens but still
+    // need be separated.
     C = SB_LookAt (Source, SB_GetLen (Source) - TokLen);
     if ((C == '.' && Next == '.') || (C == '/' && (Next == '/' || Next == '*'))) {
         return 1;
@@ -1309,10 +1283,9 @@ static int TryPastePPTok (StrBuf* Target,
                           StrBuf* Appended,
                           unsigned FirstTokLen,
                           unsigned SecondTokLen)
-/* Paste the whole appened pp-token sequence onto the end of the target
-** pp-token sequence. Diagnose if it fails to form a valid pp-token with the
-** two pp-tokens pasted together. Return 1 if succeeds.
-*/
+// Paste the whole appened pp-token sequence onto the end of the target
+// pp-token sequence. Diagnose if it fails to form a valid pp-token with the
+// two pp-tokens pasted together. Return 1 if succeeds.
 {
     unsigned    TokLen;
     StrBuf*     OldSource;
@@ -1324,10 +1297,9 @@ static int TryPastePPTok (StrBuf* Target,
         return 1;
     }
 
-    /* Since we need to concatenate the token sequences, remove the
-    ** last whitespace that was added to target, since it must come
-    ** from the input.
-    */
+    // Since we need to concatenate the token sequences, remove the
+    // last whitespace that was added to target, since it must come
+    // from the input.
     if (IsBlank (SB_LookAtLast (Target))) {
         SB_Drop (Target, 1);
     }
@@ -1339,9 +1311,8 @@ static int TryPastePPTok (StrBuf* Target,
     if (FirstTokLen == 1) {
         char C = SB_LookAt (Target, SB_GetLen (Target) - FirstTokLen);
         char N = SB_LookAt (Appended, 0);
-        /* Avoid forming a comment introducer or an ellipsis. Note that an
-        ** ellipsis pp-token cannot be formed with macros anyway.
-        */
+        // Avoid forming a comment introducer or an ellipsis. Note that an
+        // ellipsis pp-token cannot be formed with macros anyway.
         if ((C == '.' && N == '.') || (C == '/' && (N == '/' || N == '*'))) {
             SB_AppendChar (Target, ' ');
             SB_Append (Target, Appended);
@@ -1425,9 +1396,8 @@ static int TryPastePPTok (StrBuf* Target,
 
 
 static void SeparatePPTok (StrBuf* Target, char Next)
-/* Add a space to target if the previous pp-token could be concatenated with
-** the following character.
-*/
+// Add a space to target if the previous pp-token could be concatenated with
+// the following character.
 {
     if (CurRescanStack->PrevTok != 0) {
         unsigned Len = SB_GetLen (CurRescanStack->PrevTok) - SB_GetIndex (CurRescanStack->PrevTok);
@@ -1444,9 +1414,8 @@ static void SeparatePPTok (StrBuf* Target, char Next)
 
 
 static void LazyCheckNextPPTok (const StrBuf* Prev, unsigned LastTokLen)
-/* Memorize the previous pp-token(s) to later check for potential pp-token
-** concatenation.
-*/
+// Memorize the previous pp-token(s) to later check for potential pp-token
+// concatenation.
 {
     char        C;
     int         CheckEllipsis = 0;
@@ -1457,10 +1426,9 @@ static void LazyCheckNextPPTok (const StrBuf* Prev, unsigned LastTokLen)
     /* Check for some special cases */
     C = SB_AtUnchecked (Prev, NewIndex);
 
-    /* We may exclude certain punctuators for speedups. As newer C standards
-    ** could add more punctuators such as "[[", "]]", "::" and so on, this
-    ** check might need changes accordingly.
-    */
+    // We may exclude certain punctuators for speedups. As newer C standards
+    // could add more punctuators such as "[[", "]]", "::" and so on, this
+    // check might need changes accordingly.
     if (C == '[' || C == ']' || C == '(' || C == ')' ||
         C == '{' || C == '}' || C == '~' || C == '?' ||
         C == ':' || C == ';' || C == ',') {
@@ -1504,9 +1472,8 @@ static void LazyCheckNextPPTok (const StrBuf* Prev, unsigned LastTokLen)
 
 
 static int CheckExtraTokens (const char* Name)
-/* Check for extra tokens at the end of the directive. Return 1 if there are
-** extra tokens, otherwise 0.
-*/
+// Check for extra tokens at the end of the directive. Return 1 if there are
+// extra tokens, otherwise 0.
 {
     SkipWhitespace (0);
     if (SB_GetIndex (Line) != SB_GetLen (Line)) {
@@ -1525,9 +1492,8 @@ static int CheckExtraTokens (const char* Name)
 
 
 static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, int MultiLine)
-/* Identify the arguments to a macro call as-is. Return the total count of
-** identifiers and right parentheses in the read argument list.
-*/
+// Identify the arguments to a macro call as-is. Return the total count of
+// identifiers and right parentheses in the read argument list.
 {
     unsigned    Idx         = 0;
     unsigned    CountInArg  = 0;
@@ -1546,9 +1512,8 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
         unsigned OldPendingNewLines = PendingNewLines;
         int Skipped = SkipWhitespace (MultiLine);
 
-        /* Directives can only be found in an argument list that spans
-        ** multiple lines.
-        */
+        // Directives can only be found in an argument list that spans
+        // multiple lines.
         if (MultiLine && OldPendingNewLines < PendingNewLines && CurC == '#') {
             unsigned Newlines = 0;
 
@@ -1569,9 +1534,8 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
             Skipped = 0;
         }
 
-        /* Finish reading the current argument if we are not inside nested
-        ** parentheses or a variadic macro argument.
-        */
+        // Finish reading the current argument if we are not inside nested
+        // parentheses or a variadic macro argument.
         if (Parens == 0 &&
             ((CurC == ',' && !ME_IsNextArgVariadic (E, M)) || CurC == ')')) {
 
@@ -1580,9 +1544,8 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
                 SB_Drop (&Arg.Tokens, 1);
             }
 
-            /* If this is not the single empty argument for a macro with an
-            ** empty argument list, remember it.
-            */
+            // If this is not the single empty argument for a macro with an
+            // empty argument list, remember it.
             if (CurC != ')'                 ||
                 CollCount (&E->Args) > 0    ||
                 SB_NotEmpty (&Arg.Tokens)   ||
@@ -1739,19 +1702,17 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
     /* Deallocate argument resources */
     DoneMacroExp (&Arg);
 
-    /* Return the total count of identifiers and right parentheses in the
-    ** argument list.
-    */
+    // Return the total count of identifiers and right parentheses in the
+    // argument list.
     return Idx;
 }
 
 
 
 static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, Macro* M, unsigned* IdentCount)
-/* Argument substitution according to ISO/IEC 9899:1999 (E), 6.10.3.1ff.
-** Return the length of the last pp-token in the result and output the count
-** of identifiers and right parentheses in the result to *IdentCount.
-*/
+// Argument substitution according to ISO/IEC 9899:1999 (E), 6.10.3.1ff.
+// Return the length of the last pp-token in the result and output the count
+// of identifiers and right parentheses in the result to *IdentCount.
 {
     unsigned    Idx         = NameIdx;
     ident       Ident;
@@ -1770,12 +1731,11 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
     SB_Reset (&M->Replacement);
     OldSource = InitLine (&M->Replacement);
 
-    /* If the macro expansion replaces an function-like macro with an argument
-    ** list containing a right parenthesis outside the hidesets of previously
-    ** replaced macros, stop those hidesets from this replacement. This is not
-    ** required by the standard but just to match up with other major C
-    ** compilers.
-    */
+    // If the macro expansion replaces an function-like macro with an argument
+    // list containing a right parenthesis outside the hidesets of previously
+    // replaced macros, stop those hidesets from this replacement. This is not
+    // required by the standard but just to match up with other major C
+    // compilers.
     ME_HandleSemiNestedMacro (NameIdx, NameIdx + *IdentCount, E);
 
     /* Substitution loop */
@@ -1791,9 +1751,8 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
             /* Check if it's a macro parameter */
             if ((ParamIdx = FindMacroParam (M, Ident)) >= 0) {
 
-                /* If a ## operator follows, we have to insert the actual
-                ** argument as-is, otherwise it must be macro-replaced.
-                */
+                // If a ## operator follows, we have to insert the actual
+                // argument as-is, otherwise it must be macro-replaced.
                 if (CurC == '#' && NextC == '#') {
 
                     /* Get the corresponding actual argument */
@@ -1873,9 +1832,8 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
             NextChar ();
             SkipWhitespace (0);
 
-            /* If the next token is an identifier which is a macro argument,
-            ** replace it, otherwise just add it.
-            */
+            // If the next token is an identifier which is a macro argument,
+            // replace it, otherwise just add it.
             if (IsSym (Ident)) {
                 unsigned NewCount = 1;
 
@@ -1894,10 +1852,9 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
                     /* Adjust tracking */
                     NewCount = A->IdentCount;
 
-                    /* If the preceding pp-token is not a placemarker and is
-                    ** concatenated to with an identifier, the count of tracked
-                    ** identifiers is then one less.
-                    */
+                    // If the preceding pp-token is not a placemarker and is
+                    // concatenated to with an identifier, the count of tracked
+                    // identifiers is then one less.
                     if (TryPastePPTok (Target, &A->Tokens, TokLen, A->FirstTokLen)) {
                         if (TokLen > 0 && (A->Flags & MES_BEGIN_WITH_IDENT) != 0) {
                             --NewCount;
@@ -1919,10 +1876,9 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
                     /* Just an ordinary identifier - add as-is */
                     SB_CopyStr (&Buf, Ident);
 
-                    /* If the preceding pp-token is not a placemarker and is
-                    ** concatenated to with an identifier, the count of tracked
-                    ** identifiers is then one less.
-                    */
+                    // If the preceding pp-token is not a placemarker and is
+                    // concatenated to with an identifier, the count of tracked
+                    // identifiers is then one less.
                     Len = SB_GetLen (&Buf);
                     if (TryPastePPTok (Target, &Buf, TokLen, Len)) {
                         if (TokLen > 0) {
@@ -1966,10 +1922,9 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
             CopyQuotedString (&Buf);
         } else {
             if (CurC == '#' && M->ParamCount >= 0) {
-                /* A # operator within a macro expansion of a function-like
-                ** macro. Read the following identifier and check if it's a
-                ** macro parameter.
-                */
+                // A # operator within a macro expansion of a function-like
+                // macro. Read the following identifier and check if it's a
+                // macro parameter.
                 NextChar ();
                 SkipWhitespace (0);
                 if (!IsSym (Ident) || (ParamIdx = FindMacroParam (M, Ident)) < 0) {
@@ -1982,9 +1937,8 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
                     Stringize (&A->Tokens, &Buf);
                 }
             } else if (GetPunc (Ident)) {
-                /* Count right parens. This is OK since they cannot be pasted
-                ** to form different punctuators with others.
-                */
+                // Count right parens. This is OK since they cannot be pasted
+                // to form different punctuators with others.
                 if (Ident[0] == ')') {
                     /* Adjust tracking */
                     ME_OffsetHideSets (Idx, 1, E);
@@ -1997,10 +1951,9 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
             }
         }
 
-        /* Squeeze any whitespace for consistency. Especially, comments must
-        ** be consumed before fed to the punctuator parser, or their leading
-        ** '/' characters would be parsed wrongly as division operators.
-        */
+        // Squeeze any whitespace for consistency. Especially, comments must
+        // be consumed before fed to the punctuator parser, or their leading
+        // '/' characters would be parsed wrongly as division operators.
         HaveSpace = SkipWhitespace (0);
 
         if (NeedPaste) {
@@ -2048,9 +2001,8 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
 
 
 static unsigned ExpandMacro (unsigned Idx, StrBuf* Target, MacroExp* E, Macro* M, int MultiLine)
-/* Expand a macro into Target. Return the length of the last pp-token in the
-** result of the expansion.
-*/
+// Expand a macro into Target. Return the length of the last pp-token in the
+// result of the expansion.
 {
     unsigned Count = 0;     /* Count of identifiers and right parentheses */
     unsigned Len   = 0;     /* Length of the last pp-token in the result */
@@ -2098,9 +2050,8 @@ static unsigned ExpandMacro (unsigned Idx, StrBuf* Target, MacroExp* E, Macro* M
 
 
 static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsigned ModeFlags)
-/* Scan for and perform macro replacement. Return the count of identifiers and
-** right parentheses in the replacement result.
-*/
+// Scan for and perform macro replacement. Return the count of identifiers and
+// right parentheses in the replacement result.
 {
     unsigned    Count       = 0;
     StrBuf*     TmpTarget   = NewStrBuf ();
@@ -2176,9 +2127,8 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                     if (M->ParamCount >= 0) {
                         int HaveSpace = SkipWhitespace (MultiLine) > 0;
 
-                        /* A function-like macro name without an immediately
-                        ** following argument list is not subject to expansion.
-                        */
+                        // A function-like macro name without an immediately
+                        // following argument list is not subject to expansion.
                         if (CurC != '(') {
                             /* No expansion */
                             ++Count;
@@ -2196,17 +2146,15 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                                 ME_SetTokLens (E, strlen (M->Name));
                             }
 
-                            /* Since we have already got on hold of the next
-                            ** line, we have to reuse it as the next line
-                            ** instead of reading a new line from the source.
-                            */
+                            // Since we have already got on hold of the next
+                            // line, we have to reuse it as the next line
+                            // instead of reading a new line from the source.
                             if (PendingNewLines > 0 && MultiLine) {
                                 unsigned I = SB_GetIndex (Line);
 
-                                /* There is no way a function-like macro call
-                                ** detection could span multiple lines within
-                                ** the range of another just expanded macro.
-                                */
+                                // There is no way a function-like macro call
+                                // detection could span multiple lines within
+                                // the range of another just expanded macro.
                                 CHECK (CollCount (&CurRescanStack->Lines) == 1);
 
                                 /* Revert one newline */
@@ -2248,9 +2196,8 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                     /* Either an object-like or function-like macro */
                     MultiLine = MultiLine && M->ParamCount >= 0;
 
-                    /* If we were going to support #pragma in macro argument
-                    ** list, it would be output to OLine.
-                    */
+                    // If we were going to support #pragma in macro argument
+                    // list, it would be output to OLine.
                     if (MultiLine && OLine == 0) {
                         OLine = TmpTarget;
                         LastTokLen = ExpandMacro (Count, TmpTarget, E, M, MultiLine);
@@ -2283,10 +2230,9 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                         /* Switch the buffers */
                         TmpTarget = NewStrBuf ();
                     } else if (PendingNewLines > 0 && MultiLine) {
-                        /* Cancel remaining check for pp-tokens separation
-                        ** if there is since ther have been newlines that
-                        ** can always separate them.
-                        */
+                        // Cancel remaining check for pp-tokens separation
+                        // if there is since ther have been newlines that
+                        // can always separate them.
                         if (CurRescanStack->PrevTok != 0) {
                             FreeStrBuf (CurRescanStack->PrevTok);
                             CurRescanStack->PrevTok = 0;
@@ -2305,9 +2251,8 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                         }
                     }
 
-                    /* Since we are rescanning, we needn't add the
-                    ** count of just replaced identifiers right now.
-                    */
+                    // Since we are rescanning, we needn't add the
+                    // count of just replaced identifiers right now.
                     continue;
                 }
 
@@ -2342,9 +2287,8 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
             } else if (IsQuotedString ()) {
                 CopyQuotedString (Target);
             } else {
-                /* We want to squeeze whitespace until the end of the current
-                ** input line, so we have to deal with such cases specially.
-                */
+                // We want to squeeze whitespace until the end of the current
+                // input line, so we have to deal with such cases specially.
                 if (CollCount (&CurRescanStack->Lines) > 1) {
                     RescanInputStack* RIS = CurRescanStack;
 
@@ -2361,9 +2305,8 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                     Skipped = SkipWhitespace (0);
                 }
 
-                /* Punctuators must be checked after whitespace since comments
-                ** introducers may be misinterpreted as division operators.
-                */
+                // Punctuators must be checked after whitespace since comments
+                // introducers may be misinterpreted as division operators.
                 if (!Skipped) {
                     if (GetPunc (Ident)) {
                         if (Ident[0] == ')') {
@@ -2372,9 +2315,8 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
                         }
                         SB_AppendStr (Target, Ident);
 
-                        /* If an identifier follows immediately, it could be a macro
-                        ** expanded later that occasionally need a space to separate.
-                        */
+                        // If an identifier follows immediately, it could be a macro
+                        // expanded later that occasionally need a space to separate.
                         if (IsIdent (CurC)) {
                             /* Memorize the previous pp-token and check it later */
                             LazyCheckNextPPTok (Target, strlen (Ident));
@@ -2396,9 +2338,8 @@ static unsigned ReplaceMacros (StrBuf* Source, StrBuf* Target, MacroExp* E, unsi
         }
 
 Loop:
-        /* Switch back to the previous input stream if we have finished
-        ** rescanning the current one.
-        */
+        // Switch back to the previous input stream if we have finished
+        // rescanning the current one.
         if (CurC == '\0' && CollCount (&CurRescanStack->Lines) > 1) {
             /* Check for rescan sequence end and pp-token pasting */
             Skipped = SkipWhitespace (0) || Skipped;
@@ -2459,10 +2400,9 @@ Loop:
 
 
 static int ParseMacroReplacement (StrBuf* Source, Macro* M)
-/* Check correctness of macro definition while squeezing old and new style
-** comments and other non-newline whitespace sequences. Return 1 on success
-** or 0 on failure.
-*/
+// Check correctness of macro definition while squeezing old and new style
+// comments and other non-newline whitespace sequences. Return 1 on success
+// or 0 on failure.
 {
     /* Switch to the new input source */
     StrBuf*     OldSource = InitLine (Source);
@@ -2599,9 +2539,8 @@ static void DoDefine (void)
                 break;
             }
 
-            /* The next token must be either an identifier, or - if not in
-            ** C89 mode - the ellipsis.
-            */
+            // The next token must be either an identifier, or - if not in
+            // C89 mode - the ellipsis.
             if (Std >= STD_C99 && CurC == '.') {
                 /* Ellipsis */
                 NextChar ();
@@ -2612,9 +2551,8 @@ static void DoDefine (void)
                 NextChar ();
                 NextChar ();
 
-                /* Remember that the macro is variadic and use __VA_ARGS__ as
-                ** the parameter name.
-                */
+                // Remember that the macro is variadic and use __VA_ARGS__ as
+                // the parameter name.
                 AddMacroParam (M, "__VA_ARGS__");
                 M->Variadic = 1;
 
@@ -2631,9 +2569,8 @@ static void DoDefine (void)
                 AddMacroParam (M, Ident);
             }
 
-            /* If we had an ellipsis, or the next char is not a comma, we've
-            ** reached the end of the macro parameter list.
-            */
+            // If we had an ellipsis, or the next char is not a comma, we've
+            // reached the end of the macro parameter list.
             SkipWhitespace (0);
             if (M->Variadic || CurC != ',') {
                 break;
@@ -2650,21 +2587,19 @@ static void DoDefine (void)
 
     } else {
 
-        /* Object like macro. Check ISO/IEC 9899:1999 (E) 6.10.3p3:
-        ** "There shall be white-space between the identifier and the
-        ** replacement list in the definition of an object-like macro."
-        ** Note: C89 doesn't have this constraint.
-        ** Note: if there is no replacement list, a space is not required.
-        */
+        // Object like macro. Check ISO/IEC 9899:1999 (E) 6.10.3p3:
+        // "There shall be white-space between the identifier and the
+        // replacement list in the definition of an object-like macro."
+        // Note: C89 doesn't have this constraint.
+        // Note: if there is no replacement list, a space is not required.
         if (Std == STD_C99 && !IsSpace (CurC) && CurC != 0) {
             PPWarning ("ISO C99 requires whitespace after the macro name");
         }
 
     }
 
-    /* Remove whitespace and comments from the line, store the preprocessed
-    ** line into the macro replacement buffer.
-    */
+    // Remove whitespace and comments from the line, store the preprocessed
+    // line into the macro replacement buffer.
     if (ParseMacroReplacement (Line, M) == 0) {
         goto Error_Handler;
     }
@@ -2676,9 +2611,8 @@ static void DoDefine (void)
     /* Get an existing macro definition with this name */
     Existing = FindMacro (M->Name);
 
-    /* If we have an existing macro, check if the redefinition is identical.
-    ** Print a diagnostic if not.
-    */
+    // If we have an existing macro, check if the redefinition is identical.
+    // Print a diagnostic if not.
     if (Existing != 0) {
         if (MacroCmp (M, Existing) != 0) {
             PPError ("Macro redefinition is not identical");
@@ -2753,9 +2687,8 @@ static int DoIf (int Skip)
 
     if (!Skip) {
 
-        /* We're about to use a dedicated expression parser to evaluate the #if
-        ** expression. Save the current tokens to come back here later.
-        */
+        // We're about to use a dedicated expression parser to evaluate the #if
+        // expression. Save the current tokens to come back here later.
         Token SavedCurTok = CurTok;
         Token SavedNextTok = NextTok;
 
@@ -2775,10 +2708,9 @@ static int DoIf (int Skip)
         SB_Reset (MLine);
         MLine = InitLine (MLine);
 
-        /* Add two semicolons as sentinels to the line, so the following
-        ** expression evaluation will eat these two tokens but nothing from
-        ** the following line.
-        */
+        // Add two semicolons as sentinels to the line, so the following
+        // expression evaluation will eat these two tokens but nothing from
+        // the following line.
         SB_AppendStr (Line, ";;");
         SB_Terminate (Line);
 
@@ -2818,10 +2750,9 @@ static int DoIfDef (int Skip, int Flag)
             IsDef = IsMacro (Ident);
             /* Check for extra tokens */
             CheckExtraTokens (Flag ? "ifdef" : "ifndef");
-            /* Check if this is an include guard. This is the case if we have
-            ** a #ifndef directive at the start of a new file and the macro
-            ** is not defined. If so, remember it.
-            */
+            // Check if this is an include guard. This is the case if we have
+            // a #ifndef directive at the start of a new file and the macro
+            // is not defined. If so, remember it.
             if (Flag == 0 && (CurInput->GFlags & IG_NEWFILE) != 0 && !IsDef) {
                 CurInput->GFlags |= IG_ISGUARDED;
                 SB_CopyStr (&CurInput->GuardMacro, Ident);
@@ -2846,15 +2777,14 @@ static void DoInclude (void)
     /* Skip whitespace so the input pointer points to the argument */
     SkipWhitespace (0);
 
-    /* We may have three forms of the #include directive:
-    **
-    ** - # include "q-char-sequence" new-line
-    ** - # include <h-char-sequence> new-line
-    ** - # include pp-tokens new-line
-    **
-    ** The former two are processed as is while the latter is preprocessed and
-    ** must then resemble one of the first two forms.
-    */
+    // We may have three forms of the #include directive:
+    // 
+    // - # include "q-char-sequence" new-line
+    // - # include <h-char-sequence> new-line
+    // - # include pp-tokens new-line
+    // 
+    // The former two are processed as is while the latter is preprocessed and
+    // must then resemble one of the first two forms.
     if (CurC == '"' || CurC == '<') {
         /* Copy the argument part over to MLine */
         unsigned Start = SB_GetIndex (Line);
@@ -2870,9 +2800,8 @@ static void DoInclude (void)
     SB_Reset (MLine);
     MLine = InitLine (MLine);
 
-    /* Get the next char and check for a valid file name terminator. Setup
-    ** the include directory spec (SYS/USR) by looking at the terminator.
-    */
+    // Get the next char and check for a valid file name terminator. Setup
+    // the include directory spec (SYS/USR) by looking at the terminator.
     switch (CurC) {
 
         case '\"':
@@ -2918,9 +2847,8 @@ Done:
     /* Restore input source */
     MLine = InitLine (MLine);
 
-    /* Clear the remaining line so the next input will come from the new
-    ** file (if open)
-    */
+    // Clear the remaining line so the next input will come from the new
+    // file (if open)
     ClearLine ();
 }
 
@@ -2932,9 +2860,8 @@ static unsigned GetLineDirectiveNum (void)
     unsigned long Num = 0;
     StrBuf Buf = AUTO_STRBUF_INITIALIZER;
 
-    /* The only non-decimal-numeric character allowed in the digit-sequence is
-    ** the digit separator '\'' as of C23, but we haven't supported it yet.
-    */
+    // The only non-decimal-numeric character allowed in the digit-sequence is
+    // the digit separator '\'' as of C23, but we haven't supported it yet.
     SkipWhitespace (0);
     while (IsDigit (CurC))
     {
@@ -3017,9 +2944,8 @@ static void DoLine (void)
 
 
 static void DoPragma (void)
-/* Handle a #pragma line by converting the #pragma preprocessor directive into
-** the _Pragma() compiler operator.
-*/
+// Handle a #pragma line by converting the #pragma preprocessor directive into
+// the _Pragma() compiler operator.
 {
     StrBuf* PragmaLine = OLine;
 
@@ -3091,11 +3017,10 @@ static int ParseDirectives (unsigned ModeFlags)
     /* Check for stuff to skip */
     while (CurC == '\0' || CurC == '#' || PPSkip) {
 
-        /* If a #ifndef that was assumed to be an include guard was closed
-        ** recently, we may not have anything else following in the file
-        ** besides whitespace otherwise the assumption was false and we don't
-        ** actually have an include guard.
-        */
+        // If a #ifndef that was assumed to be an include guard was closed
+        // recently, we may not have anything else following in the file
+        // besides whitespace otherwise the assumption was false and we don't
+        // actually have an include guard.
         if (CurC != '\0' && (CurInput->GFlags & IG_COMPLETE) == IG_COMPLETE) {
             CurInput->GFlags &= ~IG_ISGUARDED;
         }
@@ -3184,9 +3109,8 @@ static int ParseDirectives (unsigned ModeFlags)
                 case PPD_ENDIF:
                     CurInput->GFlags &= ~IG_NEWFILE;
                     if (PPStack->Index >= 0) {
-                        /* Remove any clauses on top of stack that do not
-                        ** need a terminating #endif.
-                        */
+                        // Remove any clauses on top of stack that do not
+                        // need a terminating #endif.
                         while (PPStack->Index >= 0 &&
                                (PPStack->Stack[PPStack->Index] & IFCOND_NEEDTERM) == 0) {
                             --PPStack->Index;
@@ -3294,11 +3218,10 @@ static int ParseDirectives (unsigned ModeFlags)
         Whitespace = SkipWhitespace (0) || Whitespace;
     }
 
-    /* If a #ifndef that was assumed to be an include guard was closed
-    ** recently, we may not have anything else following in the file
-    ** besides whitespace otherwise the assumption was false and we don't
-    ** actually have an include guard.
-    */
+    // If a #ifndef that was assumed to be an include guard was closed
+    // recently, we may not have anything else following in the file
+    // besides whitespace otherwise the assumption was false and we don't
+    // actually have an include guard.
     if (CurC != '\0' && (CurInput->GFlags & IG_COMPLETE) == IG_COMPLETE) {
         CurInput->GFlags &= ~IG_ISGUARDED;
     }
@@ -3339,9 +3262,8 @@ void HandleSpecialMacro (Macro* M, const char* Name)
 
 
 static void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
-/* Mimic Translation Phase 3. Handle old and new style comments. Collapse
-** non-newline whitespace sequences.
-*/
+// Mimic Translation Phase 3. Handle old and new style comments. Collapse
+// non-newline whitespace sequences.
 {
     /* Switch to the new input source */
     StrBuf* OldSource = InitLine (Source);
@@ -3385,9 +3307,8 @@ static void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
 
 
 static void PreprocessDirective (StrBuf* Source, StrBuf* Target, unsigned ModeFlags)
-/* Preprocess a single line. Handle specified tokens and operators, remove
-** whitespace and comments, then do macro replacement.
-*/
+// Preprocess a single line. Handle specified tokens and operators, remove
+// whitespace and comments, then do macro replacement.
 {
     MacroExp    E;
 
@@ -3502,9 +3423,8 @@ void PreprocessBegin (IFile* Input)
 
 
 void PreprocessEnd (IFile* Input)
-/* Preprocessor done with current file. The parameter is the file we're
-** switching back to.
-*/
+// Preprocessor done with current file. The parameter is the file we're
+// switching back to.
 {
     /* Switch back to the old input file */
     CurInput = Input;

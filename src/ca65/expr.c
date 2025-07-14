@@ -72,12 +72,11 @@
 
 
 
-/* Since all expressions are first packed into expression trees, and each
-** expression tree node is allocated on the heap, we add some type of special
-** purpose memory allocation here: Instead of freeing the nodes, we save some
-** number of freed nodes for later and remember them in a single linked list
-** using the Left link.
-*/
+// Since all expressions are first packed into expression trees, and each
+// expression tree node is allocated on the heap, we add some type of special
+// purpose memory allocation here: Instead of freeing the nodes, we save some
+// number of freed nodes for later and remember them in a single linked list
+// using the Left link.
 #define MAX_FREE_NODES  64
 static ExprNode*        FreeExprNodes = 0;
 static unsigned         FreeNodeCount = 0;
@@ -191,10 +190,9 @@ static const ExprNode* ResolveSymbolChain(const ExprNode* E)
 
 
 int IsEasyConst (const ExprNode* E, long* Val)
-/* Do some light checking if the given node is a constant. Don't care if E is
-** a complex expression. If E is a constant, return true and place its value
-** into Val, provided that Val is not NULL.
-*/
+// Do some light checking if the given node is a constant. Don't care if E is
+// a complex expression. If E is a constant, return true and place its value
+// into Val, provided that Val is not NULL.
 {
     /* Resolve symbols, follow symbol chains */
     E = ResolveSymbolChain (E);
@@ -339,9 +337,8 @@ static ExprNode* Symbol (SymEntry* S)
     } else {
         /* Mark the symbol as referenced */
         SymRef (S);
-        /* If the symbol is a variable, return just its value, otherwise
-        ** return a reference to the symbol.
-        */
+        // If the symbol is a variable, return just its value, otherwise
+        // return a reference to the symbol.
         if (SymIsVar (S)) {
             return CloneExpr (GetSymExpr (S));
         } else {
@@ -372,17 +369,15 @@ ExprNode* FuncBankByte (void)
 static ExprNode* FuncBlank (void)
 /* Handle the .BLANK builtin function */
 {
-    /* We have a list of tokens that ends with the closing paren. Skip
-    ** the tokens, and count them. Allow optionally curly braces.
-    */
+    // We have a list of tokens that ends with the closing paren. Skip
+    // the tokens, and count them. Allow optionally curly braces.
     token_t Term = GetTokListTerm (TOK_RPAREN);
     unsigned Count = 0;
     while (CurTok.Tok != Term) {
 
-        /* Check for end of line or end of input. Since the calling function
-        ** will check for the closing paren, we don't need to print an error
-        ** here, just bail out.
-        */
+        // Check for end of line or end of input. Since the calling function
+        // will check for the closing paren, we don't need to print an error
+        // here, just bail out.
         if (TokIsSep (CurTok.Tok)) {
             break;
         }
@@ -525,10 +520,9 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     TokNode* Last = 0;
     TokNode* Node;
 
-    /* A list of tokens follows. Read this list and remember it building a
-    ** single linked list of tokens including attributes. The list is
-    ** either enclosed in curly braces, or terminated by a comma.
-    */
+    // A list of tokens follows. Read this list and remember it building a
+    // single linked list of tokens including attributes. The list is
+    // either enclosed in curly braces, or terminated by a comma.
     token_t Term = GetTokListTerm (TOK_COMMA);
     while (CurTok.Tok != Term) {
 
@@ -561,10 +555,9 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
         ConsumeComma ();
     }
 
-    /* Read the second list which is optionally enclosed in curly braces and
-    ** terminated by the right parenthesis. Compare each token against the
-    ** one in the first list.
-    */
+    // Read the second list which is optionally enclosed in curly braces and
+    // terminated by the right parenthesis. Compare each token against the
+    // one in the first list.
     Term = GetTokListTerm (TOK_RPAREN);
     Result = 1;
     Node = Root;
@@ -739,14 +732,12 @@ static ExprNode* FuncAddrSize (void)
             return GenLiteral0 ();
         }
 
-        /* If ScopeName is empty, no explicit scope was specified. We have to
-        ** search upper scope levels in this case.
-        */
+        // If ScopeName is empty, no explicit scope was specified. We have to
+        // search upper scope levels in this case.
         NoScope = SB_IsEmpty (&ScopeName);
 
-        /* If we did find a scope with the name, read the symbol defining the
-        ** size, otherwise search for a symbol entry with the name and scope.
-        */
+        // If we did find a scope with the name, read the symbol defining the
+        // size, otherwise search for a symbol entry with the name and scope.
         if (NoScope) {
             Sym = SymFindAny (ParentScope, &Name);
         } else {
@@ -820,9 +811,8 @@ static ExprNode* FuncSizeOf (void)
             return GenLiteral0 ();
         }
 
-        /* If ScopeName is empty, no explicit scope was specified. We have to
-        ** search upper scope levels in this case.
-        */
+        // If ScopeName is empty, no explicit scope was specified. We have to
+        // search upper scope levels in this case.
         NoScope = SB_IsEmpty (&ScopeName);
 
         /* First search for a scope with the given name */
@@ -832,9 +822,8 @@ static ExprNode* FuncSizeOf (void)
             Scope = SymFindScope (ParentScope, &Name, SYM_FIND_EXISTING);
         }
 
-        /* If we did find a scope with the name, read the symbol defining the
-        ** size, otherwise search for a symbol entry with the name and scope.
-        */
+        // If we did find a scope with the name, read the symbol defining the
+        // size, otherwise search for a symbol entry with the name and scope.
         if (Scope) {
             /* Yep, it's a scope */
             SizeSym = GetSizeOfScope (Scope);
@@ -901,9 +890,8 @@ static ExprNode* FuncStrAt (void)
         goto ExitPoint;
     }
 
-    /* Get the char, handle as unsigned. Be sure to translate it into
-    ** the target character set.
-    */
+    // Get the char, handle as unsigned. Be sure to translate it into
+    // the target character set.
     C = TgtTranslateChar (SB_At (&Str, (unsigned)Index));
 
 ExitPoint:
@@ -949,17 +937,15 @@ static ExprNode* FuncStrLen (void)
 static ExprNode* FuncTCount (void)
 /* Handle the .TCOUNT function */
 {
-    /* We have a list of tokens that ends with the closing paren. Skip
-    ** the tokens, and count them. Allow optionally curly braces.
-    */
+    // We have a list of tokens that ends with the closing paren. Skip
+    // the tokens, and count them. Allow optionally curly braces.
     token_t Term = GetTokListTerm (TOK_RPAREN);
     int Count = 0;
     while (CurTok.Tok != Term) {
 
-        /* Check for end of line or end of input. Since the calling function
-        ** will check for the closing paren, we don't need to print an error
-        ** here, just bail out.
-        */
+        // Check for end of line or end of input. Since the calling function
+        // will check for the closing paren, we don't need to print an error
+        // here, just bail out.
         if (TokIsSep (CurTok.Tok)) {
             break;
         }
@@ -1307,9 +1293,8 @@ static ExprNode* Term (void)
                     Internal ("Invalid token");
             }
 
-            /* Generate a literal expression and delete the old left and
-            ** right sides.
-            */
+            // Generate a literal expression and delete the old left and
+            // right sides.
             FreeExpr (Left);
             FreeExpr (Right);
             Root = GenLiteralExpr (Val);
@@ -1374,9 +1359,8 @@ static ExprNode* SimpleExpr (void)
                 default:        Internal ("Invalid token");
             }
 
-            /* Generate a literal expression and delete the old left and
-            ** right sides.
-            */
+            // Generate a literal expression and delete the old left and
+            // right sides.
             FreeExpr (Left);
             FreeExpr (Right);
             Root = GenLiteralExpr (Val);
@@ -1440,9 +1424,8 @@ static ExprNode* BoolExpr (void)
                 default:        Internal ("Invalid token");
             }
 
-            /* Generate a literal expression and delete the old left and
-            ** right sides.
-            */
+            // Generate a literal expression and delete the old left and
+            // right sides.
             FreeExpr (Left);
             FreeExpr (Right);
             Root = GenLiteralExpr (Val);
@@ -1503,9 +1486,8 @@ static ExprNode* Expr2 (void)
                 default:        Internal ("Invalid token");
             }
 
-            /* Generate a literal expression and delete the old left and
-            ** right sides.
-            */
+            // Generate a literal expression and delete the old left and
+            // right sides.
             FreeExpr (Left);
             FreeExpr (Right);
             Root = GenLiteralExpr (Val);
@@ -1561,9 +1543,8 @@ static ExprNode* Expr1 (void)
                 default:        Internal ("Invalid token");
             }
 
-            /* Generate a literal expression and delete the old left and
-            ** right sides.
-            */
+            // Generate a literal expression and delete the old left and
+            // right sides.
             FreeExpr (Left);
             FreeExpr (Right);
             Root = GenLiteralExpr (Val);
@@ -1629,9 +1610,8 @@ static ExprNode* Expr0 (void)
 
 
 ExprNode* Expression (void)
-/* Evaluate an expression, build the expression tree on the heap and return
-** a pointer to the root of the tree.
-*/
+// Evaluate an expression, build the expression tree on the heap and return
+// a pointer to the root of the tree.
 {
     return Expr0 ();
 }
@@ -1639,10 +1619,9 @@ ExprNode* Expression (void)
 
 
 long ConstExpression (void)
-/* Parse an expression. Check if the expression is const, and print an error
-** message if not. Return the value of the expression, or a dummy, if it is
-** not constant.
-*/
+// Parse an expression. Check if the expression is const, and print an error
+// message if not. Return the value of the expression, or a dummy, if it is
+// not constant.
 {
     long Val;
 
@@ -1796,9 +1775,8 @@ ExprNode* GenSwapExpr (ExprNode* Expr)
 
 
 ExprNode* GenBranchExpr (unsigned Offs)
-/* Return an expression that encodes the difference between current PC plus
-** offset and the target expression (that is, Expression() - (*+Offs) ).
-*/
+// Return an expression that encodes the difference between current PC plus
+// offset and the target expression (that is, Expression() - (*+Offs) ).
 {
     ExprNode* N;
     ExprNode* Root;
@@ -1813,12 +1791,11 @@ ExprNode* GenBranchExpr (unsigned Offs)
         /* Free the constant expression tree */
         FreeExpr (N);
 
-        /* Generate the final expression:
-        ** Val - (* + Offs)
-        ** Val - ((Seg + PC) + Offs)
-        ** Val - Seg - PC - Offs
-        ** (Val - PC - Offs) - Seg
-        */
+        // Generate the final expression:
+        // Val - (* + Offs)
+        // Val - ((Seg + PC) + Offs)
+        // Val - Seg - PC - Offs
+        // (Val - PC - Offs) - Seg
         Root = GenLiteralExpr (Val - GetPC () - Offs);
         if (GetRelocMode ()) {
             N = Root;
@@ -1829,12 +1806,11 @@ ExprNode* GenBranchExpr (unsigned Offs)
 
     } else {
 
-        /* Generate the expression:
-        ** N - (* + Offs)
-        ** N - ((Seg + PC) + Offs)
-        ** N - Seg - PC - Offs
-        ** N - (PC + Offs) - Seg
-        */
+        // Generate the expression:
+        // N - (* + Offs)
+        // N - ((Seg + PC) + Offs)
+        // N - Seg - PC - Offs
+        // N - (PC + Offs) - Seg
         Root = NewExprNode (EXPR_MINUS);
         Root->Left  = N;
         Root->Right = GenLiteralExpr (GetPC () + Offs);
@@ -1957,10 +1933,9 @@ ExprNode* GenNE (ExprNode* Expr, long Val)
 
 
 int IsConstExpr (ExprNode* Expr, long* Val)
-/* Return true if the given expression is a constant expression, that is, one
-** with no references to external symbols. If Val is not NULL and the
-** expression is constant, the constant value is stored here.
-*/
+// Return true if the given expression is a constant expression, that is, one
+// with no references to external symbols. If Val is not NULL and the
+// expression is constant, the constant value is stored here.
 {
     int IsConst;
 
@@ -1983,9 +1958,8 @@ int IsConstExpr (ExprNode* Expr, long* Val)
 
 
 ExprNode* CloneExpr (ExprNode* Expr)
-/* Clone the given expression tree. The function will simply clone symbol
-** nodes, it will not resolve them.
-*/
+// Clone the given expression tree. The function will simply clone symbol
+// nodes, it will not resolve them.
 {
     ExprNode* Clone;
 
@@ -2041,9 +2015,8 @@ void WriteExpr (ExprNode* Expr)
         return;
     }
 
-    /* If the is a leafnode, write the expression attribute, otherwise
-    ** write the expression operands.
-    */
+    // If the is a leafnode, write the expression attribute, otherwise
+    // write the expression operands.
     switch (Expr->Op) {
 
         case EXPR_LITERAL:
@@ -2082,13 +2055,12 @@ void WriteExpr (ExprNode* Expr)
 
 
 void ExprGuessedAddrSize (const ExprNode* Expr, unsigned char AddrSize)
-/* Mark the address size of the given expression tree as guessed. The address
-** size passed as argument is the one NOT used, because the actual address
-** size wasn't known. Example: Zero page addressing was not used because symbol
-** is undefined, and absolute addressing was available.
-** This function will actually parse the expression tree for undefined symbols,
-** and mark these symbols accordingly.
-*/
+// Mark the address size of the given expression tree as guessed. The address
+// size passed as argument is the one NOT used, because the actual address
+// size wasn't known. Example: Zero page addressing was not used because symbol
+// is undefined, and absolute addressing was available.
+// This function will actually parse the expression tree for undefined symbols,
+// and mark these symbols accordingly.
 {
     /* Accept NULL expressions */
     if (Expr == 0) {

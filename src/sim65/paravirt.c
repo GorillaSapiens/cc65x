@@ -197,9 +197,8 @@ static void PVOpen (CPURegs* Regs)
     unsigned Name  = PopParam (2);
 
     if (Regs->YR - 4 < 2) {
-        /* If the caller didn't supply the mode
-        ** argument, use a reasonable default.
-        */
+        // If the caller didn't supply the mode
+        // argument, use a reasonable default.
         Mode = 0x01 | 0x02;
     }
 
@@ -265,10 +264,9 @@ static void PVClose (CPURegs* Regs)
     if (FD != 0xFFFF) {
         RetVal = close (FD);
     } else {
-        /* test/val/constexpr.c "abuses" close, expecting close(-1) to return -1.
-        ** This behaviour is not the same on all target platforms.
-        ** MSVC's close treats it as a fatal error instead and terminates.
-        */
+        // test/val/constexpr.c "abuses" close, expecting close(-1) to return -1.
+        // This behaviour is not the same on all target platforms.
+        // MSVC's close treats it as a fatal error instead and terminates.
         RetVal = 0xFFFF;
     }
 

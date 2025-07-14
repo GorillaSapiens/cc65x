@@ -87,10 +87,9 @@ unsigned GetLocalLabel (void)
 
 
 const char* LocalLabelName (unsigned L)
-/* Make a label name from the given label number. The label name will be
-** created in static storage and overwritten when calling the function
-** again.
-*/
+// Make a label name from the given label number. The label name will be
+// created in static storage and overwritten when calling the function
+// again.
 {
     static char Buf[64];
     sprintf (Buf, "L%04X", L);
@@ -136,9 +135,8 @@ unsigned GetLocalDataLabel (void)
 
 
 const char* LocalDataLabelName (unsigned L)
-/* Make a label name from the given data label number. The label name will be
-** created in static storage and overwritten when calling the function again.
-*/
+// Make a label name from the given data label number. The label name will be
+// created in static storage and overwritten when calling the function again.
 {
     static char Buf[64];
     sprintf (Buf, "M%04X", L);
@@ -165,9 +163,8 @@ unsigned GetPooledLiteralLabel (void)
 
 
 const char* PooledLiteralLabelName (unsigned L)
-/* Make a litral label name from the given label number. The label name will be
-** created in static storage and overwritten when calling the function again.
-*/
+// Make a litral label name from the given label number. The label name will be
+// created in static storage and overwritten when calling the function again.
 {
     static char Buf[64];
     sprintf (Buf, "S%04X", L);

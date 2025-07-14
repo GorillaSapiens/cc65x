@@ -77,9 +77,8 @@ void FreeExpr (ExprNode* Root);
 /* Free the expression tree, Root is pointing to. */
 
 int IsConstExpr (ExprNode* Root);
-/* Return true if the given expression is a constant expression, that is, one
-** with no references to external symbols.
-*/
+// Return true if the given expression is a constant expression, that is, one
+// with no references to external symbols.
 
 Import* GetExprImport (ExprNode* Expr);
 /* Get the import data structure for a symbol expression node */
@@ -94,10 +93,9 @@ long GetExprVal (ExprNode* Expr);
 /* Get the value of a constant expression */
 
 void GetSegExprVal (ExprNode* Expr, SegExprDesc* D);
-/* Check if the given expression consists of a segment reference and only
-** constant values, additions and subtractions. If anything else is found,
-** set D->TooComplex to true. The function will initialize D.
-*/
+// Check if the given expression consists of a segment reference and only
+// constant values, additions and subtractions. If anything else is found,
+// set D->TooComplex to true. The function will initialize D.
 
 ExprNode* LiteralExpr (long Val, ObjData* O);
 /* Return an expression tree that encodes the given literal value */

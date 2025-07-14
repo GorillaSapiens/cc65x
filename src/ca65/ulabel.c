@@ -74,9 +74,8 @@ static unsigned ULabDefCount    = 0;    /* Number of defined labels */
 
 
 static ULabel* NewULabel (ExprNode* Val)
-/* Create a new ULabel and insert it into the collection. The created label
-** structure is returned.
-*/
+// Create a new ULabel and insert it into the collection. The created label
+// structure is returned.
 {
     /* Allocate memory for the ULabel structure */
     ULabel* L = xmalloc (sizeof (ULabel));
@@ -97,12 +96,11 @@ static ULabel* NewULabel (ExprNode* Val)
 
 
 ExprNode* ULabRef (int Which)
-/* Get an unnamed label. If Which is negative, it is a backreference (a
-** reference to an already defined label), and the function will return a
-** segment relative expression. If Which is positive, it is a forward ref,
-** and the function will return a expression node for an unnamed label that
-** must be resolved later.
-*/
+// Get an unnamed label. If Which is negative, it is a backreference (a
+// reference to an already defined label), and the function will return a
+// segment relative expression. If Which is positive, it is a forward ref,
+// and the function will return a expression node for an unnamed label that
+// must be resolved later.
 {
     int     Index;
     ULabel* L;
@@ -142,9 +140,8 @@ ExprNode* ULabRef (int Which)
     /* Mark the label as referenced */
     ++L->Ref;
 
-    /* If the label is already defined, return its value, otherwise return
-    ** just a reference.
-    */
+    // If the label is already defined, return its value, otherwise return
+    // just a reference.
     if (L->Val) {
         return CloneExpr (L->Val);
     } else {
@@ -158,10 +155,9 @@ void ULabDef (void)
 /* Define an unnamed label at the current PC */
 {
     if (ULabDefCount < CollCount (&ULabList)) {
-        /* We did already have a forward reference to this label, so has
-        ** already been generated, but doesn't have a value. Use the current
-        ** PC for the label value.
-        */
+        // We did already have a forward reference to this label, so has
+        // already been generated, but doesn't have a value. Use the current
+        // PC for the label value.
         ULabel* L = CollAtUnchecked (&ULabList, ULabDefCount);
         CHECK (L->Val == 0);
         L->Val = GenCurrentPC ();
@@ -188,10 +184,9 @@ int ULabCanResolve (void)
 
 
 ExprNode* ULabResolve (unsigned Index)
-/* Return a valid expression for the unnamed label with the given index. This
-** is used to resolve unnamed labels when assembly is done, so it is an error
-** if a label is still undefined in this phase.
-*/
+// Return a valid expression for the unnamed label with the given index. This
+// is used to resolve unnamed labels when assembly is done, so it is an error
+// if a label is still undefined in this phase.
 {
     /* Get the label and check that it is defined */
     ULabel* L = CollAt (&ULabList, Index);
@@ -204,9 +199,8 @@ ExprNode* ULabResolve (unsigned Index)
 
 
 void ULabDone (void)
-/* Run through all unnamed labels, check for anomalies and errors and do
-** necessary cleanups.
-*/
+// Run through all unnamed labels, check for anomalies and errors and do
+// necessary cleanups.
 {
     /* Check if there are undefined labels */
     unsigned I = ULabDefCount;
@@ -216,9 +210,8 @@ void ULabDone (void)
         ++I;
     }
 
-    /* Walk over all labels and emit a warning if any unreferenced ones
-    ** are found. Remove line infos because they're no longer needed.
-    */
+    // Walk over all labels and emit a warning if any unreferenced ones
+    // are found. Remove line infos because they're no longer needed.
     for (I = 0; I < CollCount (&ULabList); ++I) {
         ULabel* L = CollAtUnchecked (&ULabList, I);
         if (L->Ref == 0) {

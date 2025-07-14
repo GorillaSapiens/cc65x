@@ -59,9 +59,8 @@
 static void CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
 /* Copy the struct/union represented by RExpr to the one represented by LExpr */
 {
-    /* If the size is that of a basic type (char, int, long), we will copy
-    ** the struct using the primary register, otherwise we will use memcpy.
-    */
+    // If the size is that of a basic type (char, int, long), we will copy
+    // the struct using the primary register, otherwise we will use memcpy.
     const Type* ltype  = LExpr->Type;
     const Type* stype  = GetStructReplacementType (ltype);
     int         UseReg = (stype != ltype);
@@ -109,9 +108,8 @@ static void CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
             ED_AddrExpr (RExpr);
             LoadExpr (CF_NONE, RExpr);
         } else if (RExpr->IVal != 0) {
-            /* We have an expression in the primary plus a constant
-            ** offset. Adjust the value in the primary accordingly.
-            */
+            // We have an expression in the primary plus a constant
+            // offset. Adjust the value in the primary accordingly.
             g_inc (CF_PTR | CF_CONST, RExpr->IVal);
             RExpr->IVal = 0;
         }
@@ -132,10 +130,9 @@ static void CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
         ED_IndExpr (LExpr);
     }
 
-    /* Clear the tested flag set during loading. This is not neccessary
-    ** currently (and probably ever) as a struct/union cannot be converted
-    ** to a boolean in C, but there is no harm to be future-proof.
-    */
+    // Clear the tested flag set during loading. This is not neccessary
+    // currently (and probably ever) as a struct/union cannot be converted
+    // to a boolean in C, but there is no harm to be future-proof.
     ED_MarkAsUntested (LExpr);
 }
 
@@ -191,9 +188,8 @@ void DoIncDecBitField (ExprDesc* Expr, long Val, unsigned KeepResult)
     /* Push the interim result on stack */
     g_push (ChunkFlags & ~CF_FORCECHAR, 0);
 
-    /* If the original lhs was using the primary, it is now accessible only via
-    ** the pushed address. Reload that address.
-    */
+    // If the original lhs was using the primary, it is now accessible only via
+    // the pushed address. Reload that address.
     if (ED_IsLocPrimaryOrExpr (Expr)) {
         g_getlocal (CF_PTR, AddrSP);
     }
@@ -273,15 +269,13 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
     /* The rhs must be an integer (or a float, but we don't support that yet */
     if (!IsClassInt (Expr2.Type)) {
         Error ("Invalid right operand for binary operator '%s'", Op);
-        /* Continue. Wrong code will be generated, but the compiler won't
-        ** break, so this is the best error recovery.
-        */
+        // Continue. Wrong code will be generated, but the compiler won't
+        // break, so this is the best error recovery.
     }
 
-    /* Special treatment if the value is constant.
-    ** Beware: Expr2 may contain side effects, so there must not be
-    ** code generated for Expr2.
-    */
+    // Special treatment if the value is constant.
+    // Beware: Expr2 may contain side effects, so there must not be
+    // code generated for Expr2.
     if (ED_IsConstAbsInt (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
 
         if (Gen == 0) {
@@ -292,9 +286,8 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
             /* Load the whole data chunk containing the bits to be changed */
             LoadExpr (ChunkFlags, Expr);
 
-            /* If the value is equal to the mask now, all bits are one, and we
-            ** can skip the mask operation.
-            */
+            // If the value is equal to the mask now, all bits are one, and we
+            // can skip the mask operation.
             if (Val != Mask) {
                 /* Get the bits that are not to be affected */
                 g_and (ChunkFlags | CF_CONST, ~(Mask << Expr->Type->A.B.Offs));
@@ -311,9 +304,8 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
 
         } else {
 
-            /* Since we will operate with a constant, we can remove the push if
-            ** the generator has the NOPUSH flag set.
-            */
+            // Since we will operate with a constant, we can remove the push if
+            // the generator has the NOPUSH flag set.
             if (Gen->Flags & GEN_NOPUSH) {
                 RemoveCode (&PushPos);
             }
@@ -336,10 +328,9 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
                         const Type* CalType  = IntPromotion (Expr->Type);
                         unsigned    ExprBits = BitSizeOf (CalType);
 
-                        /* If the shift count is greater than or equal to the width of the
-                        ** promoted left operand, the behaviour is undefined according to
-                        ** the standard.
-                        */
+                        // If the shift count is greater than or equal to the width of the
+                        // promoted left operand, the behaviour is undefined according to
+                        // the standard.
                         if (Expr2.IVal < 0) {
                             Warning ("Negative shift count %ld treated as %u for %s",
                                      Expr2.IVal,
@@ -421,9 +412,8 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
     /* Push the interim result on stack */
     g_push (ChunkFlags & ~CF_FORCECHAR, 0);
 
-    /* If the original lhs was using the primary, it is now accessible only via
-    ** the pushed address. Reload that address.
-    */
+    // If the original lhs was using the primary, it is now accessible only via
+    // the pushed address. Reload that address.
     if (ED_IsLocPrimaryOrExpr (Expr)) {
         g_getlocal (CF_PTR, AddrSP);
     }
@@ -475,9 +465,8 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
         /* Read the expression on the right side of the '=' */
         MarkedExprWithCheck (hie1, &Expr2);
 
-        /* Do type conversion if necessary. Beware: Do not use char type
-        ** here!
-        */
+        // Do type conversion if necessary. Beware: Do not use char type
+        // here!
         TypeConversion (&Expr2, Expr->Type);
 
         /* If necessary, load the value into the primary register */
@@ -498,20 +487,17 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
         /* The rhs must be an integer (or a float, but we don't support that yet */
         if (!IsClassInt (Expr2.Type)) {
             Error ("Invalid right operand for binary operator '%s'", Op);
-            /* Continue. Wrong code will be generated, but the compiler won't
-            ** break, so this is the best error recovery.
-            */
+            // Continue. Wrong code will be generated, but the compiler won't
+            // break, so this is the best error recovery.
         }
 
-        /* Special treatment if the value is constant.
-        ** Beware: Expr2 may contain side effects, so there must not be
-        ** code generated for Expr2.
-        */
+        // Special treatment if the value is constant.
+        // Beware: Expr2 may contain side effects, so there must not be
+        // code generated for Expr2.
         if (ED_IsConstAbsInt (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
 
-            /* Since we will operate with a constant, we can remove the push if
-            ** the generator has the NOPUSH flag set.
-            */
+            // Since we will operate with a constant, we can remove the push if
+            // the generator has the NOPUSH flag set.
             if (Gen->Flags & GEN_NOPUSH) {
                 RemoveCode (&PushPos);
             }
@@ -520,9 +506,8 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
                 Expr2.IVal *= CheckedSizeOf (Expr->Type+1);
             }
 
-            /* If the lhs is character sized, the operation may be later done
-            ** with characters.
-            */
+            // If the lhs is character sized, the operation may be later done
+            // with characters.
             if (CheckedSizeOf (Expr->Type) == SIZEOF_CHAR) {
                 Flags |= CF_FORCECHAR;
             }
@@ -545,10 +530,9 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
                         const Type* CalType  = IntPromotion (Expr->Type);
                         unsigned    ExprBits = BitSizeOf (CalType);
 
-                        /* If the shift count is greater than or equal to the width of the
-                        ** promoted left operand, the behaviour is undefined according to
-                        ** the standard.
-                        */
+                        // If the shift count is greater than or equal to the width of the
+                        // promoted left operand, the behaviour is undefined according to
+                        // the standard.
                         if (Expr2.IVal < 0) {
                             Warning ("Negative shift count %ld treated as %u for %s",
                                      Expr2.IVal,
@@ -584,9 +568,8 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
                 g_scale (CG_TypeOf (Expr2.Type), CheckedSizeOf (Expr->Type+1));
             }
 
-            /* If the lhs is character sized, the operation may be later done
-            ** with characters.
-            */
+            // If the lhs is character sized, the operation may be later done
+            // with characters.
             if (CheckedSizeOf (Expr->Type) == SIZEOF_CHAR) {
                 Flags |= CF_FORCECHAR;
             }
@@ -618,9 +601,8 @@ void OpAssign (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
     /* Only "=" accept struct/union */
     if (IsClassStruct (ltype) ? Gen != 0 : !IsScalarType (ltype)) {
         Error ("Invalid left operand for binary operator '%s'", Op);
-        /* Continue. Wrong code will be generated, but the compiler won't
-        ** break, so this is the best error recovery.
-        */
+        // Continue. Wrong code will be generated, but the compiler won't
+        // break, so this is the best error recovery.
     } else {
         /* Check for assignment to incomplete type */
         if (IsIncompleteESUType (ltype)) {
@@ -643,11 +625,10 @@ void OpAssign (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
     /* Skip the '=' or 'op=' token */
     NextToken ();
 
-    /* cc65 does not have full support for handling structs or unions. Since
-    ** assigning structs is one of the more useful operations from this family,
-    ** allow it here.
-    ** Note: IsClassStruct() is also true for union types.
-    */
+    // cc65 does not have full support for handling structs or unions. Since
+    // assigning structs is one of the more useful operations from this family,
+    // allow it here.
+    // Note: IsClassStruct() is also true for union types.
     if (IsClassStruct (ltype)) {
         /* Copy the struct or union by value */
         CopyStruct (Expr, &Expr2);
@@ -686,9 +667,8 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
     /* There must be an integer or pointer on the left side */
     if (!IsClassInt (Expr->Type) && !IsTypePtr (Expr->Type)) {
         Error ("Invalid left operand for binary operator '%s'", Op);
-        /* Continue. Wrong code will be generated, but the compiler won't
-        ** break, so this is the best error recovery.
-        */
+        // Continue. Wrong code will be generated, but the compiler won't
+        // break, so this is the best error recovery.
     } else {
         /* We must have an lvalue */
         if (ED_IsRVal (Expr)) {
@@ -712,15 +692,13 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
     ED_Init (&Expr2);
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
-    /* Evaluate the rhs. We expect an integer here, since float is not
-    ** supported
-    */
+    // Evaluate the rhs. We expect an integer here, since float is not
+    // supported
     hie1 (&Expr2);
     if (!IsClassInt (Expr2.Type)) {
         Error ("Invalid right operand for binary operator '%s'", Op);
-        /* Continue. Wrong code will be generated, but the compiler won't
-        ** break, so this is the best error recovery.
-        */
+        // Continue. Wrong code will be generated, but the compiler won't
+        // break, so this is the best error recovery.
     }
 
     /* Setup the code generator flags */
@@ -758,10 +736,9 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
         case E_LOC_REGISTER:
         case E_LOC_LITERAL:
         case E_LOC_CODE:
-            /* Absolute numeric addressed variable, global variable, local
-            ** static variable, register variable, pooled literal or code
-            ** label location.
-            */
+            // Absolute numeric addressed variable, global variable, local
+            // static variable, register variable, pooled literal or code
+            // label location.
             if (Gen->Tok == TOK_PLUS_ASSIGN) {
                 g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
             } else {

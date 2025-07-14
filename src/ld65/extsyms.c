@@ -123,9 +123,8 @@ ExtSym* NewExtSym (ExtSymTab* Tab, unsigned Name)
 
 
 static void FreeExtSym (ExtSym* E)
-/* Free an external symbol structure. Will not unlink the entry, so internal
-** use only.
-*/
+// Free an external symbol structure. Will not unlink the entry, so internal
+// use only.
 {
     xfree (E);
 }
@@ -171,9 +170,8 @@ void FreeExtSymTab (ExtSymTab* Tab)
 
 
 ExtSym* GetExtSym (const ExtSymTab* Tab, unsigned Name)
-/* Return the entry for the external symbol with the given name. Return NULL
-** if there is no such symbol.
-*/
+// Return the entry for the external symbol with the given name. Return NULL
+// if there is no such symbol.
 {
     /* Hash the name */
     unsigned Hash = (Name & HASHTAB_MASK);
@@ -203,9 +201,8 @@ unsigned ExtSymCount (const ExtSymTab* Tab)
 
 
 const ExtSym* ExtSymList (const ExtSymTab* Tab)
-/* Return the start of the symbol list sorted by symbol number. Call
-** ExtSymNext for the next symbol.
-*/
+// Return the start of the symbol list sorted by symbol number. Call
+// ExtSymNext for the next symbol.
 {
     return Tab->Root;
 }

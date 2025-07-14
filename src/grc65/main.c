@@ -1,18 +1,15 @@
-/* GEOS resource compiler
+// GEOS resource compiler
+// 
+// by Maciej 'YTM/Elysium' Witkowiak
+// 
+// see GEOSLib documentation for license info
 
-   by Maciej 'YTM/Elysium' Witkowiak
+// - make it work, then do it better
+// - more or less comments? it was hard to code, should be even harder to
+// understand =D
+// - add loadable icons feature (binary - 63 bytes)
 
-   see GEOSLib documentation for license info
-*/
-
-/* - make it work, then do it better
-   - more or less comments? it was hard to code, should be even harder to
-     understand =D
-   - add loadable icons feature (binary - 63 bytes)
-*/
-
-/* - err, maybe free allocated memory, huh? (who cares, it's just a little prog...)
-*/
+// - err, maybe free allocated memory, huh? (who cares, it's just a little prog...)
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -887,10 +884,9 @@ static char *filterInput (FILE *F, char *tbl)
                 do {
                     a = getc (F);
                 } while (a != '\n' && a != EOF);
-                /* Don't discard this newline/EOF, continue to next loop.
-                ** A previous implementation used fseek(F,-1,SEEK_CUR),
-                ** which is invalid for text mode files, and was unreliable across platforms.
-                */
+                // Don't discard this newline/EOF, continue to next loop.
+                // A previous implementation used fseek(F,-1,SEEK_CUR),
+                // which is invalid for text mode files, and was unreliable across platforms.
                 continue;
             } else {
                 tbl[i++] = a;

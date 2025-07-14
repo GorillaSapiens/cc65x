@@ -54,13 +54,12 @@
 
 
 
-/* The following is a very basic vsnprintf like function called xvsnprintf. It
-** features only the basic format specifiers (especially the floating point
-** stuff is missing), but may be extended if required. Reason for supplying
-** my own implementation is that vsnprintf is standard but not implemented by
-** older compilers, and some that implement it, don't adhere to the standard
-** (for example Microsoft with its _vsnprintf).
-*/
+// The following is a very basic vsnprintf like function called xvsnprintf. It
+// features only the basic format specifiers (especially the floating point
+// stuff is missing), but may be extended if required. Reason for supplying
+// my own implementation is that vsnprintf is standard but not implemented by
+// older compilers, and some that implement it, don't adhere to the standard
+// (for example Microsoft with its _vsnprintf).
 
 typedef struct {
 
@@ -72,10 +71,9 @@ typedef struct {
     size_t      BufSize;
     size_t      BufFill;
 
-    /* Argument string buffer and string buffer pointer. The string buffer
-    ** must be big enough to hold a converted integer of the largest type
-    ** including an optional sign and terminating zero.
-    */
+    // Argument string buffer and string buffer pointer. The string buffer
+    // must be big enough to hold a converted integer of the largest type
+    // including an optional sign and terminating zero.
     char        ArgBuf[256];
     int         ArgLen;
 
@@ -222,10 +220,9 @@ static void FormatInt (PrintfCtrl* P, uintmax_t Val)
     /* Convert the value into a (reversed string). */
     ToStr (P, Val);
 
-    /* The default precision for all integer conversions is one. This means
-    ** that the fPrec flag is always set and does not need to be checked
-    ** later on.
-    */
+    // The default precision for all integer conversions is one. This means
+    // that the fPrec flag is always set and does not need to be checked
+    // later on.
     if ((P->Flags & fPrec) == 0) {
         P->Flags |= fPrec;
         P->Prec = 1;
@@ -304,10 +301,9 @@ static void FormatStr (PrintfCtrl* P, const char* Val)
 {
     unsigned WidthPadding;
 
-    /* Get the string length limited to the precision. Beware: We cannot use
-    ** strlen here, because if a precision is given, the string may not be
-    ** zero terminated.
-    */
+    // Get the string length limited to the precision. Beware: We cannot use
+    // strlen here, because if a precision is given, the string may not be
+    // zero terminated.
     int Len;
     if ((P->Flags & fPrec) != 0) {
         const char* S = memchr (Val, '\0', P->Prec);
@@ -366,9 +362,8 @@ static void StoreOffset (PrintfCtrl* P)
 
 
 int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
-/* A basic vsnprintf implementation. Does currently only support integer
-** formats.
-*/
+// A basic vsnprintf implementation. Does currently only support integer
+// formats.
 {
     PrintfCtrl P;
     int Done;
@@ -417,9 +412,8 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
         /* Optional field width */
         if (F == '*') {
             P.Width = va_arg (P.ap, int);
-            /* A negative field width argument is taken as a - flag followed
-            ** by a positive field width.
-            */
+            // A negative field width argument is taken as a - flag followed
+            // by a positive field width.
             if (P.Width < 0) {
                 P.Flags |= fMinus;
                 P.Width = -P.Width;
@@ -444,9 +438,8 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
             P.Flags |= fPrec;
             if (F == '*') {
                 P.Prec = va_arg (P.ap, int);
-                /* A negative precision argument is taken as if the precision
-                ** were omitted.
-                */
+                // A negative precision argument is taken as if the precision
+                // were omitted.
                 if (P.Prec < 0) {
                     P.Flags &= ~fPrec;
                 }
@@ -461,9 +454,8 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
                     P.Prec = P.Prec * 10 + (F - '0');
                 }
             } else if (F == '-') {
-                /* A negative precision argument is taken as if the precision
-                ** were omitted.
-                */
+                // A negative precision argument is taken as if the precision
+                // were omitted.
                 F = *Format++;          /* Skip the minus */
                 while (IsDigit (F = *Format++)) ;
                 P.Flags &= ~fPrec;
@@ -592,9 +584,8 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
                     CHECK (S != 0);
                     /* Handle the length by using a precision */
                     if ((P.Flags & fPrec) != 0) {
-                        /* Precision already specified, use length of string
-                        ** if less.
-                        */
+                        // Precision already specified, use length of string
+                        // if less.
                         if ((unsigned) P.Prec > SB_GetLen (S)) {
                             P.Prec = SB_GetLen (S);
                         }
@@ -633,10 +624,9 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
     /* We don't need P.ap any longer */
     va_end (P.ap);
 
-    /* Terminate the output string and return the number of chars that had
-    ** been written if the buffer was large enough.
-    ** Beware: The terminating zero is not counted for the function result!
-    */
+    // Terminate the output string and return the number of chars that had
+    // been written if the buffer was large enough.
+    // Beware: The terminating zero is not counted for the function result!
     AddChar (&P, '\0');
     return P.BufFill - 1;
 }
@@ -644,9 +634,8 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
 
 
 int xsnprintf (char* Buf, size_t Size, const char* Format, ...)
-/* A basic snprintf implementation. Does currently only support integer
-** formats.
-*/
+// A basic snprintf implementation. Does currently only support integer
+// formats.
 {
     int Res;
     va_list ap;

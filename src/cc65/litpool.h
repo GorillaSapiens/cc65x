@@ -107,14 +107,12 @@ void PushLiteralPool (struct SymEntry* Func);
 /* Push the current literal pool onto the stack and create a new one */
 
 LiteralPool* PopLiteralPool (void);
-/* Pop the last literal pool from TOS and activate it. Return the old
-** literal pool.
-*/
+// Pop the last literal pool from TOS and activate it. Return the old
+// literal pool.
 
 void MoveLiteralPool (LiteralPool* LocalPool);
-/* Move all referenced literals in LocalPool to the global literal pool. This
-** function will free LocalPool after moving the used string literals.
-*/
+// Move all referenced literals in LocalPool to the global literal pool. This
+// function will free LocalPool after moving the used string literals.
 
 void OutputLocalLiteralPool (LiteralPool* Pool);
 /* Output the local literal pool */

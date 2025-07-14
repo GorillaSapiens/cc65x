@@ -49,9 +49,8 @@
 
 
 
-/* The name of the symbol used to encode the size. The name of this entry is
-** choosen so that it cannot be accessed by the user.
-*/
+// The name of the symbol used to encode the size. The name of this entry is
+// choosen so that it cannot be accessed by the user.
 static const StrBuf SizeEntryName = LIT_STRBUF_INITIALIZER (".size");
 
 
@@ -63,9 +62,8 @@ static const StrBuf SizeEntryName = LIT_STRBUF_INITIALIZER (".size");
 
 
 int IsSizeOfSymbol (const SymEntry* Sym)
-/* Return true if the given symbol is the one that encodes the size of some
-** entity. Sym may also be a NULL pointer in which case false is returned.
-*/
+// Return true if the given symbol is the one that encodes the size of some
+// entity. Sym may also be a NULL pointer in which case false is returned.
 {
     return (Sym != 0 && SB_Compare (GetSymName (Sym), &SizeEntryName) == 0);
 }
@@ -73,9 +71,8 @@ int IsSizeOfSymbol (const SymEntry* Sym)
 
 
 SymEntry* FindSizeOfScope (SymTable* Scope)
-/* Get the size of a scope. The function returns the symbol table entry that
-** encodes the size or NULL if there is no such entry.
-*/
+// Get the size of a scope. The function returns the symbol table entry that
+// encodes the size or NULL if there is no such entry.
 {
     return SymFind (Scope, &SizeEntryName, SYM_FIND_EXISTING);
 }
@@ -83,9 +80,8 @@ SymEntry* FindSizeOfScope (SymTable* Scope)
 
 
 SymEntry* FindSizeOfSymbol (SymEntry* Sym)
-/* Get the size of a symbol table entry. The function returns the symbol table
-** entry that encodes the size of the symbol or NULL if there is no such entry.
-*/
+// Get the size of a symbol table entry. The function returns the symbol table
+// entry that encodes the size of the symbol or NULL if there is no such entry.
 {
     return SymFindLocal (Sym, &SizeEntryName, SYM_FIND_EXISTING);
 }
@@ -93,9 +89,8 @@ SymEntry* FindSizeOfSymbol (SymEntry* Sym)
 
 
 SymEntry* GetSizeOfScope (SymTable* Scope)
-/* Get the size of a scope. The function returns the symbol table entry that
-** encodes the size, and will create a new entry if it does not exist.
-*/
+// Get the size of a scope. The function returns the symbol table entry that
+// encodes the size, and will create a new entry if it does not exist.
 {
     return SymFind (Scope, &SizeEntryName, SYM_ALLOC_NEW);
 }
@@ -103,10 +98,9 @@ SymEntry* GetSizeOfScope (SymTable* Scope)
 
 
 SymEntry* GetSizeOfSymbol (SymEntry* Sym)
-/* Get the size of a symbol table entry. The function returns the symbol table
-** entry that encodes the size of the symbol and will create a new one if it
-** does not exist.
-*/
+// Get the size of a symbol table entry. The function returns the symbol table
+// entry that encodes the size of the symbol and will create a new one if it
+// does not exist.
 {
     return SymFindLocal (Sym, &SizeEntryName, SYM_ALLOC_NEW);
 }

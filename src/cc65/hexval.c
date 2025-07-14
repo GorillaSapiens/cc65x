@@ -49,9 +49,8 @@
 
 
 unsigned HexVal (int C)
-/* Convert a hex digit into a value. The function will emit an error for
-** invalid hex digits.
-*/
+// Convert a hex digit into a value. The function will emit an error for
+// invalid hex digits.
 {
     if (!IsXDigit (C)) {
         Error ("Invalid hexadecimal digit: '%c'", C);

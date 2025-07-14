@@ -55,22 +55,21 @@
 
 
 unsigned OptDecouple (CodeSeg* S)
-/* Decouple operations, that is, do the following replacements:
-**
-**   dex        -> ldx #imm
-**   inx        -> ldx #imm
-**   dey        -> ldy #imm
-**   iny        -> ldy #imm
-**   tax        -> ldx #imm
-**   txa        -> lda #imm
-**   tay        -> ldy #imm
-**   tya        -> lda #imm
-**   lda zp     -> lda #imm
-**   ldx zp     -> ldx #imm
-**   ldy zp     -> ldy #imm
-**
-** Provided that the register values are known of course.
-*/
+// Decouple operations, that is, do the following replacements:
+// 
+// dex        -> ldx #imm
+// inx        -> ldx #imm
+// dey        -> ldy #imm
+// iny        -> ldy #imm
+// tax        -> ldx #imm
+// txa        -> lda #imm
+// tay        -> ldy #imm
+// tya        -> lda #imm
+// lda zp     -> lda #imm
+// ldx zp     -> ldx #imm
+// ldy zp     -> ldy #imm
+// 
+// Provided that the register values are known of course.
 {
     unsigned Changes = 0;
     unsigned I;
@@ -279,16 +278,15 @@ unsigned OptDecouple (CodeSeg* S)
 
 
 unsigned OptIndLoads1 (CodeSeg* S)
-/* Change
-**
-**     lda      (zp),y
-**
-** into
-**
-**     lda      (zp,x)
-**
-** provided that x and y are both zero.
-*/
+// Change
+// 
+// lda      (zp),y
+// 
+// into
+// 
+// lda      (zp,x)
+// 
+// provided that x and y are both zero.
 {
     unsigned Changes = 0;
     unsigned I;
@@ -327,16 +325,15 @@ unsigned OptIndLoads1 (CodeSeg* S)
 
 
 unsigned OptIndLoads2 (CodeSeg* S)
-/* Change
-**
-**     lda      (zp,x)
-**
-** into
-**
-**     lda      (zp),y
-**
-** provided that x and y are both zero.
-*/
+// Change
+// 
+// lda      (zp,x)
+// 
+// into
+// 
+// lda      (zp),y
+// 
+// provided that x and y are both zero.
 {
     unsigned Changes = 0;
     unsigned I;
@@ -381,10 +378,9 @@ unsigned OptIndLoads2 (CodeSeg* S)
 
 
 static unsigned IsDecSP (const CodeEntry* E)
-/* Check if this is an insn that decrements the stack pointer. If so, return
-** the decrement. If not, return zero.
-** The function expects E to be a subroutine call.
-*/
+// Check if this is an insn that decrements the stack pointer. If so, return
+// the decrement. If not, return zero.
+// The function expects E to be a subroutine call.
 {
     if (strncmp (E->Arg, "decsp", 5) == 0) {
         if (E->Arg[5] >= '1' && E->Arg[5] <= '8') {
@@ -401,9 +397,8 @@ static unsigned IsDecSP (const CodeEntry* E)
 
 
 unsigned OptStackPtrOps (CodeSeg* S)
-/* Merge adjacent calls to decsp into one. NOTE: This function won't merge all
-** known cases!
-*/
+// Merge adjacent calls to decsp into one. NOTE: This function won't merge all
+// known cases!
 {
     unsigned Changes = 0;
     unsigned I;
@@ -526,9 +521,8 @@ unsigned OptGotoSPAdj (CodeSeg* S)
                 CS_DelEntries (S, I, 9);
             }
             else if (adjustment > 255) {
-                /* For ranges [-32768, 255) and (255, 32767) the only modification
-                ** is to replace the absolute with immediate addressing
-                */
+                // For ranges [-32768, 255) and (255, 32767) the only modification
+                // is to replace the absolute with immediate addressing
                 Arg = MakeHexArg (adjustment & 0xff);
                 X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, L[1]->LI);
                 CS_InsertEntry (S, X, I + 1);
@@ -601,9 +595,8 @@ unsigned OptLoadStore2 (CodeSeg* S)
         /* Get next entry */
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check if this is a 16 bit load followed by a store into the same
-        ** address.
-        */
+        // Check if this is a 16 bit load followed by a store into the same
+        // address.
         if (CE_IsCallTo (E, "ldaxysp")          &&  /* Stack load ... */
             RegValIsKnown (E->RI->In.RegY)      &&  /* ... with known offs */
             (N = CS_GetNextEntry (S, I)) != 0   &&  /* Next insn ... */
@@ -614,9 +607,8 @@ unsigned OptLoadStore2 (CodeSeg* S)
             !CE_HasLabel (N)                    &&  /* ... without label ... */
             CE_IsCallTo (N, "staxysp")) {           /* ... is store */
 
-            /* Found - remove it. Leave the load in place. If it's unused, it
-            ** will get removed by later steps.
-            */
+            // Found - remove it. Leave the load in place. If it's unused, it
+            // will get removed by later steps.
             CS_DelEntries (S, I+1, 2);
 
             /* Remember, we had changes */
@@ -634,9 +626,8 @@ unsigned OptLoadStore2 (CodeSeg* S)
 
 
 unsigned OptLoad1 (CodeSeg* S)
-/* Search for a call to ldaxysp where X is not used later and replace it by
-** a load of just the A register.
-*/
+// Search for a call to ldaxysp where X is not used later and replace it by
+// a load of just the A register.
 {
     unsigned I;
     unsigned Changes = 0;
@@ -715,9 +706,8 @@ unsigned OptLoad2 (CodeSeg* S)
                 !CS_RangeHasLabel (S, I+1, 2)                   &&
                 !RegXUsed (S, I+3)) {
 
-                /* A/X are stored into memory somewhere and X is not used
-                ** later
-                */
+                // A/X are stored into memory somewhere and X is not used
+                // later
 
                 /* lda (c_sp),y */
                 X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[0]->LI);
@@ -783,9 +773,8 @@ unsigned OptLoad2 (CodeSeg* S)
 
 
 unsigned OptBinOps1 (CodeSeg* S)
-/* Search for an AND/EOR/ORA where the value of A or the operand is known and
-** replace it by something simpler.
-*/
+// Search for an AND/EOR/ORA where the value of A or the operand is known and
+// replace it by something simpler.
 {
     unsigned Changes = 0;
 
@@ -806,14 +795,12 @@ unsigned OptBinOps1 (CodeSeg* S)
 
             case OP65_AND:
                 if (In->RegA == 0x00) {
-                    /* Zero AND anything gives zero. The instruction can be
-                    ** replaced by an immediate load of zero.
-                    */
+                    // Zero AND anything gives zero. The instruction can be
+                    // replaced by an immediate load of zero.
                     X = NewCodeEntry (OP65_LDA, AM65_IMM, "$00", 0, E->LI);
                 } else if (In->RegA == 0xFF) {
-                    /* 0xFF AND anything equals the operand. The instruction
-                    ** can be replaced by a simple load of the operand.
-                    */
+                    // 0xFF AND anything equals the operand. The instruction
+                    // can be replaced by a simple load of the operand.
                     X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, 0, E->LI);
                 } else if (E->AM == AM65_ZP) {
                     short Operand = -1;
@@ -825,22 +812,19 @@ unsigned OptBinOps1 (CodeSeg* S)
                         case REG_SREG_HI:   Operand = In->SRegHi;   break;
                     }
                     if (Operand == 0x00) {
-                        /* AND with zero gives zero. The instruction can be
-                        ** replaced by an immediate load of zero.
-                        */
+                        // AND with zero gives zero. The instruction can be
+                        // replaced by an immediate load of zero.
                         X = NewCodeEntry (OP65_LDA, AM65_IMM, "$00", 0, E->LI);
                     } else if (Operand == 0xFF) {
-                        /* AND with 0xFF is a no-op besides setting the flags.
-                        ** The instruction can be removed if the flags aren't
-                        ** used later.
-                        */
+                        // AND with 0xFF is a no-op besides setting the flags.
+                        // The instruction can be removed if the flags aren't
+                        // used later.
                         if (!LoadFlagsUsed (S, I+1)) {
                             Delete = 1;
                         }
                     } else if (Operand >= 0) {
-                        /* The instruction can be replaced by an immediate
-                        ** AND.
-                        */
+                        // The instruction can be replaced by an immediate
+                        // AND.
                         const char* Arg = MakeHexArg (Operand);
                         X = NewCodeEntry (OP65_AND, AM65_IMM, Arg, 0, E->LI);
                     }
@@ -849,9 +833,8 @@ unsigned OptBinOps1 (CodeSeg* S)
 
             case OP65_EOR:
                 if (In->RegA == 0x00) {
-                    /* Zero EOR anything equals the operand. The instruction
-                    ** can be replaced by a simple load.
-                    */
+                    // Zero EOR anything equals the operand. The instruction
+                    // can be replaced by a simple load.
                     X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, 0, E->LI);
                 } else if (E->AM == AM65_ZP) {
                     short Operand = -1;
@@ -863,17 +846,15 @@ unsigned OptBinOps1 (CodeSeg* S)
                         case REG_SREG_HI:   Operand = In->SRegHi;   break;
                     }
                     if (Operand == 0x00) {
-                        /* EOR with 0x00 is a no-op besides setting the flags.
-                        ** The instruction can be removed if the flags aren't
-                        ** used later.
-                        */
+                        // EOR with 0x00 is a no-op besides setting the flags.
+                        // The instruction can be removed if the flags aren't
+                        // used later.
                         if (!LoadFlagsUsed (S, I+1)) {
                             Delete = 1;
                         }
                     } else if (Operand >= 0) {
-                        /* The instruction can be replaced by an immediate
-                        ** EOR.
-                        */
+                        // The instruction can be replaced by an immediate
+                        // EOR.
                         const char* Arg = MakeHexArg (Operand);
                         X = NewCodeEntry (OP65_EOR, AM65_IMM, Arg, 0, E->LI);
                     }
@@ -882,14 +863,12 @@ unsigned OptBinOps1 (CodeSeg* S)
 
             case OP65_ORA:
                 if (In->RegA == 0x00) {
-                    /* ORA with 0x00 is a no-op. The instruction can be
-                    ** replaced by a simple load.
-                    */
+                    // ORA with 0x00 is a no-op. The instruction can be
+                    // replaced by a simple load.
                     X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, 0, E->LI);
                 } else if (In->RegA == 0xFF) {
-                    /* ORA with 0xFF gives 0xFF. The instruction can be replaced
-                    ** by an immediate load of 0xFF.
-                    */
+                    // ORA with 0xFF gives 0xFF. The instruction can be replaced
+                    // by an immediate load of 0xFF.
                     X = NewCodeEntry (OP65_LDA, AM65_IMM, "$FF", 0, E->LI);
                 } else if (E->AM == AM65_ZP) {
                     short Operand = -1;
@@ -901,22 +880,19 @@ unsigned OptBinOps1 (CodeSeg* S)
                         case REG_SREG_HI:   Operand = In->SRegHi;   break;
                     }
                     if (Operand == 0x00) {
-                        /* ORA with 0x00 is a no-op besides setting the flags.
-                        ** The instruction can be removed if the flags aren't
-                        ** used later.
-                        */
+                        // ORA with 0x00 is a no-op besides setting the flags.
+                        // The instruction can be removed if the flags aren't
+                        // used later.
                         if (!LoadFlagsUsed (S, I+1)) {
                             Delete = 1;
                         }
                     } else if (Operand == 0xFF) {
-                        /* ORA with 0xFF results in 0xFF. The instruction can
-                        ** be replaced by a simple load.
-                        */
+                        // ORA with 0xFF results in 0xFF. The instruction can
+                        // be replaced by a simple load.
                         X = NewCodeEntry (OP65_LDA, AM65_IMM, "$FF", 0, E->LI);
                     } else if (Operand >= 0) {
-                        /* The instruction can be replaced by an immediate
-                        ** ORA.
-                        */
+                        // The instruction can be replaced by an immediate
+                        // ORA.
                         const char* Arg = MakeHexArg (Operand);
                         X = NewCodeEntry (OP65_ORA, AM65_IMM, Arg, 0, E->LI);
                     }
@@ -928,9 +904,8 @@ unsigned OptBinOps1 (CodeSeg* S)
 
         }
 
-        /* If we must delete the instruction, do that. If we have a replacement
-        ** entry, place it and remove the old one.
-        */
+        // If we must delete the instruction, do that. If we have a replacement
+        // entry, place it and remove the old one.
         if (X) {
             CS_InsertEntry (S, X, I+1);
             Delete = 1;
@@ -952,9 +927,8 @@ unsigned OptBinOps1 (CodeSeg* S)
 
 
 unsigned OptBinOps2 (CodeSeg* S)
-/* Search for an AND/EOR/ORA for identical memory locations and replace it
-** by something simpler.
-*/
+// Search for an AND/EOR/ORA for identical memory locations and replace it
+// by something simpler.
 {
     unsigned Changes = 0;
 
@@ -967,9 +941,8 @@ unsigned OptBinOps2 (CodeSeg* S)
         /* Get next entry */
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check if this is an 8 bit load followed by a bit operation with the
-        ** same memory cell.
-        */
+        // Check if this is an 8 bit load followed by a bit operation with the
+        // same memory cell.
         if (E->OPC == OP65_LDA                  &&
             (N = CS_GetNextEntry (S, I)) != 0   &&  /* Next insn ... */
             !CE_HasLabel (N)                    &&  /* ... without label ... */
@@ -979,14 +952,12 @@ unsigned OptBinOps2 (CodeSeg* S)
             E->AM == N->AM                      && /* ... with same addr mode ... */
             strcmp (E->Arg, N->Arg) == 0) {        /* ... and same argument */
 
-            /* For an EOR, the result is zero. For the other instructions, the
-            ** result doesn't change so they can be removed.
-            */
+            // For an EOR, the result is zero. For the other instructions, the
+            // result doesn't change so they can be removed.
             if (N->OPC == OP65_EOR) {
-                /* Simply insert a load of the now known value. The flags will
-                ** be correct because of the load and the preceeding
-                ** instructions will be removed by later steps.
-                */
+                // Simply insert a load of the now known value. The flags will
+                // be correct because of the load and the preceeding
+                // instructions will be removed by later steps.
                 CodeEntry* X = NewCodeEntry (OP65_LDA, AM65_IMM, "$00", 0, N->LI);
                 CS_InsertEntry (S, X, I+2);
             } else {

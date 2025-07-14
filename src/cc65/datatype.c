@@ -128,9 +128,8 @@ Type* TypeDup (const Type* T)
 
 
 Type* TypeAlloc (unsigned Len)
-/* Allocate memory for a type string of length Len. Len *must* include the
-** trailing T_END.
-*/
+// Allocate memory for a type string of length Len. Len *must* include the
+// trailing T_END.
 {
     return xmalloc (Len * sizeof (Type));
 }
@@ -164,9 +163,8 @@ int SignExtendChar (int C)
 
 
 long GetIntegerTypeMin (const Type* Type)
-/* Get the smallest possible value of the integer type.
-** The type must have a known size.
-*/
+// Get the smallest possible value of the integer type.
+// The type must have a known size.
 {
     if (SizeOf (Type) == 0) {
         Internal ("Incomplete type used in GetIntegerTypeMin");
@@ -183,9 +181,8 @@ long GetIntegerTypeMin (const Type* Type)
 
 
 unsigned long GetIntegerTypeMax (const Type* Type)
-/* Get the largest possible value of the integer type.
-** The type must have a known size.
-*/
+// Get the largest possible value of the integer type.
+// The type must have a known size.
 {
     if (SizeOf (Type) == 0) {
         Internal ("Incomplete type used in GetIntegerTypeMax");
@@ -195,10 +192,9 @@ unsigned long GetIntegerTypeMax (const Type* Type)
         /* Min signed value of N-byte integer is pow(2, 8*N-1) - 1 */
         return (1UL << (CHAR_BITS * SizeOf (Type) - 1U)) - 1UL;
     } else {
-        /* Max signed value of N-byte integer is pow(2, 8*N) - 1. However,
-        ** workaround is needed as in ISO C it is UB if the shift count is
-        ** equal to the bit width of the left operand type.
-        */
+        // Max signed value of N-byte integer is pow(2, 8*N) - 1. However,
+        // workaround is needed as in ISO C it is UB if the shift count is
+        // equal to the bit width of the left operand type.
         return (1UL << 1U << (CHAR_BITS * SizeOf (Type) - 1U)) - 1UL;
     }
 }
@@ -219,15 +215,13 @@ unsigned SizeOf (const Type* T)
     switch (GetUnderlyingTypeCode (T)) {
 
         case T_VOID:
-            /* A void variable is a cc65 extension.
-            ** Get its size (in bytes).
-            */
+            // A void variable is a cc65 extension.
+            // Get its size (in bytes).
             return T->A.U;
 
-        /* Beware: There's a chance that this triggers problems in other parts
-        ** of the compiler. The solution is to fix the callers, because calling
-        ** SizeOf() with a function type as argument is bad.
-        */
+        // Beware: There's a chance that this triggers problems in other parts
+        // of the compiler. The solution is to fix the callers, because calling
+        // SizeOf() with a function type as argument is bad.
         case T_FUNC:
             return 0;   /* Size of function is unknown */
 
@@ -299,10 +293,9 @@ unsigned PSizeOf (const Type* T)
 
 
 unsigned CheckedBitSizeOf (const Type* T)
-/* Return the size (in bit-width) of a data type. If the size is zero, emit an
-** error and return some valid size instead (so the rest of the compiler
-** doesn't have to work with invalid sizes).
-*/
+// Return the size (in bit-width) of a data type. If the size is zero, emit an
+// error and return some valid size instead (so the rest of the compiler
+// doesn't have to work with invalid sizes).
 {
     return IsTypeBitField (T) ? T->A.B.Width : CHAR_BITS * CheckedSizeOf (T);
 }
@@ -310,10 +303,9 @@ unsigned CheckedBitSizeOf (const Type* T)
 
 
 unsigned CheckedSizeOf (const Type* T)
-/* Return the size (in bytes) of a data type. If the size is zero, emit an
-** error and return some valid size instead (so the rest of the compiler
-** doesn't have to work with invalid sizes).
-*/
+// Return the size (in bytes) of a data type. If the size is zero, emit an
+// error and return some valid size instead (so the rest of the compiler
+// doesn't have to work with invalid sizes).
 {
     unsigned Size = SizeOf (T);
     if (Size == 0) {
@@ -330,10 +322,9 @@ unsigned CheckedSizeOf (const Type* T)
 
 
 unsigned CheckedPSizeOf (const Type* T)
-/* Return the size (in bytes) of a data type that is pointed to by a pointer.
-** If the size is zero, emit an error and return some valid size instead (so
-** the rest of the compiler doesn't have to work with invalid sizes).
-*/
+// Return the size (in bytes) of a data type that is pointed to by a pointer.
+// If the size is zero, emit an error and return some valid size instead (so
+// the rest of the compiler doesn't have to work with invalid sizes).
 {
     unsigned Size = PSizeOf (T);
     if (Size == 0) {
@@ -352,9 +343,8 @@ unsigned CheckedPSizeOf (const Type* T)
 static unsigned GetMinimalTypeSizeByBitWidth (unsigned BitWidth)
 /* Return the size of the smallest integer type that may have BitWidth bits */
 {
-    /* Since all integer types supported in cc65 for bit-fields have sizes that
-    ** are powers of 2, we can just use this bit-twiddling trick.
-    */
+    // Since all integer types supported in cc65 for bit-fields have sizes that
+    // are powers of 2, we can just use this bit-twiddling trick.
     unsigned V = (int)(BitWidth - 1U) / (int)CHAR_BITS;
     V |= V >> 1;
     V |= V >> 2;
@@ -369,9 +359,8 @@ static unsigned GetMinimalTypeSizeByBitWidth (unsigned BitWidth)
 
 
 TypeCode GetUnderlyingTypeCode (const Type* Type)
-/* Get the type code of the unqualified underlying type of Type.
-** Return GetUnqualRawTypeCode (Type) if Type is not scalar.
-*/
+// Get the type code of the unqualified underlying type of Type.
+// Return GetUnqualRawTypeCode (Type) if Type is not scalar.
 {
     TypeCode Underlying = GetUnqualRawTypeCode (Type);
 
@@ -405,10 +394,9 @@ TypeCode GetUnderlyingTypeCode (const Type* Type)
             default:              Underlying |= T_RANK_INT;      break;
         }
     } else if (IsTypeBitField (Type)) {
-        /* We consider the smallest type that can represent all values of the
-        ** bit-field, instead of the type used in the declaration, the truly
-        ** underlying of the bit-field.
-        */
+        // We consider the smallest type that can represent all values of the
+        // bit-field, instead of the type used in the declaration, the truly
+        // underlying of the bit-field.
         switch (GetMinimalTypeSizeByBitWidth (Type->A.B.Width)) {
             case SIZEOF_CHAR:     Underlying = T_CHAR;      break;
             case SIZEOF_INT:      Underlying = T_INT;       break;
@@ -476,9 +464,8 @@ Type* GetCharArrayType (unsigned Len)
 
 
 Type* NewPointerTo (const Type* T)
-/* Return a type string that is "pointer to T". The type string is allocated
-** on the heap and may be freed after use.
-*/
+// Return a type string that is "pointer to T". The type string is allocated
+// on the heap and may be freed after use.
 {
     /* Get the size of the type string including the terminator */
     unsigned Size = TypeLen (T) + 1;
@@ -497,9 +484,8 @@ Type* NewPointerTo (const Type* T)
 
 
 Type* NewBitFieldOf (const Type* T, unsigned BitOffs, unsigned BitWidth)
-/* Return a type string that is "unqualified T : BitWidth" aligned on BitOffs.
-** The type string is allocated on the heap and may be freed after use.
-*/
+// Return a type string that is "unqualified T : BitWidth" aligned on BitOffs.
+// The type string is allocated on the heap and may be freed after use.
 {
     Type* P;
 
@@ -528,9 +514,8 @@ Type* NewBitFieldOf (const Type* T, unsigned BitOffs, unsigned BitWidth)
 
 
 const Type* AddressOf (const Type* T)
-/* Return a type string that is "address of T". The type string is allocated
-** on the heap and may be freed after use.
-*/
+// Return a type string that is "address of T". The type string is allocated
+// on the heap and may be freed after use.
 {
     /* Get the size of the type string including the terminator */
     unsigned Size = TypeLen (T) + 1;
@@ -549,9 +534,8 @@ const Type* AddressOf (const Type* T)
 
 
 const Type* Indirect (const Type* T)
-/* Do one indirection for the given type, that is, return the type where the
-** given type points to.
-*/
+// Do one indirection for the given type, that is, return the type where the
+// given type points to.
 {
     /* We are expecting a pointer expression */
     CHECK (IsClassPtr (T));
@@ -572,10 +556,9 @@ Type* ArrayToPtr (const Type* T)
 
 
 const Type* PtrConversion (const Type* T)
-/* If the type is a function, convert it to pointer to function. If the
-** expression is an array, convert it to pointer to first element. Otherwise
-** return T.
-*/
+// If the type is a function, convert it to pointer to function. If the
+// expression is an array, convert it to pointer to first element. Otherwise
+// return T.
 {
     if (IsTypeFunc (T)) {
         return AddressOf (T);
@@ -589,10 +572,9 @@ const Type* PtrConversion (const Type* T)
 
 
 const Type* StdConversion (const Type* T)
-/* If the type is a function, convert it to pointer to function. If the
-** expression is an array, convert it to pointer to first element. If the
-** type is an integer, do integeral promotion. Otherwise return T.
-*/
+// If the type is a function, convert it to pointer to function. If the
+// expression is an array, convert it to pointer to first element. If the
+// type is an integer, do integeral promotion. Otherwise return T.
 {
     if (IsTypeFunc (T)) {
         return AddressOf (T);
@@ -608,51 +590,45 @@ const Type* StdConversion (const Type* T)
 
 
 const Type* IntPromotion (const Type* T)
-/* Apply the integer promotions to T and return the result. The returned type
-** string may be T if there is no need to change it.
-*/
+// Apply the integer promotions to T and return the result. The returned type
+// string may be T if there is no need to change it.
 {
     /* We must have an int to apply int promotions */
     PRECONDITION (IsClassInt (T));
 
-    /* https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.1
-    ** A char, a short int, or an int bit-field, or their signed or unsigned varieties, or
-    ** an object that has enumeration type, may be used in an expression wherever an int or
-    ** unsigned int may be used. If an int can represent all values of the original type,
-    ** the value is converted to an int; otherwise it is converted to an unsigned int.
-    ** These are called the integral promotions.
-    */
+    // https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.1
+    // A char, a short int, or an int bit-field, or their signed or unsigned varieties, or
+    // an object that has enumeration type, may be used in an expression wherever an int or
+    // unsigned int may be used. If an int can represent all values of the original type,
+    // the value is converted to an int; otherwise it is converted to an unsigned int.
+    // These are called the integral promotions.
 
     if (IsTypeBitField (T)) {
-        /* As we now support long bit-fields, we need modified rules for them:
-        ** - If an int can represent all values of the bit-field, the bit-field is converted
-        **   to an int;
-        ** - Otherwise, if an unsigned int can represent all values of the bit-field, the
-        **   bit-field is converted to an unsigned int;
-        ** - Otherwise, the bit-field will have its declared integer type.
-        ** These rules are borrowed from C++ and seem to be consistent with GCC/Clang's.
-        */
+        // As we now support long bit-fields, we need modified rules for them:
+        // - If an int can represent all values of the bit-field, the bit-field is converted
+        // to an int;
+        // - Otherwise, if an unsigned int can represent all values of the bit-field, the
+        // bit-field is converted to an unsigned int;
+        // - Otherwise, the bit-field will have its declared integer type.
+        // These rules are borrowed from C++ and seem to be consistent with GCC/Clang's.
         if (T->A.B.Width > INT_BITS) {
             return IsSignUnsigned (T) ? type_ulong : type_long;
         }
         return T->A.B.Width == INT_BITS && IsSignUnsigned (T) ? type_uint : type_int;
     } else if (IsRankChar (T)) {
-        /* An integer can represent all values from either signed or unsigned char, so convert
-        ** chars to int.
-        */
+        // An integer can represent all values from either signed or unsigned char, so convert
+        // chars to int.
         return type_int;
     } else if (IsRankShort (T)) {
-        /* An integer cannot represent all values from unsigned short, so convert unsigned short
-        ** to unsigned int.
-        */
+        // An integer cannot represent all values from unsigned short, so convert unsigned short
+        // to unsigned int.
         return IsSignUnsigned (T) ? type_uint : type_int;
     } else if (!IsIncompleteESUType (T)) {
         /* The type is a complete type not smaller than int, so leave it alone. */
         return T;
     } else {
-        /* Otherwise, this is an incomplete enum, and there is expceted to be an error already.
-        ** Assume int to avoid further errors.
-        */
+        // Otherwise, this is an incomplete enum, and there is expceted to be an error already.
+        // Assume int to avoid further errors.
         return type_int;
     }
 }
@@ -662,16 +638,14 @@ const Type* IntPromotion (const Type* T)
 const Type* ArithmeticConvert (const Type* lhst, const Type* rhst)
 /* Perform the usual arithmetic conversions for binary operators. */
 {
-    /* https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.5
-    ** Many binary operators that expect operands of arithmetic type cause conversions and yield
-    ** result types in a similar way. The purpose is to yield a common type, which is also the type
-    ** of the result. This pattern is called the usual arithmetic conversions.
-    */
+    // https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.5
+    // Many binary operators that expect operands of arithmetic type cause conversions and yield
+    // result types in a similar way. The purpose is to yield a common type, which is also the type
+    // of the result. This pattern is called the usual arithmetic conversions.
 
-    /* There are additional rules for floating point types that we don't bother with, since
-    ** floating point types are not (yet) supported.
-    ** The integral promotions are performed on both operands.
-    */
+    // There are additional rules for floating point types that we don't bother with, since
+    // floating point types are not (yet) supported.
+    // The integral promotions are performed on both operands.
     if (IsClassFloat(lhst) || IsClassFloat(rhst)) {
         Error ("Floating point arithmetic not supported.");
         return type_long;
@@ -679,34 +653,30 @@ const Type* ArithmeticConvert (const Type* lhst, const Type* rhst)
     lhst = IntPromotion (lhst);
     rhst = IntPromotion (rhst);
 
-    /* If either operand has type unsigned long int, the other operand is converted to
-    ** unsigned long int.
-    */
+    // If either operand has type unsigned long int, the other operand is converted to
+    // unsigned long int.
     if ((IsRankLong (lhst) && IsSignUnsigned (lhst)) ||
         (IsRankLong (rhst) && IsSignUnsigned (rhst))) {
         return type_ulong;
     }
 
-    /* Otherwise, if one operand has type long int and the other has type unsigned int,
-    ** if a long int can represent all values of an unsigned int, the operand of type unsigned int
-    ** is converted to long int ; if a long int cannot represent all the values of an unsigned int,
-    ** both operands are converted to unsigned long int.
-    */
+    // Otherwise, if one operand has type long int and the other has type unsigned int,
+    // if a long int can represent all values of an unsigned int, the operand of type unsigned int
+    // is converted to long int ; if a long int cannot represent all the values of an unsigned int,
+    // both operands are converted to unsigned long int.
     if ((IsRankLong (lhst) && IsRankInt (rhst) && IsSignUnsigned (rhst)) ||
         (IsRankLong (rhst) && IsRankInt (lhst) && IsSignUnsigned (lhst))) {
         /* long can represent all unsigneds, so we are in the first sub-case. */
         return type_long;
     }
 
-    /* Otherwise, if either operand has type long int, the other operand is converted to long int.
-    */
+    // Otherwise, if either operand has type long int, the other operand is converted to long int.
     if (IsRankLong (lhst) || IsRankLong (rhst)) {
         return type_long;
     }
 
-    /* Otherwise, if either operand has type unsigned int, the other operand is converted to
-    ** unsigned int.
-    */
+    // Otherwise, if either operand has type unsigned int, the other operand is converted to
+    // unsigned int.
     if ((IsRankInt (lhst) && IsSignUnsigned (lhst)) ||
         (IsRankInt (rhst) && IsSignUnsigned (rhst))) {
         return type_uint;
@@ -786,10 +756,9 @@ const Type* GetUnderlyingType (const Type* Type)
             return Type->A.S->V.E.Type;
         }
     } else if (IsTypeBitField (Type)) {
-        /* We consider the smallest type that can represent all values of the
-        ** bit-field, instead of the type used in the declaration, the truly
-        ** underlying of the bit-field.
-        */
+        // We consider the smallest type that can represent all values of the
+        // bit-field, instead of the type used in the declaration, the truly
+        // underlying of the bit-field.
         switch (GetMinimalTypeSizeByBitWidth (Type->A.B.Width)) {
             case SIZEOF_CHAR: Type = IsSignSigned (Type) ? type_schar : type_uchar; break;
             case SIZEOF_INT:  Type = IsSignSigned (Type) ? type_int   : type_uint;  break;
@@ -807,9 +776,8 @@ const Type* GetStructReplacementType (const Type* SType)
 /* Get a replacement type for passing a struct/union by value in the primary */
 {
     const Type* NewType;
-    /* If the size is less than or equal to that of a long, we will copy the
-    ** struct using the primary register, otherwise we will use memcpy.
-    */
+    // If the size is less than or equal to that of a long, we will copy the
+    // struct using the primary register, otherwise we will use memcpy.
     switch (SizeOf (SType)) {
         case 1:     NewType = type_uchar;   break;
         case 2:     NewType = type_uint;    break;
@@ -842,10 +810,9 @@ const Type* GetBitFieldChunkType (const Type* Type)
 
     ChunkSize = GetMinimalTypeSizeByBitWidth (Type->A.B.Offs + Type->A.B.Width);
     if (ChunkSize < SizeOf (Type + 1)) {
-        /* The end of the bit-field is offset by some bits so that it requires
-        ** more bytes to be accessed as a whole than its underlying type does.
-        ** Note: In cc65 the bit offset is always less than CHAR_BITS.
-        */
+        // The end of the bit-field is offset by some bits so that it requires
+        // more bytes to be accessed as a whole than its underlying type does.
+        // Note: In cc65 the bit offset is always less than CHAR_BITS.
         switch (ChunkSize) {
             case SIZEOF_CHAR: return IsSignSigned (Type) ? type_schar : type_uchar;
             case SIZEOF_INT:  return IsSignSigned (Type) ? type_int   : type_uint;
@@ -854,10 +821,9 @@ const Type* GetBitFieldChunkType (const Type* Type)
         }
     }
 
-    /* We can always use the declarartion integer type as the chunk type.
-    ** Note: A bit-field will not occupy bits located in bytes more than that
-    ** of its declaration type in cc65. So this is OK.
-    */
+    // We can always use the declarartion integer type as the chunk type.
+    // Note: A bit-field will not occupy bits located in bytes more than that
+    // of its declaration type in cc65. So this is OK.
     return Type + 1;
 }
 
@@ -1008,10 +974,9 @@ int IsAnonStructClass (const Type* T)
 
 
 int IsPassByRefType (const Type* T)
-/* Return true if this is a large struct/union type that doesn't fit in the
-** primary. This returns false for the void value extension type since it is
-** not passable at all.
-*/
+// Return true if this is a large struct/union type that doesn't fit in the
+// primary. This returns false for the void value extension type since it is
+// not passable at all.
 {
     return IsClassStruct (T) && GetStructReplacementType (T) == T;
 }
@@ -1082,10 +1047,9 @@ TypeCode AddrSizeQualifier (unsigned AddrSize)
 
 
 int IsVariadicFunc (const Type* T)
-/* Return true if this is a function type or pointer to function type with
-** variable parameter list.
-** Check fails if the type is not a function or a pointer to function.
-*/
+// Return true if this is a function type or pointer to function type with
+// variable parameter list.
+// Check fails if the type is not a function or a pointer to function.
 {
     return (GetFuncDesc (T)->Flags & FD_VARIADIC) != 0;
 }
@@ -1093,10 +1057,9 @@ int IsVariadicFunc (const Type* T)
 
 
 int IsFastcallFunc (const Type* T)
-/* Return true if this is a function type or pointer to function type by
-** __fastcall__ calling convention.
-** Check fails if the type is not a function or a pointer to function.
-*/
+// Return true if this is a function type or pointer to function type by
+// __fastcall__ calling convention.
+// Check fails if the type is not a function or a pointer to function.
 {
     if (GetUnqualRawTypeCode (T) == T_PTR) {
         /* Pointer to function */
@@ -1196,9 +1159,8 @@ const FuncDesc* GetFuncDefinitionDesc (const Type* T)
 
 
 long GetElementCount (const Type* T)
-/* Get the element count of the array specified in T (which must be of
-** array type).
-*/
+// Get the element count of the array specified in T (which must be of
+// array type).
 {
     CHECK (IsTypeArray (T));
     return T->A.L;
@@ -1207,9 +1169,8 @@ long GetElementCount (const Type* T)
 
 
 void SetElementCount (Type* T, long Count)
-/* Set the element count of the array specified in T (which must be of
-** array type).
-*/
+// Set the element count of the array specified in T (which must be of
+// array type).
 {
     CHECK (IsTypeArray (T));
     T->A.L = Count;
@@ -1236,10 +1197,9 @@ Type* GetElementTypeModifiable (Type* T)
 
 
 const Type* GetBaseElementType (const Type* T)
-/* Return the base element type of a given type. If T is not an array, this
-** will return. Otherwise it will return the base element type, which means
-** the element type that is not an array.
-*/
+// Return the base element type of a given type. If T is not an array, this
+// will return. Otherwise it will return the base element type, which means
+// the element type that is not an array.
 {
     while (IsTypeArray (T)) {
         ++T;
@@ -1256,9 +1216,8 @@ const Type* GetBaseElementType (const Type* T)
 
 
 struct SymEntry* GetESUTagSym (const Type* T)
-/* Get the tag symbol entry of the enum/struct/union type.
-** Return 0 if it is not an enum/struct/union.
-*/
+// Get the tag symbol entry of the enum/struct/union type.
+// Return 0 if it is not an enum/struct/union.
 {
     if ((IsClassStruct (T) || IsTypeEnum (T))) {
         return T->A.S;
@@ -1287,9 +1246,8 @@ void SetESUTagSym (Type* T, struct SymEntry* S)
 
 
 const char* GetBasicTypeName (const Type* T)
-/* Return a const name string of the basic type.
-** Return "<type>" for unknown basic types.
-*/
+// Return a const name string of the basic type.
+// Return "<type>" for unknown basic types.
 {
     switch (GetRawTypeRank (T)) {
     case T_RANK_ENUM:       return "enum";
@@ -1344,9 +1302,8 @@ const char* GetBasicTypeName (const Type* T)
 
 
 static const char* GetTagSymName (const Type* T)
-/* Return a name string of the type or the symbol name if it is an ESU type.
-** Note: This may use a static buffer that could be overwritten by other calls.
-*/
+// Return a name string of the type or the symbol name if it is an ESU type.
+// Note: This may use a static buffer that could be overwritten by other calls.
 {
     static char TypeName [IDENTSIZE + 16];
     SymEntry* Sym;
@@ -1434,9 +1391,8 @@ static void GetParameterList (StrBuf* ParamList, StrBuf* Buf, const FuncDesc* D,
 
 
 static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBuf* East, const Type* T)
-/* Return the name string of the given type split into a western part and an
-** eastern part.
-*/
+// Return the name string of the given type split into a western part and an
+// eastern part.
 {
     struct StrBuf Buf = AUTO_STRBUF_INITIALIZER;
 
@@ -1584,10 +1540,9 @@ struct StrBuf* GetFullTypeNameBuf (struct StrBuf* S, const Type* T)
 
 
 int GetQualifierTypeCodeNameBuf (struct StrBuf* S, TypeCode Qual, TypeCode IgnoredQual)
-/* Return the names of the qualifiers of the type.
-** Qualifiers to be ignored can be specified with the IgnoredQual flags.
-** Return the count of added qualifier names.
-*/
+// Return the names of the qualifiers of the type.
+// Qualifiers to be ignored can be specified with the IgnoredQual flags.
+// Return the count of added qualifier names.
 {
     int Count = 0;
 

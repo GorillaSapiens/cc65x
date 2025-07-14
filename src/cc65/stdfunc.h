@@ -51,15 +51,13 @@
 
 
 void AddCmpCodeIfSizeNot256 (const char* Code, long Size);
-/* Add a line of Assembly code that compares an index register
-** only if it isn't comparing to #<256.  (If the next line
-** is "bne", then this will avoid a redundant line.)
-*/
+// Add a line of Assembly code that compares an index register
+// only if it isn't comparing to #<256.  (If the next line
+// is "bne", then this will avoid a redundant line.)
 
 int FindStdFunc (const char* Name);
-/* Determine if the given function is a known standard function that may be
-** called in a special way. If so, return the index, otherwise return -1.
-*/
+// Determine if the given function is a known standard function that may be
+// called in a special way. If so, return the index, otherwise return -1.
 
 void HandleStdFunc (int Index, struct FuncDesc* F, ExprDesc* lval);
 /* Generate code for a known standard function. */

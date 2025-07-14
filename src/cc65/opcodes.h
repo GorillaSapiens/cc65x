@@ -209,9 +209,8 @@ extern const OPCDesc OPCTable[OP65_COUNT];
 
 
 const OPCDesc* FindOP65 (const char* OPC);
-/* Find the given opcode and return the opcode description. If the opcode was
-** not found, NULL is returned.
-*/
+// Find the given opcode and return the opcode description. If the opcode was
+// not found, NULL is returned.
 
 unsigned GetInsnSize (opc_t OPC, am_t AM);
 /* Return the size of the given instruction */
@@ -239,22 +238,19 @@ INLINE unsigned GetOPCInfo (opc_t OPC)
 #endif
 
 unsigned char GetAMUseInfo (am_t AM);
-/* Get usage info for the given addressing mode (addressing modes that use
-** index registers return REG_r info for these registers).
-*/
+// Get usage info for the given addressing mode (addressing modes that use
+// index registers return REG_r info for these registers).
 
 opc_t GetInverseBranch (opc_t OPC);
 /* Return a branch that reverse the condition of the branch given in OPC */
 
 opc_t MakeShortBranch (opc_t OPC);
-/* Return the short version of the given branch. If the branch is already
-** a short branch, return the opcode unchanged.
-*/
+// Return the short version of the given branch. If the branch is already
+// a short branch, return the opcode unchanged.
 
 opc_t MakeLongBranch (opc_t OPC);
-/* Return the long version of the given branch. If the branch is already
-** a long branch, return the opcode unchanged.
-*/
+// Return the long version of the given branch. If the branch is already
+// a long branch, return the opcode unchanged.
 
 bc_t GetBranchCond (opc_t OPC);
 /* Get the condition for the conditional branch in OPC */

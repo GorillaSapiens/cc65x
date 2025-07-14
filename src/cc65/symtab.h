@@ -154,10 +154,9 @@ SymEntry* FindTagSym (const char* Name);
 /* Find with the given name the tag symbol visible in the current scope */
 
 SymEntry FindStructField (const Type* TypeArray, const char* Name);
-/* Find a struct/union field in the fields list.
-** Return the info about the found field symbol filled in an entry struct by
-** value, or an empty entry struct if the field is not found.
-*/
+// Find a struct/union field in the fields list.
+// Return the info about the found field symbol filled in an entry struct by
+// value, or an empty entry struct if the field is not found.
 
 unsigned short FindSPAdjustment (const char* Name);
 /* Search for an entry in the table of SP adjustments */

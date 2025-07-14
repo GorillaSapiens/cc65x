@@ -336,15 +336,13 @@ static void DefineCpuMacros (void)
 {
     const char* CPUName;
 
-    /* Note: The list of CPUs handled here must match the one checked in
-    ** OptCPU().
-    */
+    // Note: The list of CPUs handled here must match the one checked in
+    // OptCPU().
     switch (CPU) {
 
-        /* The following ones are legal CPUs as far as the assembler is
-        ** concerned but are ruled out earlier in the compiler, so this
-        ** function should never see them.
-        */
+        // The following ones are legal CPUs as far as the assembler is
+        // concerned but are ruled out earlier in the compiler, so this
+        // function should never see them.
         case CPU_NONE:
         case CPU_SWEET16:
         case CPU_M740:
@@ -402,9 +400,8 @@ static void DefineCpuMacros (void)
             break;
     }
 
-    /* Define the macros for instruction sets. We only include the ones for
-    ** the available CPUs.
-    */
+    // Define the macros for instruction sets. We only include the ones for
+    // the available CPUs.
     DefineNumericMacro ("__CPU_ISET_6502__", CPU_ISET_6502);
     DefineNumericMacro ("__CPU_ISET_6502X__", CPU_ISET_6502X);
     DefineNumericMacro ("__CPU_ISET_6502DTV__", CPU_ISET_6502DTV);
@@ -417,9 +414,8 @@ static void DefineCpuMacros (void)
     DefineNumericMacro ("__CPU_ISET_4510__", CPU_ISET_4510);
     DefineNumericMacro ("__CPU_ISET_45GS02__", CPU_ISET_45GS02);
 
-    /* Now define the macro that contains the bit set with the available
-    ** cpu instructions.
-    */
+    // Now define the macro that contains the bit set with the available
+    // cpu instructions.
     DefineNumericMacro ("__CPU__", CPUIsets[CPU]);
 }
 
@@ -466,10 +462,9 @@ static void DefineSym (const char* Def)
         /* No value given. Define the macro with the value 1 */
         DefineNumericMacro (Def, 1);
     } else {
-        /* We have a value, P points to the '=' character. Since the argument
-        ** is const, create a copy and replace the '=' in the copy by a zero
-        ** terminator.
-        */
+        // We have a value, P points to the '=' character. Since the argument
+        // is const, create a copy and replace the '=' in the copy by a zero
+        // terminator.
         char* Q;
         unsigned Len = strlen (Def)+1;
         char* S = (char*) xmalloc (Len);
@@ -585,9 +580,8 @@ static void OptCreateFullDep (const char* Opt attribute ((unused)),
 static void OptCPU (const char* Opt, const char* Arg)
 /* Handle the --cpu option */
 {
-    /* Find the CPU from the given name. We do only accept a certain number
-    ** of CPUs. If the list is changed, be sure to adjust SetCpuMacros().
-    */
+    // Find the CPU from the given name. We do only accept a certain number
+    // of CPUs. If the list is changed, be sure to adjust SetCpuMacros().
     CPU = FindCPU (Arg);
     if (CPU != CPU_6502 && CPU != CPU_6502X && CPU != CPU_65SC02 &&
         CPU != CPU_65C02 && CPU != CPU_65816 && CPU != CPU_HUC6280 &&
@@ -644,14 +638,12 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
         AbEnd ("Cannot open '%s': %s", Arg, strerror (errno));
     }
 
-    /* Read line by line, ignore empty lines and switch optimization
-    ** steps on/off.
-    */
+    // Read line by line, ignore empty lines and switch optimization
+    // steps on/off.
     while (fgets (Buf, sizeof (Buf), F) != 0) {
 
-        /* Remove trailing control chars. This will also remove the
-        ** trailing newline.
-        */
+        // Remove trailing control chars. This will also remove the
+        // trailing newline.
         unsigned Len = strlen (Buf);
         while (Len > 0 && IsControl (Buf[Len-1])) {
             --Len;
@@ -664,9 +656,8 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
             ++Line;
         }
 
-        /* Check the first character and enable/disable the step or
-        ** ignore the line
-        */
+        // Check the first character and enable/disable the step or
+        // ignore the line
         switch (*Line) {
 
             case '\0':
@@ -691,9 +682,8 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
 
     }
 
-    /* Close the file, no error check here since we were just reading and
-    ** this is only a debug function.
-    */
+    // Close the file, no error check here since we were just reading and
+    // this is only a debug function.
     (void) fclose (F);
 }
 
@@ -1196,9 +1186,8 @@ int main (int argc, char* argv[])
     /* Create the output file name if it was not explicitly given */
     MakeDefaultOutputName (InputFile);
 
-    /* If no CPU given, use the default CPU for the target. Define macros that
-    ** allow to query the CPU.
-    */
+    // If no CPU given, use the default CPU for the target. Define macros that
+    // allow to query the CPU.
     if (CPU == CPU_UNKNOWN) {
         if (Target != TGT_UNKNOWN) {
             CPU = GetTargetProperties (Target)->DefaultCPU;

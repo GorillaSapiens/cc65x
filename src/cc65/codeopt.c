@@ -358,9 +358,8 @@ static int CmpOptStep (const void* Key, const void* Func)
 
 
 static OptFunc* FindOptFunc (const char* Name)
-/* Find an optimizer step by name in the table and return a pointer. Return
-** NULL if no such step is found.
-*/
+// Find an optimizer step by name in the table and return a pointer. Return
+// NULL if no such step is found.
 {
     /* Search for the function in the list */
     OptFunc** O = bsearch (Name, OptFuncs, OPTFUNC_COUNT, sizeof (OptFuncs[0]), CmpOptStep);
@@ -370,9 +369,8 @@ static OptFunc* FindOptFunc (const char* Name)
 
 
 static OptFunc* GetOptFunc (const char* Name)
-/* Find an optimizer step by name in the table and return a pointer. Print an
-** error and call AbEnd if not found.
-*/
+// Find an optimizer step by name in the table and return a pointer. Print an
+// error and call AbEnd if not found.
 {
     /* Search for the function in the list */
     OptFunc* F = FindOptFunc (Name);
@@ -580,9 +578,8 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
 {
     unsigned Changes, C;
 
-    /* Don't run the function if it is removed, disabled or prohibited by the
-    ** code size factor
-    */
+    // Don't run the function if it is removed, disabled or prohibited by the
+    // code size factor
     if (F->Func == 0 || F->Disabled || F->CodeSizeFactor > S->CodeSizeFactor) {
         return 0;
     }
@@ -619,11 +616,10 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
 
 
 static unsigned RunOptGroup1 (CodeSeg* S)
-/* Run the first group of optimization steps. These steps translate known
-** patterns emitted by the code generator into more optimal patterns. Order
-** of the steps is important, because some of the steps done earlier cover
-** the same patterns as later steps as subpatterns.
-*/
+// Run the first group of optimization steps. These steps translate known
+// patterns emitted by the code generator into more optimal patterns. Order
+// of the steps is important, because some of the steps done earlier cover
+// the same patterns as later steps as subpatterns.
 {
     unsigned Changes = 0;
 
@@ -676,11 +672,10 @@ static unsigned RunOptGroup1 (CodeSeg* S)
 
 
 static unsigned RunOptGroup2 (CodeSeg* S)
-/* Run one group of optimization steps. This step involves just decoupling
-** instructions by replacing them by instructions that do not depend on
-** previous instructions. This makes it easier to find instructions that
-** aren't used.
-*/
+// Run one group of optimization steps. This step involves just decoupling
+// instructions by replacing them by instructions that do not depend on
+// previous instructions. This makes it easier to find instructions that
+// aren't used.
 {
     unsigned Changes = 0;
 
@@ -693,10 +688,9 @@ static unsigned RunOptGroup2 (CodeSeg* S)
 
 
 static unsigned RunOptGroup3 (CodeSeg* S)
-/* Run one group of optimization steps. These steps depend on each other,
-** that means that one step may allow another step to do additional work,
-** so we will repeat the steps as long as we see any changes.
-*/
+// Run one group of optimization steps. These steps depend on each other,
+// that means that one step may allow another step to do additional work,
+// so we will repeat the steps as long as we see any changes.
 {
     unsigned Changes, C;
 
@@ -780,9 +774,8 @@ static unsigned RunOptGroup3 (CodeSeg* S)
 
 
 static unsigned RunOptGroup4 (CodeSeg* S)
-/* Run another round of pattern replacements. These are done late, since there
-** may be better replacements before.
-*/
+// Run another round of pattern replacements. These are done late, since there
+// may be better replacements before.
 {
     unsigned Changes = 0;
 
@@ -813,10 +806,9 @@ static unsigned RunOptGroup5 (CodeSeg* S)
         Changes += RunOptFunc (S, &DOpt65C02Ind, 1);
         Changes += RunOptFunc (S, &DOpt65C02Stores, 1);
         if (Changes) {
-            /* The 65C02 replacement codes do often make the use of a register
-            ** value unnecessary, so if we have changes, run another load
-            ** removal pass.
-            */
+            // The 65C02 replacement codes do often make the use of a register
+            // value unnecessary, so if we have changes, run another load
+            // removal pass.
             Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
         }
     }
@@ -828,19 +820,17 @@ static unsigned RunOptGroup5 (CodeSeg* S)
 
 
 static unsigned RunOptGroup6 (CodeSeg* S)
-/* This one is quite special. It tries to replace "lda (c_sp),y" by "lda (c_sp,x)".
-** The latter is ony cycle slower, but if we're able to remove the necessary
-** load of the Y register, because X is zero anyway, we gain 1 cycle and
-** shorten the code by one (transfer) or two bytes (load). So what we do is
-** to replace the insns, remove unused loads, and then change back all insns
-** where Y is still zero (meaning that the load has not been removed).
-*/
+// This one is quite special. It tries to replace "lda (c_sp),y" by "lda (c_sp,x)".
+// The latter is ony cycle slower, but if we're able to remove the necessary
+// load of the Y register, because X is zero anyway, we gain 1 cycle and
+// shorten the code by one (transfer) or two bytes (load). So what we do is
+// to replace the insns, remove unused loads, and then change back all insns
+// where Y is still zero (meaning that the load has not been removed).
 {
     unsigned Changes = 0;
 
-    /* This group will only run for a standard 6502, because the 65C02 has a
-    ** better addressing mode that covers this case.
-    */
+    // This group will only run for a standard 6502, because the 65C02 has a
+    // better addressing mode that covers this case.
     if ((CPUIsets[CPU] & CPU_ISET_65SC02) == 0) {
         Changes += RunOptFunc (S, &DOptIndLoads1, 1);
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
@@ -854,22 +844,19 @@ static unsigned RunOptGroup6 (CodeSeg* S)
 
 
 static unsigned RunOptGroup7 (CodeSeg* S)
-/* The last group of optimization steps. Adjust branches, do size optimizations.
-*/
+// The last group of optimization steps. Adjust branches, do size optimizations.
 {
     unsigned Changes = 0;
     unsigned C;
 
-    /* Optimize for size, that is replace operations by shorter ones, even
-    ** if this does hinder further optimizations (no problem since we're
-    ** done soon).
-    */
+    // Optimize for size, that is replace operations by shorter ones, even
+    // if this does hinder further optimizations (no problem since we're
+    // done soon).
     C = RunOptFunc (S, &DOptSize1, 1);
     if (C) {
         Changes += C;
-        /* Run some optimization passes again, since the size optimizations
-        ** may have opened new oportunities.
-        */
+        // Run some optimization passes again, since the size optimizations
+        // may have opened new oportunities.
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
         Changes += RunOptFunc (S, &DOptUnusedStores, 1);
         Changes += RunOptFunc (S, &DOptJumpTarget1, 5);
@@ -880,9 +867,8 @@ static unsigned RunOptGroup7 (CodeSeg* S)
     C = RunOptFunc (S, &DOptSize2, 1);
     if (C) {
         Changes += C;
-        /* Run some optimization passes again, since the size optimizations
-        ** may have opened new oportunities.
-        */
+        // Run some optimization passes again, since the size optimizations
+        // may have opened new oportunities.
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
         Changes += RunOptFunc (S, &DOptJumpTarget1, 5);
         Changes += RunOptFunc (S, &DOptStore5, 1);
@@ -903,14 +889,13 @@ static unsigned RunOptGroup7 (CodeSeg* S)
     C += RunOptFunc (S, &DOptJumpCascades, 1);
     C += RunOptFunc (S, &DOptBranchDist2, 1);
 
-    /* Adjust branch distances again, since the previous step may change code
-       between branches */
+    // Adjust branch distances again, since the previous step may change code
+    // between branches 
     C += RunOptFunc (S, &DOptBranchDist, 3);
 
     Changes += C;
-    /* If we had changes, we must run dead code elimination again,
-    ** since the changes may have introduced dead code.
-    */
+    // If we had changes, we must run dead code elimination again,
+    // since the changes may have introduced dead code.
     if (C) {
         Changes += RunOptFunc (S, &DOptDeadCode, 1);
     }

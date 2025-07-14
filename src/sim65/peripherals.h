@@ -63,24 +63,22 @@ typedef struct {
     uint64_t CpuInstructions;
     uint64_t IrqEvents;
     uint64_t NmiEvents;
-    /* The 'latched_...' fields below hold values that are sampled upon a write
-     * to the PERIPHERALS_COUNTER_LATCH address.
-     * One of these will be visible (read only) through an eight-byte aperture.
-     * The purpose of these latched registers is to read 64-bit values one byte
-     * at a time, without having to worry that their content will change along
-     * the way.
-     */
+    // The 'latched_...' fields below hold values that are sampled upon a write
+    // to the PERIPHERALS_COUNTER_LATCH address.
+    // One of these will be visible (read only) through an eight-byte aperture.
+    // The purpose of these latched registers is to read 64-bit values one byte
+    // at a time, without having to worry that their content will change along
+    // the way.
     uint64_t LatchedClockCycles;
     uint64_t LatchedCpuInstructions;
     uint64_t LatchedIrqEvents;
     uint64_t LatchedNmiEvents;
     uint64_t LatchedWallclockTime;
     uint64_t LatchedWallclockTimeSplit;
-    /* Select which of the six latched registers will be visible.
-     * This is a single byte, read/write register, accessible via address
-     * PERIPHERALS_COUNTER_SELECT. If a non-existent latch register is selected,
-     * the PERIPHERALS_COUNTER_VALUE will be zero.
-     */
+    // Select which of the six latched registers will be visible.
+    // This is a single byte, read/write register, accessible via address
+    // PERIPHERALS_COUNTER_SELECT. If a non-existent latch register is selected,
+    // the PERIPHERALS_COUNTER_VALUE will be zero.
     uint8_t LatchedValueSelected;
 } CounterPeripheral;
 

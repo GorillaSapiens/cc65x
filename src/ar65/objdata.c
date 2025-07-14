@@ -121,9 +121,8 @@ void ClearObjData (ObjData* O)
 
 
 ObjData* FindObjData (const char* Module)
-/* Search for the module with the given name and return it. Return NULL if the
-** module is not in the list.
-*/
+// Search for the module with the given name and return it. Return NULL if the
+// module is not in the list.
 {
     unsigned I;
 

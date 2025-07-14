@@ -62,9 +62,8 @@ HashTable* InitHashTable (HashTable* T, unsigned Slots, const HashFunctions* Fun
 
 
 void DoneHashTable (HashTable* T)
-/* Destroy the contents of a hash table. Note: This will not free the entries
-** in the table!
-*/
+// Destroy the contents of a hash table. Note: This will not free the entries
+// in the table!
 {
     /* Just free the array with the table pointers */
     xfree (T->Table);
@@ -102,9 +101,8 @@ static void HT_Alloc (HashTable* T)
 
 
 HashNode* HT_FindHash (const HashTable* T, const void* Key, unsigned Hash)
-/* Find the node with the given key. Differs from HT_Find in that the hash
-** for the key is precalculated and passed to the function.
-*/
+// Find the node with the given key. Differs from HT_Find in that the hash
+// for the key is precalculated and passed to the function.
 {
     HashNode* N;
 
@@ -117,9 +115,8 @@ HashNode* HT_FindHash (const HashTable* T, const void* Key, unsigned Hash)
     N = T->Table[Hash % T->Slots];
     while (N) {
 
-        /* First compare the full hash, to avoid calling the compare function
-        ** if it is not really necessary.
-        */
+        // First compare the full hash, to avoid calling the compare function
+        // if it is not really necessary.
         if (N->Hash == Hash &&
             T->Func->Compare (Key, T->Func->GetKey (N)) == 0) {
             /* Found */
@@ -187,9 +184,8 @@ void HT_Remove (HashTable* T, void* Entry)
     /* Remove the entry from the single linked list */
     HashNode** Q = &T->Table[Slot];
     while (1) {
-        /* If the pointer is NULL, the node is not in the table which we will
-        ** consider a serious error.
-        */
+        // If the pointer is NULL, the node is not in the table which we will
+        // consider a serious error.
         CHECK (*Q != 0);
         if (*Q == N) {
             /* Found - remove it */
@@ -205,13 +201,12 @@ void HT_Remove (HashTable* T, void* Entry)
 
 
 void HT_Walk (HashTable* T, int (*F) (void* Entry, void* Data), void* Data)
-/* Walk over all nodes of a hash table, optionally deleting entries from the
-** table. For each node, the user supplied function F is called, passing a
-** pointer to the entry, and the data pointer passed to HT_Walk by the caller.
-** If F returns true, the node is deleted from the hash table otherwise it's
-** left in place. While deleting the node, the node is not accessed, so it is
-** safe for F to free the memory associcated with the entry.
-*/
+// Walk over all nodes of a hash table, optionally deleting entries from the
+// table. For each node, the user supplied function F is called, passing a
+// pointer to the entry, and the data pointer passed to HT_Walk by the caller.
+// If F returns true, the node is deleted from the hash table otherwise it's
+// left in place. While deleting the node, the node is not accessed, so it is
+// safe for F to free the memory associcated with the entry.
 {
     unsigned I;
 
@@ -230,9 +225,8 @@ void HT_Walk (HashTable* T, int (*F) (void* Entry, void* Data), void* Data)
         while (*Cur) {
             /* Fetch the next node in chain now, because F() may delete it */
             HashNode* Next = (*Cur)->Next;
-            /* Call the user function. N is also the pointer to the entry. If
-            ** the function returns true, the entry is to be deleted.
-            */
+            // Call the user function. N is also the pointer to the entry. If
+            // the function returns true, the entry is to be deleted.
             if (F (*Cur, Data)) {
                 /* Delete the node from the chain */
                 *Cur = Next;

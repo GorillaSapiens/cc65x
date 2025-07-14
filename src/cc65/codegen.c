@@ -65,12 +65,11 @@
 #include "util.h"
 #include "codegen.h"
 
-/* This is a terrible hack that tries to combat the ever reoccuring issue with
-   Mingw and PRIXPTR - the macro should have been defined like this for us in
-   the first place.
-   NOTE: "I64x" works in the github actions now, so if your local mingw64 fails,
-         you probably have to update.
-*/
+// This is a terrible hack that tries to combat the ever reoccuring issue with
+// Mingw and PRIXPTR - the macro should have been defined like this for us in
+// the first place.
+// NOTE: "I64x" works in the github actions now, so if your local mingw64 fails,
+// you probably have to update.
 #if defined(__MINGW64__)
 #undef PRIXPTR
 #define PRIXPTR "I64x"
@@ -223,9 +222,8 @@ void g_preamble (void)
 
     /* Import zero page variables */
     AddTextLine ("\t.importzp\t" "c_sp, sreg, regsave, regbank");
-    /* The space above is intentional, to ease replacement of the name of
-    ** the stack pointer.  Don't worry, the preprocessor will concatenate them.
-    */
+    // The space above is intentional, to ease replacement of the name of
+    // the stack pointer.  Don't worry, the preprocessor will concatenate them.
     AddTextLine ("\t.importzp\ttmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4");
 
     /* Define long branch macros */
@@ -238,9 +236,8 @@ void g_fileinfo (const char* Name, unsigned long Size, unsigned long MTime)
 /* If debug info is enabled, place a file info into the source */
 {
     if (DebugInfo) {
-        /* We have to place this into the global text segment, so it will
-        ** appear before all .dbg line statements.
-        */
+        // We have to place this into the global text segment, so it will
+        // appear before all .dbg line statements.
         TS_AddLine (GS->Text, "\t.dbg\t\tfile, \"%s\", %lu, %lu", Name, Size, MTime);
     }
 }
@@ -353,16 +350,14 @@ int push (unsigned flags)
 
 
 static unsigned MakeByteOffs (unsigned Flags, unsigned Offs)
-/* The value in Offs is an offset to an address in a/x. Make sure, an object
-** of the type given in Flags can be loaded or stored into this address by
-** adding part of the offset to the address in ax, so that the remaining
-** offset fits into an index register. Return the remaining offset.
-*/
+// The value in Offs is an offset to an address in a/x. Make sure, an object
+// of the type given in Flags can be loaded or stored into this address by
+// adding part of the offset to the address in ax, so that the remaining
+// offset fits into an index register. Return the remaining offset.
 {
-    /* If the offset is too large for a byte register, add the high byte
-    ** of the offset to the primary. Beware: We need a special correction
-    ** if the offset in the low byte will overflow in the operation.
-    */
+    // If the offset is too large for a byte register, add the high byte
+    // of the offset to the primary. Beware: We need a special correction
+    // if the offset in the low byte will overflow in the operation.
     unsigned O = Offs & ~0xFFU;
     if ((Offs & 0xFF) > 256 - sizeofarg (Flags)) {
         /* We need to add the low byte also */
@@ -430,9 +425,8 @@ void g_defliterallabel (unsigned label)
 void g_aliasliterallabel (unsigned label, unsigned baselabel, long offs)
 /* Define label as an alias for baselabel+offs */
 {
-    /* We need an intermediate buffer here since LocalLabelName uses a
-    ** static buffer which changes with each call.
-    */
+    // We need an intermediate buffer here since LocalLabelName uses a
+    // static buffer which changes with each call.
     StrBuf L = AUTO_STRBUF_INITIALIZER;
     SB_AppendStr (&L, PooledLiteralLabelName (label));
     SB_Terminate (&L);
@@ -478,8 +472,8 @@ void g_importstartup (void)
 
 
 void g_importmainargs (void)
-/* Forced import of a special symbol that handles arguments to main. This will
-   happen only when the compiler sees a main function that takes arguments. */
+// Forced import of a special symbol that handles arguments to main. This will
+// happen only when the compiler sees a main function that takes arguments. 
 {
     AddTextLine ("\t.forceimport\tinitmainargs");
 }
@@ -492,11 +486,10 @@ void g_importmainargs (void)
 
 
 
-/* Remember the argument size of a function. The variable is set by g_enter
-** and used by g_leave. If the function gets its argument size by the caller
-** (variable param list or function without prototype), g_enter will set the
-** value to -1.
-*/
+// Remember the argument size of a function. The variable is set by g_enter
+// and used by g_leave. If the function gets its argument size by the caller
+// (variable param list or function without prototype), g_enter will set the
+// value to -1.
 static int funcargs;
 
 
@@ -517,9 +510,8 @@ void g_enter (unsigned flags, unsigned argsize)
 void g_leave (int DoCleanup)
 /* Function epilogue */
 {
-    /* In the main function in cc65 mode nothing has to be dropped because
-    ** the program is terminated anyway.
-    */
+    // In the main function in cc65 mode nothing has to be dropped because
+    // the program is terminated anyway.
     if (DoCleanup) {
         /* How many bytes of locals do we have to drop? */
         unsigned ToDrop = (unsigned) -StackPtr;
@@ -672,10 +664,9 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 
     } else if (StackOffs <= RegOffs) {
 
-        /* More bytes, but the relation between the register offset in the
-        ** register bank and the stack offset allows us to generate short
-        ** code that uses just one index register.
-        */
+        // More bytes, but the relation between the register offset in the
+        // register bank and the stack offset allows us to generate short
+        // code that uses just one index register.
         unsigned Label = GetLocalLabel ();
         AddCodeLine ("ldy #$%02X", StackOffs);
         g_defcodelabel (Label);
@@ -687,9 +678,8 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 
     } else {
 
-        /* OK, this is the generic code. We need to save X because the
-        ** caller will only save A.
-        */
+        // OK, this is the generic code. We need to save X because the
+        // caller will only save A.
         unsigned Label = GetLocalLabel ();
         AddCodeLine ("stx tmp1");
         AddCodeLine ("ldy #$%02X", (unsigned char) (StackOffs + Bytes - 1));
@@ -742,9 +732,8 @@ void g_getimmed (unsigned Flags, uintptr_t Val, long Offs)
                 B3 = (unsigned char) (Val >> 16);
                 B4 = (unsigned char) (Val >> 24);
 
-                /* Load the value. Don't be too smart here and let
-                 * the optimizer do its job.
-                 */
+                // Load the value. Don't be too smart here and let
+                // the optimizer do its job.
                 AddCodeLine ("lda #$%02X", B4);
                 AddCodeLine ("sta sreg+1");
                 AddCodeLine ("lda #$%02X", B3);
@@ -884,14 +873,12 @@ void g_getlocal (unsigned Flags, int Offs)
 
 
 void g_getind (unsigned Flags, unsigned Offs)
-/* Fetch the specified object type indirect through the primary register
-** into the primary register
-*/
+// Fetch the specified object type indirect through the primary register
+// into the primary register
 {
-    /* If the offset is greater than 255, add the part that is > 255 to
-    ** the primary. This way we get an easy addition and use the low byte
-    ** as the offset
-    */
+    // If the offset is greater than 255, add the part that is > 255 to
+    // the primary. This way we get an easy addition and use the low byte
+    // as the offset
     Offs = MakeByteOffs (Flags, Offs);
 
     /* Handle the indirect fetch */
@@ -1002,18 +989,16 @@ void g_leasp (int Offs)
 
 
 void g_leavariadic (int Offs)
-/* Fetch the address of a parameter in a variadic function into the primary
-** register
-*/
+// Fetch the address of a parameter in a variadic function into the primary
+// register
 {
     unsigned ArgSizeOffs;
 
     /* Calculate the offset relative to c_sp */
     Offs -= StackPtr;
 
-    /* Get the offset of the parameter which is stored at c_sp+0 on function
-    ** entry and check if this offset is reachable with a byte offset.
-    */
+    // Get the offset of the parameter which is stored at c_sp+0 on function
+    // entry and check if this offset is reachable with a byte offset.
     CHECK (StackPtr <= 0);
     ArgSizeOffs = -StackPtr;
     CheckLocalOffs (ArgSizeOffs);
@@ -1150,15 +1135,13 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
 
 
 void g_putind (unsigned Flags, unsigned Offs)
-/* Store the specified object type in the primary register at the address
-** on the top of the stack
-*/
+// Store the specified object type in the primary register at the address
+// on the top of the stack
 {
-    /* We can handle offsets below $100 directly, larger offsets must be added
-    ** to the address. Since a/x is in use, best code is achieved by adding
-    ** just the high byte. Be sure to check if the low byte will overflow while
-    ** while storing.
-    */
+    // We can handle offsets below $100 directly, larger offsets must be added
+    // to the address. Since a/x is in use, best code is achieved by adding
+    // just the high byte. Be sure to check if the low byte will overflow while
+    // while storing.
     if ((Offs & 0xFF) > 256 - sizeofarg (Flags | CF_FORCECHAR)) {
 
         /* Overflow - we need to add the low byte also */
@@ -1279,36 +1262,32 @@ void g_tosint (unsigned flags)
 
 
 static void g_regchar (unsigned to)
-/* Treat the value in the primary register as a char with specified signedness
-** and convert it to an int (whose representation is irrelevent of signedness).
-*/
+// Treat the value in the primary register as a char with specified signedness
+// and convert it to an int (whose representation is irrelevent of signedness).
 {
-    /* Since char is the smallest type supported here, we never need any info
-    ** about the original type to "promote from it". However, we have to make
-    ** sure the entire AX contains the correct char value as an int, since we
-    ** will almost always use the char value as an int in AX directly in code
-    ** generation (unless CF_FORCECHAR is specified). That is to say, we don't
-    ** need the original "from" flags for the first conversion to char, but do
-    ** need the original "to" flags as the new "from" flags for the conversion
-    ** to int.
-    */
+    // Since char is the smallest type supported here, we never need any info
+    // about the original type to "promote from it". However, we have to make
+    // sure the entire AX contains the correct char value as an int, since we
+    // will almost always use the char value as an int in AX directly in code
+    // generation (unless CF_FORCECHAR is specified). That is to say, we don't
+    // need the original "from" flags for the first conversion to char, but do
+    // need the original "to" flags as the new "from" flags for the conversion
+    // to int.
     g_regint (to | CF_FORCECHAR);
 }
 
 
 
 void g_regint (unsigned from)
-/* Convert the value in the primary register to an int (whose representation
-** is irrelevent of signedness).
-*/
+// Convert the value in the primary register to an int (whose representation
+// is irrelevent of signedness).
 {
     switch (from & CF_TYPEMASK) {
 
         case CF_CHAR:
-            /* If the original value was forced to use only A, it must be
-            ** extended from char to fill AX. Otherwise nothing to do here
-            ** since AX would already have the correct int value.
-            */
+            // If the original value was forced to use only A, it must be
+            // extended from char to fill AX. Otherwise nothing to do here
+            // since AX would already have the correct int value.
             if (from & CF_FORCECHAR) {
                 AddCodeLine ("ldx #$00");
 
@@ -1336,17 +1315,15 @@ void g_regint (unsigned from)
 
 
 void g_reglong (unsigned from)
-/* Convert the value in the primary register to a long (whose representation
-** is irrelevent of signedness).
-*/
+// Convert the value in the primary register to a long (whose representation
+// is irrelevent of signedness).
 {
     switch (from & CF_TYPEMASK) {
 
         case CF_CHAR:
-            /* If the original value was forced to use only A, it must be
-            ** extended from char to long. Otherwise AX would already have
-            ** the correct int value to be extened to long.
-            */
+            // If the original value was forced to use only A, it must be
+            // extended from char to long. Otherwise AX would already have
+            // the correct int value to be extened to long.
             if (from & CF_FORCECHAR) {
                 /* Conversion is from char */
                 if (from & CF_UNSIGNED) {
@@ -1397,13 +1374,12 @@ void g_reglong (unsigned from)
 static unsigned g_intpromotion (unsigned flags)
 /* Return new flags for integral promotions for types smaller than int. */
 {
-    /* https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.1
-    ** A char, a short int, or an int bit-field, or their signed or unsigned varieties, or an
-    ** object that has enumeration type, may be used in an expression wherever an int or
-    ** unsigned int may be used. If an int can represent all values of the original type, the value
-    ** is converted to an int; otherwise it is converted to an unsigned int.
-    ** These are called the integral promotions.
-    */
+    // https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.1
+    // A char, a short int, or an int bit-field, or their signed or unsigned varieties, or an
+    // object that has enumeration type, may be used in an expression wherever an int or
+    // unsigned int may be used. If an int can represent all values of the original type, the value
+    // is converted to an int; otherwise it is converted to an unsigned int.
+    // These are called the integral promotions.
 
     if ((flags & CF_TYPEMASK) == CF_CHAR) {
         /* int can represent all unsigned chars, so unsigned char is promoted to int. */
@@ -1412,9 +1388,8 @@ static unsigned g_intpromotion (unsigned flags)
         flags |= CF_INT;
         return flags;
     } else if ((flags & CF_TYPEMASK) == CF_SHORT) {
-        /* int cannot represent all unsigned shorts, so unsigned short is promoted to
-        ** unsigned int.
-        */
+        // int cannot represent all unsigned shorts, so unsigned short is promoted to
+        // unsigned int.
         flags &= ~CF_TYPEMASK;
         flags |= CF_INT;
         return flags;
@@ -1427,10 +1402,9 @@ static unsigned g_intpromotion (unsigned flags)
 
 
 unsigned g_typeadjust (unsigned lhs, unsigned rhs)
-/* Adjust the integer operands before doing a binary operation. lhs is a flags
-** value, that corresponds to the value on TOS, rhs corresponds to the value
-** in (e)ax. The return value is the flags value for the resulting type.
-*/
+// Adjust the integer operands before doing a binary operation. lhs is a flags
+// value, that corresponds to the value on TOS, rhs corresponds to the value
+// in (e)ax. The return value is the flags value for the resulting type.
 {
     /* Get the type spec from the flags */
     unsigned ltype = lhs & CF_TYPEMASK;
@@ -1452,23 +1426,21 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
     /* Result is const if both operands are const. */
     unsigned const_flag = (lhs & CF_CONST) & (rhs & CF_CONST);
 
-    /* https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.5
-    ** Many binary operators that expect operands of arithmetic type cause conversions and yield
-    ** result types in a similar way. The purpose is to yield a common type, which is also the type
-    ** of the result. This pattern is called the usual arithmetic conversions.
-    */
+    // https://port70.net/~nsz/c/c89/c89-draft.html#3.2.1.5
+    // Many binary operators that expect operands of arithmetic type cause conversions and yield
+    // result types in a similar way. The purpose is to yield a common type, which is also the type
+    // of the result. This pattern is called the usual arithmetic conversions.
 
     /* Note that this logic is largely duplicated by ArithmeticConvert. */
 
-    /* Before we apply the integral promotions, we check if both types are the same character type.
-    ** If so, we return that type, rather than int, which would be returned by the standard
-    ** rules.  This is only a performance optimization allowing the use of unsigned and/or char
-    ** operations; it does not affect correctness, as the flags are only used for code generation,
-    ** and not to determine types of other expressions containing this one.  For codgen, CF_CHAR
-    ** means the operands are char and the result is int (unless CF_FORCECHAR is also set, in
-    ** which case the result is char).  This special case part is not duplicated by
-    ** ArithmeticConvert.
-    */
+    // Before we apply the integral promotions, we check if both types are the same character type.
+    // If so, we return that type, rather than int, which would be returned by the standard
+    // rules.  This is only a performance optimization allowing the use of unsigned and/or char
+    // operations; it does not affect correctness, as the flags are only used for code generation,
+    // and not to determine types of other expressions containing this one.  For codgen, CF_CHAR
+    // means the operands are char and the result is int (unless CF_FORCECHAR is also set, in
+    // which case the result is char).  This special case part is not duplicated by
+    // ArithmeticConvert.
     if ((lhs & CF_TYPEMASK) == CF_CHAR && (rhs & CF_TYPEMASK) == CF_CHAR &&
         (lhs & CF_UNSIGNED) == (rhs & CF_UNSIGNED)) {
         /* Signedness flags are the same, so just use one of them. */
@@ -1482,34 +1454,30 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
     ltype = lhs & CF_TYPEMASK;
     rtype = rhs & CF_TYPEMASK;
 
-    /* If either operand has type unsigned long int, the other operand is converted to
-    ** unsigned long int.
-    */
+    // If either operand has type unsigned long int, the other operand is converted to
+    // unsigned long int.
     if ((ltype == CF_LONG && (lhs & CF_UNSIGNED)) ||
         (rtype == CF_LONG && (rhs & CF_UNSIGNED))) {
         return const_flag | CF_UNSIGNED | CF_LONG;
     }
 
-    /* Otherwise, if one operand has type long int and the other has type unsigned int,
-    ** if a long int can represent all values of an unsigned int, the operand of type unsigned int
-    ** is converted to long int ; if a long int cannot represent all the values of an unsigned int,
-    ** both operands are converted to unsigned long int.
-    */
+    // Otherwise, if one operand has type long int and the other has type unsigned int,
+    // if a long int can represent all values of an unsigned int, the operand of type unsigned int
+    // is converted to long int ; if a long int cannot represent all the values of an unsigned int,
+    // both operands are converted to unsigned long int.
     if ((ltype == CF_LONG && rtype == CF_INT && (rhs & CF_UNSIGNED)) ||
         (rtype == CF_LONG && ltype == CF_INT && (lhs & CF_UNSIGNED))) {
         /* long can represent all unsigneds, so we are in the first sub-case. */
         return const_flag | CF_LONG;
     }
 
-    /* Otherwise, if either operand has type long int, the other operand is converted to long int.
-    */
+    // Otherwise, if either operand has type long int, the other operand is converted to long int.
     if (ltype == CF_LONG || rtype == CF_LONG) {
         return const_flag | CF_LONG;
     }
 
-    /* Otherwise, if either operand has type unsigned int, the other operand is converted to
-    ** unsigned int.
-    */
+    // Otherwise, if either operand has type unsigned int, the other operand is converted to
+    // unsigned int.
     if ((ltype == CF_INT && (lhs & CF_UNSIGNED)) ||
         (rtype == CF_INT && (rhs & CF_UNSIGNED))) {
         return const_flag | CF_UNSIGNED | CF_INT;
@@ -1526,9 +1494,8 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
 
 
 unsigned g_typecast (unsigned to, unsigned from)
-/* Cast the value in the primary register to the specified operand size and
-** signedness. Return the result flags.
-*/
+// Cast the value in the primary register to the specified operand size and
+// signedness. Return the result flags.
 {
     /* Check if a conversion is needed */
     if ((from & CF_CONST) == 0) {
@@ -1545,9 +1512,8 @@ unsigned g_typecast (unsigned to, unsigned from)
                 break;
 
             case CF_CHAR:
-                /* We must truncate the primary register to char and then
-                ** sign-extend it to signed int in AX.
-                */
+                // We must truncate the primary register to char and then
+                // sign-extend it to signed int in AX.
                 g_regchar (to);
                 break;
 
@@ -1557,11 +1523,10 @@ unsigned g_typecast (unsigned to, unsigned from)
         }
     }
 
-    /* Do not need any other action. If the "to" type is int, and the primary
-    ** register is long, it will be automagically truncated. If the right hand
-    ** side is const, it is not located in the primary register and handled by
-    ** the expression parser code.
-    */
+    // Do not need any other action. If the "to" type is int, and the primary
+    // register is long, it will be automagically truncated. If the right hand
+    // side is const, it is not located in the primary register and handled by
+    // the expression parser code.
 
     /* Result is const if the right hand side was const */
     to |= (from & CF_CONST);
@@ -1573,11 +1538,10 @@ unsigned g_typecast (unsigned to, unsigned from)
 
 
 void g_scale (unsigned flags, long val)
-/* Scale the value in the primary register by the given value. If val is positive,
-** scale up, is val is negative, scale down. This function is used to scale
-** the operands or results of pointer arithmetic by the size of the type, the
-** pointer points to.
-*/
+// Scale the value in the primary register by the given value. If val is positive,
+// scale up, is val is negative, scale down. This function is used to scale
+// the operands or results of pointer arithmetic by the size of the type, the
+// pointer points to.
 {
     /* Value may not be zero */
     if (val == 0) {
@@ -1907,10 +1871,9 @@ void g_addeqlocal (unsigned flags, int Offs, unsigned long val)
 void g_addeqind (unsigned flags, unsigned offs, unsigned long val)
 /* Emit += for the location with address in ax */
 {
-    /* If the offset is too large for a byte register, add the high byte
-    ** of the offset to the primary. Beware: We need a special correction
-    ** if the offset in the low byte will overflow in the operation.
-    */
+    // If the offset is too large for a byte register, add the high byte
+    // of the offset to the primary. Beware: We need a special correction
+    // if the offset in the low byte will overflow in the operation.
     offs = MakeByteOffs (flags, offs);
 
     /* Check the size and determine operation */
@@ -2141,10 +2104,9 @@ void g_subeqlocal (unsigned flags, int Offs, unsigned long val)
 void g_subeqind (unsigned flags, unsigned offs, unsigned long val)
 /* Emit -= for the location with address in ax */
 {
-    /* If the offset is too large for a byte register, add the high byte
-    ** of the offset to the primary. Beware: We need a special correction
-    ** if the offset in the low byte will overflow in the operation.
-    */
+    // If the offset is too large for a byte register, add the high byte
+    // of the offset to the primary. Beware: We need a special correction
+    // if the offset in the low byte will overflow in the operation.
     offs = MakeByteOffs (flags, offs);
 
     /* Check the size and determine operation */
@@ -2309,9 +2271,8 @@ void g_restore (unsigned flags)
 
 
 void g_cmp (unsigned flags, unsigned long val)
-/* Immediate compare. The primary register will not be changed, Z flag
-** will be set.
-*/
+// Immediate compare. The primary register will not be changed, Z flag
+// will be set.
 {
     unsigned L;
 
@@ -2345,12 +2306,11 @@ void g_cmp (unsigned flags, unsigned long val)
 
 
 static void oper (unsigned Flags, unsigned long Val, const char* const* Subs)
-/* Encode a binary operation. subs is a pointer to four strings:
-**      0       --> Operate on ints
-**      1       --> Operate on unsigneds
-**      2       --> Operate on longs
-**      3       --> Operate on unsigned longs
-*/
+// Encode a binary operation. subs is a pointer to four strings:
+// 0       --> Operate on ints
+// 1       --> Operate on unsigneds
+// 2       --> Operate on longs
+// 3       --> Operate on unsigned longs
 {
     /* Determine the offset into the array */
     if (Flags & CF_UNSIGNED) {
@@ -2467,9 +2427,8 @@ void g_push (unsigned flags, unsigned long val)
 
 
 void g_swap (unsigned flags)
-/* Swap the primary register and the top of the stack. flags give the type
-** of *both* values (must have same size).
-*/
+// Swap the primary register and the top of the stack. flags give the type
+// of *both* values (must have same size).
 {
     switch (flags & CF_TYPEMASK) {
 
@@ -2559,11 +2518,10 @@ void g_falsejump (unsigned flags attribute ((unused)), unsigned label)
 
 
 void g_branch (unsigned Label)
-/* Branch unconditionally to Label if the CPU has the BRA instruction.
-** Otherwise, jump to Label.
-** Use this function, instead of g_jump(), only where it is certain that
-** the label cannot be farther away from the branch than -128/+127 bytes.
-*/
+// Branch unconditionally to Label if the CPU has the BRA instruction.
+// Otherwise, jump to Label.
+// Use this function, instead of g_jump(), only where it is certain that
+// the label cannot be farther away from the branch than -128/+127 bytes.
 {
     if ((CPUIsets[CPU] & (CPU_ISET_65SC02 | CPU_ISET_6502DTV)) != 0) {
         AddCodeLine ("bra %s", LocalLabelName (Label));
@@ -2592,9 +2550,8 @@ void g_drop (unsigned Space)
 /* Drop space allocated on the stack */
 {
     if (Space > 255) {
-        /* Inline the code since calling addysp repeatedly is quite some
-        ** overhead.
-        */
+        // Inline the code since calling addysp repeatedly is quite some
+        // overhead.
         AddCodeLine ("pha");
         AddCodeLine ("lda #$%02X", (unsigned char) Space);
         AddCodeLine ("clc");
@@ -2621,9 +2578,8 @@ void g_space (int Space)
         /* This is actually a drop operation */
         g_drop (-Space);
     } else if (Space > 255) {
-        /* Inline the code since calling subysp repeatedly is quite some
-        ** overhead.
-        */
+        // Inline the code since calling subysp repeatedly is quite some
+        // overhead.
         AddCodeLine ("pha");
         AddCodeLine ("lda c_sp");
         AddCodeLine ("sec");
@@ -2731,9 +2687,8 @@ void g_mul (unsigned flags, unsigned long val)
         }
     }
 
-    /* If the right hand side is const, the lhs is not on stack but still
-    ** in the primary register.
-    */
+    // If the right hand side is const, the lhs is not on stack but still
+    // in the primary register.
     if (flags & CF_CONST) {
 
         switch (flags & CF_TYPEMASK) {
@@ -2820,9 +2775,8 @@ void g_mul (unsigned flags, unsigned long val)
                 typeerror (flags);
         }
 
-        /* If we go here, we didn't emit code. Push the lhs on stack and fall
-        ** into the normal, non-optimized stuff.
-        */
+        // If we go here, we didn't emit code. Push the lhs on stack and fall
+        // into the normal, non-optimized stuff.
         flags &= ~CF_FORCECHAR; /* Handle chars as ints */
         g_push (flags & ~CF_CONST, 0);
 
@@ -2855,8 +2809,8 @@ void g_div (unsigned flags, unsigned long val)
             return;
         }
 
-        /* Check if we can afford using shift instead of multiplication at the
-        ** cost of code size */
+        // Check if we can afford using shift instead of multiplication at the
+        // cost of code size 
         if (p2 == 0 || (p2 > 0 && IS_Get (&CodeSizeFactor) >= (Negation ? 200 : 170))) {
             /* Generate a conditional shift instead */
             if (p2 > 0) {
@@ -2864,9 +2818,8 @@ void g_div (unsigned flags, unsigned long val)
                 unsigned int  EndLabel     = GetLocalLabel ();
                 unsigned long MaskedVal    = Negation ? val : NegatedVal;
 
-                /* GitHub #169 - if abs(expr) < abs(val), the result is always 0.
-                ** First, check whether expr >= 0 and skip to the shift if true.
-                */
+                // GitHub #169 - if abs(expr) < abs(val), the result is always 0.
+                // First, check whether expr >= 0 and skip to the shift if true.
                 switch (flags & CF_TYPEMASK) {
                 case CF_CHAR:
                     if (flags & CF_FORCECHAR) {
@@ -2893,13 +2846,12 @@ void g_div (unsigned flags, unsigned long val)
                     typeerror (flags);
                     break;
                 }
-                /* Second, check whether expr <= -asb(val) and skip to the
-                ** shift if true. The original content of expr has to be saved
-                ** before the checking comparison and restored after that, as
-                ** the content in Primary register will be destroyed.
-                ** The result of the comparison is a boolean. We can store
-                ** it in the Carry flag with a LSR and branch on it later.
-                */
+                // Second, check whether expr <= -asb(val) and skip to the
+                // shift if true. The original content of expr has to be saved
+                // before the checking comparison and restored after that, as
+                // the content in Primary register will be destroyed.
+                // The result of the comparison is a boolean. We can store
+                // it in the Carry flag with a LSR and branch on it later.
                 g_save (flags);
                 g_le (flags | CF_UNSIGNED, MaskedVal);
                 AddCodeLine ("lsr a");
@@ -2912,17 +2864,15 @@ void g_div (unsigned flags, unsigned long val)
                 /* TODO: replace with BEQ? Would it be optimized? */
                 g_jump (EndLabel);
 
-                /* Do the shift. The sign of the result may need to be corrected
-                ** later.
-                */
+                // Do the shift. The sign of the result may need to be corrected
+                // later.
                 g_defcodelabel (DoShiftLabel);
                 g_asr (flags, p2);
                 g_defcodelabel (EndLabel);
             }
 
-            /* Negate the result as long as val < 0, even if val == -1 and no
-            ** shift was generated.
-            */
+            // Negate the result as long as val < 0, even if val == -1 and no
+            // shift was generated.
             if (Negation) {
                 g_neg (flags);
             }
@@ -2931,9 +2881,8 @@ void g_div (unsigned flags, unsigned long val)
             return;
         }
 
-        /* If we go here, we didn't emit code. Push the lhs on stack and fall
-        ** into the normal, non-optimized stuff.
-        */
+        // If we go here, we didn't emit code. Push the lhs on stack and fall
+        // into the normal, non-optimized stuff.
         flags &= ~CF_FORCECHAR; /* Handle chars as ints */
         g_push (flags & ~CF_CONST, 0);
     }
@@ -2977,9 +2926,8 @@ void g_or (unsigned flags, unsigned long val)
         "tosorax", "tosorax", "tosoreax", "tosoreax"
     };
 
-    /* If the right hand side is const, the lhs is not on stack but still
-    ** in the primary register.
-    */
+    // If the right hand side is const, the lhs is not on stack but still
+    // in the primary register.
     if (flags & CF_CONST) {
 
         switch (flags & CF_TYPEMASK) {
@@ -3026,10 +2974,9 @@ void g_or (unsigned flags, unsigned long val)
                 typeerror (flags);
         }
 
-        /* If we go here, we didn't emit code. Push the lhs on stack and fall
-        ** into the normal, non-optimized stuff. Note: The standard stuff will
-        ** always work with ints.
-        */
+        // If we go here, we didn't emit code. Push the lhs on stack and fall
+        // into the normal, non-optimized stuff. Note: The standard stuff will
+        // always work with ints.
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -3048,9 +2995,8 @@ void g_xor (unsigned flags, unsigned long val)
     };
 
 
-    /* If the right hand side is const, the lhs is not on stack but still
-    ** in the primary register.
-    */
+    // If the right hand side is const, the lhs is not on stack but still
+    // in the primary register.
     if (flags & CF_CONST) {
 
         switch (flags & CF_TYPEMASK) {
@@ -3094,10 +3040,9 @@ void g_xor (unsigned flags, unsigned long val)
                 typeerror (flags);
         }
 
-        /* If we go here, we didn't emit code. Push the lhs on stack and fall
-        ** into the normal, non-optimized stuff. Note: The standard stuff will
-        ** always work with ints.
-        */
+        // If we go here, we didn't emit code. Push the lhs on stack and fall
+        // into the normal, non-optimized stuff. Note: The standard stuff will
+        // always work with ints.
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -3115,9 +3060,8 @@ void g_and (unsigned Flags, unsigned long Val)
         "tosandax", "tosandax", "tosandeax", "tosandeax"
     };
 
-    /* If the right hand side is const, the lhs is not on stack but still
-    ** in the primary register.
-    */
+    // If the right hand side is const, the lhs is not on stack but still
+    // in the primary register.
     if (Flags & CF_CONST) {
 
         switch (Flags & CF_TYPEMASK) {
@@ -3186,10 +3130,9 @@ void g_and (unsigned Flags, unsigned long Val)
                 typeerror (Flags);
         }
 
-        /* If we go here, we didn't emit code. Push the lhs on stack and fall
-        ** into the normal, non-optimized stuff. Note: The standard stuff will
-        ** always work with ints.
-        */
+        // If we go here, we didn't emit code. Push the lhs on stack and fall
+        // into the normal, non-optimized stuff. Note: The standard stuff will
+        // always work with ints.
         Flags &= ~CF_FORCECHAR;
         g_push (Flags & ~CF_CONST, 0);
     }
@@ -3207,28 +3150,25 @@ void g_asr (unsigned flags, unsigned long val)
         "tosasrax", "tosshrax", "tosasreax", "tosshreax"
     };
 
-    /* If the right hand side is const, the lhs is not on stack, but still
-    ** in the primary register.
-    */
+    // If the right hand side is const, the lhs is not on stack, but still
+    // in the primary register.
     if (flags & CF_CONST) {
         switch (flags & CF_TYPEMASK) {
             case CF_CHAR:
                 if (flags & CF_FORCECHAR) {
                     val &= 7;
                     if ((flags & CF_UNSIGNED) != 0) {
-                        /* Instead of `val` right shifts, we can also do `9 - val` left rotates
-                        ** and a mask.  This saves 3 bytes and 8 cycles for `val == 7` and
-                        ** 1 byte and 4 cycles for `val == 6`.
-                        */
+                        // Instead of `val` right shifts, we can also do `9 - val` left rotates
+                        // and a mask.  This saves 3 bytes and 8 cycles for `val == 7` and
+                        // 1 byte and 4 cycles for `val == 6`.
                         if (val < 6) {
                             while (val--) {
                                 AddCodeLine ("lsr a");  /* 1 byte, 2 cycles */
                             }
                         } else {
                             unsigned i;
-                            /* The first ROL shifts in garbage and sets carry to the high bit.
-                            ** The garbage is cleaned up by the mask.
-                            */
+                            // The first ROL shifts in garbage and sets carry to the high bit.
+                            // The garbage is cleaned up by the mask.
                             for (i = val; i < 9; ++i) {
                                 AddCodeLine ("rol a");  /* 1 byte,  2 cycles */
                             }
@@ -3368,10 +3308,9 @@ void g_asr (unsigned flags, unsigned long val)
                 typeerror (flags);
         }
 
-        /* If we go here, we didn't emit code. Push the lhs on stack and fall
-        ** into the normal, non-optimized stuff. Note: The standard stuff will
-        ** always work with ints.
-        */
+        // If we go here, we didn't emit code. Push the lhs on stack and fall
+        // into the normal, non-optimized stuff. Note: The standard stuff will
+        // always work with ints.
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -3389,17 +3328,15 @@ void g_asl (unsigned flags, unsigned long val)
         "tosaslax", "tosshlax", "tosasleax", "tosshleax"
     };
 
-    /* If the right hand side is const, the lhs is not on stack, but still
-    ** in the primary register.
-    */
+    // If the right hand side is const, the lhs is not on stack, but still
+    // in the primary register.
     if (flags & CF_CONST) {
         switch (flags & CF_TYPEMASK) {
             case CF_CHAR:
                 if ((flags & CF_FORCECHAR) != 0) {
                     val &= 7;
-                    /* Large shifts are faster and smaller with ROR.  See g_asr for detailed
-                    ** byte and cycle counts.
-                    */
+                    // Large shifts are faster and smaller with ROR.  See g_asr for detailed
+                    // byte and cycle counts.
                     if (val < 6) {
                         while (val--) {
                             AddCodeLine ("asl a");
@@ -3492,10 +3429,9 @@ void g_asl (unsigned flags, unsigned long val)
                 typeerror (flags);
         }
 
-        /* If we go here, we didn't emit code. Push the lhs on stack and fall
-        ** into the normal, non-optimized stuff. Note: The standard stuff will
-        ** always work with ints.
-        */
+        // If we go here, we didn't emit code. Push the lhs on stack and fall
+        // into the normal, non-optimized stuff. Note: The standard stuff will
+        // always work with ints.
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -3777,11 +3713,10 @@ void g_dec (unsigned flags, unsigned long val)
 
 
 
-/*
-** Following are the conditional operators. They compare the TOS against
-** the primary and put a literal 1 in the primary if the condition is
-** true, otherwise they clear the primary register
-*/
+// 
+// Following are the conditional operators. They compare the TOS against
+// the primary and put a literal 1 in the primary if the condition is
+// true, otherwise they clear the primary register
 
 
 
@@ -3794,9 +3729,8 @@ void g_eq (unsigned flags, unsigned long val)
 
     unsigned L;
 
-    /* If the right hand side is const, the lhs is not on stack but still
-    ** in the primary register.
-    */
+    // If the right hand side is const, the lhs is not on stack but still
+    // in the primary register.
     if (flags & CF_CONST) {
 
         switch (flags & CF_TYPEMASK) {
@@ -3825,10 +3759,9 @@ void g_eq (unsigned flags, unsigned long val)
                 typeerror (flags);
         }
 
-        /* If we go here, we didn't emit code. Push the lhs on stack and fall
-        ** into the normal, non-optimized stuff. Note: The standard stuff will
-        ** always work with ints.
-        */
+        // If we go here, we didn't emit code. Push the lhs on stack and fall
+        // into the normal, non-optimized stuff. Note: The standard stuff will
+        // always work with ints.
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -3848,9 +3781,8 @@ void g_ne (unsigned flags, unsigned long val)
 
     unsigned L;
 
-    /* If the right hand side is const, the lhs is not on stack but still
-    ** in the primary register.
-    */
+    // If the right hand side is const, the lhs is not on stack but still
+    // in the primary register.
     if (flags & CF_CONST) {
 
         switch (flags & CF_TYPEMASK) {
@@ -3879,10 +3811,9 @@ void g_ne (unsigned flags, unsigned long val)
                 typeerror (flags);
         }
 
-        /* If we go here, we didn't emit code. Push the lhs on stack and fall
-        ** into the normal, non-optimized stuff. Note: The standard stuff will
-        ** always work with ints.
-        */
+        // If we go here, we didn't emit code. Push the lhs on stack and fall
+        // into the normal, non-optimized stuff. Note: The standard stuff will
+        // always work with ints.
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -3902,15 +3833,13 @@ void g_lt (unsigned flags, unsigned long val)
 
     unsigned Label;
 
-    /* If the right hand side is const, the lhs is not on stack but still
-    ** in the primary register.
-    */
+    // If the right hand side is const, the lhs is not on stack but still
+    // in the primary register.
     if (flags & CF_CONST) {
 
-        /* Because the handling of the overflow flag is too complex for
-        ** inlining, we can handle only unsigned compares, and signed
-        ** compares against zero here.
-        */
+        // Because the handling of the overflow flag is too complex for
+        // inlining, we can handle only unsigned compares, and signed
+        // compares against zero here.
         if (flags & CF_UNSIGNED) {
 
             /* Give a warning in some special cases */
@@ -4041,10 +3970,9 @@ void g_lt (unsigned flags, unsigned long val)
 
         }
 
-        /* If we go here, we didn't emit code. Push the lhs on stack and fall
-        ** into the normal, non-optimized stuff. Note: The standard stuff will
-        ** always work with ints.
-        */
+        // If we go here, we didn't emit code. Push the lhs on stack and fall
+        // into the normal, non-optimized stuff. Note: The standard stuff will
+        // always work with ints.
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -4063,9 +3991,8 @@ void g_le (unsigned flags, unsigned long val)
     };
 
 
-    /* If the right hand side is const, the lhs is not on stack but still
-    ** in the primary register.
-    */
+    // If the right hand side is const, the lhs is not on stack but still
+    // in the primary register.
     if (flags & CF_CONST) {
 
         /* Look at the type */
@@ -4076,9 +4003,8 @@ void g_le (unsigned flags, unsigned long val)
                     if (flags & CF_UNSIGNED) {
                         /* Unsigned compare */
                         if (val < 0xFF) {
-                            /* Use < instead of <= because the former gives
-                            ** better code on the 6502 than the latter.
-                            */
+                            // Use < instead of <= because the former gives
+                            // better code on the 6502 than the latter.
                             g_lt (flags, val+1);
                         } else {
                             /* Always true */
@@ -4088,9 +4014,8 @@ void g_le (unsigned flags, unsigned long val)
                     } else {
                         /* Signed compare */
                         if ((long) val < 0x7F) {
-                            /* Use < instead of <= because the former gives
-                            ** better code on the 6502 than the latter.
-                            */
+                            // Use < instead of <= because the former gives
+                            // better code on the 6502 than the latter.
                             g_lt (flags, val+1);
                         } else {
                             /* Always true */
@@ -4106,9 +4031,8 @@ void g_le (unsigned flags, unsigned long val)
                 if (flags & CF_UNSIGNED) {
                     /* Unsigned compare */
                     if (val < 0xFFFF) {
-                        /* Use < instead of <= because the former gives
-                        ** better code on the 6502 than the latter.
-                        */
+                        // Use < instead of <= because the former gives
+                        // better code on the 6502 than the latter.
                         g_lt (flags, val+1);
                     } else {
                         /* Always true */
@@ -4131,9 +4055,8 @@ void g_le (unsigned flags, unsigned long val)
                 if (flags & CF_UNSIGNED) {
                     /* Unsigned compare */
                     if (val < 0xFFFFFFFF) {
-                        /* Use < instead of <= because the former gives
-                        ** better code on the 6502 than the latter.
-                        */
+                        // Use < instead of <= because the former gives
+                        // better code on the 6502 than the latter.
                         g_lt (flags, val+1);
                     } else {
                         /* Always true */
@@ -4156,10 +4079,9 @@ void g_le (unsigned flags, unsigned long val)
                 typeerror (flags);
         }
 
-        /* If we go here, we didn't emit code. Push the lhs on stack and fall
-        ** into the normal, non-optimized stuff. Note: The standard stuff will
-        ** always work with ints.
-        */
+        // If we go here, we didn't emit code. Push the lhs on stack and fall
+        // into the normal, non-optimized stuff. Note: The standard stuff will
+        // always work with ints.
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -4178,9 +4100,8 @@ void g_gt (unsigned flags, unsigned long val)
     };
 
 
-    /* If the right hand side is const, the lhs is not on stack but still
-    ** in the primary register.
-    */
+    // If the right hand side is const, the lhs is not on stack but still
+    // in the primary register.
     if (flags & CF_CONST) {
 
         /* Look at the type */
@@ -4190,15 +4111,13 @@ void g_gt (unsigned flags, unsigned long val)
                 if (flags & CF_FORCECHAR) {
                     if (flags & CF_UNSIGNED) {
                         if (val == 0) {
-                            /* If we have a compare > 0, we will replace it by
-                            ** != 0 here, since both are identical but the
-                            ** latter is easier to optimize.
-                            */
+                            // If we have a compare > 0, we will replace it by
+                            // != 0 here, since both are identical but the
+                            // latter is easier to optimize.
                             g_ne (flags, val);
                         } else if (val < 0xFF) {
-                            /* Use >= instead of > because the former gives
-                            ** better code on the 6502 than the latter.
-                            */
+                            // Use >= instead of > because the former gives
+                            // better code on the 6502 than the latter.
                             g_ge (flags, val+1);
                         } else {
                             /* Never true */
@@ -4207,9 +4126,8 @@ void g_gt (unsigned flags, unsigned long val)
                         }
                     } else {
                         if ((long) val < 0x7F) {
-                            /* Use >= instead of > because the former gives
-                            ** better code on the 6502 than the latter.
-                            */
+                            // Use >= instead of > because the former gives
+                            // better code on the 6502 than the latter.
                             g_ge (flags, val+1);
                         } else {
                             /* Never true */
@@ -4225,18 +4143,16 @@ void g_gt (unsigned flags, unsigned long val)
                 if (flags & CF_UNSIGNED) {
                     /* Unsigned compare */
                     if (val == 0) {
-                        /* If we have a compare > 0, we will replace it by
-                        ** != 0 here, since both are identical but the latter
-                        ** is easier to optimize.
-                        */
+                        // If we have a compare > 0, we will replace it by
+                        // != 0 here, since both are identical but the latter
+                        // is easier to optimize.
                         g_ne (flags, val);
                     } else if (val < 0xFFFF) {
                         if (val == 0xFF) {
                             AddCodeLine ("cpx #$00");
                         } else {
-                            /* Use >= instead of > because the former gives better
-                            ** code on the 6502 than the latter.
-                            */
+                            // Use >= instead of > because the former gives better
+                            // code on the 6502 than the latter.
                             g_ge (flags, val+1);
                         }
                     } else {
@@ -4260,17 +4176,15 @@ void g_gt (unsigned flags, unsigned long val)
                 if (flags & CF_UNSIGNED) {
                     /* Unsigned compare */
                     if (val == 0) {
-                        /* If we have a compare > 0, we will replace it by
-                        ** != 0 here, since both are identical but the latter
-                        ** is easier to optimize.
-                        */
+                        // If we have a compare > 0, we will replace it by
+                        // != 0 here, since both are identical but the latter
+                        // is easier to optimize.
                         g_ne (flags, val);
                     } else if (val == 0xFF) {
                         AddCodeLine ("cpx #$00");
                     } else if (val < 0xFFFFFFFF) {
-                        /* Use >= instead of > because the former gives better
-                        ** code on the 6502 than the latter.
-                        */
+                        // Use >= instead of > because the former gives better
+                        // code on the 6502 than the latter.
                         g_ge (flags, val+1);
                     } else {
                         /* Never true */
@@ -4295,10 +4209,9 @@ void g_gt (unsigned flags, unsigned long val)
                 typeerror (flags);
         }
 
-        /* If we go here, we didn't emit code. Push the lhs on stack and fall
-        ** into the normal, non-optimized stuff. Note: The standard stuff will
-        ** always work with ints.
-        */
+        // If we go here, we didn't emit code. Push the lhs on stack and fall
+        // into the normal, non-optimized stuff. Note: The standard stuff will
+        // always work with ints.
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -4319,15 +4232,13 @@ void g_ge (unsigned flags, unsigned long val)
     unsigned Label;
 
 
-    /* If the right hand side is const, the lhs is not on stack but still
-    ** in the primary register.
-    */
+    // If the right hand side is const, the lhs is not on stack but still
+    // in the primary register.
     if (flags & CF_CONST) {
 
-        /* Because the handling of the overflow flag is too complex for
-        ** inlining, we can handle only unsigned compares, and signed
-        ** compares against zero here.
-        */
+        // Because the handling of the overflow flag is too complex for
+        // inlining, we can handle only unsigned compares, and signed
+        // compares against zero here.
         if (flags & CF_UNSIGNED) {
 
             /* Give a warning in some special cases */
@@ -4453,10 +4364,9 @@ void g_ge (unsigned flags, unsigned long val)
             }
         }
 
-        /* If we go here, we didn't emit code. Push the lhs on stack and fall
-        ** into the normal, non-optimized stuff. Note: The standard stuff will
-        ** always work with ints.
-        */
+        // If we go here, we didn't emit code. Push the lhs on stack and fall
+        // into the normal, non-optimized stuff. Note: The standard stuff will
+        // always work with ints.
         flags &= ~CF_FORCECHAR;
         g_push (flags & ~CF_CONST, 0);
     }
@@ -4659,10 +4569,9 @@ void g_testbitfield (ATTR_UNUSED(unsigned Flags), unsigned BitOffs, unsigned Bit
     /* We don't use these flags for now. Could CF_NOKEEP be potentially interesting? */
     Flags &= ~CF_STYPEMASK;
 
-    /* If we need to do a test, then we avoid shifting (ASR only shifts one bit at a time,
-    ** so is slow) and just AND the head and tail bytes with the appropriate mask, then
-    ** OR the results with the rest bytes.
-    */
+    // If we need to do a test, then we avoid shifting (ASR only shifts one bit at a time,
+    // so is slow) and just AND the head and tail bytes with the appropriate mask, then
+    // OR the results with the rest bytes.
     if (Bytes == 1) {
         HeadMask = TailMask = HeadMask & TailMask;
     }
@@ -4712,9 +4621,8 @@ void g_testbitfield (ATTR_UNUSED(unsigned Flags), unsigned BitOffs, unsigned Bit
 
     /* Handle the tail byte */
     if (TailMask != 0xFF) {
-        /* If we have to do any more masking operation, register A will be used for that,
-        ** and its current content in it must be saved.
-        */
+        // If we have to do any more masking operation, register A will be used for that,
+        // and its current content in it must be saved.
         if (UntestedBytes & 0x1) {
             AddCodeLine ("sta tmp1");
         }
@@ -4768,11 +4676,10 @@ void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
     /* Shift right by the bit offset; no code is emitted if BitOffs is zero */
     g_asr (Flags | CF_CONST, BitOffs);
 
-    /* To zero-extend, we will and by the width if the field doesn't end on a char or
-    ** int boundary.  If it does end on a boundary, then zeros will have already been shifted in,
-    ** but we need to clear the high byte for char.  g_and emits no code if the mask is all ones.
-    ** This is here so the signed and unsigned branches can use it.
-    */
+    // To zero-extend, we will and by the width if the field doesn't end on a char or
+    // int boundary.  If it does end on a boundary, then zeros will have already been shifted in,
+    // but we need to clear the high byte for char.  g_and emits no code if the mask is all ones.
+    // This is here so the signed and unsigned branches can use it.
     if (EndBit == CHAR_BITS) {
         /* We need to clear the high byte, since CF_FORCECHAR was set. */
         ZeroExtendMask = 0xFF;
@@ -4787,12 +4694,11 @@ void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
         unsigned SignBitPosInByte = SignBitPos % CHAR_BITS;
 
         if (ZeroExtendMask != 0) {
-            /* The universal trick is:
-            **   x = bits & bit_mask
-            **   m = 1 << (bit_width - 1)
-            **   r = (x ^ m) - m
-            ** which works for long as well.
-            */
+            // The universal trick is:
+            // x = bits & bit_mask
+            // m = 1 << (bit_width - 1)
+            // r = (x ^ m) - m
+            // which works for long as well.
 
             if (SignBitByte + 1U == sizeofarg (FullWidthFlags)) {
                 /* We can just sign-extend on the high byte if it is the only affected one */
@@ -4877,9 +4783,8 @@ void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
                   case 0:
                     AddCodeLine ("tya");
                     AddCodeLine ("ora #$%02X", Mask);
-                    /* We could jump over the following tya instead, but that wouldn't be faster
-                    ** than taking this extra tay and then the tya.
-                    */
+                    // We could jump over the following tya instead, but that wouldn't be faster
+                    // than taking this extra tay and then the tya.
                     AddCodeLine ("tay");
                     break;
                   case 1:
@@ -4896,16 +4801,14 @@ void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
                     FAIL ("Invalid Byte for sign bit");
                 }
             } else {
-                /* Since we are going to get back .A later anyways, we may just do the op on the
-                ** higher bytes with whatever content currently in it.
-                */
+                // Since we are going to get back .A later anyways, we may just do the op on the
+                // higher bytes with whatever content currently in it.
                 unsigned long Mask = ~((2UL << SignBitPos) - 1UL);
                 g_or (FullWidthFlags | CF_CONST, Mask);
             }
 
-            /* Get back .A. We need to duplicate the TYA, rather than move it before
-            ** the branch to share with the other label, because TYA changes some condition codes.
-            */
+            // Get back .A. We need to duplicate the TYA, rather than move it before
+            // the branch to share with the other label, because TYA changes some condition codes.
             g_defcodelabel (ZeroExtendLabel);
             AddCodeLine ("tya");
         }
@@ -5036,11 +4939,11 @@ void g_asmcode (struct StrBuf* B)
     const char *buf = SB_GetConstBuf(B);
 
     /* remove whitespace at end of line */
-    /* NOTE: This masks problems in ParseInsn(), which in some cases seems to
-             rely on no whitespace being present at the end of a line in generated
-             code (see issue #1252). However, it generally seems to be a good
-             idea to remove trailing whitespace from (inline) assembly, so we
-             do it anyway. */
+    // NOTE: This masks problems in ParseInsn(), which in some cases seems to
+    // rely on no whitespace being present at the end of a line in generated
+    // code (see issue #1252). However, it generally seems to be a good
+    // idea to remove trailing whitespace from (inline) assembly, so we
+    // do it anyway. 
     while (len) {
        switch (buf[len - 1]) {
        case '\n':

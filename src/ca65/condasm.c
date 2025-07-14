@@ -103,10 +103,9 @@ static IfDesc* GetCurrentIf (void)
 static int GetOverallIfCond (void)
 /* Get the overall condition based on all conditions on the stack. */
 {
-    /* Since the last entry contains the overall condition of the parent, we
-    ** must check it in combination of the current condition. If there is no
-    ** last entry, the overall condition is true.
-    */
+    // Since the last entry contains the overall condition of the parent, we
+    // must check it in combination of the current condition. If there is no
+    // last entry, the overall condition is true.
     return (IfCount == 0) ||
            ((IfStack[IfCount-1].Flags & (ifCond | ifParentCond)) == (ifCond | ifParentCond));
 }
@@ -259,10 +258,9 @@ void DoConditionals (void)
                     D = AllocIf (".ELSEIF", 0);
                     NextTok ();
 
-                    /* Ignore the new condition if we are inside a false .ELSE
-                    ** branch. This way we won't get any errors about undefined
-                    ** symbols or similar...
-                    */
+                    // Ignore the new condition if we are inside a false .ELSE
+                    // branch. This way we won't get any errors about undefined
+                    // symbols or similar...
                     if (IfCond) {
                         SetIfCond (D, ConstExpression ());
                         ExpectSep ();
@@ -280,9 +278,8 @@ void DoConditionals (void)
                 /* We're done with this .IF.. - remove the descriptor(s) */
                 FreeIf ();
 
-                /* Be sure not to read the next token until the .IF stack
-                ** has been cleanup up, since we may be at end of file.
-                */
+                // Be sure not to read the next token until the .IF stack
+                // has been cleanup up, since we may be at end of file.
                 NextTok ();
                 ExpectSep ();
 
@@ -537,10 +534,9 @@ void DoConditionals (void)
 
 
 int CheckConditionals (void)
-/* Check if the current token is one that starts a conditional directive, and
-** call DoConditionals if so. Return true if a conditional directive was found,
-** return false otherwise.
-*/
+// Check if the current token is one that starts a conditional directive, and
+// call DoConditionals if so. Return true if a conditional directive was found,
+// return false otherwise.
 {
     switch (CurTok.Tok) {
         case TOK_ELSE:
@@ -579,16 +575,14 @@ int CheckConditionals (void)
 
 
 void CheckOpenIfs (void)
-/* Called from the scanner before closing an input file. Will check for any
-** open .ifs in this file.
-*/
+// Called from the scanner before closing an input file. Will check for any
+// open .ifs in this file.
 {
     const LineInfo* LI;
 
     while (1) {
-        /* Get the current file number and check if the topmost entry on the
-        ** .IF stack was inserted with this file number
-        */
+        // Get the current file number and check if the topmost entry on the
+        // .IF stack was inserted with this file number
         IfDesc* D = GetCurrentIf ();
         if (D == 0) {
             /* There are no open .IFs */

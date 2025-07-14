@@ -75,9 +75,8 @@ static void LoadAddress (unsigned Flags, ExprDesc* Expr)
             break;
 
         case E_LOC_REGISTER:
-            /* Register variable. Taking the address is usually not
-            ** allowed.
-            */
+            // Register variable. Taking the address is usually not
+            // allowed.
             if (IS_Get (&AllowRegVarAddr) == 0) {
                 Error ("Cannot take the address of a register variable");
             }
@@ -95,9 +94,8 @@ static void LoadAddress (unsigned Flags, ExprDesc* Expr)
 
         case E_LOC_EXPR:
             if (Expr->IVal != 0) {
-                /* We have an expression in the primary plus a constant
-                ** offset. Adjust the value in the primary accordingly.
-                */
+                // We have an expression in the primary plus a constant
+                // offset. Adjust the value in the primary accordingly.
                 g_inc (Flags | CF_CONST, Expr->IVal);
             }
             break;
@@ -110,21 +108,19 @@ static void LoadAddress (unsigned Flags, ExprDesc* Expr)
 
 
 void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
-/* Load an expression into the primary register if it is not already there.
-** If Flags contains any CF_TYPEMASK bits, it then overrides the codegen type
-** info that would be otherwise taken from the expression type.
-** Note: This function can't modify the content in Expr since there are many
-** instances of the "GetCodePos + LoadExpr (maybe indirectly) + RemoveCode"
-** code pattern here and there which assumes that Expr should be unchanged,
-** unfortunately.
-*/
+// Load an expression into the primary register if it is not already there.
+// If Flags contains any CF_TYPEMASK bits, it then overrides the codegen type
+// info that would be otherwise taken from the expression type.
+// Note: This function can't modify the content in Expr since there are many
+// instances of the "GetCodePos + LoadExpr (maybe indirectly) + RemoveCode"
+// code pattern here and there which assumes that Expr should be unchanged,
+// unfortunately.
 {
     if (!ED_IsAddrExpr (Expr)) {
 
-        /* Lvalue. If this is a bit field its type is unsigned. But if the
-        ** field is completely contained in the lower byte, we will throw away
-        ** the high byte anyway and may therefore load just the low byte.
-        */
+        // Lvalue. If this is a bit field its type is unsigned. But if the
+        // field is completely contained in the lower byte, we will throw away
+        // the high byte anyway and may therefore load just the low byte.
         int AdjustBitField = 0;
         unsigned BitFieldFullWidthFlags = 0;
         if ((Flags & CF_TYPEMASK) == 0) {
@@ -138,12 +134,11 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
                 /* Flags we need operate on the whole chunk containing the bit-field.  */
                 Flags |= CG_TypeOf (GetBitFieldChunkType (Expr->Type));
 
-                /* If we're adjusting, then only load a char (not an int) and do only char ops;
-                ** We will clear the high byte in the adjustment.  CF_FORCECHAR does nothing if
-                ** the type is not CF_CHAR;
-                ** If adjusting, then we're sign extending manually, so do everything unsigned
-                ** to make shifts faster.
-                */
+                // If we're adjusting, then only load a char (not an int) and do only char ops;
+                // We will clear the high byte in the adjustment.  CF_FORCECHAR does nothing if
+                // the type is not CF_CHAR;
+                // If adjusting, then we're sign extending manually, so do everything unsigned
+                // to make shifts faster.
                 Flags |= CF_UNSIGNED | CF_FORCECHAR;
                 BitFieldFullWidthFlags |= CF_UNSIGNED;
             } else {
@@ -156,15 +151,13 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         }
 
         if (ED_YetToTest (Expr)) {
-            /* If we're only testing, we do not need to promote char to int.
-            ** CF_FORCECHAR does nothing if the type is not CF_CHAR.
-            */
+            // If we're only testing, we do not need to promote char to int.
+            // CF_FORCECHAR does nothing if the type is not CF_CHAR.
             Flags |= CF_FORCECHAR;
 
-            /* Setting CF_TEST will cause the load to perform optimizations and not actually load
-            ** all bits of the bit-field, instead just computing the condition codes.  Therefore,
-            ** if adjustment is required, we do not set CF_TEST here, but handle it below.
-            */
+            // Setting CF_TEST will cause the load to perform optimizations and not actually load
+            // all bits of the bit-field, instead just computing the condition codes.  Therefore,
+            // if adjustment is required, we do not set CF_TEST here, but handle it below.
             if (!AdjustBitField) {
                 Flags |= CF_TEST;
             }
@@ -216,9 +209,8 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
             case E_LOC_PRIMARY:
                 /* The primary register */
                 if (Expr->IVal != 0) {
-                    /* We have an expression in the primary plus a constant
-                    ** offset. Adjust the value in the primary accordingly.
-                    */
+                    // We have an expression in the primary plus a constant
+                    // offset. Adjust the value in the primary accordingly.
                     g_inc (Flags | CF_CONST, Expr->IVal);
 
                     /* We might want to clear the offset, but we can't */
@@ -232,25 +224,22 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
                 /* Reference to address in primary with offset in Expr */
                 g_getind (Flags, Expr->IVal);
 
-                /* Since the content in primary is now overwritten with the
-                ** dereference value, we might want to change the expression
-                ** loc to E_LOC_PRIMARY as well. That way we could be able to
-                ** call this function as many times as we want. Unfortunately,
-                ** we can't.
-                */
+                // Since the content in primary is now overwritten with the
+                // dereference value, we might want to change the expression
+                // loc to E_LOC_PRIMARY as well. That way we could be able to
+                // call this function as many times as we want. Unfortunately,
+                // we can't.
                 break;
 
             default:
                 Internal ("Invalid location in LoadExpr: 0x%04X", ED_GetLoc (Expr));
         }
 
-        /* Handle bit fields if necessary. The actual type may have been casted or converted,
-        ** so be sure to always use unsigned ints for the operations.
-        */
+        // Handle bit fields if necessary. The actual type may have been casted or converted,
+        // so be sure to always use unsigned ints for the operations.
         if (AdjustBitField) {
-            /* We always need to do something with the low byte, so there is no opportunity
-            ** for optimization by skipping it.
-            */
+            // We always need to do something with the low byte, so there is no opportunity
+            // for optimization by skipping it.
             CHECK (Expr->Type->A.B.Offs < CHAR_BITS);
 
             if (ED_YetToTest (Expr)) {

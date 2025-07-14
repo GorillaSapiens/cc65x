@@ -103,10 +103,9 @@ ObjData* NewObjData (void)
 
 
 void FreeObjData (ObjData* O)
-/* Free an ObjData object. NOTE: This function works only for unused object
-** data, that is, ObjData objects that aren't used because they aren't
-** referenced.
-*/
+// Free an ObjData object. NOTE: This function works only for unused object
+// data, that is, ObjData objects that aren't used because they aren't
+// referenced.
 {
     unsigned I;
 
@@ -144,9 +143,8 @@ void FreeObjData (ObjData* O)
 
 
 void FreeObjStrings (ObjData* O)
-/* Free the module string data. Used once the object file is loaded completely
-** when all strings are converted to global strings.
-*/
+// Free the module string data. Used once the object file is loaded completely
+// when all strings are converted to global strings.
 {
     xfree (O->Strings);
     O->Strings = 0;
@@ -163,9 +161,8 @@ void InsertObjData (ObjData* O)
 
 
 void InsertObjGlobals (ObjData* O)
-/* Insert imports and exports from the object file into the global import and
-** export lists.
-*/
+// Insert imports and exports from the object file into the global import and
+// export lists.
 {
     unsigned I;
 
@@ -193,9 +190,8 @@ unsigned MakeGlobalStringId (const ObjData* O, unsigned Index)
 
 
 const char* GetObjFileName (const ObjData* O)
-/* Get the name of the object file. Return "[linker generated]" if the object
-** file is NULL.
-*/
+// Get the name of the object file. Return "[linker generated]" if the object
+// file is NULL.
 {
     return O? GetString (O->Name) : "[linker generated]";
 }

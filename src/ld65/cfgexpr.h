@@ -56,9 +56,8 @@ long CfgConstExpr (void);
 /* Read an integer expression, make sure its constant and return its value */
 
 long CfgCheckedConstExpr (long Min, long Max);
-/* Read an expression, make sure it's an int and in range, then return its
-** value.
-*/
+// Read an expression, make sure it's an int and in range, then return its
+// value.
 
 
 

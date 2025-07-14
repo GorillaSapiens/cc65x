@@ -120,9 +120,8 @@ void AddSearchPath (SearchPaths* P, const char* NewPath)
 
 
 void AddSearchPathFromEnv (SearchPaths* P, const char* EnvVar)
-/* Add a search path from an environment variable to the end of an existing
-** list.
-*/
+// Add a search path from an environment variable to the end of an existing
+// list.
 {
     AddSearchPath (P, getenv (EnvVar));
 }
@@ -130,9 +129,8 @@ void AddSearchPathFromEnv (SearchPaths* P, const char* EnvVar)
 
 
 void AddSubSearchPathFromEnv (SearchPaths* P, const char* EnvVar, const char* SubDir)
-/* Add a search path from an environment variable, adding a subdirectory to
-** the environment variable value.
-*/
+// Add a search path from an environment variable, adding a subdirectory to
+// the environment variable value.
 {
     StrBuf Dir = AUTO_STRBUF_INITIALIZER;
 
@@ -172,36 +170,34 @@ void AddSubSearchPathFromEnv (SearchPaths* P, const char* EnvVar, const char* Su
 
 
 
-/*
-   on POSIX-compatible operating system, a binary can be started in
-   3 distinct ways:
-
-   1) using absolute path; in which case argv[0] starts with '/'
-   2) using relative path; in which case argv[0] contains '/', but
-      does not start with it. e.g.: ./ca65 ; bin/cc65
-   3) using PATH environment variable, which is a colon-separated
-      list of directories which will be searched for a command
-      name used unprefixed. see execlp() and execvp() in man 3p exec:
-
->  The argument file is used to construct a pathname that identifies the new
->  process  image  file.  If the file argument contains a <slash> character,
->  the  file  argument  shall  be  used  as  the  pathname  for  this  file.
->  Otherwise,  the  path prefix for this file is obtained by a search of the
->  directories passed  as  the  environment  variable  PATH  (see  the  Base
->  Definitions  volume  of  POSIX.1*2008, Chapter 8, Environment Variables).
->  If this environment variable is not present, the results  of  the  search
->  are implementation-defined.
-
-*/
+// 
+// on POSIX-compatible operating system, a binary can be started in
+// 3 distinct ways:
+// 
+// 1) using absolute path; in which case argv[0] starts with '/'
+// 2) using relative path; in which case argv[0] contains '/', but
+// does not start with it. e.g.: ./ca65 ; bin/cc65
+// 3) using PATH environment variable, which is a colon-separated
+// list of directories which will be searched for a command
+// name used unprefixed. see execlp() and execvp() in man 3p exec:
+// 
+// >  The argument file is used to construct a pathname that identifies the new
+// >  process  image  file.  If the file argument contains a <slash> character,
+// >  the  file  argument  shall  be  used  as  the  pathname  for  this  file.
+// >  Otherwise,  the  path prefix for this file is obtained by a search of the
+// >  directories passed  as  the  environment  variable  PATH  (see  the  Base
+// >  Definitions  volume  of  POSIX.1*2008, Chapter 8, Environment Variables).
+// >  If this environment variable is not present, the results  of  the  search
+// >  are implementation-defined.
+// 
 
 
 
 static int SearchPathBin(const char* bin, char* buf, size_t buflen)
-/* search colon-separated list of paths in PATH environment variable
-** for the full path of argv[0].
-** returns 1 if successfull, in which case buf will contain the full path.
-** bin = binary name (from argv[0]), buf = work buffer, buflen = sizeof buf
-*/
+// search colon-separated list of paths in PATH environment variable
+// for the full path of argv[0].
+// returns 1 if successfull, in which case buf will contain the full path.
+// bin = binary name (from argv[0]), buf = work buffer, buflen = sizeof buf
 {
     char* p = getenv ("PATH");
     char* o;
@@ -233,28 +229,27 @@ static int SearchPathBin(const char* bin, char* buf, size_t buflen)
 
 
 static char* GetProgPath(char* pathbuf, char* a0)
-/* search for the full path of the binary using the argv[0] parameter
-** passed to int main(), according to the description above.
-**
-** the binary name will be passed to realpath(3p) to have all symlinks
-** resolved and gratuitous path components like "../" removed.
-**
-** argument "pathbuf" is a work buffer of size PATH_MAX,
-** "a0" the original argv[0].
-** returns pathbuf with the full path of the binary.
-*/
+// search for the full path of the binary using the argv[0] parameter
+// passed to int main(), according to the description above.
+// 
+// the binary name will be passed to realpath(3p) to have all symlinks
+// resolved and gratuitous path components like "../" removed.
+// 
+// argument "pathbuf" is a work buffer of size PATH_MAX,
+// "a0" the original argv[0].
+// returns pathbuf with the full path of the binary.
 {
     char tmp[PATH_MAX];
 
     if (!strchr(a0, '/')) {
-        /* path doesn't contain directory separator, so it was looked up
-           via PATH environment variable */
+        // path doesn't contain directory separator, so it was looked up
+        // via PATH environment variable 
         SearchPathBin (a0, tmp, PATH_MAX);
         a0 = tmp;
     }
 
-    /* realpath returns the work buffer passed to it, so checking the
-       return value is superfluous. gcc11 warns anyway. */
+    // realpath returns the work buffer passed to it, so checking the
+    // return value is superfluous. gcc11 warns anyway. 
     if (realpath (a0, pathbuf)) {}
 
     return pathbuf;
@@ -263,13 +258,12 @@ static char* GetProgPath(char* pathbuf, char* a0)
 #endif
 
 void AddSubSearchPathFromBin (SearchPaths* P, const char* SubDir)
-/* Add a search path from the running binary, adding a subdirectory to
-** the parent directory of the directory containing the binary.
-**
-** currently this will work on POSIX systems and on Windows. Should
-** we run into build errors on systems that are neither, we must add
-** another exception below.
-*/
+// Add a search path from the running binary, adding a subdirectory to
+// the parent directory of the directory containing the binary.
+// 
+// currently this will work on POSIX systems and on Windows. Should
+// we run into build errors on systems that are neither, we must add
+// another exception below.
 {
     char* Ptr;
     char Dir[PATH_MAX];
@@ -311,10 +305,9 @@ void AddSubSearchPathFromBin (SearchPaths* P, const char* SubDir)
 
 
 int PushSearchPath (SearchPaths* P, const char* NewPath)
-/* Add a new search path to the head of an existing search path list, provided
-** that it's not already there. If the path is already at the first position,
-** return zero, otherwise return a non zero value.
-*/
+// Add a new search path to the head of an existing search path list, provided
+// that it's not already there. If the path is already at the first position,
+// return zero, otherwise return a non zero value.
 {
     /* Generate a clean copy of NewPath */
     char* Path = CleanupPath (NewPath);
@@ -344,9 +337,8 @@ void PopSearchPath (SearchPaths* P)
 
 
 char* GetSearchPath (SearchPaths* P, unsigned Index)
-/* Return the search path at the given index, if the index is valid, return an
-** empty string otherwise.
-*/
+// Return the search path at the given index, if the index is valid, return an
+// empty string otherwise.
 {
     if (Index < CollCount (P))
         return CollAtUnchecked (P, Index);
@@ -356,9 +348,8 @@ char* GetSearchPath (SearchPaths* P, unsigned Index)
 
 
 char* SearchFile (const SearchPaths* P, const char* File)
-/* Search for a file in a list of directories. Return a pointer to a malloced
-** area that contains the complete path, if found, return 0 otherwise.
-*/
+// Search for a file in a list of directories. Return a pointer to a malloced
+// area that contains the complete path, if found, return 0 otherwise.
 {
     char* Name = 0;
     StrBuf PathName = AUTO_STRBUF_INITIALIZER;

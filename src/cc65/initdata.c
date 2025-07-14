@@ -102,9 +102,8 @@ static unsigned ParseInitInternal (Type* T, int* Braces, int AllowFlexibleMember
 
 
 static void SkipInitializer (int BracesExpected)
-/* Skip the remainder of an initializer in case of errors. Try to be somewhat
-** smart so we don't have too many following errors.
-*/
+// Skip the remainder of an initializer in case of errors. Try to be somewhat
+// smart so we don't have too many following errors.
 {
     while (CurTok.Tok != TOK_CEOF && CurTok.Tok != TOK_SEMI && BracesExpected >= 0) {
         switch (CurTok.Tok) {
@@ -121,10 +120,9 @@ static void SkipInitializer (int BracesExpected)
 
 
 static unsigned OpeningCurlyBraces (unsigned BracesNeeded)
-/* Accept any number of opening curly braces around an initialization, skip
-** them and return the number. If the number of curly braces is less than
-** BracesNeeded, issue a warning.
-*/
+// Accept any number of opening curly braces around an initialization, skip
+// them and return the number. If the number of curly braces is less than
+// BracesNeeded, issue a warning.
 {
     unsigned BraceCount = 0;
     while (CurTok.Tok == TOK_LCURLY) {
@@ -140,10 +138,9 @@ static unsigned OpeningCurlyBraces (unsigned BracesNeeded)
 
 
 static void ClosingCurlyBraces (unsigned BracesExpected)
-/* Accept and skip the given number of closing curly braces together with
-** an optional comma. Output an error messages, if the input does not contain
-** the expected number of braces.
-*/
+// Accept and skip the given number of closing curly braces together with
+// an optional comma. Output an error messages, if the input does not contain
+// the expected number of braces.
 {
     while (BracesExpected) {
         /* TODO: Skip all excess initializers until next closing curly brace */
@@ -193,9 +190,8 @@ static void DefineData (ExprDesc* Expr)
             break;
 
         case E_LOC_REGISTER:
-            /* Register variable. Taking the address is usually not
-            ** allowed.
-            */
+            // Register variable. Taking the address is usually not
+            // allowed.
             if (IS_Get (&AllowRegVarAddr) == 0) {
                 Error ("Cannot take the address of a register variable");
             }
@@ -252,16 +248,14 @@ static void DefineStrData (Literal* Lit, unsigned Count)
 
 
 static ExprDesc ParseScalarInitInternal (const Type* T)
-/* Parse initializaton for scalar data types. This function will not output the
-** data but return it in ED.
-*/
+// Parse initializaton for scalar data types. This function will not output the
+// data but return it in ED.
 {
     /* Optional opening brace */
     unsigned BraceCount = OpeningCurlyBraces (0);
 
-    /* We warn if an initializer for a scalar contains braces, because this is
-    ** quite unusual and often a sign for some problem in the input.
-    */
+    // We warn if an initializer for a scalar contains braces, because this is
+    // quite unusual and often a sign for some problem in the input.
     if (BraceCount > 0) {
         Warning ("Braces around scalar initializer");
     }
@@ -302,9 +296,8 @@ static unsigned ParsePointerInit (const Type* T)
     /* Optional opening brace */
     unsigned BraceCount = OpeningCurlyBraces (0);
 
-    /* We warn if an initializer for a scalar contains braces, because this is
-    ** quite unusual and often a sign for some problem in the input.
-    */
+    // We warn if an initializer for a scalar contains braces, because this is
+    // quite unusual and often a sign for some problem in the input.
     if (BraceCount > 0) {
         Warning ("Braces around scalar initializer");
     }
@@ -348,17 +341,15 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
         /* Char array initialized by string constant */
         int NeedParen;
 
-        /* If the initializer is enclosed in curly braces, remember this fact
-        ** and skip the opening one.
-        */
+        // If the initializer is enclosed in curly braces, remember this fact
+        // and skip the opening one.
         NeedParen = (CurTok.Tok == TOK_LCURLY);
         if (NeedParen) {
             NextToken ();
         }
 
-        /* If the array is one too small for the string literal, omit the
-        ** trailing zero.
-        */
+        // If the array is one too small for the string literal, omit the
+        // trailing zero.
         Count = GetLiteralSize (CurTok.SVal);
         if (ElementCount != UNSPECIFIED &&
             ElementCount != FLEXIBLE    &&
@@ -373,18 +364,16 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
         /* Skip the string */
         NextToken ();
 
-        /* If the initializer was enclosed in curly braces, we need a closing
-        ** one.
-        */
+        // If the initializer was enclosed in curly braces, we need a closing
+        // one.
         if (NeedParen) {
             ConsumeRCurly ();
         }
 
     } else {
 
-        /* An array can be initialized without a pair of enclosing curly braces
-        ** if it is itself a member of a struct/union or an element of an array.
-        */
+        // An array can be initialized without a pair of enclosing curly braces
+        // if it is itself a member of a struct/union or an element of an array.
         if (*Braces == 0 || CurTok.Tok == TOK_LCURLY) {
             /* Consume the opening curly brace */
             HasCurly = ConsumeLCurly ();
@@ -394,9 +383,8 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
         /* Initialize the array members */
         Count = 0;
         while (CurTok.Tok != TOK_RCURLY) {
-            /* Flexible array members cannot be initialized within an array.
-            ** (Otherwise the size of each element may differ.)
-            */
+            // Flexible array members cannot be initialized within an array.
+            // (Otherwise the size of each element may differ.)
             ParseInitInternal (ElementType, Braces, 0);
             ++Count;
             if (CurTok.Tok != TOK_COMMA) {
@@ -404,10 +392,9 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
             }
 
             if (!HasCurly && ElementCount > 0 && Count >= ElementCount) {
-                /* If the array is initialized without enclosing curly braces,
-                ** it only accepts how many elements initializers up to its
-                ** count of elements, leaving any following initializers out.
-                */
+                // If the array is initialized without enclosing curly braces,
+                // it only accepts how many elements initializers up to its
+                // count of elements, leaving any following initializers out.
                 break;
             }
             NextToken ();
@@ -430,9 +417,8 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
         ElementCount = Count;
     } else if (ElementCount == FLEXIBLE) {
         if (AllowFlexibleMembers) {
-            /* In non ANSI mode, allow initialization of flexible array
-            ** members.
-            */
+            // In non ANSI mode, allow initialization of flexible array
+            // members.
             ElementCount = Count;
         } else {
             /* Forbid */
@@ -472,9 +458,8 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
     /* Get the size of the struct from the symbol table entry */
     SI.Size = TagSym->V.S.Size;
 
-    /* Check if this struct definition has a field table. If it doesn't, it
-    ** is an incomplete definition.
-    */
+    // Check if this struct definition has a field table. If it doesn't, it
+    // is an incomplete definition.
     Tab = TagSym->V.S.SymTab;
     if (Tab == 0) {
         Error ("Cannot initialize variables with incomplete type");
@@ -515,16 +500,14 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             goto NextMember;
         }
 
-        /* This may be an anonymous bit-field, in which case it doesn't
-        ** have an initializer.
-        */
+        // This may be an anonymous bit-field, in which case it doesn't
+        // have an initializer.
         if (SymIsBitField (TagSym) && IsAnonName (TagSym->Name)) {
             if (!IsTypeUnion (T)) {
-                /* Account for the data and output it if we have at least a full
-                ** byte. We may have more if there was storage unit overlap, for
-                ** example two consecutive 7 bit fields. Those would be packed
-                ** into 2 bytes.
-                */
+                // Account for the data and output it if we have at least a full
+                // byte. We may have more if there was storage unit overlap, for
+                // example two consecutive 7 bit fields. Those would be packed
+                // into 2 bytes.
                 SI.ValBits += TagSym->Type->A.B.Width;
                 CHECK (SI.ValBits <= CHAR_BIT * sizeof(SI.BitVal));
                 /* TODO: Generalize this so any type can be used. */
@@ -545,9 +528,8 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
 
         if (SymIsBitField (TagSym)) {
 
-            /* Parse initialization of one field. Bit-fields need a special
-            ** handling.
-            */
+            // Parse initialization of one field. Bit-fields need a special
+            // handling.
             ExprDesc Field;
             ED_Init (&Field);
             unsigned long Val;
@@ -567,9 +549,8 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
                 ED_MakeConstAbsInt (&Field, 1);
             }
 
-            /* Truncate the initializer value to the width of the bit-field and check if we lost
-            ** any useful bits.
-            */
+            // Truncate the initializer value to the width of the bit-field and check if we lost
+            // any useful bits.
             Val = (unsigned long) Field.IVal & Mask;
             if (IsSignUnsigned (TagSym->Type)) {
                 if (Field.IVal < 0 || (unsigned long) Field.IVal != Val) {
@@ -602,12 +583,11 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
 
             /* Account for the data and output any full bytes we have. */
             SI.ValBits += TagSym->Type->A.B.Width;
-            /* Make sure unsigned is big enough to hold the value, 32 bits.
-            ** This cannot be more than 32 bits because a 16-bit or 32-bit
-            ** bit-field will always be byte-aligned with padding before it
-            ** if there are bits from prior fields that haven't been output
-            ** yet.
-            */
+            // Make sure unsigned is big enough to hold the value, 32 bits.
+            // This cannot be more than 32 bits because a 16-bit or 32-bit
+            // bit-field will always be byte-aligned with padding before it
+            // if there are bits from prior fields that haven't been output
+            // yet.
             CHECK (SI.ValBits <= CHAR_BIT * sizeof(SI.BitVal));
             /* TODO: Generalize this so any type can be used. */
             CHECK (SI.ValBits <= LONG_BITS);
@@ -617,15 +597,13 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
 
         } else {
 
-            /* Standard member. We should never have stuff from a
-            ** bit-field left because an anonymous member was added
-            ** for padding by ParseStructSpec.
-            */
+            // Standard member. We should never have stuff from a
+            // bit-field left because an anonymous member was added
+            // for padding by ParseStructSpec.
             CHECK (SI.ValBits == 0);
 
-            /* Flexible array members may only be initialized if they are
-            ** the last field (or part of the last struct field).
-            */
+            // Flexible array members may only be initialized if they are
+            // the last field (or part of the last struct field).
             SI.Offs += ParseInitInternal (TagSym->Type, Braces, AllowFlexibleMembers && TagSym->NextSym == 0);
         }
 
@@ -663,19 +641,17 @@ NextMember:
         SI.Offs = SI.Size;
     }
 
-    /* Return the actual number of bytes initialized. This number may be
-    ** larger than sizeof (Struct) if flexible array members are present and
-    ** were initialized (possible in non ANSI mode).
-    */
+    // Return the actual number of bytes initialized. This number may be
+    // larger than sizeof (Struct) if flexible array members are present and
+    // were initialized (possible in non ANSI mode).
     return SI.Offs;
 }
 
 
 
 static unsigned ParseVoidInit (Type* T)
-/* Parse an initialization of a void variable (special cc65 extension).
-** Return the number of bytes initialized.
-*/
+// Parse an initialization of a void variable (special cc65 extension).
+// Return the number of bytes initialized.
 {
     unsigned Size;
 
@@ -779,9 +755,8 @@ static unsigned ParseInitInternal (Type* T, int *Braces, int AllowFlexibleMember
             return ParseStructInit (T, Braces, AllowFlexibleMembers);
 
         case T_ENUM:
-            /* Incomplete enum type must have already raised errors.
-            ** Just proceed to consume the value.
-            */
+            // Incomplete enum type must have already raised errors.
+            // Just proceed to consume the value.
             return ParseScalarInit (T);
 
         case T_VOID:
@@ -806,14 +781,12 @@ unsigned ParseInit (Type* T)
     /* Current curly braces layers */
     int Braces = 0;
 
-    /* Parse the initialization. Flexible array members can only be initialized
-    ** in cc65 mode.
-    */
+    // Parse the initialization. Flexible array members can only be initialized
+    // in cc65 mode.
     unsigned Size = ParseInitInternal (T, &Braces, IS_Get (&Standard) == STD_CC65);
 
-    /* The initialization may not generate code on global level, because code
-    ** outside function scope will never get executed.
-    */
+    // The initialization may not generate code on global level, because code
+    // outside function scope will never get executed.
     if (HaveGlobalCode ()) {
         Error ("Non constant initializers");
         RemoveGlobalCode ();

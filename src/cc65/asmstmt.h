@@ -45,10 +45,9 @@
 
 
 void AsmStatement (void);
-/* This function parses ASM statements. The syntax of the ASM directive
-** looks like the one defined for C++ (C has no ASM directive), that is,
-** a string literal in parenthesis.
-*/
+// This function parses ASM statements. The syntax of the ASM directive
+// looks like the one defined for C++ (C has no ASM directive), that is,
+// a string literal in parenthesis.
 
 
 

@@ -166,16 +166,15 @@ static void Parse (void)
             /* The symbol is now visible in the file scope */
             if ((Decl.StorageClass & SC_TYPEMASK) != SC_FUNC &&
                 (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
-                /* Check if we must reserve storage for the variable. We do this,
-                **
-                **   - if it is not a typedef or function,
-                **   - if we don't had a storage class given ("int i")
-                **   - if the storage class is explicitly specified as static,
-                **   - or if there is an initialization.
-                **
-                ** This means that "extern int i;" will not get storage allocated
-                ** in this translation unit.
-                */
+                // Check if we must reserve storage for the variable. We do this,
+                // 
+                // - if it is not a typedef or function,
+                // - if we don't had a storage class given ("int i")
+                // - if the storage class is explicitly specified as static,
+                // - or if there is an initialization.
+                // 
+                // This means that "extern int i;" will not get storage allocated
+                // in this translation unit.
                 if ((Decl.StorageClass & SC_STORAGEMASK) == SC_NONE     ||
                     (Decl.StorageClass & SC_STORAGEMASK) == SC_STATIC   ||
                     ((Decl.StorageClass & SC_STORAGEMASK) == SC_EXTERN &&
@@ -185,17 +184,15 @@ static void Parse (void)
                 }
             }
 
-            /* If this is a function declarator that is not followed by a comma
-            ** or semicolon, it must be followed by a function body.
-            */
+            // If this is a function declarator that is not followed by a comma
+            // or semicolon, it must be followed by a function body.
             if ((Decl.StorageClass & SC_TYPEMASK) == SC_FUNC) {
                 if (CurTok.Tok == TOK_LCURLY) {
                     /* A definition */
                     Decl.StorageClass |= SC_DEF;
 
-                    /* Convert an empty parameter list into one accepting no
-                    ** parameters (same as void) as required by the standard.
-                    */
+                    // Convert an empty parameter list into one accepting no
+                    // parameters (same as void) as required by the standard.
                     FuncDef = GetFuncDesc (Decl.Type);
                     if (FuncDef->Flags & FD_EMPTY) {
                         FuncDef->Flags = (FuncDef->Flags & ~FD_EMPTY) | FD_VOID_PARAM;
@@ -204,9 +201,8 @@ static void Parse (void)
                     /* Just a declaration */
                     FuncDef = GetFuncDesc (Decl.Type);
                     if ((FuncDef->Flags & (FD_EMPTY | FD_OLDSTYLE)) == FD_OLDSTYLE) {
-                        /* A parameter list without types is only allowed in a
-                        ** function definition.
-                        */
+                        // A parameter list without types is only allowed in a
+                        // function definition.
                         Error ("Parameter names without types in function declaration");
                     }
                 }
@@ -234,9 +230,8 @@ static void Parse (void)
                     }
                     Sym->Flags |= SC_DEF;
 
-                    /* We cannot initialize types of unknown size, or
-                    ** void types in ISO modes.
-                    */
+                    // We cannot initialize types of unknown size, or
+                    // void types in ISO modes.
                     if (Size == 0) {
                         if (!IsEmptiableObjectType (Decl.Type)) {
                             if (!IsTypeArray (Decl.Type)) {
@@ -251,10 +246,9 @@ static void Parse (void)
                         }
                     }
 
-                    /* Switch to the data or rodata segment. For arrays, check
-                     ** the element qualifiers, since not the array but its
-                     ** elements are const.
-                     */
+                    // Switch to the data or rodata segment. For arrays, check
+                    // the element qualifiers, since not the array but its
+                    // elements are const.
                     if (IsQualConst (GetBaseElementType (Decl.Type))) {
                         g_userodata ();
                     } else {
@@ -284,25 +278,23 @@ static void Parse (void)
                             Sym->Flags |= SC_DEF;
                         }
                     } else {
-                        /* Check for enum forward declaration.
-                        ** Warn about it when extensions are not allowed.
-                        */
+                        // Check for enum forward declaration.
+                        // Warn about it when extensions are not allowed.
                         if (Size == 0 && IsTypeEnum (Decl.Type)) {
                             if (IS_Get (&Standard) != STD_CC65) {
                                 Warning ("ISO C forbids forward references to 'enum' types");
                             }
                         }
 
-                        /* A global (including static) uninitialized variable is
-                        ** only a tentative definition. For example, this is valid:
-                        ** int i;
-                        ** int i;
-                        ** static int j;
-                        ** static int j = 42;
-                        ** Code for them will be generated by FinishCompile().
-                        ** For now, just save the BSS segment name
-                        ** (can be set by #pragma bss-name).
-                        */
+                        // A global (including static) uninitialized variable is
+                        // only a tentative definition. For example, this is valid:
+                        // int i;
+                        // int i;
+                        // static int j;
+                        // static int j = 42;
+                        // Code for them will be generated by FinishCompile().
+                        // For now, just save the BSS segment name
+                        // (can be set by #pragma bss-name).
                         const char* bssName = GetSegName (SEG_BSS);
 
                         if (Sym->V.BssName != 0) {
@@ -314,9 +306,8 @@ static void Parse (void)
                             Sym->V.BssName = xstrdup (bssName);
                         }
 
-                        /* This is to make the automatical zeropage setting of the symbol
-                        ** work right.
-                        */
+                        // This is to make the automatical zeropage setting of the symbol
+                        // work right.
                         g_usebss ();
                     }
                 }
@@ -347,14 +338,12 @@ static void Parse (void)
         if (Sym && IsTypeFunc (Sym->Type) && CurTok.Tok == TOK_LCURLY) {
             /* A function definition is not terminated with a semicolon */
             if (IsTypeFunc (Spec.Type) && TypeCmp (Sym->Type, Spec.Type).C >= TC_EQUAL) {
-                /* ISO C: The type category in a function definition cannot be
-                ** inherited from a typedef.
-                */
+                // ISO C: The type category in a function definition cannot be
+                // inherited from a typedef.
                 Error ("Function cannot be defined with a typedef");
             } else if (Comma) {
-                /* ISO C: A function definition cannot shall its return type
-                ** specifier with other declarators.
-                */
+                // ISO C: A function definition cannot shall its return type
+                // specifier with other declarators.
                 Error ("';' expected after top level declarator");
             }
 
@@ -396,9 +385,8 @@ void Compile (const char* FileName)
     time_t      Time;
     struct tm*  TM;
 
-    /* Since strftime is locale dependent, we need the abbreviated month names
-    ** in English.
-    */
+    // Since strftime is locale dependent, we need the abbreviated month names
+    // in English.
     static const char MonthNames[12][4] = {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -413,10 +401,9 @@ void Compile (const char* FileName)
     DefineNumericMacro ("__CC65_STD_CC65__", STD_CC65);
     DefineNumericMacro ("__CC65_STD__", IS_Get (&Standard));
 
-    /* Optimization macros. Since no source code has been parsed for now, the
-    ** IS_Get functions access the values in effect now, regardless of any
-    ** changes using #pragma later.
-    */
+    // Optimization macros. Since no source code has been parsed for now, the
+    // IS_Get functions access the values in effect now, regardless of any
+    // changes using #pragma later.
     if (IS_Get (&Optimize)) {
         DefineNumericMacro ("__OPT__", 1);
     }
@@ -468,10 +455,9 @@ void Compile (const char* FileName)
     /* Create the global code and data segments */
     CreateGlobalSegments ();
 
-    /* There shouldn't be needs for local labels outside a function, but the
-    ** current code generator still tries to get some at times even though the
-    ** code were ill-formed. So just set it up with the global segment list.
-    */
+    // There shouldn't be needs for local labels outside a function, but the
+    // current code generator still tries to get some at times even though the
+    // code were ill-formed. So just set it up with the global segment list.
     UseLabelPoolFromSegments (GS);
 
     /* Initialize the literal pool */
@@ -515,18 +501,15 @@ void Compile (const char* FileName)
         /* Ok, start the ball rolling... */
         Parse ();
 
-        /* Reset the BSS segment name to its default; so that the below strcmp()
-        ** will work as expected, at the beginning of the list of variables
-        */
+        // Reset the BSS segment name to its default; so that the below strcmp()
+        // will work as expected, at the beginning of the list of variables
         SetSegName (SEG_BSS, SEGNAME_BSS);
 
-        /* Walk over all global symbols and generate code for uninitialized
-        ** global variables.
-        */
+        // Walk over all global symbols and generate code for uninitialized
+        // global variables.
         for (Entry = GetGlobalSymTab ()->SymHead; Entry; Entry = Entry->NextSym) {
-            /* Is it a global (with or without static) tentative declaration of
-            ** an uninitialized variable?
-            */
+            // Is it a global (with or without static) tentative declaration of
+            // an uninitialized variable?
             if ((Entry->Flags & (SC_TU_STORAGE | SC_DEF)) == SC_TU_STORAGE) {
                 /* Assembly definition of uninitialized global variable */
                 SymEntry* TagSym = GetESUTagSym (Entry->Type);
@@ -595,9 +578,8 @@ void FinishCompile (void)
 {
     SymEntry* Entry;
 
-    /* Walk over all global symbols and do clean-up and optimizations for
-    ** functions.
-    */
+    // Walk over all global symbols and do clean-up and optimizations for
+    // functions.
     for (Entry = GetGlobalSymTab ()->SymHead; Entry; Entry = Entry->NextSym) {
         if (SymIsOutputFunc (Entry)) {
             /* Continue with previous label numbers */

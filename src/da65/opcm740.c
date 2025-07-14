@@ -44,8 +44,8 @@
 /*                                   Data                                    */
 /*****************************************************************************/
 
-/* CAUTION: in the pdf $1a is dec, and $3a is inc - if that is really the case,
- * the table below should be fixed and this notice removed */
+// CAUTION: in the pdf $1a is dec, and $3a is inc - if that is really the case,
+// the table below should be fixed and this notice removed 
 
 /* Descriptions for all opcodes */
 const OpcDesc OpcTable_M740[256] = {

@@ -101,10 +101,9 @@ static long DoStructInternal (long Offs, unsigned Type)
 {
     long Size = 0;
 
-    /* Outside of other structs, we need a name. Inside another struct or
-    ** union, the struct may be anonymous; in which case, no new lexical level
-    ** is started.
-    */
+    // Outside of other structs, we need a name. Inside another struct or
+    // union, the struct may be anonymous; in which case, no new lexical level
+    // is started.
     int Anon = (CurTok.Tok != TOK_IDENT);
 
     if (!Anon) {
@@ -135,9 +134,8 @@ static long DoStructInternal (long Offs, unsigned Type)
         /* The format is "[identifier ].storage-allocator[ multiplier]" */
         Sym = 0;
         if (CurTok.Tok == TOK_IDENT) {
-            /* Beware: An identifier may be a macro also;
-            ** in which case, we must start over.
-            */
+            // Beware: An identifier may be a macro also;
+            // in which case, we must start over.
             Macro* M = FindMacro (&CurTok.SVal);
 
             if (M) {
@@ -258,12 +256,11 @@ static long DoStructInternal (long Offs, unsigned Type)
         ConsumeSep ();
     }
 
-    /* If this is not an anon. struct, enter a special symbol named ".size"
-    ** into the symbol table, of the struct, that holds the size of the
-    ** struct. Since the symbol starts with a dot, it cannot be accessed
-    ** by user code.
-    ** Leave the struct scope level.
-    */
+    // If this is not an anon. struct, enter a special symbol named ".size"
+    // into the symbol table, of the struct, that holds the size of the
+    // struct. Since the symbol starts with a dot, it cannot be accessed
+    // by user code.
+    // Leave the struct scope level.
     if (!Anon) {
         /* Add a symbol */
         SymEntry* SizeSym = GetSizeOfScope (CurrentScope);

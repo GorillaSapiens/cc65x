@@ -53,13 +53,12 @@
 
 
 SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
-/* Parse a (possibly scoped) identifer. The scope of the name must exist and
-** is returned as function result, while the last part (the identifier) which
-** may be either a symbol or a scope depending on the context is returned in
-** Name. FullName is a string buffer that is used to store the full name of
-** the identifier including the scope. It is used internally and may be used
-** by the caller for error messages or similar.
-*/
+// Parse a (possibly scoped) identifer. The scope of the name must exist and
+// is returned as function result, while the last part (the identifier) which
+// may be either a symbol or a scope depending on the context is returned in
+// Name. FullName is a string buffer that is used to store the full name of
+// the identifier including the scope. It is used internally and may be used
+// by the caller for error messages or similar.
 {
     SymTable* Scope;
 
@@ -88,9 +87,8 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
         /* Pass the scope back to the caller */
         SB_Append (FullName, Name);
 
-        /* The scope must exist, so search for it starting with the current
-        ** scope.
-        */
+        // The scope must exist, so search for it starting with the current
+        // scope.
         Scope = SymFindAnyScope (CurrentScope, Name);
         if (Scope == 0) {
             /* Scope not found */
@@ -124,9 +122,8 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
         SB_Copy (Name, &CurTok.SVal);
         NextTok ();
 
-        /* If a namespace token follows, we search for another scope, otherwise
-        ** the name is a symbol and we're done.
-        */
+        // If a namespace token follows, we search for another scope, otherwise
+        // the name is a symbol and we're done.
         if (CurTok.Tok != TOK_NAMESPACE) {
             /* Symbol */
             return Scope;
@@ -152,9 +149,8 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
 
 
 SymEntry* ParseScopedSymName (SymFindAction Action)
-/* Parse a (possibly scoped) symbol name, search for it in the symbol table
-** and return the symbol table entry.
-*/
+// Parse a (possibly scoped) symbol name, search for it in the symbol table
+// and return the symbol table entry.
 {
     StrBuf    ScopeName = STATIC_STRBUF_INITIALIZER;
     StrBuf    Ident = STATIC_STRBUF_INITIALIZER;
@@ -170,23 +166,20 @@ SymEntry* ParseScopedSymName (SymFindAction Action)
     /* We don't need ScopeName any longer */
     SB_Done (&ScopeName);
 
-    /* Check if the scope is valid. Errors have already been diagnosed by
-    ** the routine, so just exit.
-    */
+    // Check if the scope is valid. Errors have already been diagnosed by
+    // the routine, so just exit.
     if (Scope) {
-        /* Search for the symbol and return it. If no scope was specified,
-        ** search also in the upper levels.
-        */
+        // Search for the symbol and return it. If no scope was specified,
+        // search also in the upper levels.
         if (NoScope && (Action & SYM_ALLOC_NEW) == 0) {
             Sym = SymFindAny (Scope, &Ident);
         } else {
             Sym = SymFind (Scope, &Ident, Action);
         }
     } else {
-        /* No scope ==> no symbol. To avoid errors in the calling routine that
-        ** may not expect NULL to be returned if Action contains SYM_ALLOC_NEW,
-        ** create a new symbol.
-        */
+        // No scope ==> no symbol. To avoid errors in the calling routine that
+        // may not expect NULL to be returned if Action contains SYM_ALLOC_NEW,
+        // create a new symbol.
         if (Action & SYM_ALLOC_NEW) {
             Sym = NewSymEntry (&Ident, SF_NONE);
         } else {
@@ -204,9 +197,8 @@ SymEntry* ParseScopedSymName (SymFindAction Action)
 
 
 SymTable* ParseScopedSymTable (void)
-/* Parse a (possibly scoped) symbol table (scope) name, search for it in the
-** symbol space and return the symbol table struct.
-*/
+// Parse a (possibly scoped) symbol table (scope) name, search for it in the
+// symbol space and return the symbol table struct.
 {
     StrBuf    ScopeName = STATIC_STRBUF_INITIALIZER;
     StrBuf    Name = STATIC_STRBUF_INITIALIZER;
@@ -222,10 +214,9 @@ SymTable* ParseScopedSymTable (void)
     /* We don't need FullName any longer */
     SB_Done (&ScopeName);
 
-    /* If we got no error, search for the child scope withint the enclosing one.
-    ** Beware: If no explicit parent scope was specified, search in all upper
-    ** levels.
-    */
+    // If we got no error, search for the child scope withint the enclosing one.
+    // Beware: If no explicit parent scope was specified, search in all upper
+    // levels.
     if (Scope) {
         /* Search for the last scope */
         if (NoScope) {
@@ -245,9 +236,8 @@ SymTable* ParseScopedSymTable (void)
 
 
 SymEntry* ParseAnySymName (SymFindAction Action)
-/* Parse a cheap local symbol or a a (possibly scoped) symbol name, search
-** for it in the symbol table and return the symbol table entry.
-*/
+// Parse a cheap local symbol or a a (possibly scoped) symbol name, search
+// for it in the symbol table and return the symbol table entry.
 {
     SymEntry* Sym;
 

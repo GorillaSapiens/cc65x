@@ -70,9 +70,8 @@ static void AsmRangeError (unsigned Arg)
 
 
 static void AsmErrorSkip (void)
-/* Called in case of an error, skips tokens until the closing paren or a
-** semicolon is reached.
-*/
+// Called in case of an error, skips tokens until the closing paren or a
+// semicolon is reached.
 {
     static const token_t TokenList[] = { TOK_RPAREN, TOK_SEMI };
     SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
@@ -81,9 +80,8 @@ static void AsmErrorSkip (void)
 
 
 static SymEntry* AsmGetSym (unsigned Arg, int OnStack)
-/* Find the symbol with the name currently in NextTok. The symbol must be on
-** the stack if OnStack is true. On errors, NULL is returned.
-*/
+// Find the symbol with the name currently in NextTok. The symbol must be on
+// the stack if OnStack is true. On errors, NULL is returned.
 {
     SymEntry* Sym;
 
@@ -213,9 +211,8 @@ static void ParseLongArg (StrBuf* T, unsigned Arg attribute ((unused)))
 
 
 static void ParseGVarArg (StrBuf* T, unsigned Arg)
-/* Parse the %v format specifier.
-** ### FIXME: Asm names should be generated in the same place.
-*/
+// Parse the %v format specifier.
+// ### FIXME: Asm names should be generated in the same place.
 {
     /* Parse the symbol name parameter and check the type */
     SymEntry* Sym = AsmGetSym (Arg, 0);
@@ -255,10 +252,9 @@ static void ParseLVarArg (StrBuf* T, unsigned Arg)
         return;
     }
 
-    /* The symbol may be a parameter to a variadic function. In this case, we
-    ** don't have a fixed stack offset, so check it and bail out with an error
-    ** if this is the case.
-    */
+    // The symbol may be a parameter to a variadic function. In this case, we
+    // don't have a fixed stack offset, so check it and bail out with an error
+    // if this is the case.
     if ((Sym->Flags & SC_PARAM) == SC_PARAM && F_IsVariadic (CurrentFunc)) {
         Error ("Argument %u has no fixed stack offset", Arg);
         AsmErrorSkip ();
@@ -350,17 +346,16 @@ static void ParseAsm (void)
     /* Skip the string token */
     NextToken ();
 
-    /* Parse the statement. It may contain several lines and one or more
-    ** of the following place holders:
-    **   %b     - Numerical 8 bit value
-    **   %w     - Numerical 16 bit value
-    **   %l     - Numerical 32 bit value
-    **   %v     - Assembler name of a (global) variable
-    **   %o     - Stack offset of a (local) variable
-    **   %g     - Assembler name of a C label
-    **   %s     - Any argument converted to a string (almost)
-    **   %%     - The % sign
-    */
+    // Parse the statement. It may contain several lines and one or more
+    // of the following place holders:
+    // %b     - Numerical 8 bit value
+    // %w     - Numerical 16 bit value
+    // %l     - Numerical 32 bit value
+    // %v     - Assembler name of a (global) variable
+    // %o     - Stack offset of a (local) variable
+    // %g     - Assembler name of a C label
+    // %s     - Any argument converted to a string (almost)
+    // %%     - The % sign
     Arg = 0;
     while ((C = SB_Get (&S)) != '\0') {
 
@@ -413,10 +408,9 @@ Done:
 
 
 void AsmStatement (void)
-/* This function parses ASM statements. The syntax of the ASM directive
-** looks like the one defined for C++ (C has no ASM directive), that is,
-** a string literal in parenthesis.
-*/
+// This function parses ASM statements. The syntax of the ASM directive
+// looks like the one defined for C++ (C has no ASM directive), that is,
+// a string literal in parenthesis.
 {
     /* Prevent from translating the inline code string literal in asm */
     NoCharMap = 1;
@@ -424,9 +418,8 @@ void AsmStatement (void)
     /* Skip the ASM */
     NextToken ();
 
-    /* An optional volatile qualifier disables optimization for
-    ** the entire function [same as #pragma optimize(push, off)].
-    */
+    // An optional volatile qualifier disables optimization for
+    // the entire function [same as #pragma optimize(push, off)].
     if (CurTok.Tok == TOK_VOLATILE) {
         /* Don't optimize the Current code Segment */
         CS->Code->Optimize = 0;
@@ -439,9 +432,8 @@ void AsmStatement (void)
         return;
     }
 
-    /* We have got the inline code string untranslated, now reenable string
-    ** literal translation for string arguments (if any).
-    */
+    // We have got the inline code string untranslated, now reenable string
+    // literal translation for string arguments (if any).
     NoCharMap = 0;
 
     /* String literal */
@@ -450,9 +442,8 @@ void AsmStatement (void)
         /* Print a diagnostic */
         Error ("String literal expected");
 
-        /* Try some smart error recovery: Skip tokens until we reach the
-        ** enclosing paren, or a semicolon.
-        */
+        // Try some smart error recovery: Skip tokens until we reach the
+        // enclosing paren, or a semicolon.
         AsmErrorSkip ();
 
     } else {

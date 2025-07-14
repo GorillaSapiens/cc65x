@@ -33,9 +33,8 @@
 
 
 
-/* Note: This is NOT some sort of code segment, it is used to store lines of
-** output that are textual (not real code) instead.
-*/
+// Note: This is NOT some sort of code segment, it is used to store lines of
+// output that are textual (not real code) instead.
 
 
 

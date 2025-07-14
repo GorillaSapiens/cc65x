@@ -52,9 +52,8 @@
 
 
 static int GetBranchDist (CodeSeg* S, unsigned From, CodeEntry* To)
-/* Get the branch distance between the two entries and return it. The distance
-** will be negative for backward jumps and positive for forward jumps.
-*/
+// Get the branch distance between the two entries and return it. The distance
+// will be negative for backward jumps and positive for forward jumps.
 {
     /* Get the index of the branch target */
     unsigned TI = CS_GetEntryIndex (S, To);
@@ -289,9 +288,8 @@ unsigned OptRTSJumps2 (CodeSeg* S)
             E->JumpTo != 0) {                        /* Local label */
 
 
-            /* Get the jump target and the next entry. There's always a next
-            ** entry, because we don't cover the last entry in the loop.
-            */
+            // Get the jump target and the next entry. There's always a next
+            // entry, because we don't cover the last entry in the loop.
             CodeEntry* X = 0;
             CodeEntry* T = E->JumpTo->Owner;
             CodeEntry* N = CS_GetNextEntry (S, I);
@@ -299,16 +297,14 @@ unsigned OptRTSJumps2 (CodeSeg* S)
             /* Check if it's a jump to an RTS insn */
             if (T->OPC == OP65_RTS) {
 
-                /* It's a jump to RTS. Create a conditional branch around an
-                ** RTS insn.
-                */
+                // It's a jump to RTS. Create a conditional branch around an
+                // RTS insn.
                 X = NewCodeEntry (OP65_RTS, AM65_IMP, 0, 0, T->LI);
 
             } else if (T->OPC == OP65_JMP && T->JumpTo == 0) {
 
-                /* It's a jump to a label outside the function. Create a
-                ** conditional branch around a jump to the external label.
-                */
+                // It's a jump to a label outside the function. Create a
+                // conditional branch around a jump to the external label.
                 X = NewCodeEntry (OP65_JMP, AM65_ABS, T->Arg, T->JumpTo, T->LI);
 
             }
@@ -322,9 +318,8 @@ unsigned OptRTSJumps2 (CodeSeg* S)
                 /* Insert the new insn */
                 CS_InsertEntry (S, X, I+1);
 
-                /* Create a conditional branch with the inverse condition
-                ** around the replacement insn
-                */
+                // Create a conditional branch with the inverse condition
+                // around the replacement insn
 
                 /* Get the new branch opcode */
                 NewBranch = MakeShortBranch (GetInverseBranch (E->OPC));
@@ -374,9 +369,8 @@ unsigned OptDeadJumps (CodeSeg* S)
         /* Get the next entry */
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check if it's a branch, if it has a local target, and if the target
-        ** is the next instruction.
-        */
+        // Check if it's a branch, if it has a local target, and if the target
+        // is the next instruction.
         if (E->AM == AM65_BRA                               &&
             E->JumpTo                                       &&
             E->JumpTo->Owner == CS_GetNextEntry (S, I)) {
@@ -408,9 +402,8 @@ unsigned OptDeadJumps (CodeSeg* S)
 
 
 unsigned OptDeadCode (CodeSeg* S)
-/* Remove dead code (code that follows an unconditional jump or an rts/rti
-** and has no label)
-*/
+// Remove dead code (code that follows an unconditional jump or an rts/rti
+// and has no label)
 {
     unsigned Changes = 0;
 
@@ -424,10 +417,9 @@ unsigned OptDeadCode (CodeSeg* S)
         /* Get this entry */
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check if it's an unconditional branch, and if the next entry has
-        ** no labels attached, or if the label is just used so that the insn
-        ** can jump to itself.
-        */
+        // Check if it's an unconditional branch, and if the next entry has
+        // no labels attached, or if the label is just used so that the insn
+        // can jump to itself.
         if ((E->Info & OF_DEAD) != 0                     &&     /* Dead code follows */
             (N = CS_GetNextEntry (S, I)) != 0            &&     /* Has next entry */
             (!CE_HasLabel (N)                        ||         /* Don't has a label */
@@ -463,12 +455,11 @@ unsigned OptDeadCode (CodeSeg* S)
 
 
 unsigned OptJumpCascades (CodeSeg* S)
-/* Optimize jump cascades (jumps to jumps). In such a case, the jump is
-** replaced by a jump to the final location. This will in some cases produce
-** worse code, because some jump targets are no longer reachable by short
-** branches, but this is quite rare, so there are more advantages than
-** disadvantages.
-*/
+// Optimize jump cascades (jumps to jumps). In such a case, the jump is
+// replaced by a jump to the final location. This will in some cases produce
+// worse code, because some jump targets are no longer reachable by short
+// branches, but this is quite rare, so there are more advantages than
+// disadvantages.
 {
     unsigned Changes = 0;
 
@@ -482,18 +473,17 @@ unsigned OptJumpCascades (CodeSeg* S)
         /* Get this entry */
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check:
-        **   - if it's a branch,
-        **   - if it has a jump label,
-        **   - if this jump label is not attached to the instruction itself,
-        **   - if the target instruction is itself a branch,
-        **   - if either the first branch is unconditional or the target of
-        **     the second branch is internal to the function.
-        ** The latter condition will avoid conditional branches to targets
-        ** outside of the function (usually incspx), which won't simplify the
-        ** code, since conditional far branches are emulated by a short branch
-        ** around a jump.
-        */
+        // Check:
+        // - if it's a branch,
+        // - if it has a jump label,
+        // - if this jump label is not attached to the instruction itself,
+        // - if the target instruction is itself a branch,
+        // - if either the first branch is unconditional or the target of
+        // the second branch is internal to the function.
+        // The latter condition will avoid conditional branches to targets
+        // outside of the function (usually incspx), which won't simplify the
+        // code, since conditional far branches are emulated by a short branch
+        // around a jump.
         if ((E->Info & OF_BRA) != 0             &&
             (OldLabel = E->JumpTo) != 0         &&
             (N = OldLabel->Owner) != E          &&
@@ -501,27 +491,24 @@ unsigned OptJumpCascades (CodeSeg* S)
             ((E->Info & OF_CBRA) == 0   ||
              N->JumpTo != 0)) {
 
-            /* Check if we can use the final target label. That is the case,
-            ** if the target branch is an absolute branch; or, if it is a
-            ** conditional branch checking the same condition as the first one.
-            */
+            // Check if we can use the final target label. That is the case,
+            // if the target branch is an absolute branch; or, if it is a
+            // conditional branch checking the same condition as the first one.
             if ((N->Info & OF_UBRA) != 0 ||
                 ((E->Info & OF_CBRA) != 0 &&
                  GetBranchCond (E->OPC)  == GetBranchCond (N->OPC))) {
 
-                /* This is a jump cascade and we may jump to the final target,
-                ** provided that the other insn does not jump to itself. If
-                ** this is the case, we can also jump to ourselves, otherwise
-                ** insert a jump to the new instruction and remove the old one.
-                */
+                // This is a jump cascade and we may jump to the final target,
+                // provided that the other insn does not jump to itself. If
+                // this is the case, we can also jump to ourselves, otherwise
+                // insert a jump to the new instruction and remove the old one.
                 CodeEntry* X;
                 CodeLabel* LN = N->JumpTo;
 
                 if (LN != 0 && LN->Owner == N) {
 
-                    /* We found a jump to a jump to itself. Replace our jump
-                    ** by a jump to itself.
-                    */
+                    // We found a jump to a jump to itself. Replace our jump
+                    // by a jump to itself.
                     CodeLabel* LE = CS_GenLabel (S, E);
                     X = NewCodeEntry (E->OPC, E->AM, LE->Name, LE, E->LI);
 
@@ -541,11 +528,10 @@ unsigned OptJumpCascades (CodeSeg* S)
                 /* Remember, we had changes */
                 ++Changes;
 
-            /* Check if both are conditional branches, and the condition of
-            ** the second is the inverse of that of the first. In this case,
-            ** the second branch will never be taken, and we may jump directly
-            ** to the instruction behind this one.
-            */
+            // Check if both are conditional branches, and the condition of
+            // the second is the inverse of that of the first. In this case,
+            // the second branch will never be taken, and we may jump directly
+            // to the instruction behind this one.
             } else if ((E->Info & OF_CBRA) != 0 && (N->Info & OF_CBRA) != 0) {
 
                 CodeEntry* X;   /* Instruction behind N */
@@ -561,9 +547,8 @@ unsigned OptJumpCascades (CodeSeg* S)
                     goto NextEntry;
                 }
 
-                /* We may jump behind this conditional branch. Get the
-                ** pointer to the next instruction
-                */
+                // We may jump behind this conditional branch. Get the
+                // pointer to the next instruction
                 if ((X = CS_GetNextEntry (S, CS_GetEntryIndex (S, N))) == 0) {
                     /* N is the last entry, bail out */
                     goto NextEntry;
@@ -599,10 +584,9 @@ NextEntry:
 
 
 unsigned OptRTS (CodeSeg* S)
-/* Optimize subroutine calls followed by an RTS. The subroutine call will get
-** replaced by a jump. Don't bother to delete the RTS if it does not have a
-** label, the dead code elimination should take care of it.
-*/
+// Optimize subroutine calls followed by an RTS. The subroutine call will get
+// replaced by a jump. Don't bother to delete the RTS if it does not have a
+// label, the dead code elimination should take care of it.
 {
     unsigned Changes = 0;
 
@@ -647,11 +631,10 @@ unsigned OptRTS (CodeSeg* S)
 
 
 unsigned OptJumpTarget1 (CodeSeg* S)
-/* If the instruction preceeding an unconditional branch is the same as the
-** instruction preceeding the jump target, the jump target may be moved
-** one entry back. This is a size optimization, since the instruction before
-** the branch gets removed.
-*/
+// If the instruction preceeding an unconditional branch is the same as the
+// instruction preceeding the jump target, the jump target may be moved
+// one entry back. This is a size optimization, since the instruction before
+// the branch gets removed.
 {
     unsigned Changes = 0;
     CodeEntry* E1;              /* Entry 1 */
@@ -666,9 +649,8 @@ unsigned OptJumpTarget1 (CodeSeg* S)
         /* Get next entry */
         E2 = CS_GetNextEntry (S, I);
 
-        /* Check if we have a jump or branch without a label attached, and
-        ** a jump target, which is not attached to the jump itself
-        */
+        // Check if we have a jump or branch without a label attached, and
+        // a jump target, which is not attached to the jump itself
         if (E2 != 0                     &&
             (E2->Info & OF_UBRA) != 0   &&
             !CE_HasLabel (E2)           &&
@@ -682,9 +664,8 @@ unsigned OptJumpTarget1 (CodeSeg* S)
                 goto NextEntry;
             }
 
-            /* The entry preceeding the branch target may not be the branch
-            ** insn.
-            */
+            // The entry preceeding the branch target may not be the branch
+            // insn.
             if (T1 == E2) {
                 goto NextEntry;
             }
@@ -698,18 +679,16 @@ unsigned OptJumpTarget1 (CodeSeg* S)
                 goto NextEntry;
             }
 
-            /* Get the label for the instruction preceeding the jump target.
-            ** This routine will create a new label if the instruction does
-            ** not already have one.
-            */
+            // Get the label for the instruction preceeding the jump target.
+            // This routine will create a new label if the instruction does
+            // not already have one.
             TL1 = CS_GenLabel (S, T1);
 
             /* Change the jump target to point to this new label */
             CS_MoveLabelRef (S, E2, TL1);
 
-            /* If the instruction preceeding the jump has labels attached,
-            ** move references to this label to the new label.
-            */
+            // If the instruction preceeding the jump has labels attached,
+            // move references to this label to the new label.
             if (CE_HasLabel (E1)) {
                 CS_MoveLabels (S, E1, T1);
             }
@@ -734,9 +713,8 @@ NextEntry:
 
 
 unsigned OptJumpTarget2 (CodeSeg* S)
-/* If a bcs jumps to a sec insn or a bcc jumps to clc, skip this insn, since
-** it's job is already done.
-*/
+// If a bcs jumps to a sec insn or a bcc jumps to clc, skip this insn, since
+// it's job is already done.
 {
     unsigned Changes = 0;
 
@@ -772,9 +750,8 @@ unsigned OptJumpTarget2 (CodeSeg* S)
             goto NextEntry;
         }
 
-        /* Get the owner insn of the jump target and check if it's the one, we
-        ** will skip if present.
-        */
+        // Get the owner insn of the jump target and check if it's the one, we
+        // will skip if present.
         T = E->JumpTo->Owner;
         if (T->OPC != OPC) {
             goto NextEntry;
@@ -787,10 +764,9 @@ unsigned OptJumpTarget2 (CodeSeg* S)
             goto NextEntry;
         }
 
-        /* Get the label for the instruction following the jump target.
-        ** This routine will create a new label if the instruction does
-        ** not already have one.
-        */
+        // Get the label for the instruction following the jump target.
+        // This routine will create a new label if the instruction does
+        // not already have one.
         L = CS_GenLabel (S, N);
 
         /* Change the jump target to point to this new label */
@@ -811,10 +787,9 @@ NextEntry:
 
 
 unsigned OptJumpTarget3 (CodeSeg* S)
-/* Jumps to load instructions of a register, that do already have the matching
-** register contents may skip the load instruction, since it's job is already
-** done.
-*/
+// Jumps to load instructions of a register, that do already have the matching
+// register contents may skip the load instruction, since it's job is already
+// done.
 {
     unsigned Changes = 0;
     unsigned I;
@@ -828,9 +803,8 @@ unsigned OptJumpTarget3 (CodeSeg* S)
         /* Get next entry */
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check if this is a load insn with a label and the next insn is not
-        ** a conditional branch that needs the flags from the load.
-        */
+        // Check if this is a load insn with a label and the next insn is not
+        // a conditional branch that needs the flags from the load.
         if ((E->Info & OF_LOAD) != 0            &&
             CE_IsConstImm (E)                   &&
             CE_HasLabel (E)                     &&
@@ -849,10 +823,9 @@ unsigned OptJumpTarget3 (CodeSeg* S)
                 /* Get the label */
                 CodeLabel* L = CE_GetLabel (E, J);
 
-                /* Loop over all insn that reference this label. Since we may
-                ** eventually remove a reference in the loop, we must loop
-                ** from end down to start.
-                */
+                // Loop over all insn that reference this label. Since we may
+                // eventually remove a reference in the loop, we must loop
+                // from end down to start.
                 for (K = CL_GetRefCount (L) - 1; K >= 0; --K) {
 
                     /* Get the entry that jumps here */
@@ -864,9 +837,8 @@ unsigned OptJumpTarget3 (CodeSeg* S)
                     /* Check if the outgoing value is the one thats's loaded */
                     if (Val == (unsigned char) E->Num) {
 
-                        /* OK, skip the insn. First, generate a label for the
-                        ** next insn after E.
-                        */
+                        // OK, skip the insn. First, generate a label for the
+                        // next insn after E.
                         if (LN == 0) {
                             LN = CS_GenLabel (S, N);
                         }
@@ -899,13 +871,12 @@ unsigned OptJumpTarget3 (CodeSeg* S)
 
 
 unsigned OptCondBranch1 (CodeSeg* S)
-/* Performs some optimization steps:
-**  - If an immediate load of a register is followed by a conditional jump that
-**    is never taken because the load of the register sets the flags in such a
-**    manner, remove the conditional branch.
-**  - If the conditional branch is always taken because of the register load,
-**    replace it by a jmp.
-*/
+// Performs some optimization steps:
+// - If an immediate load of a register is followed by a conditional jump that
+// is never taken because the load of the register sets the flags in such a
+// manner, remove the conditional branch.
+// - If the conditional branch is always taken because of the register load,
+// replace it by a jmp.
 {
     unsigned Changes = 0;
 
@@ -967,10 +938,9 @@ unsigned OptCondBranch1 (CodeSeg* S)
 
 
 unsigned OptCondBranch2 (CodeSeg* S)
-/* If a conditional branch jumps around an unconditional branch, remove the
-** conditional branch and make the jump a conditional branch with the inverse
-** condition of the first one.
-*/
+// If a conditional branch jumps around an unconditional branch, remove the
+// conditional branch and make the jump a conditional branch with the inverse
+// condition of the first one.
 {
     unsigned Changes = 0;
 
@@ -991,9 +961,8 @@ unsigned OptCondBranch2 (CodeSeg* S)
             !CE_HasLabel (N)                      &&  /* ..has no label attached */
             L->Owner == CS_GetNextEntry (S, I+1)) {   /* ..and jump target follows */
 
-            /* Replace the jump by a conditional branch with the inverse branch
-            ** condition than the branch around it.
-            */
+            // Replace the jump by a conditional branch with the inverse branch
+            // condition than the branch around it.
             CE_ReplaceOPC (N, GetInverseBranch (E->OPC));
 
             /* Remove the conditional branch */
@@ -1016,9 +985,8 @@ unsigned OptCondBranch2 (CodeSeg* S)
 
 
 unsigned OptCondBranch3 (CodeSeg* S)
-/* If the conditional branch is always taken because it follows an inverse
-** conditional branch, replace it by a jmp.
-*/
+// If the conditional branch is always taken because it follows an inverse
+// conditional branch, replace it by a jmp.
 {
     unsigned Changes = 0;
 
@@ -1060,9 +1028,8 @@ unsigned OptCondBranch3 (CodeSeg* S)
 
 
 unsigned OptCondBranchC (CodeSeg* S)
-/* If on entry to a "rol a" instruction the accu is zero, and a beq/bne follows,
-** we can remove the rol and branch on the state of the carry flag.
-*/
+// If on entry to a "rol a" instruction the accu is zero, and a beq/bne follows,
+// we can remove the rol and branch on the state of the carry flag.
 {
     unsigned Changes = 0;
     unsigned I;

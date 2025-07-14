@@ -97,9 +97,8 @@ void LoadCode (void)
         InputOffs = 0;
     }
 
-    /* Seek to the input offset and correct size to contain the remainder of
-    ** the file.
-    */
+    // Seek to the input offset and correct size to contain the remainder of
+    // the file.
     if (fseek (F, InputOffs, SEEK_SET) != 0) {
         Error ("Cannot seek on file '%s': %s", InFile, strerror (errno));
     }
@@ -113,10 +112,9 @@ void LoadCode (void)
         Size = InputSize;
     }
 
-    /* If the start address was not given, set it so that the code loads to
-    ** 0x10000 - Size. This is a reasonable default assuming that the file
-    ** is a ROM that contains the hardware vectors at $FFFA.
-    */
+    // If the start address was not given, set it so that the code loads to
+    // 0x10000 - Size. This is a reasonable default assuming that the file
+    // is a ROM that contains the hardware vectors at $FFFA.
     if (!HaveStartAddr) {
         if (Size > 0x10000) {
             StartAddr = 0;

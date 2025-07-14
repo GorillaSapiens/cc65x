@@ -56,21 +56,18 @@ struct Library;
 
 
 void LibAdd (FILE* F, const char* Name);
-/* Add files from the library to the list if there are references that could
-** be satisfied.
-*/
+// Add files from the library to the list if there are references that could
+// be satisfied.
 
 void LibStartGroup (void);
-/* Start a library group. Objects within a library group may reference each
-** other, and libraries are searched repeatedly until all references are
-** satisfied.
-*/
+// Start a library group. Objects within a library group may reference each
+// other, and libraries are searched repeatedly until all references are
+// satisfied.
 
 void LibEndGroup (void);
-/* End a library group and resolve all open references. Objects within a
-** library group may reference each other, and libraries are searched
-** repeatedly until all references are satisfied.
-*/
+// End a library group and resolve all open references. Objects within a
+// library group may reference each other, and libraries are searched
+// repeatedly until all references are satisfied.
 
 void LibCheckGroup (void);
 /* Check if there are open library groups */

@@ -80,9 +80,8 @@ void SetOutputName (const char* Name)
 
 
 void MakeDefaultOutputName (const char* InputFilename)
-/* If the name of the output file is empty or NULL, the name of the output
-** file is derived from the input file by adjusting the file name extension.
-*/
+// If the name of the output file is empty or NULL, the name of the output
+// file is derived from the input file by adjusting the file name extension.
 {
     if (OutputFilename == 0 || *OutputFilename == '\0') {
         /* We don't have an output file for now */
@@ -110,9 +109,8 @@ void OpenOutputFile ()
 
 
 void OpenDebugOutputFile (const char* Name)
-/* Open an output file for debugging purposes. Will call Fatal() in case of
-** failures.
-*/
+// Open an output file for debugging purposes. Will call Fatal() in case of
+// failures.
 {
     /* Output file must not be open and we must have a name*/
     PRECONDITION (OutputFile == 0);
@@ -146,9 +144,8 @@ void CloseOutputFile ()
 
 
 int WriteOutput (const char* Format, ...)
-/* Write to the output file using printf like formatting. Returns the number
-** of chars written.
-*/
+// Write to the output file using printf like formatting. Returns the number
+// of chars written.
 {
     va_list ap;
     int CharCount;

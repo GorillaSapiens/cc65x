@@ -80,9 +80,8 @@ struct CodeEntry;
 #define SC_TYPEDEF      0x0006U         /* A typedef */
 #define SC_ENUMERATOR   0x0007U         /* An enumerator */
 
-/* Note: These symbol types might be checked as bit-flags occasionally.
-**       So don't share their unique bits with other symbol types.
-*/
+// Note: These symbol types might be checked as bit-flags occasionally.
+// So don't share their unique bits with other symbol types.
 #define SC_FUNC         0x0008U         /* A function */
 #define SC_ARRAY        0x0010U         /* UNUSED: An array */
 #define SC_TYPEMASK     0x001FU         /* Mask for symbol types all above */
@@ -117,33 +116,32 @@ struct CodeEntry;
 #define SC_LOCALSCOPE   0x400000U       /* Symbol is invisible in file scope */
 #define SC_NOINLINEDEF  0x800000U       /* Symbol may never have an inline definition */
 
-/* To figure out the linkage of an object or function symbol Sym:
-** - external linkage:
-**    SymIsGlobal (Sym) && (Sym->Flags & SC_STORAGEMASK) != SC_STATIC
-** - internal linkage:
-**    SymIsGlobal (Sym) && (Sym->Flags & SC_STORAGEMASK) == SC_STATIC
-** - no linkage:
-**    !SymIsGlobal (Sym)
-**
-** To figure out the storage class of a symbol by its SC_ flags:
-**
-** - no explicit storage class specifiers (in file scope):
-**    (flags & SC_STORAGEMASK) == SC_NONE
-** - no explicit storage class specifiers (in block scope):
-**    (flags & SC_STORAGEMASK) == SC_AUTO
-** - extern:
-**    (flags & SC_STORAGEMASK) == SC_EXTERN
-** - static:
-**    (flags & SC_STORAGEMASK) == SC_STATIC
-** - auto:
-**    (flags & SC_STORAGEMASK) == SC_AUTO
-** - register:
-**    (flags & SC_STORAGEMASK) == SC_REGISTER
-** - typedef (per ISO C):
-**    (flags & SC_TYPEMASK) == SC_TYPEDEF
-**
-** Note: SC_TYPEDEF can be also used as a flag.
-*/
+// To figure out the linkage of an object or function symbol Sym:
+// - external linkage:
+// SymIsGlobal (Sym) && (Sym->Flags & SC_STORAGEMASK) != SC_STATIC
+// - internal linkage:
+// SymIsGlobal (Sym) && (Sym->Flags & SC_STORAGEMASK) == SC_STATIC
+// - no linkage:
+// !SymIsGlobal (Sym)
+// 
+// To figure out the storage class of a symbol by its SC_ flags:
+// 
+// - no explicit storage class specifiers (in file scope):
+// (flags & SC_STORAGEMASK) == SC_NONE
+// - no explicit storage class specifiers (in block scope):
+// (flags & SC_STORAGEMASK) == SC_AUTO
+// - extern:
+// (flags & SC_STORAGEMASK) == SC_EXTERN
+// - static:
+// (flags & SC_STORAGEMASK) == SC_STATIC
+// - auto:
+// (flags & SC_STORAGEMASK) == SC_AUTO
+// - register:
+// (flags & SC_STORAGEMASK) == SC_REGISTER
+// - typedef (per ISO C):
+// (flags & SC_TYPEMASK) == SC_TYPEDEF
+// 
+// Note: SC_TYPEDEF can be also used as a flag.
 #define SC_AUTO         0x01000000U     /* Auto storage class */
 #define SC_REGISTER     0x02000000U     /* Register storage class */
 #define SC_STATIC       0x03000000U     /* Static storage class */
@@ -186,9 +184,8 @@ struct SymEntry {
         /* Offset for locals */
         int                     Offs;
 
-        /* Register bank offset and offset of the saved copy on stack for
-        ** register variables.
-        */
+        // Register bank offset and offset of the saved copy on stack for
+        // register variables.
         struct {
             int                 RegOffs;
             int                 SaveOffs;
@@ -379,9 +376,8 @@ void SymUseAttr (SymEntry* Sym, struct Declarator* D);
 /* Use the attributes from the declarator for this symbol */
 
 void SymSetAsmName (SymEntry* Sym);
-/* Set the assembler name for an external symbol from the name of the symbol.
-** The symbol must have no assembler name set yet.
-*/
+// Set the assembler name for an external symbol from the name of the symbol.
+// The symbol must have no assembler name set yet.
 
 void SymCvtRegVarToAuto (SymEntry* Sym);
 /* Convert a register variable to an auto variable */

@@ -80,9 +80,8 @@ void ErrorOnNonDefinition (const CodeMark* Start, const CodeMark* End);
 void CleanupSwitch (const CodeMark* location);
 
 void MoveCode (const CodeMark* Start, const CodeMark* End, const CodeMark* Target);
-/* Move the code between Start (inclusive) and End (exclusive) to
-** (before) Target. The code marks aren't updated.
-*/
+// Move the code between Start (inclusive) and End (exclusive) to
+// (before) Target. The code marks aren't updated.
 
 int CodeRangeIsEmpty (const CodeMark* Start, const CodeMark* End);
 /* Return true if the given code range is empty (no code between Start and End) */

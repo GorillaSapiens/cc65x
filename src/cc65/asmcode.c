@@ -102,9 +102,8 @@ void CleanupSwitch (const CodeMark* location) {
 
 
 void MoveCode (const CodeMark* Start, const CodeMark* End, const CodeMark* Target)
-/* Move the code between Start (inclusive) and End (exclusive) to
-** (before) Target. The code marks aren't updated.
-*/
+// Move the code between Start (inclusive) and End (exclusive) to
+// (before) Target. The code marks aren't updated.
 {
     CS_MoveEntries (CS->Code, Start->Pos, End->Pos - Start->Pos, Target->Pos);
 }

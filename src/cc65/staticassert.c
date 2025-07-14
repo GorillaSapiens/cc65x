@@ -47,11 +47,10 @@
 
 void ParseStaticAssert (void)
 {
-    /*
-    ** static_assert-declaration ::=
-    **     _Static_assert ( constant-expression ) ;
-    **     _Static_assert ( constant-expression , string-literal ) ;
-    */
+    // 
+    // static_assert-declaration ::=
+    // _Static_assert ( constant-expression ) ;
+    // _Static_assert ( constant-expression , string-literal ) ;
     ExprDesc Expr;
     unsigned PrevErrorCount = ErrorCount;
     int      failed = 0;
@@ -71,9 +70,8 @@ void ParseStaticAssert (void)
         goto ExitPoint;
     }
 
-    /* If there is a comma, we also have an error message.  The message is optional because we
-    ** support the C2X syntax with only an expression.
-    */
+    // If there is a comma, we also have an error message.  The message is optional because we
+    // support the C2X syntax with only an expression.
     if (CurTok.Tok == TOK_COMMA) {
         /* Prevent from translating the message string literal */
         NoCharMap = 1;
@@ -93,9 +91,8 @@ void ParseStaticAssert (void)
                 Error ("static_assert failed '%s'", GetLiteralStr (CurTok.SVal));
             }
 
-            /* Consume the string constant, now that we don't need it anymore.
-            ** This should never fail since we checked the token type above.
-            */
+            // Consume the string constant, now that we don't need it anymore.
+            // This should never fail since we checked the token type above.
             Consume (TOK_SCONST, "String literal expected");
         }
     } else {

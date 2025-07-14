@@ -152,9 +152,8 @@ int XexAddInitAd (XexDesc* D, MemoryArea *InitMem, Import *InitAd)
 static unsigned XexWriteExpr (ExprNode* E, int Signed, unsigned Size,
                               unsigned long Offs attribute ((unused)),
                               void* Data)
-/* Called from SegWrite for an expression. Evaluate the expression, check the
-** range and write the expression value to the file.
-*/
+// Called from SegWrite for an expression. Evaluate the expression, check the
+// range and write the expression value to the file.
 {
     /* There's a predefined function to handle constant expressions */
     return SegWriteConstExpr (((XexDesc*)Data)->F, E, Signed, Size);
@@ -260,12 +259,11 @@ static unsigned long XexWriteMem (XexDesc* D, MemoryArea* M)
                    S->Load == M                 &&      /* LOAD segment */
                    S->Seg->Dumped == 0;                 /* Not already written */
 
-        /* If this is the run memory area, we must apply run alignment. If
-        ** this is not the run memory area but the load memory area (which
-        ** means that both are different), we must apply load alignment.
-        ** Beware: DoWrite may be true even if this is the run memory area,
-        ** because it may be also the load memory area.
-        */
+        // If this is the run memory area, we must apply run alignment. If
+        // this is not the run memory area but the load memory area (which
+        // means that both are different), we must apply load alignment.
+        // Beware: DoWrite may be true even if this is the run memory area,
+        // because it may be also the load memory area.
         if (S->Run == M) {
 
             /* Handle ALIGN and OFFSET/START */
@@ -314,9 +312,8 @@ static unsigned long XexWriteMem (XexDesc* D, MemoryArea* M)
 
         }
 
-        /* Now write the segment to disk if it is not a BSS type segment and
-        ** if the memory area is the load area.
-        */
+        // Now write the segment to disk if it is not a BSS type segment and
+        // if the memory area is the load area.
         if (DoWrite) {
             /* Start a segment with only one byte, will fix later */
             XexFakeSegment (D, Addr);
@@ -364,10 +361,9 @@ static unsigned long XexWriteMem (XexDesc* D, MemoryArea* M)
 static int XexUnresolved (unsigned Name attribute ((unused)), void* D)
 /* Called if an unresolved symbol is encountered */
 {
-    /* Unresolved symbols are an error in XEX format. Bump the counter
-    ** and return zero telling the caller that the symbol is indeed
-    ** unresolved.
-    */
+    // Unresolved symbols are an error in XEX format. Bump the counter
+    // and return zero telling the caller that the symbol is indeed
+    // unresolved.
     ((XexDesc*) D)->Undef++;
     return 0;
 }
@@ -382,9 +378,8 @@ void XexWriteTarget (XexDesc* D, struct File* F)
     /* Place the filename in the control structure */
     D->Filename = GetString (F->Name);
 
-    /* Check for unresolved symbols. The function XexUnresolved is called
-    ** if we get an unresolved symbol.
-    */
+    // Check for unresolved symbols. The function XexUnresolved is called
+    // if we get an unresolved symbol.
     D->Undef = 0;               /* Reset the counter */
     CheckUnresolvedImports (XexUnresolved, D);
     if (D->Undef > 0) {

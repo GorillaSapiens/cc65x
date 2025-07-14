@@ -70,12 +70,11 @@ struct StrBuf {
 /* Initializer for a string buffer */
 #define STRBUF_INITIALIZER      { 0, 0, 0 }
 
-/* An array of unsigneds/pointers that grows if needed. C guarantees that a
-** pointer to a union correctly converted points to each of its members.
-** So what we do here is using union entries that contain an unsigned
-** (used to store ids until they're resolved) and pointers to actual items
-** in storage.
-*/
+// An array of unsigneds/pointers that grows if needed. C guarantees that a
+// pointer to a union correctly converted points to each of its members.
+// So what we do here is using union entries that contain an unsigned
+// (used to store ids until they're resolved) and pointers to actual items
+// in storage.
 typedef union CollEntry CollEntry;
 union CollEntry {
     void*               Ptr;
@@ -92,9 +91,8 @@ struct Collection {
 /* Initializer for static collections */
 #define COLLECTION_INITIALIZER  { 0, 0, 0 }
 
-/* Span info management. The following table has as many entries as there
-** are addresses active in spans. Each entry lists the spans for this address.
-*/
+// Span info management. The following table has as many entries as there
+// are addresses active in spans. Each entry lists the spans for this address.
 typedef struct SpanInfoListEntry SpanInfoListEntry;
 struct SpanInfoListEntry {
     cc65_addr           Addr;           /* Unique address */
@@ -177,17 +175,15 @@ typedef enum {
     TOK_IDENT,                          /* To catch unknown keywords */
 } Token;
 
-/* Data structure containing information from the debug info file. A pointer
-** to this structure is passed as handle to callers from the outside.
-*/
+// Data structure containing information from the debug info file. A pointer
+// to this structure is passed as handle to callers from the outside.
 typedef struct DbgInfo DbgInfo;
 struct DbgInfo {
 
-    /* First we have all items in collections sorted by id. The ids are
-    ** continuous, so an access by id is almost as cheap as an array access.
-    ** The collections are also used when the objects are deleted, so they're
-    ** actually the ones that "own" the items.
-    */
+    // First we have all items in collections sorted by id. The ids are
+    // continuous, so an access by id is almost as cheap as an array access.
+    // The collections are also used when the objects are deleted, so they're
+    // actually the ones that "own" the items.
     Collection          CSymInfoById;   /* C symbol infos sorted by id */
     Collection          FileInfoById;   /* File infos sorted by id */
     Collection          LibInfoById;    /* Library infos sorted by id */
@@ -405,9 +401,8 @@ struct TypeInfo {
     cc65_typedata       Data[1];        /* Data, dynamically allocated */
 };
 
-/* A structure used when parsing a type string into a set of cc65_typedata
-** structures.
-*/
+// A structure used when parsing a type string into a set of cc65_typedata
+// structures.
 typedef struct TypeParseData TypeParseData;
 struct TypeParseData {
     TypeInfo*           Info;
@@ -499,9 +494,8 @@ static void SB_Done (StrBuf* B)
 
 
 static void SB_Realloc (StrBuf* B, unsigned NewSize)
-/* Reallocate the string buffer space, make sure at least NewSize bytes are
-** available.
-*/
+// Reallocate the string buffer space, make sure at least NewSize bytes are
+// available.
 {
     /* Get the current size, use a minimum of 8 bytes */
     unsigned NewAllocated = B->Allocated;
@@ -514,10 +508,9 @@ static void SB_Realloc (StrBuf* B, unsigned NewSize)
         NewAllocated *= 2;
     }
 
-    /* Reallocate the buffer. Beware: The allocated size may be zero while the
-    ** length is not. This means that we have a buffer that wasn't allocated
-    ** on the heap.
-    */
+    // Reallocate the buffer. Beware: The allocated size may be zero while the
+    // length is not. This means that we have a buffer that wasn't allocated
+    // on the heap.
     if (B->Allocated) {
         /* Just reallocate the block */
         B->Buf = xrealloc (B->Buf, NewAllocated);
@@ -533,10 +526,9 @@ static void SB_Realloc (StrBuf* B, unsigned NewSize)
 
 
 static void SB_CheapRealloc (StrBuf* B, unsigned NewSize)
-/* Reallocate the string buffer space, make sure at least NewSize bytes are
-** available. This function won't copy the old buffer contents over to the new
-** buffer and may be used if the old contents are overwritten later.
-*/
+// Reallocate the string buffer space, make sure at least NewSize bytes are
+// available. This function won't copy the old buffer contents over to the new
+// buffer and may be used if the old contents are overwritten later.
 {
     /* Get the current size, use a minimum of 8 bytes */
     unsigned NewAllocated = B->Allocated;
@@ -597,9 +589,8 @@ static char SB_At (const StrBuf* B, unsigned Pos)
 
 
 static void SB_Terminate (StrBuf* B)
-/* Zero terminate the given string buffer. NOTE: The terminating zero is not
-** accounted for in B->Len, if you want that, you have to use AppendChar!
-*/
+// Zero terminate the given string buffer. NOTE: The terminating zero is not
+// accounted for in B->Len, if you want that, you have to use AppendChar!
 {
     unsigned NewLen = B->Len + 1;
     if (NewLen > B->Allocated) {
@@ -654,9 +645,8 @@ static void SB_AppendChar (StrBuf* B, int C)
 
 
 static char* SB_StrDup (const StrBuf* B)
-/* Return the contents of B as a dynamically allocated string. The string
-** will always be NUL terminated.
-*/
+// Return the contents of B as a dynamically allocated string. The string
+// will always be NUL terminated.
 {
     /* Allocate memory */
     char* S = xmalloc (B->Len + 1);
@@ -702,16 +692,14 @@ static Collection* CollNew (void)
 
 
 static void CollDone (Collection* C)
-/* Free the data for a collection. This will not free the data contained in
-** the collection.
-*/
+// Free the data for a collection. This will not free the data contained in
+// the collection.
 {
     /* Free the pointer array */
     xfree (C->Items);
 
-    /* Clear the fields, so the collection may be reused (or CollDone called)
-    ** again
-    */
+    // Clear the fields, so the collection may be reused (or CollDone called)
+    // again
     C->Count = 0;
     C->Size  = 0;
     C->Items = 0;
@@ -740,10 +728,9 @@ static unsigned CollCount (const Collection* C)
 
 
 static void CollMove (Collection* Source, Collection* Target)
-/* Move all data from one collection to another. This function will first free
-** the data in the target collection, and - after the move - clear the data
-** from the source collection.
-*/
+// Move all data from one collection to another. This function will first free
+// the data in the target collection, and - after the move - clear the data
+// from the source collection.
 {
     /* Free the target collection data */
     xfree (Target->Items);
@@ -760,10 +747,9 @@ static void CollMove (Collection* Source, Collection* Target)
 
 
 static void CollGrow (Collection* C, unsigned Size)
-/* Grow the collection C so it is able to hold Size items without a resize
-** being necessary. This can be called for performance reasons if the number
-** of items to be placed in the collection is known in advance.
-*/
+// Grow the collection C so it is able to hold Size items without a resize
+// being necessary. This can be called for performance reasons if the number
+// of items to be placed in the collection is known in advance.
 {
     CollEntry* NewItems;
 
@@ -840,11 +826,10 @@ static void CollReplace (Collection* C, void* Item, unsigned Index)
 
 
 static void CollReplaceExpand (Collection* C, void* Item, unsigned Index)
-/* If Index is a valid index for the collection, replace the item at this
-** position by the one passed. If the collection is too small, expand it,
-** filling unused pointers with NULL, then add the new item at the given
-** position.
-*/
+// If Index is a valid index for the collection, replace the item at this
+// position by the one passed. If the collection is too small, expand it,
+// filling unused pointers with NULL, then add the new item at the given
+// position.
 {
     if (Index < C->Count) {
         /* Collection is already large enough */
@@ -1071,10 +1056,9 @@ static void DBGPRINT(const char* format, ...) {}
 
 
 static unsigned GetId (const void* Data)
-/* Return the id of one of the info structures. All structures have the Id
-** field as first member, and the C standard allows converting a union pointer
-** to the data type of the first member, so this is safe and portable.
-*/
+// Return the id of one of the info structures. All structures have the Id
+// field as first member, and the C standard allows converting a union pointer
+// to the data type of the first member, so this is safe and portable.
 {
     if (Data) {
         return *(const unsigned*)Data;
@@ -1157,10 +1141,9 @@ static void UnexpectedToken (InputData* D)
 
 
 static void UnknownKeyword (InputData* D)
-/* Print a warning about an unknown keyword in the file. Try to do smart
-** recovery, so if later versions of the debug information add additional
-** keywords, this code may be able to at least ignore them.
-*/
+// Print a warning about an unknown keyword in the file. Try to do smart
+// recovery, so if later versions of the debug information add additional
+// keywords, this code may be able to at least ignore them.
 {
     /* Output a warning */
     ParseError (D, CC65_WARNING, "Unknown keyword \"%s\" - skipping",
@@ -1169,10 +1152,9 @@ static void UnknownKeyword (InputData* D)
     /* Skip the identifier */
     NextToken (D);
 
-    /* If an equal sign follows, ignore anything up to the next line end
-    ** or comma. If a comma or line end follows, we're already done. If
-    ** we have none of both, we ignore the remainder of the line.
-    */
+    // If an equal sign follows, ignore anything up to the next line end
+    // or comma. If a comma or line end follows, we're already done. If
+    // we have none of both, we ignore the remainder of the line.
     if (D->Tok == TOK_EQUAL) {
         NextToken (D);
         while (D->Tok != TOK_COMMA && D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
@@ -1216,9 +1198,8 @@ static void FreeCSymInfo (CSymInfo* S)
 
 
 static cc65_csyminfo* new_cc65_csyminfo (unsigned Count)
-/* Allocate and return a cc65_csyminfo struct that is able to hold Count
-** entries. Initialize the count field of the returned struct.
-*/
+// Allocate and return a cc65_csyminfo struct that is able to hold Count
+// entries. Initialize the count field of the returned struct.
 {
     cc65_csyminfo* S = xmalloc (sizeof (*S) - sizeof (S->data[0]) +
                                 Count * sizeof (S->data[0]));
@@ -1293,9 +1274,8 @@ static void FreeFileInfo (FileInfo* F)
 
 
 static cc65_sourceinfo* new_cc65_sourceinfo (unsigned Count)
-/* Allocate and return a cc65_sourceinfo struct that is able to hold Count
-** entries. Initialize the count field of the returned struct.
-*/
+// Allocate and return a cc65_sourceinfo struct that is able to hold Count
+// entries. Initialize the count field of the returned struct.
 {
     cc65_sourceinfo* S = xmalloc (sizeof (*S) - sizeof (S->data[0]) +
                                   Count * sizeof (S->data[0]));
@@ -1319,10 +1299,9 @@ static void CopyFileInfo (cc65_sourcedata* D, const FileInfo* F)
 static int CompareFileInfoByName (const void* L, const void* R)
 /* Helper function to sort file infos in a collection by name */
 {
-    /* Sort by file name. If names are equal, sort by timestamp,
-    ** then sort by size. Which means, identical files will go
-    ** together.
-    */
+    // Sort by file name. If names are equal, sort by timestamp,
+    // then sort by size. Which means, identical files will go
+    // together.
     int Res = strcmp (((const FileInfo*) L)->Name,
                       ((const FileInfo*) R)->Name);
     if (Res != 0) {
@@ -1374,9 +1353,8 @@ static void FreeLibInfo (LibInfo* L)
 
 
 static cc65_libraryinfo* new_cc65_libraryinfo (unsigned Count)
-/* Allocate and return a cc65_libraryinfo struct that is able to hold Count
-** entries. Initialize the count field of the returned struct.
-*/
+// Allocate and return a cc65_libraryinfo struct that is able to hold Count
+// entries. Initialize the count field of the returned struct.
 {
     cc65_libraryinfo* L = xmalloc (sizeof (*L) - sizeof (L->data[0]) +
                                    Count * sizeof (L->data[0]));
@@ -1424,9 +1402,8 @@ static void FreeLineInfo (LineInfo* L)
 
 
 static cc65_lineinfo* new_cc65_lineinfo (unsigned Count)
-/* Allocate and return a cc65_lineinfo struct that is able to hold Count
-** entries. Initialize the count field of the returned struct.
-*/
+// Allocate and return a cc65_lineinfo struct that is able to hold Count
+// entries. Initialize the count field of the returned struct.
 {
     cc65_lineinfo* L = xmalloc (sizeof (*L) - sizeof (L->data[0]) +
                                 Count * sizeof (L->data[0]));
@@ -1498,9 +1475,8 @@ static void FreeModInfo (ModInfo* M)
 
 
 static cc65_moduleinfo* new_cc65_moduleinfo (unsigned Count)
-/* Allocate and return a cc65_moduleinfo struct that is able to hold Count
-** entries. Initialize the count field of the returned struct.
-*/
+// Allocate and return a cc65_moduleinfo struct that is able to hold Count
+// entries. Initialize the count field of the returned struct.
 {
     cc65_moduleinfo* M = xmalloc (sizeof (*M) - sizeof (M->data[0]) +
                                   Count * sizeof (M->data[0]));
@@ -1570,9 +1546,8 @@ static void FreeScopeInfo (ScopeInfo* S)
 
 
 static cc65_scopeinfo* new_cc65_scopeinfo (unsigned Count)
-/* Allocate and return a cc65_scopeinfo struct that is able to hold Count
-** entries. Initialize the count field of the returned struct.
-*/
+// Allocate and return a cc65_scopeinfo struct that is able to hold Count
+// entries. Initialize the count field of the returned struct.
 {
     cc65_scopeinfo* S = xmalloc (sizeof (*S) - sizeof (S->data[0]) +
                                  Count * sizeof (S->data[0]));
@@ -1659,9 +1634,8 @@ static void FreeSegInfo (SegInfo* S)
 
 
 static cc65_segmentinfo* new_cc65_segmentinfo (unsigned Count)
-/* Allocate and return a cc65_segmentinfo struct that is able to hold Count
-** entries. Initialize the count field of the returned struct.
-*/
+// Allocate and return a cc65_segmentinfo struct that is able to hold Count
+// entries. Initialize the count field of the returned struct.
 {
     cc65_segmentinfo* S = xmalloc (sizeof (*S) - sizeof (S->data[0]) +
                                    Count * sizeof (S->data[0]));
@@ -1726,9 +1700,8 @@ static void FreeSpanInfo (SpanInfo* S)
 
 
 static cc65_spaninfo* new_cc65_spaninfo (unsigned Count)
-/* Allocate and return a cc65_spaninfo struct that is able to hold Count
-** entries. Initialize the count field of the returned struct.
-*/
+// Allocate and return a cc65_spaninfo struct that is able to hold Count
+// entries. Initialize the count field of the returned struct.
 {
     cc65_spaninfo* S = xmalloc (sizeof (*S) - sizeof (S->data[0]) +
                                 Count * sizeof (S->data[0]));
@@ -1753,13 +1726,12 @@ static void CopySpanInfo (cc65_spandata* D, const SpanInfo* S)
 
 
 static int CompareSpanInfoByAddr (const void* L, const void* R)
-/* Helper function to sort span infos in a collection by address. Span infos
-** with smaller start address are considered smaller. If start addresses are
-** equal, line spans with smaller end address are considered smaller. This
-** means, that when CompareSpanInfoByAddr is used for sorting, a range with
-** identical start addresses will have smaller spans first, followed by
-** larger spans.
-*/
+// Helper function to sort span infos in a collection by address. Span infos
+// with smaller start address are considered smaller. If start addresses are
+// equal, line spans with smaller end address are considered smaller. This
+// means, that when CompareSpanInfoByAddr is used for sorting, a range with
+// identical start addresses will have smaller spans first, followed by
+// larger spans.
 {
     /* Sort by start of span */
     if (((const SpanInfo*) L)->Start > ((const SpanInfo*) R)->Start) {
@@ -1816,9 +1788,8 @@ static void FreeSymInfo (SymInfo* S)
 
 
 static cc65_symbolinfo* new_cc65_symbolinfo (unsigned Count)
-/* Allocate and return a cc65_symbolinfo struct that is able to hold Count
-** entries. Initialize the count field of the returned struct.
-*/
+// Allocate and return a cc65_symbolinfo struct that is able to hold Count
+// entries. Initialize the count field of the returned struct.
 {
     cc65_symbolinfo* S = xmalloc (sizeof (*S) - sizeof (S->data[0]) +
                                   Count * sizeof (S->data[0]));
@@ -1838,9 +1809,8 @@ static void CopySymInfo (cc65_symboldata* D, const SymInfo* S)
     D->symbol_type      = S->Type;
     D->symbol_size      = S->Size;
 
-    /* If this is an import, it doesn't have a value or segment. Use the data
-    ** from the matching export instead.
-    */
+    // If this is an import, it doesn't have a value or segment. Use the data
+    // from the matching export instead.
     if (S->Exp.Info) {
         /* This is an import, because it has a matching export */
         D->export_id    = S->Exp.Info->Id;
@@ -1879,9 +1849,8 @@ static int CompareSymInfoByName (const void* L, const void* R)
 static int CompareSymInfoByVal (const void* L, const void* R)
 /* Helper function to sort symbol infos in a collection by value */
 {
-    /* Sort by symbol value. If both are equal, sort by symbol name so it
-    ** looks nice when such a list is returned.
-    */
+    // Sort by symbol value. If both are equal, sort by symbol name so it
+    // looks nice when such a list is returned.
     if (((const SymInfo*) L)->Value > ((const SymInfo*) R)->Value) {
         return 1;
     } else if (((const SymInfo*) L)->Value < ((const SymInfo*) R)->Value) {
@@ -1982,9 +1951,8 @@ static void InitTypeParseData (TypeParseData* P, const StrBuf* Type,
 
 
 static cc65_typedata* TypeFromString (TypeParseData* P)
-/* Parse a type string and return a set of typedata structures. Will be called
-** recursively. Will set P->Error and return NULL in case of problems.
-*/
+// Parse a type string and return a set of typedata structures. Will be called
+// recursively. Will set P->Error and return NULL in case of problems.
 {
     cc65_typedata*  Data;
     unsigned char   B;
@@ -2088,11 +2056,10 @@ static cc65_typedata* TypeFromString (TypeParseData* P)
 
 
 static TypeInfo* ParseTypeString (InputData* D, StrBuf* Type)
-/* Check if the string T contains a valid type string. Convert it from readable
-** to binary. Calculate how many cc65_typedata structures are necessary when it
-** is converted. Convert the string into a set of cc65_typedata structures and
-** return them.
-*/
+// Check if the string T contains a valid type string. Convert it from readable
+// to binary. Calculate how many cc65_typedata structures are necessary when it
+// is converted. Convert the string into a set of cc65_typedata structures and
+// return them.
 {
     unsigned        I;
     unsigned        Count;
@@ -2126,9 +2093,8 @@ static TypeInfo* ParseTypeString (InputData* D, StrBuf* Type)
     }
     Type->Len = (Length /= 2);
 
-    /* Get a pointer to the type data, then count the number of cc65_typedata
-    ** items needed.
-    */
+    // Get a pointer to the type data, then count the number of cc65_typedata
+    // items needed.
     A = SB_GetConstBuf (Type);
     Count = 0;
     I = 0;
@@ -2197,9 +2163,8 @@ static void InitSpanInfoList (SpanInfoList* L)
 
 
 static void CreateSpanInfoList (SpanInfoList* L, Collection* SpanInfos)
-/* Create a SpanInfoList from a Collection with span infos. The collection
-** must be sorted by ascending start addresses.
-*/
+// Create a SpanInfoList from a Collection with span infos. The collection
+// must be sorted by ascending start addresses.
 {
     unsigned I, J;
     SpanInfo* S;
@@ -2259,11 +2224,10 @@ static void CreateSpanInfoList (SpanInfoList* L, Collection* SpanInfos)
         /* Get next entry */
         S = CollAt (SpanInfos, I);
 
-        /* Determine the start index of the next range. Line infos are sorted
-        ** by ascending start address, so the start address of the next entry
-        ** is always larger than the previous one - we don't need to check
-        ** that.
-        */
+        // Determine the start index of the next range. Line infos are sorted
+        // by ascending start address, so the start address of the next entry
+        // is always larger than the previous one - we don't need to check
+        // that.
         if (S->Start <= End) {
             /* Range starts within out already known linear range */
             StartIndex += (unsigned) (S->Start - Start);
@@ -2286,12 +2250,11 @@ static void CreateSpanInfoList (SpanInfoList* L, Collection* SpanInfos)
     /* Step 4: Allocate memory for the indirect tables */
     for (I = 0, List = L->List; I < L->Count; ++I, ++List) {
 
-        /* For a count of 1, we store the pointer to the lineinfo for this
-        ** address in the Data pointer directly. For counts > 1, we allocate
-        ** an array of pointers and reset the counter, so we can use it as
-        ** an index later. This is dangerous programming since it disables
-        ** all possible checks!
-        */
+        // For a count of 1, we store the pointer to the lineinfo for this
+        // address in the Data pointer directly. For counts > 1, we allocate
+        // an array of pointers and reset the counter, so we can use it as
+        // an index later. This is dangerous programming since it disables
+        // all possible checks!
         if (List->Count > 1) {
             List->Data = xmalloc (List->Count * sizeof (SpanInfo*));
             List->Count = 0;
@@ -2317,11 +2280,10 @@ static void CreateSpanInfoList (SpanInfoList* L, Collection* SpanInfos)
         /* Get next entry */
         S = CollAt (SpanInfos, I);
 
-        /* Determine the start index of the next range. Line infos are sorted
-        ** by ascending start address, so the start address of the next entry
-        ** is always larger than the previous one - we don't need to check
-        ** that.
-        */
+        // Determine the start index of the next range. Line infos are sorted
+        // by ascending start address, so the start address of the next entry
+        // is always larger than the previous one - we don't need to check
+        // that.
         if (S->Start <= End) {
             /* Range starts within out already known linear range */
             StartIndex += (unsigned) (S->Start - Start);
@@ -2742,9 +2704,8 @@ static int StrConstFollows (InputData* D)
 
 
 static int Consume (InputData* D, Token Tok, const char* Name)
-/* Check for a token and consume it. Return true if the token was consumed,
-** return false otherwise.
-*/
+// Check for a token and consume it. Return true if the token was consumed,
+// return false otherwise.
 {
     if (TokenFollows (D, Tok, Name)) {
         NextToken (D);
@@ -2781,9 +2742,8 @@ static void ConsumeEOL (InputData* D)
 static void ParseCSym (InputData* D)
 /* Parse a CSYM line */
 {
-    /* Most of the following variables are initialized with a value that is
-    ** overwritten later. This is just to avoid compiler warnings.
-    */
+    // Most of the following variables are initialized with a value that is
+    // overwritten later. This is just to avoid compiler warnings.
     unsigned            Id = 0;
     StrBuf              Name = STRBUF_INITIALIZER;
     int                 Offs = 0;
@@ -3145,9 +3105,8 @@ static void ParseInfo (InputData* D)
             break;
         }
 
-        /* Remember the token, skip it, check for equal, check for an integer
-        ** constant.
-        */
+        // Remember the token, skip it, check for equal, check for an integer
+        // constant.
         Tok = D->Tok;
         NextToken (D);
         if (!ConsumeEqual (D)) {
@@ -3504,9 +3463,8 @@ ErrorExit:
 static void ParseModule (InputData* D)
 /* Parse a MODULE line */
 {
-    /* Most of the following variables are initialized with a value that is
-    ** overwritten later. This is just to avoid compiler warnings.
-    */
+    // Most of the following variables are initialized with a value that is
+    // overwritten later. This is just to avoid compiler warnings.
     unsigned            Id = CC65_INV_ID;
     StrBuf              Name = STRBUF_INITIALIZER;
     unsigned            FileId = CC65_INV_ID;
@@ -3640,9 +3598,8 @@ ErrorExit:
 static void ParseScope (InputData* D)
 /* Parse a SCOPE line */
 {
-    /* Most of the following variables are initialized with a value that is
-    ** overwritten later. This is just to avoid compiler warnings.
-    */
+    // Most of the following variables are initialized with a value that is
+    // overwritten later. This is just to avoid compiler warnings.
     unsigned            Id = CC65_INV_ID;
     cc65_scope_type     Type = CC65_SCOPE_MODULE;
     cc65_size           Size = 0;
@@ -4170,9 +4127,8 @@ ErrorExit:
 static void ParseSym (InputData* D)
 /* Parse a SYM line */
 {
-    /* Most of the following variables are initialized with a value that is
-    ** overwritten later. This is just to avoid compiler warnings.
-    */
+    // Most of the following variables are initialized with a value that is
+    // overwritten later. This is just to avoid compiler warnings.
     Collection          DefLineIds = COLLECTION_INITIALIZER;
     unsigned            ExportId = CC65_INV_ID;
     unsigned            FileId = CC65_INV_ID;
@@ -4439,9 +4395,8 @@ ErrorExit:
 static void ParseType (InputData* D)
 /* Parse a TYPE line */
 {
-    /* Most of the following variables are initialized with a value that is
-    ** overwritten later. This is just to avoid compiler warnings.
-    */
+    // Most of the following variables are initialized with a value that is
+    // overwritten later. This is just to avoid compiler warnings.
     unsigned            Id = CC65_INV_ID;
     StrBuf              Value = STRBUF_INITIALIZER;
 
@@ -4594,9 +4549,8 @@ static void ParseVersion (InputData* D)
                 break;
 
             case TOK_IDENT:
-                /* Try to skip unknown keywords that may have been added by
-                ** a later version.
-                */
+                // Try to skip unknown keywords that may have been added by
+                // a later version.
                 UnknownKeyword (D);
                 break;
 
@@ -4638,11 +4592,10 @@ ErrorExit:
 
 static int FindCSymInfoByName (const Collection* CSymInfos, const char* Name,
                                unsigned* Index)
-/* Find the C symbol info with a given file name. The function returns true if
-** the name was found. In this case, Index contains the index of the first item
-** that matches. If the item wasn't found, the function returns false and
-** Index contains the insert position for Name.
-*/
+// Find the C symbol info with a given file name. The function returns true if
+// the name was found. In this case, Index contains the index of the first item
+// that matches. If the item wasn't found, the function returns false and
+// Index contains the insert position for Name.
 {
     /* Do a binary search */
     int Lo = 0;
@@ -4664,9 +4617,8 @@ static int FindCSymInfoByName (const Collection* CSymInfos, const char* Name,
             Lo = Cur + 1;
         } else {
             Hi = Cur - 1;
-            /* Since we may have duplicates, repeat the search until we've
-            ** the first item that has a match.
-            */
+            // Since we may have duplicates, repeat the search until we've
+            // the first item that has a match.
             if (Res == 0) {
                 Found = 1;
             }
@@ -4682,11 +4634,10 @@ static int FindCSymInfoByName (const Collection* CSymInfos, const char* Name,
 
 static int FindFileInfoByName (const Collection* FileInfos, const char* Name,
                                unsigned* Index)
-/* Find the FileInfo for a given file name. The function returns true if the
-** name was found. In this case, Index contains the index of the first item
-** that matches. If the item wasn't found, the function returns false and
-** Index contains the insert position for Name.
-*/
+// Find the FileInfo for a given file name. The function returns true if the
+// name was found. In this case, Index contains the index of the first item
+// that matches. If the item wasn't found, the function returns false and
+// Index contains the insert position for Name.
 {
     /* Do a binary search */
     int Lo = 0;
@@ -4708,9 +4659,8 @@ static int FindFileInfoByName (const Collection* FileInfos, const char* Name,
             Lo = Cur + 1;
         } else {
             Hi = Cur - 1;
-            /* Since we may have duplicates, repeat the search until we've
-            ** the first item that has a match.
-            */
+            // Since we may have duplicates, repeat the search until we've
+            // the first item that has a match.
             if (Res == 0) {
                 Found = 1;
             }
@@ -4725,9 +4675,8 @@ static int FindFileInfoByName (const Collection* FileInfos, const char* Name,
 
 
 static SpanInfoListEntry* FindSpanInfoByAddr (const SpanInfoList* L, cc65_addr Addr)
-/* Find the index of a SpanInfo for a given address. Returns 0 if no such
-** SpanInfo was found.
-*/
+// Find the index of a SpanInfo for a given address. Returns 0 if no such
+// SpanInfo was found.
 {
     /* Do a binary search */
     int Lo = 0;
@@ -4759,11 +4708,10 @@ static SpanInfoListEntry* FindSpanInfoByAddr (const SpanInfoList* L, cc65_addr A
 
 static int FindLineInfoByLine (const Collection* LineInfos, cc65_line Line,
                                unsigned *Index)
-/* Find the LineInfo for a given line number. The function returns true if the
-** name was found. In this case, Index contains the index of the first item
-** that matches. If the item wasn't found, the function returns false and
-** Index contains the insert position for Name.
-*/
+// Find the LineInfo for a given line number. The function returns true if the
+// name was found. In this case, Index contains the index of the first item
+// that matches. If the item wasn't found, the function returns false and
+// Index contains the insert position for Name.
 {
     /* Do a binary search */
     int Lo = 0;
@@ -4782,9 +4730,8 @@ static int FindLineInfoByLine (const Collection* LineInfos, cc65_line Line,
             Lo = Cur + 1;
         } else {
             Hi = Cur - 1;
-            /* Since we may have duplicates, repeat the search until we've
-            ** the first item that has a match.
-            */
+            // Since we may have duplicates, repeat the search until we've
+            // the first item that has a match.
             if(Line == CurItem->Line) {
                 Found = 1;
             }
@@ -4799,9 +4746,8 @@ static int FindLineInfoByLine (const Collection* LineInfos, cc65_line Line,
 
 
 static SegInfo* FindSegInfoByName (const Collection* SegInfos, const char* Name)
-/* Find the SegInfo for a given segment name. The function returns the segment
-** info or NULL if none was found.
-*/
+// Find the SegInfo for a given segment name. The function returns the segment
+// info or NULL if none was found.
 {
     /* Do a binary search */
     int Lo = 0;
@@ -4836,11 +4782,10 @@ static SegInfo* FindSegInfoByName (const Collection* SegInfos, const char* Name)
 
 static int FindScopeInfoByName (const Collection* ScopeInfos, const char* Name,
                                 unsigned* Index)
-/* Find the ScopeInfo for a given scope name. The function returns true if the
-** name was found. In this case, Index contains the index of the first item
-** that matches. If the item wasn't found, the function returns false and
-** Index contains the insert position for Name.
-*/
+// Find the ScopeInfo for a given scope name. The function returns true if the
+// name was found. In this case, Index contains the index of the first item
+// that matches. If the item wasn't found, the function returns false and
+// Index contains the insert position for Name.
 {
     /* Do a binary search */
     int Lo = 0;
@@ -4862,9 +4807,8 @@ static int FindScopeInfoByName (const Collection* ScopeInfos, const char* Name,
             Lo = Cur + 1;
         } else {
             Hi = Cur - 1;
-            /* Since we may have duplicates, repeat the search until we've
-            ** the first item that has a match.
-            */
+            // Since we may have duplicates, repeat the search until we've
+            // the first item that has a match.
             if (Res == 0) {
                 Found = 1;
             }
@@ -4880,11 +4824,10 @@ static int FindScopeInfoByName (const Collection* ScopeInfos, const char* Name,
 
 static int FindSymInfoByName (const Collection* SymInfos, const char* Name,
                               unsigned* Index)
-/* Find the SymInfo for a given file name. The function returns true if the
-** name was found. In this case, Index contains the index of the first item
-** that matches. If the item wasn't found, the function returns false and
-** Index contains the insert position for Name.
-*/
+// Find the SymInfo for a given file name. The function returns true if the
+// name was found. In this case, Index contains the index of the first item
+// that matches. If the item wasn't found, the function returns false and
+// Index contains the insert position for Name.
 {
     /* Do a binary search */
     int Lo = 0;
@@ -4906,9 +4849,8 @@ static int FindSymInfoByName (const Collection* SymInfos, const char* Name,
             Lo = Cur + 1;
         } else {
             Hi = Cur - 1;
-            /* Since we may have duplicates, repeat the search until we've
-            ** the first item that has a match.
-            */
+            // Since we may have duplicates, repeat the search until we've
+            // the first item that has a match.
             if (Res == 0) {
                 Found = 1;
             }
@@ -4924,11 +4866,10 @@ static int FindSymInfoByName (const Collection* SymInfos, const char* Name,
 
 static int FindSymInfoByValue (const Collection* SymInfos, long Value,
                                unsigned* Index)
-/* Find the SymInfo for a given value. The function returns true if the
-** value was found. In this case, Index contains the index of the first item
-** that matches. If the item wasn't found, the function returns false and
-** Index contains the insert position for the given value.
-*/
+// Find the SymInfo for a given value. The function returns true if the
+// value was found. In this case, Index contains the index of the first item
+// that matches. If the item wasn't found, the function returns false and
+// Index contains the insert position for the given value.
 {
     /* Do a binary search */
     int Lo = 0;
@@ -4947,9 +4888,8 @@ static int FindSymInfoByValue (const Collection* SymInfos, long Value,
             Lo = Cur + 1;
         } else {
             Hi = Cur - 1;
-            /* Since we may have duplicates, repeat the search until we've
-            ** the first item that has a match.
-            */
+            // Since we may have duplicates, repeat the search until we've
+            // the first item that has a match.
             if (Value == CurItem->Value) {
                 Found = 1;
             }
@@ -4968,9 +4908,8 @@ static void ProcessCSymInfo (InputData* D)
 {
     unsigned I;
 
-    /* Walk over all c symbols. Resolve the ids and add the c symbols to the
-    ** corresponding asm symbols.
-    */
+    // Walk over all c symbols. Resolve the ids and add the c symbols to the
+    // corresponding asm symbols.
     for (I = 0; I < CollCount (&D->Info->CSymInfoById); ++I) {
 
         /* Get this c symbol info */
@@ -4988,9 +4927,8 @@ static void ProcessCSymInfo (InputData* D)
         } else {
             S->Sym.Info = CollAt (&D->Info->SymInfoById, S->Sym.Id);
 
-            /* For normal (=static) symbols, add a backlink to the symbol but
-            ** check that there is not more than one.
-            */
+            // For normal (=static) symbols, add a backlink to the symbol but
+            // check that there is not more than one.
             if (S->SC != CC65_CSYM_AUTO && S->SC != CC65_CSYM_REG) {
                 if (S->Sym.Info->CSym) {
                     ParseError (D,
@@ -5031,13 +4969,12 @@ static void ProcessCSymInfo (InputData* D)
             }
             CollAppend (S->Scope.Info->CSymInfoByName, S);
 
-            /* If the scope has an owner symbol, it's a .PROC scope. If this
-            ** symbol is identical to the one attached to the C symbol, this
-            ** is actuallay a C function and the scope is the matching scope.
-            ** Remember the C symbol in the scope in this case.
-            ** Beware: Scopes haven't been postprocessed, so we don't have a
-            ** pointer but just an id.
-            */
+            // If the scope has an owner symbol, it's a .PROC scope. If this
+            // symbol is identical to the one attached to the C symbol, this
+            // is actuallay a C function and the scope is the matching scope.
+            // Remember the C symbol in the scope in this case.
+            // Beware: Scopes haven't been postprocessed, so we don't have a
+            // pointer but just an id.
             if (S->Sym.Info && S->Scope.Info->Label.Id == S->Sym.Info->Id) {
                 /* This scope is our function scope */
                 S->Scope.Info->CSymFunc = S;
@@ -5133,19 +5070,17 @@ static void ProcessLineInfo (InputData* D)
     Collection* LineInfos = &D->Info->LineInfoById;
     Collection* FileInfos = &D->Info->FileInfoById;
 
-    /* Walk over the line infos and replace the id numbers of file and segment
-    ** with pointers to the actual structs. Add the line info to each file
-    ** where it is defined. Resolve the spans and add backpointers to the
-    ** spans.
-    */
+    // Walk over the line infos and replace the id numbers of file and segment
+    // with pointers to the actual structs. Add the line info to each file
+    // where it is defined. Resolve the spans and add backpointers to the
+    // spans.
     for (I = 0; I < CollCount (LineInfos); ++I) {
 
         /* Get LineInfo struct */
         LineInfo* L = CollAt (LineInfos, I);
 
-        /* Replace the file id by a pointer to the FileInfo. Add a back
-        ** pointer
-        */
+        // Replace the file id by a pointer to the FileInfo. Add a back
+        // pointer
         if (L->File.Id >= CollCount (FileInfos)) {
             ParseError (D,
                         CC65_ERROR,
@@ -5185,9 +5120,8 @@ static void ProcessLineInfo (InputData* D)
         }
     }
 
-    /* Walk over all files and sort the line infos for each file so we can
-    ** do a binary search later.
-    */
+    // Walk over all files and sort the line infos for each file so we can
+    // do a binary search later.
     for (I = 0; I < CollCount (FileInfos); ++I) {
 
         /* Get a pointer to this file info */
@@ -5247,9 +5181,8 @@ static void ProcessScopeInfo (InputData* D)
 {
     unsigned I, J;
 
-    /* Walk over all scopes. Resolve the ids and add the scopes to the list
-    ** of scopes for a module.
-    */
+    // Walk over all scopes. Resolve the ids and add the scopes to the list
+    // of scopes for a module.
     for (I = 0; I < CollCount (&D->Info->ScopeInfoById); ++I) {
 
         /* Get this scope info */
@@ -5268,17 +5201,15 @@ static void ProcessScopeInfo (InputData* D)
             /* Add the scope to the list of scopes for this module */
             CollAppend (&S->Mod.Info->ScopeInfoByName, S);
 
-            /* If this is a main scope, add a pointer to the corresponding
-            ** module.
-            */
+            // If this is a main scope, add a pointer to the corresponding
+            // module.
             if (S->Parent.Id == CC65_INV_ID) {
                 /* No parent means main scope */
                 S->Mod.Info->MainScope = S;
             }
 
-            /* If this is the scope that implements a C function, add the
-            ** function to the list of all functions in this module.
-            */
+            // If this is the scope that implements a C function, add the
+            // function to the list of all functions in this module.
             if (S->CSymFunc) {
                 CollAppend (&S->Mod.Info->CSymFuncByName, S->CSymFunc);
             }
@@ -5344,11 +5275,10 @@ static void ProcessScopeInfo (InputData* D)
         }
     }
 
-    /* Walk over all modules. If a module doesn't have scopes, it wasn't
-    ** compiled with debug info which is ok. If it has debug info, it must
-    ** also have a main scope. If there are scopes, sort them by name. Do
-    ** also sort C functions in this module by name.
-    */
+    // Walk over all modules. If a module doesn't have scopes, it wasn't
+    // compiled with debug info which is ok. If it has debug info, it must
+    // also have a main scope. If there are scopes, sort them by name. Do
+    // also sort C functions in this module by name.
     for (I = 0; I < CollCount (&D->Info->ModInfoById); ++I) {
 
         /* Get this module */
@@ -5432,9 +5362,8 @@ static void ProcessSpanInfo (InputData* D)
             S->Type.Info = CollAt (&D->Info->TypeInfoById, S->Type.Id);
         }
 
-        /* Append this span info to the temporary collection that is later
-        ** sorted by address.
-        */
+        // Append this span info to the temporary collection that is later
+        // sorted by address.
         CollAppend (&SpanInfoByAddr, S);
     }
 
@@ -5619,12 +5548,11 @@ static void ProcessSymInfo (InputData* D)
 
 
 cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
-/* Parse the debug info file with the given name. On success, the function
-** will return a pointer to an opaque cc65_dbginfo structure, that must be
-** passed to the other functions in this module to retrieve information.
-** errorfunc is called in case of warnings and errors. If the file cannot be
-** read successfully, NULL is returned.
-*/
+// Parse the debug info file with the given name. On success, the function
+// will return a pointer to an opaque cc65_dbginfo structure, that must be
+// passed to the other functions in this module to retrieve information.
+// errorfunc is called in case of warnings and errors. If the file cannot be
+// read successfully, NULL is returned.
 {
     /* Data structure used to control scanning and parsing */
     InputData D = {
@@ -5755,9 +5683,8 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
                 break;
 
             case TOK_IDENT:
-                /* Output a warning, then skip the line with the unknown
-                ** keyword that may have been added by a later version.
-                */
+                // Output a warning, then skip the line with the unknown
+                // keyword that may have been added by a later version.
                 ParseError (&D, CC65_WARNING,
                             "Unknown keyword \"%s\" - skipping",
                             SB_GetConstBuf (&D.SVal));
@@ -5781,19 +5708,17 @@ CloseAndExit:
     /* Free memory allocated for SVal */
     SB_Done (&D.SVal);
 
-    /* In case of errors, delete the debug info already allocated and
-    ** return NULL
-    */
+    // In case of errors, delete the debug info already allocated and
+    // return NULL
     if (D.Errors > 0) {
         /* Free allocated stuff */
         FreeDbgInfo (D.Info);
         return 0;
     }
 
-    /* We do now have all the information from the input file. Do
-    ** postprocessing. Beware: Some of the following postprocessing
-    ** depends on the order of the calls.
-    */
+    // We do now have all the information from the input file. Do
+    // postprocessing. Beware: Some of the following postprocessing
+    // depends on the order of the calls.
     ProcessCSymInfo (&D);
     ProcessFileInfo (&D);
     ProcessLineInfo (&D);
@@ -5859,11 +5784,10 @@ const cc65_csyminfo* cc65_get_csymlist (cc65_dbginfo Handle)
 
 
 const cc65_csyminfo* cc65_csym_byid (cc65_dbginfo Handle, unsigned Id)
-/* Return information about a c symbol with a specific id. The function
-** returns NULL if the id is invalid (no such c symbol) and otherwise a
-** cc65_csyminfo structure with one entry that contains the requested
-** symbol information.
-*/
+// Return information about a c symbol with a specific id. The function
+// returns NULL if the id is invalid (no such c symbol) and otherwise a
+// cc65_csyminfo structure with one entry that contains the requested
+// symbol information.
 {
     const DbgInfo*      Info;
     cc65_csyminfo*      S;
@@ -5892,10 +5816,9 @@ const cc65_csyminfo* cc65_csym_byid (cc65_dbginfo Handle, unsigned Id)
 
 
 const cc65_csyminfo* cc65_cfunc_bymodule (cc65_dbginfo Handle, unsigned ModId)
-/* Return the list of C functions (not symbols!) for a specific module. If
-** the module id is invalid, the function will return NULL, otherwise a
-** (possibly empty) c symbol list.
-*/
+// Return the list of C functions (not symbols!) for a specific module. If
+// the module id is invalid, the function will return NULL, otherwise a
+// (possibly empty) c symbol list.
 {
     const DbgInfo*      Info;
     const ModInfo*      M;
@@ -5932,9 +5855,8 @@ const cc65_csyminfo* cc65_cfunc_bymodule (cc65_dbginfo Handle, unsigned ModId)
 
 
 const cc65_csyminfo* cc65_cfunc_byname (cc65_dbginfo Handle, const char* Name)
-/* Return a list of all C functions with the given name that have a
-** definition.
-*/
+// Return a list of all C functions with the given name that have a
+// definition.
 {
     const DbgInfo*      Info;
     unsigned            Index;
@@ -5985,9 +5907,8 @@ const cc65_csyminfo* cc65_cfunc_byname (cc65_dbginfo Handle, const char* Name)
 
 
 const cc65_csyminfo* cc65_csym_byscope (cc65_dbginfo Handle, unsigned ScopeId)
-/* Return all C symbols for a scope. The function will return NULL if the
-** given id is invalid.
-*/
+// Return all C symbols for a scope. The function will return NULL if the
+// given id is invalid.
 {
     const DbgInfo*      Info;
     const ScopeInfo*    S;
@@ -6070,11 +5991,10 @@ const cc65_libraryinfo* cc65_get_librarylist (cc65_dbginfo Handle)
 
 
 const cc65_libraryinfo* cc65_library_byid (cc65_dbginfo Handle, unsigned Id)
-/* Return information about a library with a specific id. The function
-** returns NULL if the id is invalid (no such library) and otherwise a
-** cc65_libraryinfo structure with one entry that contains the requested
-** library information.
-*/
+// Return information about a library with a specific id. The function
+// returns NULL if the id is invalid (no such library) and otherwise a
+// cc65_libraryinfo structure with one entry that contains the requested
+// library information.
 {
     const DbgInfo*      Info;
     cc65_libraryinfo*   D;
@@ -6121,11 +6041,10 @@ void cc65_free_libraryinfo (cc65_dbginfo Handle, const cc65_libraryinfo* Info)
 
 
 const cc65_lineinfo* cc65_line_byid (cc65_dbginfo Handle, unsigned Id)
-/* Return information about a line with a specific id. The function
-** returns NULL if the id is invalid (no such line) and otherwise a
-** cc65_lineinfo structure with one entry that contains the requested
-** module information.
-*/
+// Return information about a line with a specific id. The function
+// returns NULL if the id is invalid (no such line) and otherwise a
+// cc65_lineinfo structure with one entry that contains the requested
+// module information.
 {
     const DbgInfo*      Info;
     cc65_lineinfo*      D;
@@ -6155,10 +6074,9 @@ const cc65_lineinfo* cc65_line_byid (cc65_dbginfo Handle, unsigned Id)
 
 const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo Handle, unsigned FileId,
                                          cc65_line Line)
-/* Return line information for a source file/line number combination. The
-** function returns NULL if no line information was found, otherwise a list
-** of line infos.
-*/
+// Return line information for a source file/line number combination. The
+// function returns NULL if no line information was found, otherwise a list
+// of line infos.
 {
     const DbgInfo*  Info;
     const FileInfo* F;
@@ -6188,9 +6106,8 @@ const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo Handle, unsigned FileId,
         return 0;
     }
 
-    /* Index contains the first position. Count how many lines with this number
-    ** we have. Skip the first one, since we have at least one.
-    */
+    // Index contains the first position. Count how many lines with this number
+    // we have. Skip the first one, since we have at least one.
     Count = 1;
 
     while ((unsigned) Index + Count < CollCount( &F->LineInfoByLine)) {
@@ -6216,9 +6133,8 @@ const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo Handle, unsigned FileId,
 
 
 const cc65_lineinfo* cc65_line_bysource (cc65_dbginfo Handle, unsigned FileId)
-/* Return line information for a source file. The function returns NULL if the
-** file id is invalid.
-*/
+// Return line information for a source file. The function returns NULL if the
+// file id is invalid.
 {
     const DbgInfo*  Info;
     const FileInfo* F;
@@ -6255,9 +6171,8 @@ const cc65_lineinfo* cc65_line_bysource (cc65_dbginfo Handle, unsigned FileId)
 
 
 const cc65_lineinfo* cc65_line_bysymdef (cc65_dbginfo Handle, unsigned SymId)
-/* Return line information for the definition of a symbol. The function
-** returns NULL if the symbol id is invalid, otherwise a list of line infos.
-*/
+// Return line information for the definition of a symbol. The function
+// returns NULL if the symbol id is invalid, otherwise a list of line infos.
 {
     const DbgInfo*  Info;
     const SymInfo*  S;
@@ -6294,9 +6209,8 @@ const cc65_lineinfo* cc65_line_bysymdef (cc65_dbginfo Handle, unsigned SymId)
 
 
 const cc65_lineinfo* cc65_line_bysymref (cc65_dbginfo Handle, unsigned SymId)
-/* Return line information for all references of a symbol. The function
-** returns NULL if the symbol id is invalid, otherwise a list of line infos.
-*/
+// Return line information for all references of a symbol. The function
+// returns NULL if the symbol id is invalid, otherwise a list of line infos.
 {
     const DbgInfo*  Info;
     const SymInfo*  S;
@@ -6333,9 +6247,8 @@ const cc65_lineinfo* cc65_line_bysymref (cc65_dbginfo Handle, unsigned SymId)
 
 
 const cc65_lineinfo* cc65_line_byspan (cc65_dbginfo Handle, unsigned SpanId)
-/* Return line information for a a span. The function returns NULL if the
-** span id is invalid, otherwise a list of line infos.
-*/
+// Return line information for a a span. The function returns NULL if the
+// span id is invalid, otherwise a list of line infos.
 {
     const DbgInfo*  Info;
     const SpanInfo* S;
@@ -6359,9 +6272,8 @@ const cc65_lineinfo* cc65_line_byspan (cc65_dbginfo Handle, unsigned SpanId)
     /* Prepare the struct we will return to the caller */
     D = new_cc65_lineinfo (CollCount (S->LineInfoList));
 
-    /* Fill in the data. Since S->LineInfoList may be NULL, we will use the
-    ** count field of the returned data struct instead.
-    */
+    // Fill in the data. Since S->LineInfoList may be NULL, we will use the
+    // count field of the returned data struct instead.
     for (I = 0; I < D->count; ++I) {
         /* Copy the data */
         CopyLineInfo (D->data + I, CollAt (S->LineInfoList, I));
@@ -6420,11 +6332,10 @@ const cc65_moduleinfo* cc65_get_modulelist (cc65_dbginfo Handle)
 
 
 const cc65_moduleinfo* cc65_module_byid (cc65_dbginfo Handle, unsigned Id)
-/* Return information about a module with a specific id. The function
-** returns NULL if the id is invalid (no such module) and otherwise a
-** cc65_moduleinfo structure with one entry that contains the requested
-** module information.
-*/
+// Return information about a module with a specific id. The function
+// returns NULL if the id is invalid (no such module) and otherwise a
+// cc65_moduleinfo structure with one entry that contains the requested
+// module information.
 {
     const DbgInfo*      Info;
     cc65_moduleinfo*    D;
@@ -6499,11 +6410,10 @@ const cc65_spaninfo* cc65_get_spanlist (cc65_dbginfo Handle)
 
 
 const cc65_spaninfo* cc65_span_byid (cc65_dbginfo Handle, unsigned Id)
-/* Return information about a span with a specific id. The function
-** returns NULL if the id is invalid (no such span) and otherwise a
-** cc65_spaninfo structure with one entry that contains the requested
-** span information.
-*/
+// Return information about a span with a specific id. The function
+// returns NULL if the id is invalid (no such span) and otherwise a
+// cc65_spaninfo structure with one entry that contains the requested
+// span information.
 {
     const DbgInfo*      Info;
     cc65_spaninfo*      D;
@@ -6532,9 +6442,8 @@ const cc65_spaninfo* cc65_span_byid (cc65_dbginfo Handle, unsigned Id)
 
 
 const cc65_spaninfo* cc65_span_byaddr (cc65_dbginfo Handle, unsigned long Addr)
-/* Return span information for the given address. The function returns NULL
-** if no spans were found for this address.
-*/
+// Return span information for the given address. The function returns NULL
+// if no spans were found for this address.
 {
     const DbgInfo*      Info;
     SpanInfoListEntry* E;
@@ -6573,9 +6482,8 @@ const cc65_spaninfo* cc65_span_byaddr (cc65_dbginfo Handle, unsigned long Addr)
 
 
 const cc65_spaninfo* cc65_span_byline (cc65_dbginfo Handle, unsigned LineId)
-/* Return span information for the given source line. The function returns NULL
-** if the line id is invalid, otherwise the spans for this line (possibly zero).
-*/
+// Return span information for the given source line. The function returns NULL
+// if the line id is invalid, otherwise the spans for this line (possibly zero).
 {
     const DbgInfo*      Info;
     const LineInfo*     L;
@@ -6612,9 +6520,8 @@ const cc65_spaninfo* cc65_span_byline (cc65_dbginfo Handle, unsigned LineId)
 
 
 const cc65_spaninfo* cc65_span_byscope (cc65_dbginfo Handle, unsigned ScopeId)
-/* Return span information for the given scope. The function returns NULL if
-** the scope id is invalid, otherwise the spans for this scope (possibly zero).
-*/
+// Return span information for the given scope. The function returns NULL if
+// the scope id is invalid, otherwise the spans for this scope (possibly zero).
 {
     const DbgInfo*      Info;
     const ScopeInfo*    S;
@@ -6697,11 +6604,10 @@ const cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo Handle)
 
 
 const cc65_sourceinfo* cc65_source_byid (cc65_dbginfo Handle, unsigned Id)
-/* Return information about a source file with a specific id. The function
-** returns NULL if the id is invalid (no such source file) and otherwise a
-** cc65_sourceinfo structure with one entry that contains the requested
-** source file information.
-*/
+// Return information about a source file with a specific id. The function
+// returns NULL if the id is invalid (no such source file) and otherwise a
+// cc65_sourceinfo structure with one entry that contains the requested
+// source file information.
 {
     const DbgInfo*      Info;
     cc65_sourceinfo*    D;
@@ -6731,10 +6637,9 @@ const cc65_sourceinfo* cc65_source_byid (cc65_dbginfo Handle, unsigned Id)
 
 
 const cc65_sourceinfo* cc65_source_bymodule (cc65_dbginfo Handle, unsigned Id)
-/* Return information about the source files used to build a module. The
-** function returns NULL if the module id is invalid (no such module) and
-** otherwise a cc65_sourceinfo structure with one entry per source file.
-*/
+// Return information about the source files used to build a module. The
+// function returns NULL if the module id is invalid (no such module) and
+// otherwise a cc65_sourceinfo structure with one entry per source file.
 {
     const DbgInfo*      Info;
     const ModInfo*      M;
@@ -6816,9 +6721,8 @@ const cc65_scopeinfo* cc65_get_scopelist (cc65_dbginfo Handle)
 
 
 const cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo Handle, unsigned Id)
-/* Return the scope with a given id. The function returns NULL if no scope
-** with this id was found.
-*/
+// Return the scope with a given id. The function returns NULL if no scope
+// with this id was found.
 {
     const DbgInfo*      Info;
     cc65_scopeinfo*     D;
@@ -6847,9 +6751,8 @@ const cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo Handle, unsigned Id)
 
 
 const cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo Handle, unsigned ModId)
-/* Return the list of scopes for one module. The function returns NULL if no
-** scope with the given id was found.
-*/
+// Return the list of scopes for one module. The function returns NULL if no
+// scope with the given id was found.
 {
     const DbgInfo*      Info;
     const ModInfo*      M;
@@ -6885,9 +6788,8 @@ const cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo Handle, unsigned ModId)
 
 
 const cc65_scopeinfo* cc65_scope_byname (cc65_dbginfo Handle, const char* Name)
-/* Return the list of scopes with a given name. Returns NULL if no scope with
-** the given name was found, otherwise a non empty scope list.
-*/
+// Return the list of scopes with a given name. Returns NULL if no scope with
+// the given name was found, otherwise a non empty scope list.
 {
     const DbgInfo*      Info;
     unsigned            Index;
@@ -6939,9 +6841,8 @@ const cc65_scopeinfo* cc65_scope_byname (cc65_dbginfo Handle, const char* Name)
 
 
 const cc65_scopeinfo* cc65_scope_byspan (cc65_dbginfo Handle, unsigned SpanId)
-/* Return scope information for a a span. The function returns NULL if the
-** span id is invalid, otherwise a list of line scopes.
-*/
+// Return scope information for a a span. The function returns NULL if the
+// span id is invalid, otherwise a list of line scopes.
 {
     const DbgInfo*      Info;
     const SpanInfo*     S;
@@ -6965,9 +6866,8 @@ const cc65_scopeinfo* cc65_scope_byspan (cc65_dbginfo Handle, unsigned SpanId)
     /* Prepare the struct we will return to the caller */
     D = new_cc65_scopeinfo (CollCount (S->ScopeInfoList));
 
-    /* Fill in the data. Since D->ScopeInfoList may be NULL, we will use the
-    ** count field of the returned data struct instead.
-    */
+    // Fill in the data. Since D->ScopeInfoList may be NULL, we will use the
+    // count field of the returned data struct instead.
     for (I = 0; I < D->count; ++I) {
         /* Copy the data */
         CopyScopeInfo (D->data + I, CollAt (S->ScopeInfoList, I));
@@ -6980,10 +6880,9 @@ const cc65_scopeinfo* cc65_scope_byspan (cc65_dbginfo Handle, unsigned SpanId)
 
 
 const cc65_scopeinfo* cc65_childscopes_byid (cc65_dbginfo Handle, unsigned Id)
-/* Return the direct child scopes of a scope with a given id. The function
-** returns NULL if no scope with this id was found, otherwise a list of the
-** direct children.
-*/
+// Return the direct child scopes of a scope with a given id. The function
+// returns NULL if no scope with this id was found, otherwise a list of the
+// direct children.
 {
     const DbgInfo*      Info;
     cc65_scopeinfo*     D;
@@ -7065,10 +6964,9 @@ const cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
 
 
 const cc65_segmentinfo* cc65_segment_byid (cc65_dbginfo Handle, unsigned Id)
-/* Return information about a segment with a specific id. The function returns
-** NULL if the id is invalid (no such segment) and otherwise a segmentinfo
-** structure with one entry that contains the requested segment information.
-*/
+// Return information about a segment with a specific id. The function returns
+// NULL if the id is invalid (no such segment) and otherwise a segmentinfo
+// structure with one entry that contains the requested segment information.
 {
     const DbgInfo*      Info;
     cc65_segmentinfo*   D;
@@ -7098,11 +6996,10 @@ const cc65_segmentinfo* cc65_segment_byid (cc65_dbginfo Handle, unsigned Id)
 
 const cc65_segmentinfo* cc65_segment_byname (cc65_dbginfo Handle,
                                              const char* Name)
-/* Return information about a segment with a specific name. The function
-** returns NULL if no segment with this name exists and otherwise a
-** cc65_segmentinfo structure with one entry that contains the requested
-** information.
-*/
+// Return information about a segment with a specific name. The function
+// returns NULL if no segment with this name exists and otherwise a
+// cc65_segmentinfo structure with one entry that contains the requested
+// information.
 {
     const DbgInfo*      Info;
     const SegInfo*      S;
@@ -7151,9 +7048,8 @@ void cc65_free_segmentinfo (cc65_dbginfo Handle, const cc65_segmentinfo* Info)
 
 
 const cc65_symbolinfo* cc65_symbol_byid (cc65_dbginfo Handle, unsigned Id)
-/* Return the symbol with a given id. The function returns NULL if no symbol
-** with this id was found.
-*/
+// Return the symbol with a given id. The function returns NULL if no symbol
+// with this id was found.
 {
     const DbgInfo*      Info;
     cc65_symbolinfo*    D;
@@ -7182,9 +7078,8 @@ const cc65_symbolinfo* cc65_symbol_byid (cc65_dbginfo Handle, unsigned Id)
 
 
 const cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name)
-/* Return a list of symbols with a given name. The function returns NULL if
-** no symbol with this name was found.
-*/
+// Return a list of symbols with a given name. The function returns NULL if
+// no symbol with this name was found.
 {
     const DbgInfo*      Info;
     cc65_symbolinfo*    D;
@@ -7204,9 +7099,8 @@ const cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name
         return 0;
     }
 
-    /* Index contains the position. Count how many symbols with this name
-    ** we have. Skip the first one, since we have at least one.
-    */
+    // Index contains the position. Count how many symbols with this name
+    // we have. Skip the first one, since we have at least one.
     Count = 1;
     while ((unsigned) Index + Count < CollCount (&Info->SymInfoByName)) {
         const SymInfo* S = CollAt (&Info->SymInfoByName, (unsigned) Index + Count);
@@ -7232,11 +7126,10 @@ const cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name
 
 
 const cc65_symbolinfo* cc65_symbol_byscope (cc65_dbginfo Handle, unsigned ScopeId)
-/* Return a list of symbols in the given scope. This includes cheap local
-** symbols, but not symbols in subscopes. The function returns NULL if the
-** scope id is invalid (no such scope) and otherwise a - possibly empty -
-** symbol list.
-*/
+// Return a list of symbols in the given scope. This includes cheap local
+// symbols, but not symbols in subscopes. The function returns NULL if the
+// scope id is invalid (no such scope) and otherwise a - possibly empty -
+// symbol list.
 {
     const DbgInfo*      Info;
     cc65_symbolinfo*    D;
@@ -7275,10 +7168,9 @@ const cc65_symbolinfo* cc65_symbol_byscope (cc65_dbginfo Handle, unsigned ScopeI
 
 const cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start,
                                             cc65_addr End)
-/* Return a list of labels in the given range. End is inclusive. The function
-** return NULL if no symbols within the given range are found. Non label
-** symbols are ignored and not returned.
-*/
+// Return a list of labels in the given range. End is inclusive. The function
+// return NULL if no symbols within the given range are found. Non label
+// symbols are ignored and not returned.
 {
     const DbgInfo*      Info;
     Collection          SymInfoList = COLLECTION_INITIALIZER;
@@ -7292,22 +7184,19 @@ const cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start
     /* The handle is actually a pointer to a debug info struct */
     Info = Handle;
 
-    /* Search for the symbol. Because we're searching for a range, we cannot
-    ** make use of the function result.
-    */
+    // Search for the symbol. Because we're searching for a range, we cannot
+    // make use of the function result.
     FindSymInfoByValue (&Info->SymInfoByVal, Start, &Index);
 
-    /* Start from the given index, check all symbols until the end address is
-    ** reached. Place all symbols into SymInfoList for later.
-    */
+    // Start from the given index, check all symbols until the end address is
+    // reached. Place all symbols into SymInfoList for later.
     for (I = Index; I < CollCount (&Info->SymInfoByVal); ++I) {
 
         /* Get the item */
         SymInfo* Item = CollAt (&Info->SymInfoByVal, I);
 
-        /* The collection is sorted by address, so if we get a value larger
-        ** than the end address, we're done.
-        */
+        // The collection is sorted by address, so if we get a value larger
+        // than the end address, we're done.
         if (Item->Value > (long) End) {
             break;
         }
@@ -7321,9 +7210,8 @@ const cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start
         CollAppend (&SymInfoList, Item);
     }
 
-    /* If we don't have any labels within the range, bail out. No memory has
-    ** been allocated for SymInfoList.
-    */
+    // If we don't have any labels within the range, bail out. No memory has
+    // been allocated for SymInfoList.
     if (CollCount (&SymInfoList) == 0) {
         return 0;
     }
@@ -7365,9 +7253,8 @@ void cc65_free_symbolinfo (cc65_dbginfo Handle, const cc65_symbolinfo* Info)
 
 
 const cc65_typedata* cc65_type_byid (cc65_dbginfo Handle, unsigned Id)
-/* Return the data for the type with the given id. The function returns NULL
-** if no type with this id was found.
-*/
+// Return the data for the type with the given id. The function returns NULL
+// if no type with this id was found.
 {
     const DbgInfo*        Info;
     const TypeInfo*       T;

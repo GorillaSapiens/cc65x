@@ -38,23 +38,22 @@
 
 #include "6502.h"
 
-/* The trace mode is a bitfield that determines how trace lines are displayed.
- *
- * The value zero indicates that tracing is disabled (the default).
- *
- * In case TraceMode is not equal to zero, the value is interpreted as a bitfield:
- *
- * Bit    Bit value     Enables
- * ---    -----------   -------------------------------
- *  6      0x40 ( 64)   Print the instruction counter.
- *  5      0x20 ( 32)   Print the clock cycle counter.
- *  4      0x10 ( 16)   Print the PC (program counter).
- *  3      0x08 (  8)   Print the instruction bytes.
- *  2      0x04 (  4)   Print the instruction assembly.
- *  1      0x02 (  2)   Print the CPU registers.
- *  0      0x01 (  1)   Print the CC65 stack pointer.
- *
- */
+// The trace mode is a bitfield that determines how trace lines are displayed.
+// 
+// The value zero indicates that tracing is disabled (the default).
+// 
+// In case TraceMode is not equal to zero, the value is interpreted as a bitfield:
+// 
+// Bit    Bit value     Enables
+// ---    -----------   -------------------------------
+// 6      0x40 ( 64)   Print the instruction counter.
+// 5      0x20 ( 32)   Print the clock cycle counter.
+// 4      0x10 ( 16)   Print the PC (program counter).
+// 3      0x08 (  8)   Print the instruction bytes.
+// 2      0x04 (  4)   Print the instruction assembly.
+// 1      0x02 (  2)   Print the CPU registers.
+// 0      0x01 (  1)   Print the CC65 stack pointer.
+// 
 
 #define TRACE_FIELD_INSTR_COUNTER   0x40
 #define TRACE_FIELD_CLOCK_COUNTER   0x20

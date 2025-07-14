@@ -64,11 +64,10 @@
 typedef struct Bitmap Bitmap;
 struct Bitmap {
 
-    /* Name of the bitmap. This is used for error messages and should be
-    ** something that allows the user to identify which bitmap the message
-    ** refers to. For bitmaps loaded from a file, using the file name is
-    ** a good idea.
-    */
+    // Name of the bitmap. This is used for error messages and should be
+    // something that allows the user to identify which bitmap the message
+    // refers to. For bitmaps loaded from a file, using the file name is
+    // a good idea.
     StrBuf      Name;
 
     /* Size of the bitmap */
@@ -105,20 +104,17 @@ int ValidBitmapSize (unsigned Width, unsigned Height);
 Bitmap* SliceBitmap (const Bitmap* Original,
                      unsigned X, unsigned Y,
                      unsigned Width, unsigned Height);
-/* Create a slice of the given bitmap. The slice starts at position X/Y of
-** the original and has the given width and height. Location 0/0 is at the
-** upper left corner.
-*/
+// Create a slice of the given bitmap. The slice starts at position X/Y of
+// the original and has the given width and height. Location 0/0 is at the
+// upper left corner.
 
 Color GetPixelColor (const Bitmap* B, unsigned X, unsigned Y);
-/* Get the color for a given pixel. For indexed bitmaps, the palette entry
-** is returned.
-*/
+// Get the color for a given pixel. For indexed bitmaps, the palette entry
+// is returned.
 
 Pixel GetPixel (const Bitmap* B, unsigned X, unsigned Y);
-/* Return a pixel from the bitmap. The returned value may either be a color
-** or a palette index, depending on the type of the bitmap.
-*/
+// Return a pixel from the bitmap. The returned value may either be a color
+// or a palette index, depending on the type of the bitmap.
 
 #if defined(HAVE_INLINE)
 INLINE int BitmapIsIndexed (const Bitmap* B)
@@ -172,9 +168,8 @@ INLINE const StrBuf* GetBitmapName (const Bitmap* B)
 
 #if defined(HAVE_INLINE)
 INLINE unsigned GetBitmapColors (const Bitmap* B)
-/* Get the number of colors in an image. The function will return the number
-** of palette entries for indexed bitmaps and 2^24 for non indexed bitmaps.
-*/
+// Get the number of colors in an image. The function will return the number
+// of palette entries for indexed bitmaps and 2^24 for non indexed bitmaps.
 {
     return B->Pal? B->Pal->Count : (1U << 24);
 }
@@ -184,8 +179,7 @@ INLINE unsigned GetBitmapColors (const Bitmap* B)
 
 #if defined(HAVE_INLINE)
 INLINE unsigned GetBitmapBPP (const Bitmap* B)
-/* Get the bits per pixel of the converted sprite
- */
+// Get the bits per pixel of the converted sprite
 {
     return B->BPP;
 }

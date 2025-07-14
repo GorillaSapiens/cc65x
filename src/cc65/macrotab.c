@@ -110,9 +110,8 @@ static void OutputMacro (const Macro* M, int Full)
 static void OutputMacros (int Predefined, int Full)
 /* Output macros to the output file depending on the flags given. */
 {
-    /* Note: The Full flag is currently not used by any callers but is left in
-    ** place for possible future changes.
-    */
+    // Note: The Full flag is currently not used by any callers but is left in
+    // place for possible future changes.
     unsigned I;
     for (I = 0; I < MACRO_TAB_SIZE; ++I) {
         const Macro* M = MacroTab [I];
@@ -134,9 +133,8 @@ static void OutputMacros (int Predefined, int Full)
 
 
 Macro* NewMacro (const char* Name, unsigned char Predefined)
-/* Allocate a macro structure with the given name. The structure is not
-** inserted into the macro table.
-*/
+// Allocate a macro structure with the given name. The structure is not
+// inserted into the macro table.
 {
     /* Get the length of the macro name */
     unsigned Len = strlen (Name);
@@ -160,9 +158,8 @@ Macro* NewMacro (const char* Name, unsigned char Predefined)
 
 
 void FreeMacro (Macro* M)
-/* Delete a macro definition. The function will NOT remove the macro from the
-** table, use UndefineMacro for that.
-*/
+// Delete a macro definition. The function will NOT remove the macro from the
+// table, use UndefineMacro for that.
 {
     unsigned I;
 
@@ -177,10 +174,9 @@ void FreeMacro (Macro* M)
 
 
 Macro* CloneMacro (const Macro* M)
-/* Clone a macro definition. The function is not insert the macro into the
-** macro table, thus the cloned instance cannot be freed with UndefineMacro.
-** Use FreeMacro for that.
-*/
+// Clone a macro definition. The function is not insert the macro into the
+// macro table, thus the cloned instance cannot be freed with UndefineMacro.
+// Use FreeMacro for that.
 {
     Macro* New = NewMacro (M->Name, M->Predefined);
     unsigned I;
@@ -242,11 +238,10 @@ void InsertMacro (Macro* M)
 
 
 Macro* UndefineMacro (const char* Name)
-/* Search for the macro with the given name, if it exists, remove it from
-** the defined macro table and insert it to a list for pending deletion.
-** Return the macro if it was found and removed, return 0 otherwise.
-** To safely free the removed macro, use FreeUndefinedMacros().
-*/
+// Search for the macro with the given name, if it exists, remove it from
+// the defined macro table and insert it to a list for pending deletion.
+// Return the macro if it was found and removed, return 0 otherwise.
+// To safely free the removed macro, use FreeUndefinedMacros().
 {
     /* Get the hash value of the macro name */
     unsigned Hash = HashStr (Name) % MACRO_TAB_SIZE;
@@ -330,9 +325,8 @@ Macro* FindMacro (const char* Name)
 
 
 int FindMacroParam (const Macro* M, const char* Param)
-/* Search for a macro parameter. If found, return the index of the parameter.
-** If the parameter was not found, return -1.
-*/
+// Search for a macro parameter. If found, return the index of the parameter.
+// If the parameter was not found, return -1.
 {
     unsigned I;
     for (I = 0; I < CollCount (&M->Params); ++I) {
@@ -351,10 +345,9 @@ int FindMacroParam (const Macro* M, const char* Param)
 void AddMacroParam (Macro* M, const char* Param)
 /* Add a macro parameter. */
 {
-    /* Check if we have a duplicate macro parameter, but add it anyway.
-    ** Beware: Don't use FindMacroParam here, since the actual argument array
-    ** may not be initialized.
-    */
+    // Check if we have a duplicate macro parameter, but add it anyway.
+    // Beware: Don't use FindMacroParam here, since the actual argument array
+    // may not be initialized.
     unsigned I;
     for (I = 0; I < CollCount (&M->Params); ++I) {
         if (strcmp (CollAtUnchecked (&M->Params, I), Param) == 0) {

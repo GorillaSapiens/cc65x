@@ -50,15 +50,14 @@
 
 
 unsigned OptSub1 (CodeSeg* S)
-/* Search for the sequence
-**
-**      sbc     ...
-**      bcs     L
-**      dex
-** L:
-**
-** and remove the handling of the high byte if X is not used later.
-*/
+// Search for the sequence
+// 
+// sbc     ...
+// bcs     L
+// dex
+// L:
+// 
+// and remove the handling of the high byte if X is not used later.
 {
     unsigned Changes = 0;
 
@@ -102,22 +101,21 @@ unsigned OptSub1 (CodeSeg* S)
 
 
 unsigned OptSub2 (CodeSeg* S)
-/* Search for the sequence
-**
-**      lda     xx
-**      sec
-**      sta     tmp1
-**      lda     yy
-**      sbc     tmp1
-**      sta     yy
-**
-** and replace it by
-**
-**      sec
-**      lda     yy
-**      sbc     xx
-**      sta     yy
-*/
+// Search for the sequence
+// 
+// lda     xx
+// sec
+// sta     tmp1
+// lda     yy
+// sbc     tmp1
+// sta     yy
+// 
+// and replace it by
+// 
+// sec
+// lda     yy
+// sbc     xx
+// sta     yy
 {
     unsigned Changes = 0;
 
@@ -149,15 +147,13 @@ unsigned OptSub2 (CodeSeg* S)
             /* Remove the subtraction */
             CS_DelEntry (S, I+3);
 
-            /* Move the lda to the position of the subtraction and change the
-            ** op to SBC.
-            */
+            // Move the lda to the position of the subtraction and change the
+            // op to SBC.
             CS_MoveEntry (S, I, I+3);
             CE_ReplaceOPC (E, OP65_SBC);
 
-            /* If the sequence head had a label, move this label back to the
-            ** head.
-            */
+            // If the sequence head had a label, move this label back to the
+            // head.
             if (CE_HasLabel (E)) {
                 CS_MoveLabels (S, E, L[0]);
             }
@@ -179,9 +175,8 @@ unsigned OptSub2 (CodeSeg* S)
 
 
 unsigned OptSub3 (CodeSeg* S)
-/* Search for a call to decaxn and replace it by an 8 bit sub if the X register
-** is not used later.
-*/
+// Search for a call to decaxn and replace it by an 8 bit sub if the X register
+// is not used later.
 {
     unsigned Changes = 0;
 

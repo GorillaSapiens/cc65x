@@ -87,9 +87,8 @@ static void CS_PrintFunctionHeader (const CodeSeg* S)
 
 
 static void CS_MoveLabelsToEntry (CodeSeg* S, CodeEntry* E)
-/* Move all labels from the label pool to the given entry and remove them
-** from the pool.
-*/
+// Move all labels from the label pool to the given entry and remove them
+// from the pool.
 {
     /* Transfer the labels if we have any */
     unsigned I;
@@ -190,11 +189,10 @@ static CodeLabel* PickRefLab (CodeEntry* E)
     unsigned I;
     unsigned LabelCount = CE_GetLabelCount (E);
     CHECK (LabelCount > 0);
-    /* Use either the first one as reference label, or a label with a Ref that has no JumpTo.
-    ** This is a hack to partially work around #1211.  Refs with no JumpTo are labels used
-    ** in data segments.  (They are not tracked.)  If a data segment is the only reference,
-    ** the label will be pruned away, but the data reference will remain, causing linking to fail.
-    */
+    // Use either the first one as reference label, or a label with a Ref that has no JumpTo.
+    // This is a hack to partially work around #1211.  Refs with no JumpTo are labels used
+    // in data segments.  (They are not tracked.)  If a data segment is the only reference,
+    // the label will be pruned away, but the data reference will remain, causing linking to fail.
     CodeLabel* L0 = CE_GetLabel (E, 0);
     for (I = 1; I < LabelCount; ++I) {
         unsigned J;
@@ -234,9 +232,8 @@ static const char* SkipSpace (const char* S)
 
 static const char* ReadToken (const char* L, const char* Term,
                               char* Buf, unsigned BufSize)
-/* Read the next token into Buf, return the updated line pointer. The
-** token is terminated by one of the characters given in term.
-*/
+// Read the next token into Buf, return the updated line pointer. The
+// token is terminated by one of the characters given in term.
 {
     /* Read/copy the token */
     unsigned I = 0;
@@ -245,9 +242,8 @@ static const char* ReadToken (const char* L, const char* Term,
         if (I < BufSize-1) {
             Buf[I] = *L;
         } else if (I == BufSize-1) {
-            /* Cannot store this character, this is an input error (maybe
-            ** identifier too long or similar).
-            */
+            // Cannot store this character, this is an input error (maybe
+            // identifier too long or similar).
             Error ("ASM code error: syntax error");
         }
         ++I;
@@ -269,12 +265,11 @@ static const char* ReadToken (const char* L, const char* Term,
 
 
 static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
-/* Parse an instruction nnd generate a code entry from it. If the line contains
-** errors, output an error message and return NULL.
-** For simplicity, we don't accept the broad range of input a "real" assembler
-** does. The instruction and the argument are expected to be separated by
-** white space, for example.
-*/
+// Parse an instruction nnd generate a code entry from it. If the line contains
+// errors, output an error message and return NULL.
+// For simplicity, we don't accept the broad range of input a "real" assembler
+// does. The instruction and the argument are expected to be separated by
+// white space, for example.
 {
     char                Mnemo[IDENTSIZE+10];
     const OPCDesc*      OPC;
@@ -298,9 +293,8 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
         /* Add the label */
         CS_AddLabel (S, Mnemo);
 
-        /* If we have reached end of line, bail out, otherwise a mnemonic
-        ** may follow.
-        */
+        // If we have reached end of line, bail out, otherwise a mnemonic
+        // may follow.
         if (*L == '\0') {
             return 0;
         }
@@ -433,9 +427,8 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
                             AM = AM65_ABSX;
                         }
                     } else if (Reg == 'Y') {
-                        /* On 6502 only LDX and STX support AM65_ZPY.
-                        ** We just play it simple and safe for now.
-                        */
+                        // On 6502 only LDX and STX support AM65_ZPY.
+                        // We just play it simple and safe for now.
                         AM = AM65_ABSY;
                     } else {
                         Error ("ASM code error: syntax error");
@@ -451,18 +444,16 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 
     }
 
-    /* We do now have the addressing mode in AM. Allocate a new CodeEntry
-    ** structure and half-initialize it. We'll set the argument and the label
-    ** later.
-    */
+    // We do now have the addressing mode in AM. Allocate a new CodeEntry
+    // structure and half-initialize it. We'll set the argument and the label
+    // later.
     E = NewCodeEntry (OPC->OPC, AM, Arg, 0, LI);
 
-    /* If the instruction is a branch or accessing memory data, check if for
-    ** the argument could refer to a label. If it does but the label does not
-    ** exist yet, generate it. This may lead to unused labels (if the label
-    ** is actually an external one) which are removed by the CS_MergeLabels
-    ** function later.
-    */
+    // If the instruction is a branch or accessing memory data, check if for
+    // the argument could refer to a label. If it does but the label does not
+    // exist yet, generate it. This may lead to unused labels (if the label
+    // is actually an external one) which are removed by the CS_MergeLabels
+    // function later.
     if ((E->Info & OF_CALL) == 0 &&
         (E->ArgInfo & AIF_HAS_NAME) != 0) {
         ArgBase = E->ArgBase;
@@ -475,9 +466,8 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
         unsigned Hash = HashStr (ArgBase) % CS_LABEL_HASH_SIZE;
         Label = CS_FindLabel (S, ArgBase, Hash);
 
-        /* If we don't have the label, it's a forward ref - create it unless
-        ** it's an external function.
-        */
+        // If we don't have the label, it's a forward ref - create it unless
+        // it's an external function.
         if (Label == 0 && (OPC->OPC != OP65_JMP || IsLabel)) {
             /* Generate a new label */
             Label = CS_NewCodeLabel (S, ArgBase, Hash);
@@ -519,9 +509,8 @@ CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func)
         S->LabelHash[I] = 0;
     }
 
-    /* If we have a function given, get the return type of the function.
-    ** Assume ANY return type besides void will use the A and X registers.
-    */
+    // If we have a function given, get the return type of the function.
+    // Assume ANY return type besides void will use the A and X registers.
     if (S->Func && !IsTypeVoid ((RetType = GetFuncReturnType (Func->Type)))) {
         if (SizeOf (RetType) == SizeOf (type_long)) {
             S->ExitRegs = REG_EAX;
@@ -614,9 +603,8 @@ void CS_AddLine (CodeSeg* S, LineInfo* LI, const char* Format, ...)
 
 
 void CS_InsertEntry (CodeSeg* S, struct CodeEntry* E, unsigned Index)
-/* Insert the code entry at the index given. Following code entries will be
-** moved to slots with higher indices.
-*/
+// Insert the code entry at the index given. Following code entries will be
+// moved to slots with higher indices.
 {
     /* Insert the entry into the collection */
     CollInsert (&S->Entries, E, Index);
@@ -625,28 +613,25 @@ void CS_InsertEntry (CodeSeg* S, struct CodeEntry* E, unsigned Index)
 
 
 void CS_DelEntry (CodeSeg* S, unsigned Index)
-/* Delete an entry from the code segment. This includes moving any associated
-** labels, removing references to labels and even removing the referenced labels
-** if the reference count drops to zero.
-** Note: Labels are moved forward if possible, that is, they are moved to the
-** next insn (not the preceeding one).
-*/
+// Delete an entry from the code segment. This includes moving any associated
+// labels, removing references to labels and even removing the referenced labels
+// if the reference count drops to zero.
+// Note: Labels are moved forward if possible, that is, they are moved to the
+// next insn (not the preceeding one).
 {
     /* Get the code entry for the given index */
     CodeEntry* E = CS_GetEntry (S, Index);
 
-    /* If the entry has a labels, we have to move this label to the next insn.
-    ** If there is no next insn, move the label into the code segement label
-    ** pool. The operation is further complicated by the fact that the next
-    ** insn may already have a label. In that case change all reference to
-    ** this label and delete the label instead of moving it.
-    */
+    // If the entry has a labels, we have to move this label to the next insn.
+    // If there is no next insn, move the label into the code segement label
+    // pool. The operation is further complicated by the fact that the next
+    // insn may already have a label. In that case change all reference to
+    // this label and delete the label instead of moving it.
     unsigned Count = CE_GetLabelCount (E);
     if (Count > 0) {
 
-        /* The instruction has labels attached. Check if there is a next
-        ** instruction.
-        */
+        // The instruction has labels attached. Check if there is a next
+        // instruction.
         if (Index == CS_GetEntryCount (S)-1) {
 
             /* No next instruction, move to the codeseg label pool */
@@ -663,9 +648,8 @@ void CS_DelEntry (CodeSeg* S, unsigned Index)
         }
     }
 
-    /* If this insn references a label, remove the reference. And, if the
-    ** the reference count for this label drops to zero, remove this label.
-    */
+    // If this insn references a label, remove the reference. And, if the
+    // the reference count for this label drops to zero, remove this label.
     if (E->JumpTo) {
         /* Remove the reference */
         CS_RemoveLabelRef (S, E);
@@ -681,13 +665,11 @@ void CS_DelEntry (CodeSeg* S, unsigned Index)
 
 
 void CS_DelEntries (CodeSeg* S, unsigned Start, unsigned Count)
-/* Delete a range of code entries. This includes removing references to labels,
-** labels attached to the entries and so on.
-*/
+// Delete a range of code entries. This includes removing references to labels,
+// labels attached to the entries and so on.
 {
-    /* Start deleting the entries from the rear, because this involves less
-    ** memory moving.
-    */
+    // Start deleting the entries from the rear, because this involves less
+    // memory moving.
     while (Count--) {
         CS_DelEntry (S, Start + Count);
     }
@@ -696,24 +678,22 @@ void CS_DelEntries (CodeSeg* S, unsigned Start, unsigned Count)
 
 
 void CS_MoveEntries (CodeSeg* S, unsigned Start, unsigned Count, unsigned NewPos)
-/* Move a range of entries from one position to another. Start is the index
-** of the first entry to move, Count is the number of entries and NewPos is
-** the index of the target entry. The entry with the index Start will later
-** have the index NewPos. All entries with indices NewPos and above are
-** moved to higher indices. If the code block is moved to the end of the
-** current code, and if pending labels exist, these labels will get attached
-** to the first instruction of the moved block (the first one after the
-** current code end)
-*/
+// Move a range of entries from one position to another. Start is the index
+// of the first entry to move, Count is the number of entries and NewPos is
+// the index of the target entry. The entry with the index Start will later
+// have the index NewPos. All entries with indices NewPos and above are
+// moved to higher indices. If the code block is moved to the end of the
+// current code, and if pending labels exist, these labels will get attached
+// to the first instruction of the moved block (the first one after the
+// current code end)
 {
     /* Transparently handle an empty range */
     if (Count == 0) {
         return;
     }
 
-    /* If NewPos is at the end of the code segment, move any labels from the
-    ** label pool to the first instruction of the moved range.
-    */
+    // If NewPos is at the end of the code segment, move any labels from the
+    // label pool to the first instruction of the moved range.
     if (NewPos == CS_GetEntryCount (S)) {
         CS_MoveLabelsToEntry (S, CS_GetEntry (S, Start));
     }
@@ -725,9 +705,8 @@ void CS_MoveEntries (CodeSeg* S, unsigned Start, unsigned Count, unsigned NewPos
 
 
 struct CodeEntry* CS_GetPrevEntry (CodeSeg* S, unsigned Index)
-/* Get the code entry preceeding the one with the index Index. If there is no
-** preceeding code entry, return NULL.
-*/
+// Get the code entry preceeding the one with the index Index. If there is no
+// preceeding code entry, return NULL.
 {
     if (Index == 0) {
         /* This is the first entry */
@@ -741,9 +720,8 @@ struct CodeEntry* CS_GetPrevEntry (CodeSeg* S, unsigned Index)
 
 
 struct CodeEntry* CS_GetNextEntry (CodeSeg* S, unsigned Index)
-/* Get the code entry following the one with the index Index. If there is no
-** following code entry, return NULL.
-*/
+// Get the code entry following the one with the index Index. If there is no
+// following code entry, return NULL.
 {
     if (Index >= CollCount (&S->Entries)-1) {
         /* This is the last entry */
@@ -758,9 +736,8 @@ struct CodeEntry* CS_GetNextEntry (CodeSeg* S, unsigned Index)
 
 int CS_GetEntries (CodeSeg* S, struct CodeEntry** List,
                    unsigned Start, unsigned Count)
-/* Get Count code entries into List starting at index start. Return true if
-** we got the lines, return false if not enough lines were available.
-*/
+// Get Count code entries into List starting at index start. Return true if
+// we got the lines, return false if not enough lines were available.
 {
     /* Check if enough entries are available */
     if (Start + Count > CollCount (&S->Entries)) {
@@ -789,10 +766,9 @@ unsigned CS_GetEntryIndex (CodeSeg* S, struct CodeEntry* E)
 
 
 int CS_RangeHasLabel (CodeSeg* S, unsigned Start, unsigned Count)
-/* Return true if any of the code entries in the given range has a label
-** attached. If the code segment does not span the given range, check the
-** possible span instead.
-*/
+// Return true if any of the code entries in the given range has a label
+// attached. If the code segment does not span the given range, check the
+// possible span instead.
 {
     unsigned EntryCount = CS_GetEntryCount(S);
 
@@ -802,9 +778,8 @@ int CS_RangeHasLabel (CodeSeg* S, unsigned Start, unsigned Count)
         Count = EntryCount - Start;
     }
 
-    /* Check each entry. Since we have validated the index above, we may
-    ** use the unchecked access function in the loop which is faster.
-    */
+    // Check each entry. Since we have validated the index above, we may
+    // use the unchecked access function in the loop which is faster.
     while (Count--) {
         const CodeEntry* E = CollAtUnchecked (&S->Entries, Start++);
         if (CE_HasLabel (E)) {
@@ -855,9 +830,8 @@ CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name)
 
 
 CodeLabel* CS_GenLabel (CodeSeg* S, struct CodeEntry* E)
-/* If the code entry E does already have a label, return it. Otherwise
-** create a new label, attach it to E and return it.
-*/
+// If the code entry E does already have a label, return it. Otherwise
+// create a new label, attach it to E and return it.
 {
     CodeLabel* L;
 
@@ -906,11 +880,10 @@ void CS_DelLabel (CodeSeg* S, CodeLabel* L)
     }
     CollDeleteAll (&L->JumpFrom);
 
-    /* Remove the reference to the owning instruction if it has one. The
-    ** function may be called for a label without an owner when deleting
-    ** unfinished parts of the code. This is unfortunate since it allows
-    ** errors to slip through.
-    */
+    // Remove the reference to the owning instruction if it has one. The
+    // function may be called for a label without an owner when deleting
+    // unfinished parts of the code. This is unfortunate since it allows
+    // errors to slip through.
     if (L->Owner) {
         CollDeleteItem (&L->Owner->Labels, L);
     }
@@ -922,17 +895,15 @@ void CS_DelLabel (CodeSeg* S, CodeLabel* L)
 
 
 void CS_MergeLabels (CodeSeg* S)
-/* Merge code labels. That means: For each instruction, remove all labels but
-** one and adjust references accordingly.
-*/
+// Merge code labels. That means: For each instruction, remove all labels but
+// one and adjust references accordingly.
 {
     unsigned I;
     unsigned J;
 
-    /* First, remove all labels from the label symbol table that don't have an
-    ** owner (this means that they are actually external labels but we didn't
-    ** know that previously since they may have also been forward references).
-    */
+    // First, remove all labels from the label symbol table that don't have an
+    // owner (this means that they are actually external labels but we didn't
+    // know that previously since they may have also been forward references).
     for (I = 0; I < CS_LABEL_HASH_SIZE; ++I) {
 
         /* Get the first label in this hash chain */
@@ -948,10 +919,9 @@ void CS_MergeLabels (CodeSeg* S)
                 for (J = 0; J < CL_GetRefCount (X); ++J) {
                     /* Get the entry referencing this label */
                     CodeEntry* E = CL_GetRef (X, J);
-                    /* And remove the reference. Do NOT call CE_ClearJumpTo
-                    ** here, because this will also clear the label name,
-                    ** which is not what we want.
-                    */
+                    // And remove the reference. Do NOT call CE_ClearJumpTo
+                    // here, because this will also clear the label name,
+                    // which is not what we want.
                     E->JumpTo = 0;
                 }
 
@@ -984,16 +954,14 @@ void CS_MergeLabels (CodeSeg* S)
             continue;
         }
 
-        /* Pick a label to keep, all references will be moved to this one, and the other labels
-        ** will be deleted.  PickRefLab moves this to index 0.
-        */
+        // Pick a label to keep, all references will be moved to this one, and the other labels
+        // will be deleted.  PickRefLab moves this to index 0.
         RefLab = PickRefLab (E);
 
-        /* Walk through the remaining labels and change references to these
-        ** labels to a reference to the one and only label. Delete the labels
-        ** that are no longer used. To increase performance, walk backwards
-        ** through the list.
-        */
+        // Walk through the remaining labels and change references to these
+        // labels to a reference to the one and only label. Delete the labels
+        // that are no longer used. To increase performance, walk backwards
+        // through the list.
         for (J = LabelCount-1; J >= 1; --J) {
 
             /* Get the next label */
@@ -1006,10 +974,9 @@ void CS_MergeLabels (CodeSeg* S)
             CS_DelLabel (S, L);
         }
 
-        /* The reference label is the only remaining label. Check if there
-        ** are any references to this label, and delete it if this is not
-        ** the case.
-        */
+        // The reference label is the only remaining label. Check if there
+        // are any references to this label, and delete it if this is not
+        // the case.
         if (CollCount (&RefLab->JumpFrom) == 0) {
             /* Delete the label */
             CS_DelLabel (S, RefLab);
@@ -1020,11 +987,10 @@ void CS_MergeLabels (CodeSeg* S)
 
 
 void CS_MoveLabels (CodeSeg* S, struct CodeEntry* Old, struct CodeEntry* New)
-/* Move all labels from Old to New. The routine will move the labels itself
-** if New does not have any labels, and move references if there is at least
-** a label for new. If references are moved, the old label is deleted
-** afterwards.
-*/
+// Move all labels from Old to New. The routine will move the labels itself
+// if New does not have any labels, and move references if there is at least
+// a label for new. If references are moved, the old label is deleted
+// afterwards.
 {
     /* Get the number of labels to move */
     unsigned OldLabelCount = CE_GetLabelCount (Old);
@@ -1063,11 +1029,10 @@ void CS_MoveLabels (CodeSeg* S, struct CodeEntry* Old, struct CodeEntry* New)
 
 
 void CS_RemoveLabelRef (CodeSeg* S, struct CodeEntry* E)
-/* Remove the reference between E and the label it jumps to. The reference
-** will be removed on both sides and E->JumpTo will be 0 after that. If
-** the reference was the only one for the label, the label will get
-** deleted.
-*/
+// Remove the reference between E and the label it jumps to. The reference
+// will be removed on both sides and E->JumpTo will be 0 after that. If
+// the reference was the only one for the label, the label will get
+// deleted.
 {
     /* Get a pointer to the label and make sure it exists */
     CodeLabel* L = E->JumpTo;
@@ -1088,10 +1053,9 @@ void CS_RemoveLabelRef (CodeSeg* S, struct CodeEntry* E)
 
 
 void CS_MoveLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L)
-/* Change the reference of E to L instead of the current one. If this
-** was the only reference to the old label, the old label will get
-** deleted.
-*/
+// Change the reference of E to L instead of the current one. If this
+// was the only reference to the old label, the old label will get
+// deleted.
 {
     /* Get the old label */
     CodeLabel* OldLabel = E->JumpTo;
@@ -1114,11 +1078,10 @@ void CS_MoveLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L)
 
 
 void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last)
-/* Delete all entries between first and last, both inclusive. The function
-** can only handle basic blocks (First is the only entry, Last the only exit)
-** and no open labels. It will call FAIL if any of these preconditions are
-** violated.
-*/
+// Delete all entries between first and last, both inclusive. The function
+// can only handle basic blocks (First is the only entry, Last the only exit)
+// and no open labels. It will call FAIL if any of these preconditions are
+// violated.
 {
     unsigned   I;
     CodeEntry* FirstEntry;
@@ -1126,18 +1089,16 @@ void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last)
     /* Do some sanity checks */
     CHECK (First <= Last && Last < CS_GetEntryCount (S));
 
-    /* If Last is actually the last insn, call CS_DelCodeAfter instead, which
-    ** is more flexible in this case.
-    */
+    // If Last is actually the last insn, call CS_DelCodeAfter instead, which
+    // is more flexible in this case.
     if (Last == CS_GetEntryCount (S) - 1) {
         CS_DelCodeAfter (S, First);
         return;
     }
 
-    /* Get the first entry and check if it has any labels. If it has, move
-    ** them to the insn following Last. If Last is the last insn of the code
-    ** segment, make them ownerless and move them to the label pool.
-    */
+    // Get the first entry and check if it has any labels. If it has, move
+    // them to the insn following Last. If Last is the last insn of the code
+    // segment, make them ownerless and move them to the label pool.
     FirstEntry = CS_GetEntry (S, First);
     if (CE_HasLabel (FirstEntry)) {
         /* Get the entry following last */
@@ -1151,9 +1112,8 @@ void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last)
         }
     }
 
-    /* First pass: Delete all references to labels. If the reference count
-    ** for a label drops to zero, delete it.
-    */
+    // First pass: Delete all references to labels. If the reference count
+    // for a label drops to zero, delete it.
     for (I = Last; I >= First; --I) {
 
         /* Get the next entry */
@@ -1171,10 +1131,9 @@ void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last)
         }
     }
 
-    /* Second pass: Delete the instructions. If a label attached to an
-    ** instruction still has references, it must be references from outside
-    ** the deleted area, which is an error.
-    */
+    // Second pass: Delete the instructions. If a label attached to an
+    // instruction still has references, it must be references from outside
+    // the deleted area, which is an error.
     for (I = Last; I >= First; --I) {
 
         /* Get the next entry */
@@ -1217,12 +1176,11 @@ void CS_ErrorOnNonDefinition (CodeSeg* S, unsigned First, unsigned Last)
             }
         }
 
-        /* detect stack decrement > 255 bytes by comparing
-        ** against a signature.  this is rare.  if the
-        ** compiler does this with a different signature
-        ** in the future, an error will be produced, but
-        ** at least we still won't produce bad code.
-        */
+        // detect stack decrement > 255 bytes by comparing
+        // against a signature.  this is rare.  if the
+        // compiler does this with a different signature
+        // in the future, an error will be produced, but
+        // at least we still won't produce bad code.
         if (E->OPC == OP65_PHA) {
             unsigned long J;
             static struct {
@@ -1290,9 +1248,8 @@ void CS_DelCodeAfter (CodeSeg* S, unsigned Last)
     /* Get the number of entries in this segment */
     unsigned Count = CS_GetEntryCount (S);
 
-    /* First pass: Delete all references to labels. If the reference count
-    ** for a label drops to zero, delete it.
-    */
+    // First pass: Delete all references to labels. If the reference count
+    // for a label drops to zero, delete it.
     unsigned C = Count;
     while (Last < C--) {
 
@@ -1301,9 +1258,8 @@ void CS_DelCodeAfter (CodeSeg* S, unsigned Last)
 
         /* Check if this entry has a label reference */
         if (E->JumpTo) {
-            /* If the label is a label in the label pool and this is the last
-            ** reference to the label, remove the label from the pool.
-            */
+            // If the label is a label in the label pool and this is the last
+            // reference to the label, remove the label from the pool.
             CodeLabel* L = E->JumpTo;
             int Index = CollIndex (&S->Labels, L);
             if (Index >= 0 && CollCount (&L->JumpFrom) == 1) {
@@ -1317,11 +1273,10 @@ void CS_DelCodeAfter (CodeSeg* S, unsigned Last)
 
     }
 
-    /* Second pass: Delete the instructions. If a label attached to an
-    ** instruction still has references, it must be references from outside
-    ** the deleted area. Don't delete the label in this case, just make it
-    ** ownerless and move it to the label pool.
-    */
+    // Second pass: Delete the instructions. If a label attached to an
+    // instruction still has references, it must be references from outside
+    // the deleted area. Don't delete the label in this case, just make it
+    // ownerless and move it to the label pool.
     C = Count;
     while (Last < C--) {
 
@@ -1355,11 +1310,10 @@ void CS_ResetMarks (CodeSeg* S, unsigned First, unsigned Last)
 
 
 int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last)
-/* Check if the given code segment range is a basic block. That is, check if
-** First is the only entrance and Last is the only exit. This means that no
-** jump/branch inside the block may jump to an insn below First or after(!)
-** Last, and that no insn may jump into this block from the outside.
-*/
+// Check if the given code segment range is a basic block. That is, check if
+// First is the only entrance and Last is the only exit. This means that no
+// jump/branch inside the block may jump to an insn below First or after(!)
+// Last, and that no insn may jump into this block from the outside.
 {
     unsigned I;
 
@@ -1369,18 +1323,16 @@ int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last)
     /* First pass: Walk over the range and remove all marks from the entries */
     CS_ResetMarks (S, First, Last);
 
-    /* Second pass: Walk over the range checking all labels. Note: There may be
-    ** label on the first insn which is ok.
-    */
+    // Second pass: Walk over the range checking all labels. Note: There may be
+    // label on the first insn which is ok.
     I = First + 1;
     while (I <= Last) {
 
         /* Get the next entry */
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check if this entry has one or more labels, if so, check which
-        ** entries jump to this label.
-        */
+        // Check if this entry has one or more labels, if so, check which
+        // entries jump to this label.
         unsigned LabelCount = CE_GetLabelCount (E);
         unsigned LabelIndex;
         for (LabelIndex = 0; LabelIndex < LabelCount; ++LabelIndex) {
@@ -1388,9 +1340,8 @@ int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last)
             /* Get this label */
             CodeLabel* L = CE_GetLabel (E, LabelIndex);
 
-            /* Walk over all entries that jump to this label. Check for each
-            ** of the entries if it is out of the range.
-            */
+            // Walk over all entries that jump to this label. Check for each
+            // of the entries if it is out of the range.
             unsigned RefCount = CL_GetRefCount (L);
             unsigned RefIndex;
             for (RefIndex = 0; RefIndex < RefCount; ++RefIndex) {
@@ -1398,11 +1349,10 @@ int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last)
                 /* Get the code entry that jumps here */
                 CodeEntry* Ref = CL_GetRef (L, RefIndex);
 
-                /* Walk over out complete range and check if we find the
-                ** refering entry. This is cheaper than using CS_GetEntryIndex,
-                ** because CS_GetEntryIndex will search the complete code
-                ** segment and not just our range.
-                */
+                // Walk over out complete range and check if we find the
+                // refering entry. This is cheaper than using CS_GetEntryIndex,
+                // because CS_GetEntryIndex will search the complete code
+                // segment and not just our range.
                 unsigned J;
                 for (J = First; J <= Last; ++J) {
                     if (Ref == CS_GetEntry (S, J)) {
@@ -1410,18 +1360,16 @@ int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last)
                     }
                 }
                 if (J > Last) {
-                    /* We did not find the entry. This means that the jump to
-                    ** out code segment entry E came from outside the range,
-                    ** which in turn means that the given range is not a basic
-                    ** block.
-                    */
+                    // We did not find the entry. This means that the jump to
+                    // out code segment entry E came from outside the range,
+                    // which in turn means that the given range is not a basic
+                    // block.
                     CS_ResetMarks (S, First, Last);
                     return 0;
                 }
 
-                /* If we come here, we found the entry. Mark it, so we know
-                ** that the branch to the label is in range.
-                */
+                // If we come here, we found the entry. Mark it, so we know
+                // that the branch to the label is in range.
                 CE_SetMark (Ref);
             }
         }
@@ -1430,10 +1378,9 @@ int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last)
         ++I;
     }
 
-    /* Third pass: Walk again over the range and check all branches. If we
-    ** find a branch that is not marked, its target is not inside the range
-    ** (since we checked all the labels in the range before).
-    */
+    // Third pass: Walk again over the range and check all branches. If we
+    // find a branch that is not marked, its target is not inside the range
+    // (since we checked all the labels in the range before).
     I = First;
     while (I <= Last) {
 
@@ -1443,9 +1390,8 @@ int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last)
         /* Check if this is a branch and if so, if it has a mark */
         if (E->Info & (OF_UBRA | OF_CBRA)) {
             if (!CE_HasMark (E)) {
-                /* No mark means not a basic block. Before bailing out, be sure
-                ** to remove the marks from the remaining entries.
-                */
+                // No mark means not a basic block. Before bailing out, be sure
+                // to remove the marks from the remaining entries.
                 CS_ResetMarks (S, I+1, Last);
                 return 0;
             }
@@ -1465,19 +1411,17 @@ int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last)
 
 
 void CS_OutputPrologue (const CodeSeg* S)
-/* If the given code segment is a code segment for a function, output the
-** assembler prologue into the file. That is: Output a comment header, switch
-** to the correct segment and enter the local function scope. If the code
-** segment is global, do nothing.
-*/
+// If the given code segment is a code segment for a function, output the
+// assembler prologue into the file. That is: Output a comment header, switch
+// to the correct segment and enter the local function scope. If the code
+// segment is global, do nothing.
 {
     /* Get the function associated with the code segment */
     SymEntry* Func = S->Func;
 
-    /* If the code segment is associated with a function, print a function
-    ** header and enter a local scope. Be sure to switch to the correct
-    ** segment before outputing the function label.
-    */
+    // If the code segment is associated with a function, print a function
+    // header and enter a local scope. Be sure to switch to the correct
+    // segment before outputing the function label.
     if (Func) {
         /* Get the function descriptor */
         CS_PrintFunctionHeader (S);
@@ -1495,9 +1439,8 @@ void CS_OutputPrologue (const CodeSeg* S)
 
 
 void CS_OutputEpilogue (const CodeSeg* S)
-/* If the given code segment is a code segment for a function, output the
-** assembler epilogue into the file. That is: Close the local function scope.
-*/
+// If the given code segment is a code segment for a function, output the
+// assembler epilogue into the file. That is: Close the local function scope.
 {
     if (S->Func) {
         WriteOutput (".endproc\n\n");
@@ -1531,17 +1474,15 @@ void CS_Output (CodeSeg* S)
     for (I = 0; I < Count; ++I) {
         /* Get the next entry */
         const CodeEntry* E = CollConstAt (&S->Entries, I);
-        /* Check if the line info has changed. If so, output the source line
-        ** if the option is enabled and output debug line info if the debug
-        ** option is enabled.
-        */
+        // Check if the line info has changed. If so, output the source line
+        // if the option is enabled and output debug line info if the debug
+        // option is enabled.
         if (E->LI != LI) {
             /* Line info has changed, remember the new line info */
             LI = E->LI;
 
-            /* Add the source line as a comment. Beware: When line continuation
-            ** was used, the line may contain newlines.
-            */
+            // Add the source line as a comment. Beware: When line continuation
+            // was used, the line may contain newlines.
             if (AddSource) {
                 const char* L = LI->Line;
                 WriteOutput (";\n; ");
@@ -1618,9 +1559,8 @@ void CS_GenRegInfo (CodeSeg* S)
         RC_InvalidatePS (&Regs);
         CurrentRegs = &Regs;
 
-        /* Walk over all insns and note just the changes from one insn to the
-        ** next one.
-        */
+        // Walk over all insns and note just the changes from one insn to the
+        // next one.
         WasJump = 0;
         for (I = 0; I < CS_GetEntryCount (S); ++I) {
 
@@ -1633,14 +1573,13 @@ void CS_GenRegInfo (CodeSeg* S)
             unsigned LabelCount = CE_GetLabelCount (E);
             if (LabelCount > 0) {
 
-                /* Loop over all entry points that jump here. If these entry
-                ** points already have register info, check if all values are
-                ** known and identical. If all values are identical, and the
-                ** preceeding instruction was not an unconditional branch, check
-                ** if the register value on exit of the preceeding instruction
-                ** is also identical. If all these values are identical, the
-                ** value of a register is known, otherwise it is unknown.
-                */
+                // Loop over all entry points that jump here. If these entry
+                // points already have register info, check if all values are
+                // known and identical. If all values are identical, and the
+                // preceeding instruction was not an unconditional branch, check
+                // if the register value on exit of the preceeding instruction
+                // is also identical. If all these values are identical, the
+                // value of a register is known, otherwise it is unknown.
                 CodeLabel* Label = CE_GetLabel (E, 0);
                 unsigned Entry;
                 if (WasJump) {
@@ -1662,12 +1601,11 @@ void CS_GenRegInfo (CodeSeg* S)
                     /* Get this entry */
                     CodeEntry* J = CL_GetRef (Label, Entry);
                     if (J->RI == 0) {
-                        /* No register info for this entry. This means that the
-                        ** instruction that jumps here is at higher addresses and
-                        ** the jump is a backward jump. We need a second run to
-                        ** get the register info right in this case. Until then,
-                        ** assume unknown register contents.
-                        */
+                        // No register info for this entry. This means that the
+                        // instruction that jumps here is at higher addresses and
+                        // the jump is a backward jump. We need a second run to
+                        // get the register info right in this case. Until then,
+                        // assume unknown register contents.
                         Done = 0;
                         RC_Invalidate (&Regs);
                         RC_InvalidatePS (&Regs);
@@ -1711,10 +1649,9 @@ void CS_GenRegInfo (CodeSeg* S)
             /* Output registers for this insn are input for the next */
             CurrentRegs = &E->RI->Out;
 
-            /* If this insn is a branch on zero flag, we may have more info on
-            ** register contents for one of both flow directions, but only if
-            ** we've gone through a previous instruction.
-            */
+            // If this insn is a branch on zero flag, we may have more info on
+            // register contents for one of both flow directions, but only if
+            // we've gone through a previous instruction.
             if (LabelCount == 0 && (E->Info & OF_ZBRA) != 0 && (P = CS_GetPrevEntry (S, I)) != 0) {
 
                 /* Get the branch condition */
@@ -1741,9 +1678,8 @@ void CS_GenRegInfo (CodeSeg* S)
                         break;
 
                     case OP65_CMP:
-                        /* If this is an immidiate compare, the A register has
-                        ** the value of the compare later.
-                        */
+                        // If this is an immidiate compare, the A register has
+                        // the value of the compare later.
                         if (CE_IsConstImm (P)) {
                             if (BC == BC_EQ) {
                                 E->RI->Out2.RegA = (unsigned char)P->Num;
@@ -1754,9 +1690,8 @@ void CS_GenRegInfo (CodeSeg* S)
                         break;
 
                     case OP65_CPX:
-                        /* If this is an immidiate compare, the X register has
-                        ** the value of the compare later.
-                        */
+                        // If this is an immidiate compare, the X register has
+                        // the value of the compare later.
                         if (CE_IsConstImm (P)) {
                             if (BC == BC_EQ) {
                                 E->RI->Out2.RegX = (unsigned char)P->Num;
@@ -1767,9 +1702,8 @@ void CS_GenRegInfo (CodeSeg* S)
                         break;
 
                     case OP65_CPY:
-                        /* If this is an immidiate compare, the Y register has
-                        ** the value of the compare later.
-                        */
+                        // If this is an immidiate compare, the Y register has
+                        // the value of the compare later.
                         if (CE_IsConstImm (P)) {
                             if (BC == BC_EQ) {
                                 E->RI->Out2.RegY = (unsigned char)P->Num;
@@ -1805,10 +1739,9 @@ void CS_GenRegInfo (CodeSeg* S)
 
                     case OP65_TAX:
                     case OP65_TXA:
-                        /* If the branch is a beq, both A and X are zero at the
-                        ** branch target, otherwise they are zero at the next
-                        ** insn.
-                        */
+                        // If the branch is a beq, both A and X are zero at the
+                        // branch target, otherwise they are zero at the next
+                        // insn.
                         if (BC == BC_EQ) {
                             E->RI->Out2.RegA = E->RI->Out2.RegX = 0;
                         } else {
@@ -1818,10 +1751,9 @@ void CS_GenRegInfo (CodeSeg* S)
 
                     case OP65_TAY:
                     case OP65_TYA:
-                        /* If the branch is a beq, both A and Y are zero at the
-                        ** branch target, otherwise they are zero at the next
-                        ** insn.
-                        */
+                        // If the branch is a beq, both A and Y are zero at the
+                        // branch target, otherwise they are zero at the next
+                        // insn.
                         if (BC == BC_EQ) {
                             E->RI->Out2.RegA = E->RI->Out2.RegY = 0;
                         } else {

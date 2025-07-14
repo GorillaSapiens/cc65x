@@ -60,23 +60,20 @@ extern const char* LibName;
 
 
 void LibOpen (const char* Name, int MustExist, int NeedTemp);
-/* Open an existing library and a temporary copy. If MustExist is true, the
-** old library is expected to exist. If NeedTemp is true, a temporary library
-** is created.
-*/
+// Open an existing library and a temporary copy. If MustExist is true, the
+// old library is expected to exist. If NeedTemp is true, a temporary library
+// is created.
 
 unsigned long LibCopyTo (FILE* F, unsigned long Bytes);
-/* Copy data from F to the temp library file, return the start position in
-** the temporary library file.
-*/
+// Copy data from F to the temp library file, return the start position in
+// the temporary library file.
 
 void LibCopyFrom (unsigned long Pos, unsigned long Bytes, FILE* F);
 /* Copy data from the library file into another file */
 
 void LibClose (void);
-/* Write remaining data, close both files and copy the temp file to the old
-** filename
-*/
+// Write remaining data, close both files and copy the temp file to the old
+// filename
 
 
 

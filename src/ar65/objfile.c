@@ -167,9 +167,8 @@ static void SkipLineInfoList (FILE* F)
 
 
 void ObjReadData (FILE* F, ObjData* O)
-/* Read object file data from the given file. The function expects the Name
-** and Start fields to be valid. Header and basic data are read.
-*/
+// Read object file data from the given file. The function expects the Name
+// and Start fields to be valid. Header and basic data are read.
 {
     unsigned long Count;
 
@@ -239,14 +238,13 @@ void ObjAdd (const char* Name)
         Error ("Could not open '%s': %s", Name, strerror (errno));
     }
 
-    /* Get the modification time of the object file. There's a race condition
-    ** here, since we cannot use fileno() (non-standard identifier in standard
-    ** header file), and therefore not fstat. When using stat with the
-    ** file name, there's a risk that the file was deleted and recreated
-    ** while it was open. Since mtime and size are only used to check
-    ** if a file has changed in the debugger, we will ignore this problem
-    ** here.
-    */
+    // Get the modification time of the object file. There's a race condition
+    // here, since we cannot use fileno() (non-standard identifier in standard
+    // header file), and therefore not fstat. When using stat with the
+    // file name, there's a risk that the file was deleted and recreated
+    // while it was open. Since mtime and size are only used to check
+    // if a file has changed in the debugger, we will ignore this problem
+    // here.
     if (FileStat (Name, &StatBuf) != 0) {
         Error ("Cannot stat object file '%s': %s", Name, strerror (errno));
     }
@@ -263,9 +261,8 @@ void ObjAdd (const char* Name)
         /* Not found, create a new entry */
         O = NewObjData ();
     } else {
-        /* Found - check the file modification times of the internal copy
-        ** and the external one.
-        */
+        // Found - check the file modification times of the internal copy
+        // and the external one.
         if (difftime ((time_t)O->MTime, StatBuf.st_mtime) > 0.0) {
             Warning ("Replacing module '%s' by older version in library '%s'",
                      O->Name, LibName);
@@ -288,9 +285,8 @@ void ObjAdd (const char* Name)
     /* Read the basic data from the object file */
     ObjReadData (Obj, O);
 
-    /* Copy the complete object data to the library file and update the
-    ** starting offset
-    */
+    // Copy the complete object data to the library file and update the
+    // starting offset
     fseek (Obj, 0, SEEK_SET);
     O->Start    = LibCopyTo (Obj, O->Size);
 
@@ -322,9 +318,8 @@ void ObjExtract (const char* Name)
         Error ("Cannot open target file '%s': %s", Name, strerror (errno));
     }
 
-    /* Copy the complete object file data from the library to the new object
-    ** file.
-    */
+    // Copy the complete object file data from the library to the new object
+    // file.
     LibCopyFrom (O->Start, O->Size, Obj);
 
     /* Close the file */
