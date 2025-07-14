@@ -31,31 +31,24 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef ANONNAME_H
 #define ANONNAME_H
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-char* AnonFieldName (char* Buf, const char* Spec, int ANumber);
+char *AnonFieldName(char *Buf, const char *Spec, int ANumber);
 // Get a name for an anonymous field of a struct or union. The given buffer is
-// expected to be IDENTSIZE characters long. A pointer to the buffer is returned.
+// expected to be IDENTSIZE characters long. A pointer to the buffer is
+// returned.
 
-char* AnonName (char* Buf, const char* Spec);
+char *AnonName(char *Buf, const char *Spec);
 // Get a name for an anonymous variable or type. The given buffer is expected
 // to be IDENTSIZE characters long. A pointer to the buffer is returned.
 
-int IsAnonName (const char* Name);
+int IsAnonName(const char *Name);
 /* Check if the given symbol name is that of an anonymous symbol */
-
-
 
 /* End of anonname.h */
 

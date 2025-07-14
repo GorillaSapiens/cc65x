@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <limits.h>
 
 /* common */
@@ -44,137 +42,126 @@
 #include "error.h"
 #include "casenode.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-CaseNode* NewCaseNode (unsigned char Value)
+CaseNode *NewCaseNode(unsigned char Value)
 /* Create and initialize a new CaseNode */
 {
-    /* Allocate memory */
-    CaseNode* N = xmalloc (sizeof (CaseNode));
+   /* Allocate memory */
+   CaseNode *N = xmalloc(sizeof(CaseNode));
 
-    /* Initialize the fields */
-    N->Value = Value;
-    N->Label = 0;
-    N->Nodes = 0;
+   /* Initialize the fields */
+   N->Value = Value;
+   N->Label = 0;
+   N->Nodes = 0;
 
-    /* Return the new node */
-    return N;
+   /* Return the new node */
+   return N;
 }
 
-
-
-void FreeCaseNode (CaseNode* N)
+void FreeCaseNode(CaseNode *N)
 /* Delete a case node plus all sub nodes */
 {
-    if (N->Nodes) {
-        FreeCaseNodeColl (N->Nodes);
-    }
-    xfree (N);
+   if (N->Nodes) {
+      FreeCaseNodeColl(N->Nodes);
+   }
+   xfree(N);
 }
 
-
-
-void FreeCaseNodeColl (Collection* Nodes)
+void FreeCaseNodeColl(Collection *Nodes)
 /* Free a collection of case nodes */
 {
-    unsigned I;
-    for (I = 0; I < CollCount (Nodes); ++I) {
-        FreeCaseNode (CollAtUnchecked (Nodes, I));
-    }
-    FreeCollection (Nodes);
+   unsigned I;
+   for (I = 0; I < CollCount(Nodes); ++I) {
+      FreeCaseNode(CollAtUnchecked(Nodes, I));
+   }
+   FreeCollection(Nodes);
 }
 
-
-
-int SearchCaseNode (const Collection* Nodes, unsigned char Key, int* Index)
+int SearchCaseNode(const Collection *Nodes, unsigned char Key, int *Index)
 // Search for a node in the given collection. If the node has been found,
 // set Index to the index of the node and return true. If the node was not
 // found, set Index the insertion position of the node and return
 // false.
 {
-    /* Do a binary search */
-    int First = 0;
-    int Last = CollCount (Nodes) - 1;
-    int S = 0;
+   /* Do a binary search */
+   int First = 0;
+   int Last = CollCount(Nodes) - 1;
+   int S = 0;
 
-    while (First <= Last) {
+   while (First <= Last) {
 
-        /* Set current to mid of range */
-        int Current = (Last + First) / 2;
+      /* Set current to mid of range */
+      int Current = (Last + First) / 2;
 
-        /* Get the entry from this position */
-        const CaseNode* N = CollConstAt (Nodes, Current);
+      /* Get the entry from this position */
+      const CaseNode *N = CollConstAt(Nodes, Current);
 
-        /* Compare the values */
-        if (N->Value < Key) {
-            First = Current + 1;
-        } else {
-            Last = Current - 1;
-            if (N->Value == Key) {
-                /* Found. We cannot have duplicates, so end the search here. */
-                S = 1;
-                First = Current;
-            }
-        }
+      /* Compare the values */
+      if (N->Value < Key) {
+         First = Current + 1;
+      }
+      else {
+         Last = Current - 1;
+         if (N->Value == Key) {
+            /* Found. We cannot have duplicates, so end the search here. */
+            S = 1;
+            First = Current;
+         }
+      }
+   }
 
-    }
-
-    *Index = First;
-    return S;
+   *Index = First;
+   return S;
 }
 
-
-
-unsigned InsertCaseValue (Collection* Nodes, unsigned long Val, unsigned Depth)
+unsigned InsertCaseValue(Collection *Nodes, unsigned long Val, unsigned Depth)
 // Insert a new case value into a CaseNode tree with the given depth. Return
 // the code label for the value.
 {
-    CaseNode* N = 0;
-    unsigned CaseLabel = GetLocalLabel ();  /* Code label */
+   CaseNode *N = 0;
+   unsigned CaseLabel = GetLocalLabel(); /* Code label */
 
-    while (Depth--) {
+   while (Depth--) {
 
-        int Index;
+      int Index;
 
-        /* Get the key */
-        unsigned char Key = (Val >> (Depth * CHAR_BIT)) & 0xFF;
+      /* Get the key */
+      unsigned char Key = (Val >> (Depth * CHAR_BIT)) & 0xFF;
 
-        /* Search for the node in the collection */
-        if (SearchCaseNode (Nodes, Key, &Index) == 0) {
+      /* Search for the node in the collection */
+      if (SearchCaseNode(Nodes, Key, &Index) == 0) {
 
-            /* Node not found - insert one */
-            N = NewCaseNode (Key);
-            CollInsert (Nodes, N, Index);
+         /* Node not found - insert one */
+         N = NewCaseNode(Key);
+         CollInsert(Nodes, N, Index);
 
-            // If this is not the last round, create the collection for
-            // the subnodes, otherwise get a label for the code.
-            if (Depth > 0) {
-                N->Nodes = NewCollection ();
-            } else {
-                N->Label = CaseLabel;
-            }
+         // If this is not the last round, create the collection for
+         // the subnodes, otherwise get a label for the code.
+         if (Depth > 0) {
+            N->Nodes = NewCollection();
+         }
+         else {
+            N->Label = CaseLabel;
+         }
+      }
+      else {
+         /* Node found, get it */
+         N = CollAt(Nodes, Index);
 
-        } else {
-            /* Node found, get it */
-            N = CollAt (Nodes, Index);
+         // If this is the last round and we found a node, we have a
+         // duplicate case label in a switch.
+         if (Depth == 0) {
+            Error("Duplicate case label");
+         }
+      }
 
-            // If this is the last round and we found a node, we have a
-            // duplicate case label in a switch.
-            if (Depth == 0) {
-                Error ("Duplicate case label");
-            }
-        }
+      /* Get the collection from the node for the next round. */
+      Nodes = N->Nodes;
+   }
 
-        /* Get the collection from the node for the next round. */
-        Nodes = N->Nodes;
-    }
-
-    /* Return the label of the node we found/created */
-    return CaseLabel;
+   /* Return the label of the node we found/created */
+   return CaseLabel;
 }

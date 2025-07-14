@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <stdlib.h>
 
 #include "error.h"
@@ -40,41 +38,37 @@
 #include "library.h"
 #include "del.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void DelObjFiles (int argc, char* argv [])
+void DelObjFiles(int argc, char *argv[])
 /* Delete modules from a library */
 {
-    int I;
+   int I;
 
-    /* Check the argument count */
-    if (argc <= 0) {
-        Error ("No library name given");
-    }
-    if (argc <= 1) {
-        Error ("No modules to delete");
-    }
+   /* Check the argument count */
+   if (argc <= 0) {
+      Error("No library name given");
+   }
+   if (argc <= 1) {
+      Error("No modules to delete");
+   }
 
-    /* Open the library, read the index */
-    LibOpen (argv [0], 1, 1);
+   /* Open the library, read the index */
+   LibOpen(argv[0], 1, 1);
 
-    /* Delete the modules */
-    I = 1;
-    while (I < argc) {
-        /* Delete the module from the list */
-        DelObjData (argv [I]);
-        ++I;
-    }
+   /* Delete the modules */
+   I = 1;
+   while (I < argc) {
+      /* Delete the module from the list */
+      DelObjData(argv[I]);
+      ++I;
+   }
 
-    /* Create a new library file and close the old one */
-    LibClose ();
+   /* Create a new library file and close the old one */
+   LibClose();
 
-    /* Successful end */
-    exit (EXIT_SUCCESS);
+   /* Successful end */
+   exit(EXIT_SUCCESS);
 }

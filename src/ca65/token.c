@@ -31,43 +31,33 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* ca65 */
 #include "token.h"
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-int TokHasSVal (token_t Tok)
+int TokHasSVal(token_t Tok)
 /* Return true if the given token has an attached SVal */
 {
-    return (Tok == TOK_IDENT || Tok == TOK_LOCAL_IDENT || Tok == TOK_STRCON);
+   return (Tok == TOK_IDENT || Tok == TOK_LOCAL_IDENT || Tok == TOK_STRCON);
 }
 
-
-
-int TokHasIVal (token_t Tok)
+int TokHasIVal(token_t Tok)
 /* Return true if the given token has an attached IVal */
 {
-    return (Tok == TOK_INTCON || Tok == TOK_CHARCON || Tok == TOK_REG);
+   return (Tok == TOK_INTCON || Tok == TOK_CHARCON || Tok == TOK_REG);
 }
 
-
-
-void CopyToken (Token* Dst, const Token* Src)
+void CopyToken(Token *Dst, const Token *Src)
 // Copy a token from Src to Dst. The current value of Dst.SVal is free'd,
 // so Dst must be initialized.
 {
-    /* Copy the fields */
-    Dst->Tok  = Src->Tok;
-    Dst->WS   = Src->WS;
-    Dst->IVal = Src->IVal;
-    SB_Copy (&Dst->SVal, &Src->SVal);
-    Dst->Pos  = Src->Pos;
+   /* Copy the fields */
+   Dst->Tok = Src->Tok;
+   Dst->WS = Src->WS;
+   Dst->IVal = Src->IVal;
+   SB_Copy(&Dst->SVal, &Src->SVal);
+   Dst->Pos = Src->Pos;
 }

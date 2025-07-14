@@ -31,40 +31,28 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* cc65 */
 #include "stackptr.h"
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Compiler relative stackpointer */
 int StackPtr = 0;
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void SP_Push (const Type* T)
+void SP_Push(const Type *T)
 /* Adjust the stackpointer for a push of an argument of the given type */
 {
-    StackPtr -= SizeOf (T);
+   StackPtr -= SizeOf(T);
 }
 
-
-
-void SP_Pop (const Type* T)
+void SP_Pop(const Type *T)
 /* Adjust the stackpointer for a pop of an argument of the given type */
 {
-    StackPtr += SizeOf (T);
+   StackPtr += SizeOf(T);
 }

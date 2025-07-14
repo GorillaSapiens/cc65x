@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -41,84 +39,69 @@
 #include "error.h"
 #include "peripherals.h"
 
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* flag to print cycles at program termination */
 int PrintCycles = 0;
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void Warning (const char* Format, ...)
+void Warning(const char *Format, ...)
 /* Print a warning message */
 {
-    va_list ap;
-    va_start (ap, Format);
-    fprintf (stderr, "Warning: ");
-    vfprintf (stderr, Format, ap);
-    putc ('\n', stderr);
-    va_end (ap);
+   va_list ap;
+   va_start(ap, Format);
+   fprintf(stderr, "Warning: ");
+   vfprintf(stderr, Format, ap);
+   putc('\n', stderr);
+   va_end(ap);
 }
 
-
-
-void Error (const char* Format, ...)
+void Error(const char *Format, ...)
 /* Print an error message and die */
 {
-    va_list ap;
-    va_start (ap, Format);
-    fprintf (stderr, "Error: ");
-    vfprintf (stderr, Format, ap);
-    putc ('\n', stderr);
-    va_end (ap);
-    exit (SIM65_ERROR);
+   va_list ap;
+   va_start(ap, Format);
+   fprintf(stderr, "Error: ");
+   vfprintf(stderr, Format, ap);
+   putc('\n', stderr);
+   va_end(ap);
+   exit(SIM65_ERROR);
 }
 
-
-
-void ErrorCode (int Code, const char* Format, ...)
+void ErrorCode(int Code, const char *Format, ...)
 /* Print an error message and die with the given exit code */
 {
-    va_list ap;
-    va_start (ap, Format);
-    fprintf (stderr, "Error: ");
-    vfprintf (stderr, Format, ap);
-    putc ('\n', stderr);
-    va_end (ap);
-    exit (Code);
+   va_list ap;
+   va_start(ap, Format);
+   fprintf(stderr, "Error: ");
+   vfprintf(stderr, Format, ap);
+   putc('\n', stderr);
+   va_end(ap);
+   exit(Code);
 }
 
-
-
-void Internal (const char* Format, ...)
+void Internal(const char *Format, ...)
 /* Print an internal error message and die */
 {
-    va_list ap;
-    va_start (ap, Format);
-    fprintf (stderr, "Internal error: ");
-    vfprintf (stderr, Format, ap);
-    putc ('\n', stderr);
-    va_end (ap);
-    exit (SIM65_ERROR);
+   va_list ap;
+   va_start(ap, Format);
+   fprintf(stderr, "Internal error: ");
+   vfprintf(stderr, Format, ap);
+   putc('\n', stderr);
+   va_end(ap);
+   exit(SIM65_ERROR);
 }
 
-
-
-void SimExit (int Code)
+void SimExit(int Code)
 /* Exit the simulation with an exit code */
 {
-    if (PrintCycles) {
-        fprintf (stdout, "%" PRIu64 " cycles\n", Peripherals.Counter.ClockCycles);
-    }
-    exit (Code);
+   if (PrintCycles) {
+      fprintf(stdout, "%" PRIu64 " cycles\n", Peripherals.Counter.ClockCycles);
+   }
+   exit(Code);
 }

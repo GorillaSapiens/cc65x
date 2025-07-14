@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* common */
 #include "assertion.h"
 #include "coll.h"
@@ -47,113 +45,104 @@
 #include "objdata.h"
 #include "spool.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Assertion struct decl */
 struct Assertion {
-    Collection          LineInfos;      /* File position of assertion */
-    ExprNode*           Expr;           /* Expression to evaluate */
-    AssertAction        Action;         /* What to do */
-    unsigned            Msg;            /* Message to print */
-    ObjData*            Obj;            /* Object file containing the assertion */
+   Collection LineInfos; /* File position of assertion */
+   ExprNode *Expr;       /* Expression to evaluate */
+   AssertAction Action;  /* What to do */
+   unsigned Msg;         /* Message to print */
+   ObjData *Obj;         /* Object file containing the assertion */
 };
 
 /* List with all assertions */
 static Collection Assertions = STATIC_COLLECTION_INITIALIZER;
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-Assertion* ReadAssertion (FILE* F, struct ObjData* O)
+Assertion *ReadAssertion(FILE *F, struct ObjData *O)
 /* Read an assertion from the given file */
 {
-    /* Allocate memory */
-    Assertion* A = xmalloc (sizeof (Assertion));
+   /* Allocate memory */
+   Assertion *A = xmalloc(sizeof(Assertion));
 
-    /* Read the fields from the file */
-    A->LineInfos = EmptyCollection;
-    A->Expr      = ReadExpr (F, O);
-    A->Action    = (AssertAction) ReadVar (F);
-    A->Msg       = MakeGlobalStringId (O, ReadVar (F));
-    ReadLineInfoList (F, O, &A->LineInfos);
+   /* Read the fields from the file */
+   A->LineInfos = EmptyCollection;
+   A->Expr = ReadExpr(F, O);
+   A->Action = (AssertAction)ReadVar(F);
+   A->Msg = MakeGlobalStringId(O, ReadVar(F));
+   ReadLineInfoList(F, O, &A->LineInfos);
 
-    /* Set remaining fields */
-    A->Obj = O;
+   /* Set remaining fields */
+   A->Obj = O;
 
-    /* Add the assertion to the global list */
-    CollAppend (&Assertions, A);
+   /* Add the assertion to the global list */
+   CollAppend(&Assertions, A);
 
-    /* Return the new struct */
-    return A;
+   /* Return the new struct */
+   return A;
 }
 
-
-
-void CheckAssertions (void)
+void CheckAssertions(void)
 /* Check all assertions */
 {
-    unsigned I;
+   unsigned I;
 
-    /* Walk over all assertions */
-    for (I = 0; I < CollCount (&Assertions); ++I) {
+   /* Walk over all assertions */
+   for (I = 0; I < CollCount(&Assertions); ++I) {
 
-        const LineInfo* LI;
-        const char* Module;
-        unsigned Line;
+      const LineInfo *LI;
+      const char *Module;
+      unsigned Line;
 
-        /* Get the assertion */
-        Assertion* A = CollAtUnchecked (&Assertions, I);
+      /* Get the assertion */
+      Assertion *A = CollAtUnchecked(&Assertions, I);
 
-        /* Ignore assertions that shouldn't be handled at link time */
-        if (!AssertAtLinkTime (A->Action)) {
-            continue;
-        }
+      /* Ignore assertions that shouldn't be handled at link time */
+      if (!AssertAtLinkTime(A->Action)) {
+         continue;
+      }
 
-        /* Retrieve the relevant line info for this assertion */
-        LI = CollConstAt (&A->LineInfos, 0);
+      /* Retrieve the relevant line info for this assertion */
+      LI = CollConstAt(&A->LineInfos, 0);
 
-        /* Get file name and line number from the source */
-        Module = GetSourceName (LI);
-        Line   = GetSourceLine (LI);
+      /* Get file name and line number from the source */
+      Module = GetSourceName(LI);
+      Line = GetSourceLine(LI);
 
-        /* If the expression is not constant, we're not able to handle it */
-        if (!IsConstExpr (A->Expr)) {
-            Warning ("Cannot evaluate assertion in module '%s', line %u",
-                     Module, Line);
-        } else if (GetExprVal (A->Expr) == 0) {
+      /* If the expression is not constant, we're not able to handle it */
+      if (!IsConstExpr(A->Expr)) {
+         Warning("Cannot evaluate assertion in module '%s', line %u", Module,
+                 Line);
+      }
+      else if (GetExprVal(A->Expr) == 0) {
 
-            /* Assertion failed */
-            const char* Message = GetString (A->Msg);
+         /* Assertion failed */
+         const char *Message = GetString(A->Msg);
 
-            switch (A->Action) {
+         switch (A->Action) {
 
-                case ASSERT_ACT_WARN:
-                case ASSERT_ACT_LDWARN:
-                    Warning ("%s:%u: %s", Module, Line, Message);
-                    break;
+            case ASSERT_ACT_WARN:
+            case ASSERT_ACT_LDWARN:
+               Warning("%s:%u: %s", Module, Line, Message);
+               break;
 
-                case ASSERT_ACT_ERROR:
-                case ASSERT_ACT_LDERROR:
-                    Error ("%s:%u: %s", Module, Line, Message);
-                    break;
+            case ASSERT_ACT_ERROR:
+            case ASSERT_ACT_LDERROR:
+               Error("%s:%u: %s", Module, Line, Message);
+               break;
 
-                default:
-                    Internal ("Invalid assertion action (%u) in module '%s', "
-                              "line %u (file corrupt?)",
-                              A->Action, Module, Line);
-                    break;
-            }
-        }
-    }
+            default:
+               Internal("Invalid assertion action (%u) in module '%s', "
+                        "line %u (file corrupt?)",
+                        A->Action, Module, Line);
+               break;
+         }
+      }
+   }
 }

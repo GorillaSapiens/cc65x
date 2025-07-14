@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <stdio.h>
 #include <string.h>
 
@@ -44,129 +42,107 @@
 #include "error.h"
 #include "segments.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
-static struct SegContext* CurrentFunctionSegment;
-
-
+static struct SegContext *CurrentFunctionSegment;
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void UseLabelPoolFromSegments (struct SegContext* Seg)
+void UseLabelPoolFromSegments(struct SegContext *Seg)
 /* Use the info in segments for generating new label numbers */
 {
-    CurrentFunctionSegment = Seg;
+   CurrentFunctionSegment = Seg;
 }
 
-
-
-unsigned GetLocalLabel (void)
+unsigned GetLocalLabel(void)
 /* Get an unused assembler label for the function. Will never return zero. */
 {
-    PRECONDITION (CurrentFunctionSegment != 0);
+   PRECONDITION(CurrentFunctionSegment != 0);
 
-    /* Check for an overflow */
-    if (CurrentFunctionSegment->NextLabel >= 0xFFFF) {
-        Internal ("Local label overflow");
-    }
+   /* Check for an overflow */
+   if (CurrentFunctionSegment->NextLabel >= 0xFFFF) {
+      Internal("Local label overflow");
+   }
 
-    /* Return the next label */
-    return ++CurrentFunctionSegment->NextLabel;
+   /* Return the next label */
+   return ++CurrentFunctionSegment->NextLabel;
 }
 
-
-
-const char* LocalLabelName (unsigned L)
+const char *LocalLabelName(unsigned L)
 // Make a label name from the given label number. The label name will be
 // created in static storage and overwritten when calling the function
 // again.
 {
-    static char Buf[64];
-    sprintf (Buf, "L%04X", L);
-    return Buf;
+   static char Buf[64];
+   sprintf(Buf, "L%04X", L);
+   return Buf;
 }
 
-
-
-int IsLocalLabelName (const char* Name)
+int IsLocalLabelName(const char *Name)
 /* Return true if Name is the name of a local label */
 {
-    unsigned I;
+   unsigned I;
 
-    if (Name[0] != 'L' || strlen (Name) != 5) {
-        return 0;
-    }
-    for (I = 1; I <= 4; ++I) {
-        if (!IsXDigit (Name[I])) {
-            return 0;
-        }
-    }
+   if (Name[0] != 'L' || strlen(Name) != 5) {
+      return 0;
+   }
+   for (I = 1; I <= 4; ++I) {
+      if (!IsXDigit(Name[I])) {
+         return 0;
+      }
+   }
 
-    /* Local label name */
-    return 1;
+   /* Local label name */
+   return 1;
 }
 
-
-
-unsigned GetLocalDataLabel (void)
+unsigned GetLocalDataLabel(void)
 /* Get an unused local data label. Will never return zero. */
 {
-    PRECONDITION (CurrentFunctionSegment != 0);
+   PRECONDITION(CurrentFunctionSegment != 0);
 
-    /* Check for an overflow */
-    if (CurrentFunctionSegment->NextDataLabel >= 0xFFFF) {
-        Internal ("Local data label overflow");
-    }
+   /* Check for an overflow */
+   if (CurrentFunctionSegment->NextDataLabel >= 0xFFFF) {
+      Internal("Local data label overflow");
+   }
 
-    /* Return the next label */
-    return ++CurrentFunctionSegment->NextDataLabel;
+   /* Return the next label */
+   return ++CurrentFunctionSegment->NextDataLabel;
 }
 
-
-
-const char* LocalDataLabelName (unsigned L)
+const char *LocalDataLabelName(unsigned L)
 // Make a label name from the given data label number. The label name will be
 // created in static storage and overwritten when calling the function again.
 {
-    static char Buf[64];
-    sprintf (Buf, "M%04X", L);
-    return Buf;
+   static char Buf[64];
+   sprintf(Buf, "M%04X", L);
+   return Buf;
 }
 
-
-
-unsigned GetPooledLiteralLabel (void)
+unsigned GetPooledLiteralLabel(void)
 /* Get an unused literal label. Will never return zero. */
 {
-    /* Number to generate unique labels */
-    static unsigned NextLabel = 0;
+   /* Number to generate unique labels */
+   static unsigned NextLabel = 0;
 
-    /* Check for an overflow */
-    if (NextLabel >= 0xFFFF) {
-        Internal ("Literal label overflow");
-    }
+   /* Check for an overflow */
+   if (NextLabel >= 0xFFFF) {
+      Internal("Literal label overflow");
+   }
 
-    /* Return the next label */
-    return ++NextLabel;
+   /* Return the next label */
+   return ++NextLabel;
 }
 
-
-
-const char* PooledLiteralLabelName (unsigned L)
+const char *PooledLiteralLabelName(unsigned L)
 // Make a litral label name from the given label number. The label name will be
 // created in static storage and overwritten when calling the function again.
 {
-    static char Buf[64];
-    sprintf (Buf, "S%04X", L);
-    return Buf;
+   static char Buf[64];
+   sprintf(Buf, "S%04X", L);
+   return Buf;
 }

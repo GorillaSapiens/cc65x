@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* common */
 #include "check.h"
 #include "xmalloc.h"
@@ -42,59 +40,47 @@
 #include "loop.h"
 #include "stackptr.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* The root */
-static LoopDesc* LoopStack = 0;
-
-
+static LoopDesc *LoopStack = 0;
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-LoopDesc* AddLoop (unsigned BreakLabel, unsigned ContinueLabel)
+LoopDesc *AddLoop(unsigned BreakLabel, unsigned ContinueLabel)
 /* Create and add a new loop descriptor. */
 {
-    /* Allocate a new struct */
-    LoopDesc* L = xmalloc (sizeof (LoopDesc));
+   /* Allocate a new struct */
+   LoopDesc *L = xmalloc(sizeof(LoopDesc));
 
-    /* Fill in the data */
-    L->StackPtr         = StackPtr;
-    L->BreakLabel       = BreakLabel;
-    L->ContinueLabel    = ContinueLabel;
+   /* Fill in the data */
+   L->StackPtr = StackPtr;
+   L->BreakLabel = BreakLabel;
+   L->ContinueLabel = ContinueLabel;
 
-    /* Insert it into the list */
-    L->Next = LoopStack;
-    LoopStack = L;
+   /* Insert it into the list */
+   L->Next = LoopStack;
+   LoopStack = L;
 
-    /* Return a pointer to the struct */
-    return L;
+   /* Return a pointer to the struct */
+   return L;
 }
 
-
-
-LoopDesc* CurrentLoop (void)
+LoopDesc *CurrentLoop(void)
 /* Return a pointer to the descriptor of the current loop */
 {
-    return LoopStack;
+   return LoopStack;
 }
 
-
-
-void DelLoop (void)
+void DelLoop(void)
 /* Remove the current loop */
 {
-    LoopDesc* L = LoopStack;
-    CHECK (L != 0);
-    LoopStack = LoopStack->Next;
-    xfree (L);
+   LoopDesc *L = LoopStack;
+   CHECK(L != 0);
+   LoopStack = LoopStack->Next;
+   xfree(L);
 }

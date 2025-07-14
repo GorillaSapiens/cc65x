@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <string.h>
 
 /* common */
@@ -43,96 +41,84 @@
 #include "attrtab.h"
 #include "segment.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Hash definitions */
-#define HASH_SIZE       53
+#define HASH_SIZE 53
 
 /* Segment definition */
 typedef struct Segment Segment;
 struct Segment {
-    Segment*            NextStart;      /* Pointer to next segment */
-    uint32_t            Start;
-    unsigned            AddrSize;
-    char                Name[1];        /* Name, dynamically allocated */
+   Segment *NextStart; /* Pointer to next segment */
+   uint32_t Start;
+   unsigned AddrSize;
+   char Name[1]; /* Name, dynamically allocated */
 };
 
 // Table containing the segments. A segment is inserted using its hash
 // value. Collisions are handled by single-linked lists.
-static Segment* StartTab[HASH_SIZE];    /* Table containing segment starts */
-
-
+static Segment *StartTab[HASH_SIZE]; /* Table containing segment starts */
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void AddAbsSegment (uint32_t Start, uint32_t End, const char* Name)
+void AddAbsSegment(uint32_t Start, uint32_t End, const char *Name)
 /* Add an absolute segment to the segment table */
 {
-    /* Get the length of the name */
-    unsigned Len = strlen (Name);
+   /* Get the length of the name */
+   unsigned Len = strlen(Name);
 
-    /* Create a new segment */
-    Segment* S = xmalloc (sizeof (Segment) + Len);
+   /* Create a new segment */
+   Segment *S = xmalloc(sizeof(Segment) + Len);
 
-    /* Fill in the data */
-    S->Start    = Start;
-    S->AddrSize = ADDR_SIZE_ABS;
-    memcpy (S->Name, Name, Len + 1);
+   /* Fill in the data */
+   S->Start = Start;
+   S->AddrSize = ADDR_SIZE_ABS;
+   memcpy(S->Name, Name, Len + 1);
 
-    /* Insert the segment into the hash table */
-    S->NextStart = StartTab[Start % HASH_SIZE];
-    StartTab[Start % HASH_SIZE] = S;
+   /* Insert the segment into the hash table */
+   S->NextStart = StartTab[Start % HASH_SIZE];
+   StartTab[Start % HASH_SIZE] = S;
 
-    /* Mark start and end of the segment */
-    MarkAddr (Start, atSegmentStart);
-    MarkAddr (End, atSegmentEnd);
+   /* Mark start and end of the segment */
+   MarkAddr(Start, atSegmentStart);
+   MarkAddr(End, atSegmentEnd);
 
-    /* Mark the addresses within the segment */
-    MarkRange (Start, End, atSegment);
+   /* Mark the addresses within the segment */
+   MarkRange(Start, End, atSegment);
 }
 
-
-
-char* GetSegmentStartName (uint32_t Addr)
+char *GetSegmentStartName(uint32_t Addr)
 /* Return the name of the segment which starts at the given address */
 {
-    Segment* S = StartTab[Addr % HASH_SIZE];
+   Segment *S = StartTab[Addr % HASH_SIZE];
 
-    /* Search the collision list for the exact address */
-    while (S != 0) {
-        if (S->Start == Addr) {
-            return S->Name;
-        }
-        S = S->NextStart;
-    }
+   /* Search the collision list for the exact address */
+   while (S != 0) {
+      if (S->Start == Addr) {
+         return S->Name;
+      }
+      S = S->NextStart;
+   }
 
-    return 0;
+   return 0;
 }
 
-
-
-unsigned GetSegmentAddrSize (uint32_t Addr)
+unsigned GetSegmentAddrSize(uint32_t Addr)
 /* Return the address size of the segment which starts at the given address */
 {
-    Segment* S = StartTab[Addr % HASH_SIZE];
+   Segment *S = StartTab[Addr % HASH_SIZE];
 
-    /* Search the collision list for the exact address */
-    while (S != 0) {
-        if (S->Start == Addr) {
-            return S->AddrSize;
-        }
-        S = S->NextStart;
-    }
+   /* Search the collision list for the exact address */
+   while (S != 0) {
+      if (S->Start == Addr) {
+         return S->AddrSize;
+      }
+      S = S->NextStart;
+   }
 
-    return 0;
+   return 0;
 }

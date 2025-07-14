@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <stdlib.h>
 
 /* common */
@@ -44,79 +42,70 @@
 #include "input.h"
 #include "pcx.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Possible input formats */
 enum InputFormat {
-    ifPCX,                      /* PCX */
-    ifCount                     /* Number of actual input formats w/o ifAuto*/
+   ifPCX,  /* PCX */
+   ifCount /* Number of actual input formats w/o ifAuto*/
 };
 
 typedef struct InputFormatDesc InputFormatDesc;
 struct InputFormatDesc {
-    /* Read routine */
-    Bitmap* (*Read) (const Collection*);
+   /* Read routine */
+   Bitmap *(*Read)(const Collection *);
 };
 
 /* Table with input formats indexed by InputFormat */
 static InputFormatDesc InputFormatTable[ifCount] = {
-    {   ReadPCXFile     },
+    {ReadPCXFile},
 };
 
 /* Table that maps extensions to input formats. */
 /* CAUTION: table must be alphabetically sorted for bsearch */
 static const FileId FormatTable[] = {
     /* Upper case stuff for obsolete operating systems */
-/* BEGIN SORTED.SH */
-    {   "PCX",  ifPCX           },
-    {   "pcx",  ifPCX           },
-/* END SORTED.SH */
+    /* BEGIN SORTED.SH */
+    {"PCX", ifPCX},
+    {"pcx", ifPCX},
+    /* END SORTED.SH */
 };
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-Bitmap* ReadInputFile (const Collection* A)
+Bitmap *ReadInputFile(const Collection *A)
 // Read a bitmap from a file and return it. Format, file name etc. must be
 // given as attributes in A. If no format is given, the function tries to
 // autodetect it by using the extension of the file name.
 {
-    const FileId* F;
+   const FileId *F;
 
-    /* Get the file format from the command line */
-    const char* Format = GetAttrVal (A, "format");
-    if (Format != 0) {
-        /* Format is given, search for it in the table. */
-        F = bsearch (Format,
-                     FormatTable,
-                     sizeof (FormatTable) / sizeof (FormatTable[0]),
-                     sizeof (FormatTable[0]),
-                     CompareFileId);
-        if (F == 0) {
-            Error ("Unknown input format '%s'", Format);
-        }
-    } else {
-        /* No format given, use file name extension */
-        const char* Name = NeedAttrVal (A, "name", "write");
-        F = GetFileId (Name, FormatTable,
-                       sizeof (FormatTable) / sizeof (FormatTable[0]));
-        /* Found? */
-        if (F == 0) {
-            Error ("Cannot determine file format of input file '%s'", Name);
-        }
-    }
+   /* Get the file format from the command line */
+   const char *Format = GetAttrVal(A, "format");
+   if (Format != 0) {
+      /* Format is given, search for it in the table. */
+      F = bsearch(Format, FormatTable,
+                  sizeof(FormatTable) / sizeof(FormatTable[0]),
+                  sizeof(FormatTable[0]), CompareFileId);
+      if (F == 0) {
+         Error("Unknown input format '%s'", Format);
+      }
+   }
+   else {
+      /* No format given, use file name extension */
+      const char *Name = NeedAttrVal(A, "name", "write");
+      F = GetFileId(Name, FormatTable,
+                    sizeof(FormatTable) / sizeof(FormatTable[0]));
+      /* Found? */
+      if (F == 0) {
+         Error("Cannot determine file format of input file '%s'", Name);
+      }
+   }
 
-    /* Call the format specific read */
-    return InputFormatTable[F->Id].Read (A);
+   /* Call the format specific read */
+   return InputFormatTable[F->Id].Read(A);
 }

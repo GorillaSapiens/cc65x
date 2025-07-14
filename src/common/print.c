@@ -31,44 +31,34 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <stdarg.h>
 
 /* common */
 #include "print.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
-unsigned char Verbosity = 0;            /* Verbose operation flag */
-
-
+unsigned char Verbosity = 0; /* Verbose operation flag */
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void Print (FILE* F, unsigned V, const char* Format, ...)
+void Print(FILE *F, unsigned V, const char *Format, ...)
 /* Output according to Verbosity */
 {
-    va_list ap;
+   va_list ap;
 
-    /* Check the verbosity */
-    if (V > Verbosity) {
-        /* Don't output this message */
-        return;
-    }
+   /* Check the verbosity */
+   if (V > Verbosity) {
+      /* Don't output this message */
+      return;
+   }
 
-    /* Output */
-    va_start (ap, Format);
-    vfprintf (F, Format, ap);
-    va_end (ap);
+   /* Output */
+   va_start(ap, Format);
+   vfprintf(F, Format, ap);
+   va_end(ap);
 }

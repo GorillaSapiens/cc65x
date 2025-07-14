@@ -31,12 +31,8 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef GEOSBITMAP_H
 #define GEOSBITMAP_H
-
-
 
 /* common */
 #include "coll.h"
@@ -45,25 +41,15 @@
 /* sp65 */
 #include "bitmap.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-StrBuf* GenGeosBitmap (const Bitmap* B, const Collection* A);
+StrBuf *GenGeosBitmap(const Bitmap *B, const Collection *A);
 // Generate binary output in GEOS compacted bitmap format for the bitmap B.
 // The output is stored in a string buffer (which is actually a dynamic char
 // array) and returned.
 
-
-
 /* End of geosbitmap.h */
 
 #endif
-
-
-
-

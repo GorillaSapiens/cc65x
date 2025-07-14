@@ -31,56 +31,44 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef ISTACK_H
 #define ISTACK_H
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Opaque pointer to an input stack */
-typedef void* InputStack;
-
-
+typedef void *InputStack;
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void PushInput (int (*Func) (void*), void* Data, const char* Desc);
+void PushInput(int (*Func)(void *), void *Data, const char *Desc);
 /* Push an input function onto the input stack */
 
-void PopInput (void);
+void PopInput(void);
 /* Pop the current input function from the input stack */
 
-int InputFromStack (void);
+int InputFromStack(void);
 // Try to get input from the input stack. Return true if we had such input,
 // return false otherwise.
 
-int HavePushedInput (void);
+int HavePushedInput(void);
 /* Return true if we have stacked input available, return false if not */
 
-void CheckInputStack (void);
+void CheckInputStack(void);
 // Called from the scanner before closing an input file. Will check for any
 // stuff on the input stack.
 
-InputStack RetrieveInputStack (void);
+InputStack RetrieveInputStack(void);
 // Retrieve the current input stack. This will also clear it. Used when
 // including a file. The current input stack is stored together with the old
 // input file and restored when the file is closed.
 
-void RestoreInputStack (InputStack S);
+void RestoreInputStack(InputStack S);
 /* Restore an old input stack that was retrieved by RetrieveInputStack(). */
-
-
 
 /* End of istack.h */
 

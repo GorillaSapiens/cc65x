@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -44,80 +42,68 @@
 /* ld65 */
 #include "error.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Statistics */
-unsigned WarningCount   = 0;
-
-
+unsigned WarningCount = 0;
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void Warning (const char* Format, ...)
+void Warning(const char *Format, ...)
 /* Print a warning message */
 {
-    StrBuf S = STATIC_STRBUF_INITIALIZER;
-    va_list ap;
+   StrBuf S = STATIC_STRBUF_INITIALIZER;
+   va_list ap;
 
-    va_start (ap, Format);
-    SB_VPrintf (&S, Format, ap);
-    va_end (ap);
-    SB_Terminate (&S);
+   va_start(ap, Format);
+   SB_VPrintf(&S, Format, ap);
+   va_end(ap);
+   SB_Terminate(&S);
 
-    fprintf (stderr, "%s: Warning: %s\n", ProgName, SB_GetConstBuf (&S));
+   fprintf(stderr, "%s: Warning: %s\n", ProgName, SB_GetConstBuf(&S));
 
-    SB_Done (&S);
+   SB_Done(&S);
 
-    /* Count warnings */
-    ++WarningCount;
+   /* Count warnings */
+   ++WarningCount;
 }
 
-
-
-void Error (const char* Format, ...)
+void Error(const char *Format, ...)
 /* Print an error message and die */
 {
-    StrBuf S = STATIC_STRBUF_INITIALIZER;
-    va_list ap;
+   StrBuf S = STATIC_STRBUF_INITIALIZER;
+   va_list ap;
 
-    va_start (ap, Format);
-    SB_VPrintf (&S, Format, ap);
-    va_end (ap);
-    SB_Terminate (&S);
+   va_start(ap, Format);
+   SB_VPrintf(&S, Format, ap);
+   va_end(ap);
+   SB_Terminate(&S);
 
-    fprintf (stderr, "%s: Error: %s\n", ProgName, SB_GetConstBuf (&S));
+   fprintf(stderr, "%s: Error: %s\n", ProgName, SB_GetConstBuf(&S));
 
-    SB_Done (&S);
+   SB_Done(&S);
 
-    exit (EXIT_FAILURE);
+   exit(EXIT_FAILURE);
 }
 
-
-
-void Internal (const char* Format, ...)
+void Internal(const char *Format, ...)
 /* Print an internal error message and die */
 {
-    StrBuf S = STATIC_STRBUF_INITIALIZER;
-    va_list ap;
+   StrBuf S = STATIC_STRBUF_INITIALIZER;
+   va_list ap;
 
-    va_start (ap, Format);
-    SB_VPrintf (&S, Format, ap);
-    va_end (ap);
-    SB_Terminate (&S);
+   va_start(ap, Format);
+   SB_VPrintf(&S, Format, ap);
+   va_end(ap);
+   SB_Terminate(&S);
 
-    fprintf (stderr, "%s: Internal Error: %s\n", ProgName, SB_GetConstBuf (&S));
+   fprintf(stderr, "%s: Internal Error: %s\n", ProgName, SB_GetConstBuf(&S));
 
-    SB_Done (&S);
+   SB_Done(&S);
 
-    exit (EXIT_FAILURE);
+   exit(EXIT_FAILURE);
 }

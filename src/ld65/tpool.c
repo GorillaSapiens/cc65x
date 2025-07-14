@@ -31,60 +31,47 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* common */
 #include "gentype.h"
 
 /* ld65 */
 #include "tpool.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* The string pool we're using */
-StringPool* TypePool = 0;
-
-
+StringPool *TypePool = 0;
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void PrintDbgTypes (FILE* F)
+void PrintDbgTypes(FILE *F)
 /* Output the types to a debug info file */
 {
-    StrBuf Type = STATIC_STRBUF_INITIALIZER;
+   StrBuf Type = STATIC_STRBUF_INITIALIZER;
 
-    /* Get the number of strings in the type pool */
-    unsigned Count = SP_GetCount (TypePool);
+   /* Get the number of strings in the type pool */
+   unsigned Count = SP_GetCount(TypePool);
 
-    /* Output all of them */
-    unsigned Id;
-    for (Id = 0; Id < Count; ++Id) {
+   /* Output all of them */
+   unsigned Id;
+   for (Id = 0; Id < Count; ++Id) {
 
-        /* Output it */
-        fprintf (F, "type\tid=%u,val=\"%s\"\n", Id,
-                 GT_AsString (SP_Get (TypePool, Id), &Type));
+      /* Output it */
+      fprintf(F, "type\tid=%u,val=\"%s\"\n", Id,
+              GT_AsString(SP_Get(TypePool, Id), &Type));
+   }
 
-    }
-
-    /* Free the memory for the temporary string */
-    SB_Done (&Type);
+   /* Free the memory for the temporary string */
+   SB_Done(&Type);
 }
 
-
-
-void InitTypePool (void)
+void InitTypePool(void)
 /* Initialize the type pool */
 {
-    /* Allocate a type pool */
-    TypePool = NewStringPool (137);
+   /* Allocate a type pool */
+   TypePool = NewStringPool(137);
 }

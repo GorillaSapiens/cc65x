@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* cc65 */
 #include "codegen.h"
 #include "error.h"
@@ -42,102 +40,98 @@
 #include "seqpoint.h"
 #include "testexpr.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-unsigned Test (unsigned Label, int Invert)
+unsigned Test(unsigned Label, int Invert)
 // Evaluate a boolean test expression and jump depending on the result of
 // the test and on Invert. The function returns one of the TESTEXPR_xx codes
 // defined above. If the jump is always true, a warning is output.
 {
-    ExprDesc Expr;
-    unsigned Result;
+   ExprDesc Expr;
+   unsigned Result;
 
-    ED_Init (&Expr);
+   ED_Init(&Expr);
 
-    /* Read a boolean expression */
-    BoolExpr (hie0, &Expr);
+   /* Read a boolean expression */
+   BoolExpr(hie0, &Expr);
 
-    /* Check for a constant numeric expression */
-    if (ED_IsConstAbs (&Expr)) {
+   /* Check for a constant numeric expression */
+   if (ED_IsConstAbs(&Expr)) {
 
-        /* Append deferred inc/dec at sequence point */
-        DoDeferred (SQP_KEEP_NONE, &Expr);
+      /* Append deferred inc/dec at sequence point */
+      DoDeferred(SQP_KEEP_NONE, &Expr);
 
-        /* Result is constant, so we know the outcome */
-        Result = (Expr.IVal != 0) ? TESTEXPR_TRUE : TESTEXPR_FALSE;
+      /* Result is constant, so we know the outcome */
+      Result = (Expr.IVal != 0) ? TESTEXPR_TRUE : TESTEXPR_FALSE;
 
-        /* Constant rvalue */
-        if (!Invert && Expr.IVal == 0) {
-            g_jump (Label);
-            UnreachableCodeWarning ();
-        } else if (Invert && Expr.IVal != 0) {
-            g_jump (Label);
-        }
+      /* Constant rvalue */
+      if (!Invert && Expr.IVal == 0) {
+         g_jump(Label);
+         UnreachableCodeWarning();
+      }
+      else if (Invert && Expr.IVal != 0) {
+         g_jump(Label);
+      }
+   }
+   else if (ED_IsAddrExpr(&Expr)) {
 
-    } else if (ED_IsAddrExpr (&Expr)) {
+      /* Append deferred inc/dec at sequence point */
+      DoDeferred(SQP_KEEP_NONE, &Expr);
 
-        /* Append deferred inc/dec at sequence point */
-        DoDeferred (SQP_KEEP_NONE, &Expr);
+      /* Object addresses are non-NULL */
+      Result = TESTEXPR_TRUE;
 
-        /* Object addresses are non-NULL */
-        Result = TESTEXPR_TRUE;
+      /* Condition is always true */
+      if (Invert) {
+         g_jump(Label);
+      }
+   }
+   else {
 
-        /* Condition is always true */
-        if (Invert) {
-            g_jump (Label);
-        }
+      /* Result is unknown */
+      Result = TESTEXPR_UNKNOWN;
 
-    } else {
+      /* Set the test flag */
+      ED_RequireTest(&Expr);
 
-        /* Result is unknown */
-        Result = TESTEXPR_UNKNOWN;
+      /* Load the value into the primary register */
+      LoadExpr(CF_FORCECHAR, &Expr);
 
-        /* Set the test flag */
-        ED_RequireTest (&Expr);
+      /* Append deferred inc/dec at sequence point */
+      DoDeferred(SQP_KEEP_TEST, &Expr);
 
-        /* Load the value into the primary register */
-        LoadExpr (CF_FORCECHAR, &Expr);
+      /* Generate the jump */
+      if (Invert) {
+         g_truejump(CF_NONE, Label);
+      }
+      else {
+         g_falsejump(CF_NONE, Label);
+      }
+   }
 
-        /* Append deferred inc/dec at sequence point */
-        DoDeferred (SQP_KEEP_TEST, &Expr);
-
-        /* Generate the jump */
-        if (Invert) {
-            g_truejump (CF_NONE, Label);
-        } else {
-            g_falsejump (CF_NONE, Label);
-        }
-    }
-
-    /* Return the result */
-    return Result;
+   /* Return the result */
+   return Result;
 }
 
-
-
-unsigned TestInParens (unsigned Label, int Invert)
+unsigned TestInParens(unsigned Label, int Invert)
 // Evaluate a boolean test expression in parenthesis and jump depending on
 // the result of the test * and on Invert. The function returns one of the
 // TESTEXPR_xx codes defined above. If the jump is always true, a warning is
 // output.
 {
-    unsigned Result;
+   unsigned Result;
 
-    /* Eat the parenthesis */
-    ConsumeLParen ();
+   /* Eat the parenthesis */
+   ConsumeLParen();
 
-    /* Do the test */
-    Result = Test (Label, Invert);
+   /* Do the test */
+   Result = Test(Label, Invert);
 
-    /* Check for the closing brace */
-    ConsumeRParen ();
+   /* Check for the closing brace */
+   ConsumeRParen();
 
-    /* Return the result of the expression */
-    return Result;
+   /* Return the result of the expression */
+   return Result;
 }

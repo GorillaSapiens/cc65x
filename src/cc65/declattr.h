@@ -31,46 +31,34 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef DECLATTR_H
 #define DECLATTR_H
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
-
-
 
 /* Forward */
 struct Declarator;
 
 /* Supported attribute types */
 typedef enum {
-    atNoReturn,                 /* Function does not return */
-    atUnused,                   /* Symbol is unused - don't warn */
+   atNoReturn, /* Function does not return */
+   atUnused,   /* Symbol is unused - don't warn */
 } DeclAttrType;
 
 /* An actual attribute description */
 typedef struct DeclAttr DeclAttr;
 struct DeclAttr {
-    DeclAttrType                AttrType;       /* Type of attribute */
+   DeclAttrType AttrType; /* Type of attribute */
 };
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void ParseAttribute (struct Declarator* D);
+void ParseAttribute(struct Declarator *D);
 /* Parse an additional __attribute__ modifier */
-
-
 
 /* End of declattr.h */
 

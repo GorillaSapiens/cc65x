@@ -31,76 +31,62 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef SCANNER_H
 #define SCANNER_H
 
-
-
 /* ca65 */
 #include "token.h"
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Scanner variables */
-extern Token CurTok;            /* Current input token incl. attributes */
-extern int   ForcedEnd;         /* Force end of assembly */
-
-
+extern Token CurTok;  /* Current input token incl. attributes */
+extern int ForcedEnd; /* Force end of assembly */
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-int IsIdChar (int C);
+int IsIdChar(int C);
 /* Return true if the character is a valid character for an identifier */
 
-int IsIdStart (int C);
+int IsIdStart(int C);
 /* Return true if the character may start an identifier */
 
-int NewInputFile (const char* Name);
+int NewInputFile(const char *Name);
 // Open a new input file. Returns true if the file could be successfully opened
 // and false otherwise.
 
-void NewInputData (char* Text, int Malloced);
+void NewInputData(char *Text, int Malloced);
 /* Add a chunk of input data to the input stream */
 
-void LocaseSVal (void);
+void LocaseSVal(void);
 /* Make SVal lower case */
 
-void UpcaseSVal (void);
+void UpcaseSVal(void);
 /* Make SVal upper case */
 
-void NextRawTok (void);
+void NextRawTok(void);
 /* Read the next raw token from the input stream */
 
-int GetSubKey (const char* const* Keys, unsigned Count);
+int GetSubKey(const char *const *Keys, unsigned Count);
 // Search for a subkey in a table of keywords. The current token must be an
 // identifier and all keys must be in upper case. The identifier will be
 // uppercased in the process. The function returns the index of the keyword,
 // or -1 if the keyword was not found.
 
-unsigned char ParseAddrSize (void);
+unsigned char ParseAddrSize(void);
 // Check if the next token is a keyword that denotes an address size specifier.
 // If so, return the corresponding address size constant, otherwise output an
 // error message and return ADDR_SIZE_DEFAULT.
 
-void InitScanner (const char* InFile);
+void InitScanner(const char *InFile);
 /* Initialize the scanner, open the given input file */
 
-void DoneScanner (void);
+void DoneScanner(void);
 /* Release scanner resources */
-
-
 
 /* End of scanner.h */
 

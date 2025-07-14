@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <stdio.h>
 #include <string.h>
 
@@ -50,439 +48,383 @@
 #include "global.h"
 #include "litpool.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Definition of a literal */
 struct Literal {
-    unsigned    Label;                  /* Asm label for this literal */
-    int         RefCount;               /* Reference count */
-    int         Output;                 /* True if output has been generated */
-    StrBuf      Data;                   /* Literal data */
+   unsigned Label; /* Asm label for this literal */
+   int RefCount;   /* Reference count */
+   int Output;     /* True if output has been generated */
+   StrBuf Data;    /* Literal data */
 };
 
 /* Definition of the literal pool */
 struct LiteralPool {
-    struct SymEntry*    Func;               /* Function that owns the pool */
-    Collection          WritableLiterals;   /* Writable literals in the pool */
-    Collection          ReadOnlyLiterals;   /* Readonly literals in the pool */
+   struct SymEntry *Func;       /* Function that owns the pool */
+   Collection WritableLiterals; /* Writable literals in the pool */
+   Collection ReadOnlyLiterals; /* Readonly literals in the pool */
 };
 
 /* The global and current literal pool */
-static LiteralPool*     GlobalPool = 0;
-static LiteralPool*     LP         = 0;
+static LiteralPool *GlobalPool = 0;
+static LiteralPool *LP = 0;
 
 // Stack that contains the nested literal pools. Since TOS is in LiteralPool
 // and functions aren't nested in C, the maximum depth is 1. I'm using a
 // collection anyway, so the code is prepared for nested functions or
 // whatever.
-static Collection       LPStack  = STATIC_COLLECTION_INITIALIZER;
-
-
+static Collection LPStack = STATIC_COLLECTION_INITIALIZER;
 
 /*****************************************************************************/
 /*                              struct Literal                               */
 /*****************************************************************************/
 
-
-
-static Literal* NewLiteral (const StrBuf* S)
+static Literal *NewLiteral(const StrBuf *S)
 /* Create a new literal and return it */
 {
-    /* Allocate memory */
-    Literal* L = xmalloc (sizeof (*L));
+   /* Allocate memory */
+   Literal *L = xmalloc(sizeof(*L));
 
-    /* Initialize the fields */
-    L->Label    = GetPooledLiteralLabel ();
-    L->RefCount = 0;
-    L->Output   = 0;
-    SB_Init (&L->Data);
-    SB_Append (&L->Data, S);
+   /* Initialize the fields */
+   L->Label = GetPooledLiteralLabel();
+   L->RefCount = 0;
+   L->Output = 0;
+   SB_Init(&L->Data);
+   SB_Append(&L->Data, S);
 
-    /* Return the new literal */
-    return L;
+   /* Return the new literal */
+   return L;
 }
 
-
-
-static void FreeLiteral (Literal* L)
+static void FreeLiteral(Literal *L)
 /* Free a literal */
 {
-    /* Free the literal data */
-    SB_Done (&L->Data);
+   /* Free the literal data */
+   SB_Done(&L->Data);
 
-    /* Free the structure itself */
-    xfree (L);
+   /* Free the structure itself */
+   xfree(L);
 }
 
-
-
-static void OutputLiteral (Literal* L)
+static void OutputLiteral(Literal *L)
 /* Output one literal to the currently active data segment */
 {
-    /* Define the label for the literal */
-    g_defliterallabel (L->Label);
+   /* Define the label for the literal */
+   g_defliterallabel(L->Label);
 
-    /* Output the literal data */
-    g_defbytes (SB_GetConstBuf (&L->Data), SB_GetLen (&L->Data));
+   /* Output the literal data */
+   g_defbytes(SB_GetConstBuf(&L->Data), SB_GetLen(&L->Data));
 
-    /* Mark the literal as output */
-    L->Output = 1;
+   /* Mark the literal as output */
+   L->Output = 1;
 }
 
-
-
-Literal* UseLiteral (Literal* L)
+Literal *UseLiteral(Literal *L)
 /* Increase the reference counter for the literal and return it */
 {
-    /* Increase the reference count */
-    ++L->RefCount;
+   /* Increase the reference count */
+   ++L->RefCount;
 
-    /* Return the literal */
-    return L;
+   /* Return the literal */
+   return L;
 }
 
-
-
-void ReleaseLiteral (Literal* L)
+void ReleaseLiteral(Literal *L)
 /* Decrement the reference counter for the literal */
 {
-    --L->RefCount;
-    CHECK (L->RefCount >= 0);
+   --L->RefCount;
+   CHECK(L->RefCount >= 0);
 }
 
-
-
-void TranslateLiteral (Literal* L)
+void TranslateLiteral(Literal *L)
 /* Translate a literal into the target charset */
 {
-    TgtTranslateStrBuf (&L->Data);
+   TgtTranslateStrBuf(&L->Data);
 }
 
-
-
-void ConcatLiteral (Literal* L, const Literal* Appended)
+void ConcatLiteral(Literal *L, const Literal *Appended)
 /* Concatenate string literals */
 {
-    if (SB_GetLen (&L->Data) > 0 && SB_LookAtLast (&L->Data) == '\0') {
-        SB_Drop (&L->Data, 1);
-    }
-    SB_Append (&L->Data, &Appended->Data);
+   if (SB_GetLen(&L->Data) > 0 && SB_LookAtLast(&L->Data) == '\0') {
+      SB_Drop(&L->Data, 1);
+   }
+   SB_Append(&L->Data, &Appended->Data);
 }
 
-
-
-unsigned GetLiteralLabel (const Literal* L)
+unsigned GetLiteralLabel(const Literal *L)
 /* Return the asm label for a literal */
 {
-    return L->Label;
+   return L->Label;
 }
 
-
-
-const char* GetLiteralStr (const Literal* L)
+const char *GetLiteralStr(const Literal *L)
 /* Return the data for a literal as pointer to char */
 {
-    return SB_GetConstBuf (&L->Data);
+   return SB_GetConstBuf(&L->Data);
 }
 
-
-
-const StrBuf* GetLiteralStrBuf (const Literal* L)
+const StrBuf *GetLiteralStrBuf(const Literal *L)
 /* Return the data for a literal as pointer to the string buffer */
 {
-    return &L->Data;
+   return &L->Data;
 }
 
-
-
-unsigned GetLiteralSize (const Literal* L)
+unsigned GetLiteralSize(const Literal *L)
 /* Get the size of a literal string */
 {
-    return SB_GetLen (&L->Data);
+   return SB_GetLen(&L->Data);
 }
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-static LiteralPool* NewLiteralPool (struct SymEntry* Func)
+static LiteralPool *NewLiteralPool(struct SymEntry *Func)
 /* Create a new literal pool and return it */
 {
-    /* Allocate memory */
-    LiteralPool* LP = xmalloc (sizeof (*LP));
+   /* Allocate memory */
+   LiteralPool *LP = xmalloc(sizeof(*LP));
 
-    /* Initialize the fields */
-    LP->Func  = Func;
-    InitCollection (&LP->WritableLiterals);
-    InitCollection (&LP->ReadOnlyLiterals);
+   /* Initialize the fields */
+   LP->Func = Func;
+   InitCollection(&LP->WritableLiterals);
+   InitCollection(&LP->ReadOnlyLiterals);
 
-    /* Return the new pool */
-    return LP;
+   /* Return the new pool */
+   return LP;
 }
 
-
-
-static void FreeLiteralPool (LiteralPool* LP)
+static void FreeLiteralPool(LiteralPool *LP)
 /* Free a LiteralPool structure */
 {
-    /* Free the collections contained within the struct */
-    DoneCollection (&LP->WritableLiterals);
-    DoneCollection (&LP->ReadOnlyLiterals);
+   /* Free the collections contained within the struct */
+   DoneCollection(&LP->WritableLiterals);
+   DoneCollection(&LP->ReadOnlyLiterals);
 
-    /* Free the struct itself */
-    xfree (LP);
+   /* Free the struct itself */
+   xfree(LP);
 }
 
-
-
-static int Compare (void* Data attribute ((unused)),
-                    const void* Left, const void* Right)
+static int Compare(void *Data attribute((unused)), const void *Left,
+                   const void *Right)
 /* Compare function used when sorting the literal pool */
 {
-    /* Larger strings are considered "smaller" */
-    return (int) GetLiteralSize (Right) - (int) GetLiteralSize (Left);
+   /* Larger strings are considered "smaller" */
+   return (int)GetLiteralSize(Right) - (int)GetLiteralSize(Left);
 }
 
-
-
-void InitLiteralPool (void)
+void InitLiteralPool(void)
 /* Initialize the literal pool */
 {
-    /* Create the global literal pool */
-    GlobalPool = LP = NewLiteralPool (0);
+   /* Create the global literal pool */
+   GlobalPool = LP = NewLiteralPool(0);
 }
 
-
-
-void PushLiteralPool (struct SymEntry* Func)
+void PushLiteralPool(struct SymEntry *Func)
 /* Push the current literal pool onto the stack and create a new one */
 {
-    /* We must have a literal pool to push! */
-    PRECONDITION (LP != 0);
+   /* We must have a literal pool to push! */
+   PRECONDITION(LP != 0);
 
-    /* Push the old pool */
-    CollAppend (&LPStack, LP);
+   /* Push the old pool */
+   CollAppend(&LPStack, LP);
 
-    /* Create a new one */
-    LP = NewLiteralPool (Func);
+   /* Create a new one */
+   LP = NewLiteralPool(Func);
 }
 
-
-
-LiteralPool* PopLiteralPool (void)
+LiteralPool *PopLiteralPool(void)
 // Pop the last literal pool from TOS and activate it. Return the old
 // literal pool.
 {
-    /* Remember the current literal pool */
-    LiteralPool* Old = LP;
+   /* Remember the current literal pool */
+   LiteralPool *Old = LP;
 
-    /* Pop one from stack */
-    LP = CollPop (&LPStack);
+   /* Pop one from stack */
+   LP = CollPop(&LPStack);
 
-    /* Return the old one */
-    return Old;
+   /* Return the old one */
+   return Old;
 }
 
-
-
-static void MoveLiterals (Collection* Source, Collection* Target)
+static void MoveLiterals(Collection *Source, Collection *Target)
 /* Move referenced literals from Source to Target, delete unreferenced ones */
 {
-    unsigned I;
+   unsigned I;
 
-    /* Move referenced literals, remove unreferenced ones */
-    for (I = 0; I < CollCount (Source); ++I) {
+   /* Move referenced literals, remove unreferenced ones */
+   for (I = 0; I < CollCount(Source); ++I) {
 
-        /* Get the literal */
-        Literal* L = CollAt (Source, I);
+      /* Get the literal */
+      Literal *L = CollAt(Source, I);
 
-        // If it is referenced and not output, add it to the Target pool,
-        // otherwise free it
-        if (L->RefCount && !L->Output) {
-            CollAppend (Target, L);
-        } else {
-            FreeLiteral (L);
-        }
-    }
+      // If it is referenced and not output, add it to the Target pool,
+      // otherwise free it
+      if (L->RefCount && !L->Output) {
+         CollAppend(Target, L);
+      }
+      else {
+         FreeLiteral(L);
+      }
+   }
 }
 
-
-
-void MoveLiteralPool (LiteralPool* LocalPool)
+void MoveLiteralPool(LiteralPool *LocalPool)
 // Move all referenced literals in LocalPool to the global literal pool. This
 // function will free LocalPool after moving the used string literals.
 {
-    /* Move the literals */
-    MoveLiterals (&LocalPool->WritableLiterals, &GlobalPool->WritableLiterals);
-    MoveLiterals (&LocalPool->ReadOnlyLiterals, &GlobalPool->ReadOnlyLiterals);
+   /* Move the literals */
+   MoveLiterals(&LocalPool->WritableLiterals, &GlobalPool->WritableLiterals);
+   MoveLiterals(&LocalPool->ReadOnlyLiterals, &GlobalPool->ReadOnlyLiterals);
 
-    /* Free the local literal pool */
-    FreeLiteralPool (LocalPool);
+   /* Free the local literal pool */
+   FreeLiteralPool(LocalPool);
 }
 
-
-
-static void OutputWritableLiterals (Collection* Literals)
+static void OutputWritableLiterals(Collection *Literals)
 /* Output the given writable literals */
 {
-    unsigned I;
+   unsigned I;
 
-    /* If nothing there, exit... */
-    if (CollCount (Literals) == 0) {
-        return;
-    }
+   /* If nothing there, exit... */
+   if (CollCount(Literals) == 0) {
+      return;
+   }
 
-    /* Switch to the correct segment */
-    g_usedata ();
+   /* Switch to the correct segment */
+   g_usedata();
 
-    /* Emit all literals that have a reference */
-    for (I = 0; I < CollCount (Literals); ++I) {
+   /* Emit all literals that have a reference */
+   for (I = 0; I < CollCount(Literals); ++I) {
 
-        /* Get a pointer to the literal */
-        Literal* L = CollAtUnchecked (Literals, I);
+      /* Get a pointer to the literal */
+      Literal *L = CollAtUnchecked(Literals, I);
 
-        /* Output this one, if it has references and wasn't already output */
-        if (L->RefCount > 0 && !L->Output) {
-            OutputLiteral (L);
-        }
-
-    }
+      /* Output this one, if it has references and wasn't already output */
+      if (L->RefCount > 0 && !L->Output) {
+         OutputLiteral(L);
+      }
+   }
 }
 
-
-
-static void OutputReadOnlyLiterals (Collection* Literals)
+static void OutputReadOnlyLiterals(Collection *Literals)
 /* Output the given readonly literals merging (even partial) duplicates */
 {
-    unsigned I;
+   unsigned I;
 
-    /* If nothing there, exit... */
-    if (CollCount (Literals) == 0) {
-        return;
-    }
+   /* If nothing there, exit... */
+   if (CollCount(Literals) == 0) {
+      return;
+   }
 
-    /* Switch to the correct segment */
-    g_userodata ();
+   /* Switch to the correct segment */
+   g_userodata();
 
-    /* Sort the literal pool by literal size. Larger strings go first */
-    CollSort (Literals, Compare, 0);
+   /* Sort the literal pool by literal size. Larger strings go first */
+   CollSort(Literals, Compare, 0);
 
-    /* Emit all literals that have a reference */
-    for (I = 0; I < CollCount (Literals); ++I) {
+   /* Emit all literals that have a reference */
+   for (I = 0; I < CollCount(Literals); ++I) {
 
-        unsigned J;
-        Literal* C;
+      unsigned J;
+      Literal *C;
 
-        /* Get the next literal */
-        Literal* L = CollAt (Literals, I);
+      /* Get the next literal */
+      Literal *L = CollAt(Literals, I);
 
-        /* Ignore it, if it doesn't have references or was already output */
-        if (L->RefCount == 0 || L->Output) {
+      /* Ignore it, if it doesn't have references or was already output */
+      if (L->RefCount == 0 || L->Output) {
+         continue;
+      }
+
+      // Check if this literal is part of another one. Since the literals
+      // are sorted by size (larger ones first), it can only be part of a
+      // literal with a smaller index.
+      // Beware: Only check literals that have actually been referenced.
+      C = 0;
+      for (J = 0; J < I; ++J) {
+
+         const void *D;
+
+         /* Get a pointer to the compare literal */
+         Literal *L2 = CollAt(Literals, J);
+
+         /* Ignore literals that have no reference */
+         if (L2->RefCount == 0) {
             continue;
-        }
+         }
 
-        // Check if this literal is part of another one. Since the literals
-        // are sorted by size (larger ones first), it can only be part of a
-        // literal with a smaller index.
-        // Beware: Only check literals that have actually been referenced.
-        C = 0;
-        for (J = 0; J < I; ++J) {
+         /* Get a pointer to the data */
+         D = SB_GetConstBuf(&L2->Data) + SB_GetLen(&L2->Data) -
+             SB_GetLen(&L->Data);
 
-            const void* D;
+         /* Compare the data */
+         if (memcmp(D, SB_GetConstBuf(&L->Data), SB_GetLen(&L->Data)) == 0) {
+            /* Remember the literal and terminate the loop */
+            C = L2;
+            break;
+         }
+      }
 
-            /* Get a pointer to the compare literal */
-            Literal* L2 = CollAt (Literals, J);
+      /* Check if we found a match */
+      if (C != 0) {
 
-            /* Ignore literals that have no reference */
-            if (L2->RefCount == 0) {
-                continue;
-            }
+         /* This literal is part of a longer literal, merge them */
+         g_aliasliterallabel(L->Label, C->Label,
+                             GetLiteralSize(C) - GetLiteralSize(L));
+      }
+      else {
 
-            /* Get a pointer to the data */
-            D = SB_GetConstBuf (&L2->Data) + SB_GetLen (&L2->Data) - SB_GetLen (&L->Data);
+         /* Define the label for the literal */
+         g_defliterallabel(L->Label);
 
-            /* Compare the data */
-            if (memcmp (D, SB_GetConstBuf (&L->Data), SB_GetLen (&L->Data)) == 0) {
-                /* Remember the literal and terminate the loop */
-                C = L2;
-                break;
-            }
-        }
+         /* Output the literal data */
+         g_defbytes(SB_GetConstBuf(&L->Data), SB_GetLen(&L->Data));
+      }
 
-        /* Check if we found a match */
-        if (C != 0) {
-
-            /* This literal is part of a longer literal, merge them */
-            g_aliasliterallabel (L->Label, C->Label, GetLiteralSize (C) - GetLiteralSize (L));
-
-        } else {
-
-            /* Define the label for the literal */
-            g_defliterallabel (L->Label);
-
-            /* Output the literal data */
-            g_defbytes (SB_GetConstBuf (&L->Data), SB_GetLen (&L->Data));
-
-        }
-
-        /* Mark the literal */
-        L->Output = 1;
-    }
+      /* Mark the literal */
+      L->Output = 1;
+   }
 }
 
-
-
-void OutputLocalLiteralPool (LiteralPool* Pool)
+void OutputLocalLiteralPool(LiteralPool *Pool)
 /* Output the local literal pool */
 {
-    /* Output both sorts of literals */
-    OutputWritableLiterals (&Pool->WritableLiterals);
-    OutputReadOnlyLiterals (&Pool->ReadOnlyLiterals);
+   /* Output both sorts of literals */
+   OutputWritableLiterals(&Pool->WritableLiterals);
+   OutputReadOnlyLiterals(&Pool->ReadOnlyLiterals);
 }
 
-
-
-void OutputGlobalLiteralPool (void)
+void OutputGlobalLiteralPool(void)
 /* Output the global literal pool */
 {
-    OutputLocalLiteralPool (GlobalPool);
+   OutputLocalLiteralPool(GlobalPool);
 }
 
-
-
-Literal* AddLiteral (const char* S)
+Literal *AddLiteral(const char *S)
 /* Add a literal string to the literal pool. Return the literal. */
 {
-    StrBuf SB;
-    SB_InitFromString(&SB, S);
-    return AddLiteralStr(&SB);
+   StrBuf SB;
+   SB_InitFromString(&SB, S);
+   return AddLiteralStr(&SB);
 }
 
-
-
-Literal* AddLiteralStr (const StrBuf* S)
+Literal *AddLiteralStr(const StrBuf *S)
 /* Add a literal string to the literal pool. Return the literal. */
 {
-    /* Create a new literal */
-    Literal* L = NewLiteral (S);
+   /* Create a new literal */
+   Literal *L = NewLiteral(S);
 
-    /* Add the literal to the correct pool */
-    if (IS_Get (&WritableStrings)) {
-        CollAppend (&LP->WritableLiterals, L);
-    } else {
-        CollAppend (&LP->ReadOnlyLiterals, L);
-    }
+   /* Add the literal to the correct pool */
+   if (IS_Get(&WritableStrings)) {
+      CollAppend(&LP->WritableLiterals, L);
+   }
+   else {
+      CollAppend(&LP->ReadOnlyLiterals, L);
+   }
 
-    /* Return the new literal */
-    return L;
+   /* Return the new literal */
+   return L;
 }

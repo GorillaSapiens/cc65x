@@ -28,40 +28,28 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* cc65 */
 #include "seqpoint.h"
-
-
 
 /*****************************************************************************/
 /*                                   data                                    */
 /*****************************************************************************/
 
-
-
 /* Remeber if __A__, __AX__ and __EAX__ are being used */
 unsigned PendingSqpFlags = SQP_KEEP_NONE;
-
-
 
 /*****************************************************************************/
 /*                                   code                                    */
 /*****************************************************************************/
 
-
-
-void SetSQPFlags (unsigned Flags)
+void SetSQPFlags(unsigned Flags)
 /* Set the SQP_KEEP_* flags for the deferred operations in the statement */
 {
-    PendingSqpFlags = Flags;
+   PendingSqpFlags = Flags;
 }
 
-
-
-unsigned GetSQPFlags (void)
+unsigned GetSQPFlags(void)
 /* Get the SQP_KEEP_* flags for the deferred operations in the statement */
 {
-    return PendingSqpFlags;
+   return PendingSqpFlags;
 }

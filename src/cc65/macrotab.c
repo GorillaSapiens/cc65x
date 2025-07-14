@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <stdio.h>
 #include <string.h>
 
@@ -46,382 +44,341 @@
 #include "preproc.h"
 #include "macrotab.h"
 
-
-
 /*****************************************************************************/
 /*                                   data                                    */
 /*****************************************************************************/
 
-
-
 /* The macro hash table */
-#define MACRO_TAB_SIZE  211
-static Macro* MacroTab[MACRO_TAB_SIZE];
+#define MACRO_TAB_SIZE 211
+static Macro *MacroTab[MACRO_TAB_SIZE];
 
 /* The undefined macros list head */
-static Macro* UndefinedMacrosListHead;
+static Macro *UndefinedMacrosListHead;
 
 /* Some defines for better readability when calling OutputMacros() */
-#define USER_MACROS     0
-#define PREDEF_MACROS   1
-#define NAME_ONLY       0
+#define USER_MACROS 0
+#define PREDEF_MACROS 1
+#define NAME_ONLY 0
 #define FULL_DEFINITION 1
-
-
 
 /*****************************************************************************/
 /*                                  helpers                                  */
 /*****************************************************************************/
 
-
-
-static void OutputMacro (const Macro* M, int Full)
+static void OutputMacro(const Macro *M, int Full)
 /* Output one macro. If Full is true, the replacement is also output. */
 {
-    WriteOutput ("#define %s", M->Name);
-    int ParamCount = M->ParamCount;
-    if (M->ParamCount >= 0) {
-        int I;
-        if (M->Variadic) {
-            CHECK (ParamCount > 0);
-            --ParamCount;
-        }
-        WriteOutput ("(");
-        for (I = 0; I < ParamCount; ++I) {
-            const char* Name = CollConstAt (&M->Params, I);
-            WriteOutput ("%s%s", (I == 0)? "" : ",", Name);
-        }
-        if (M->Variadic) {
-            WriteOutput ("%s...", (ParamCount == 0)? "" : ",");
-        }
-        WriteOutput (")");
-    }
-    WriteOutput (" ");
-    if (Full) {
-        WriteOutput ("%.*s",
-                     SB_GetLen (&M->Replacement),
-                     SB_GetConstBuf (&M->Replacement));
-    }
-    WriteOutput ("\n");
+   WriteOutput("#define %s", M->Name);
+   int ParamCount = M->ParamCount;
+   if (M->ParamCount >= 0) {
+      int I;
+      if (M->Variadic) {
+         CHECK(ParamCount > 0);
+         --ParamCount;
+      }
+      WriteOutput("(");
+      for (I = 0; I < ParamCount; ++I) {
+         const char *Name = CollConstAt(&M->Params, I);
+         WriteOutput("%s%s", (I == 0) ? "" : ",", Name);
+      }
+      if (M->Variadic) {
+         WriteOutput("%s...", (ParamCount == 0) ? "" : ",");
+      }
+      WriteOutput(")");
+   }
+   WriteOutput(" ");
+   if (Full) {
+      WriteOutput("%.*s", SB_GetLen(&M->Replacement),
+                  SB_GetConstBuf(&M->Replacement));
+   }
+   WriteOutput("\n");
 }
 
-
-
-static void OutputMacros (int Predefined, int Full)
+static void OutputMacros(int Predefined, int Full)
 /* Output macros to the output file depending on the flags given. */
 {
-    // Note: The Full flag is currently not used by any callers but is left in
-    // place for possible future changes.
-    unsigned I;
-    for (I = 0; I < MACRO_TAB_SIZE; ++I) {
-        const Macro* M = MacroTab [I];
-        while (M) {
-            if ((Predefined != 0) == (M->Predefined != 0)) {
-                OutputMacro (M, Full);
-            }
-            M = M->Next;
-        }
-    }
+   // Note: The Full flag is currently not used by any callers but is left in
+   // place for possible future changes.
+   unsigned I;
+   for (I = 0; I < MACRO_TAB_SIZE; ++I) {
+      const Macro *M = MacroTab[I];
+      while (M) {
+         if ((Predefined != 0) == (M->Predefined != 0)) {
+            OutputMacro(M, Full);
+         }
+         M = M->Next;
+      }
+   }
 }
-
-
 
 /*****************************************************************************/
 /*                                   code                                    */
 /*****************************************************************************/
 
-
-
-Macro* NewMacro (const char* Name, unsigned char Predefined)
+Macro *NewMacro(const char *Name, unsigned char Predefined)
 // Allocate a macro structure with the given name. The structure is not
 // inserted into the macro table.
 {
-    /* Get the length of the macro name */
-    unsigned Len = strlen (Name);
+   /* Get the length of the macro name */
+   unsigned Len = strlen(Name);
 
-    /* Allocate the structure */
-    Macro* M = (Macro*) xmalloc (sizeof(Macro) + Len);
+   /* Allocate the structure */
+   Macro *M = (Macro *)xmalloc(sizeof(Macro) + Len);
 
-    /* Initialize the data */
-    M->Next         = 0;
-    M->ParamCount   = -1;        /* Flag: Not a function-like macro */
-    InitCollection (&M->Params);
-    SB_Init (&M->Replacement);
-    M->Predefined   = Predefined;
-    M->Variadic     = 0;
-    memcpy (M->Name, Name, Len+1);
+   /* Initialize the data */
+   M->Next = 0;
+   M->ParamCount = -1; /* Flag: Not a function-like macro */
+   InitCollection(&M->Params);
+   SB_Init(&M->Replacement);
+   M->Predefined = Predefined;
+   M->Variadic = 0;
+   memcpy(M->Name, Name, Len + 1);
 
-    /* Return the new macro */
-    return M;
+   /* Return the new macro */
+   return M;
 }
 
-
-
-void FreeMacro (Macro* M)
+void FreeMacro(Macro *M)
 // Delete a macro definition. The function will NOT remove the macro from the
 // table, use UndefineMacro for that.
 {
-    unsigned I;
+   unsigned I;
 
-    for (I = 0; I < CollCount (&M->Params); ++I) {
-        xfree (CollAtUnchecked (&M->Params, I));
-    }
-    DoneCollection (&M->Params);
-    SB_Done (&M->Replacement);
-    xfree (M);
+   for (I = 0; I < CollCount(&M->Params); ++I) {
+      xfree(CollAtUnchecked(&M->Params, I));
+   }
+   DoneCollection(&M->Params);
+   SB_Done(&M->Replacement);
+   xfree(M);
 }
 
-
-
-Macro* CloneMacro (const Macro* M)
+Macro *CloneMacro(const Macro *M)
 // Clone a macro definition. The function is not insert the macro into the
 // macro table, thus the cloned instance cannot be freed with UndefineMacro.
 // Use FreeMacro for that.
 {
-    Macro* New = NewMacro (M->Name, M->Predefined);
-    unsigned I;
+   Macro *New = NewMacro(M->Name, M->Predefined);
+   unsigned I;
 
-    for (I = 0; I < CollCount (&M->Params); ++I) {
-        /* Copy the parameter */
-        const char* Param = CollAtUnchecked (&M->Params, I);
-        CollAppend (&New->Params, xstrdup (Param));
-    }
-    New->ParamCount = M->ParamCount;
-    New->Variadic = M->Variadic;
-    SB_Copy (&New->Replacement, &M->Replacement);
+   for (I = 0; I < CollCount(&M->Params); ++I) {
+      /* Copy the parameter */
+      const char *Param = CollAtUnchecked(&M->Params, I);
+      CollAppend(&New->Params, xstrdup(Param));
+   }
+   New->ParamCount = M->ParamCount;
+   New->Variadic = M->Variadic;
+   SB_Copy(&New->Replacement, &M->Replacement);
 
-    return New;
+   return New;
 }
 
-
-
-void DefineNumericMacro (const char* Name, long Val)
+void DefineNumericMacro(const char *Name, long Val)
 /* Define a predefined macro for a numeric constant */
 {
-    char Buf[64];
+   char Buf[64];
 
-    /* Make a string from the number */
-    sprintf (Buf, "%ld", Val);
+   /* Make a string from the number */
+   sprintf(Buf, "%ld", Val);
 
-    /* Handle as text macro */
-    DefineTextMacro (Name, Buf);
+   /* Handle as text macro */
+   DefineTextMacro(Name, Buf);
 }
 
-
-
-void DefineTextMacro (const char* Name, const char* Val)
+void DefineTextMacro(const char *Name, const char *Val)
 /* Define a predefined macro for a textual constant */
 {
-    /* Create a new macro */
-    Macro* M = NewMacro (Name, 1);
+   /* Create a new macro */
+   Macro *M = NewMacro(Name, 1);
 
-    /* Set the value as replacement text */
-    SB_CopyStr (&M->Replacement, Val);
+   /* Set the value as replacement text */
+   SB_CopyStr(&M->Replacement, Val);
 
-    /* Insert the macro into the macro table */
-    InsertMacro (M);
+   /* Insert the macro into the macro table */
+   InsertMacro(M);
 }
 
-
-
-void InsertMacro (Macro* M)
+void InsertMacro(Macro *M)
 /* Insert the given macro into the macro table. */
 {
-    /* Get the hash value of the macro name */
-    unsigned Hash = HashStr (M->Name) % MACRO_TAB_SIZE;
+   /* Get the hash value of the macro name */
+   unsigned Hash = HashStr(M->Name) % MACRO_TAB_SIZE;
 
-    /* Insert the macro */
-    M->Next = MacroTab[Hash];
-    MacroTab[Hash] = M;
+   /* Insert the macro */
+   M->Next = MacroTab[Hash];
+   MacroTab[Hash] = M;
 }
 
-
-
-Macro* UndefineMacro (const char* Name)
+Macro *UndefineMacro(const char *Name)
 // Search for the macro with the given name, if it exists, remove it from
 // the defined macro table and insert it to a list for pending deletion.
 // Return the macro if it was found and removed, return 0 otherwise.
 // To safely free the removed macro, use FreeUndefinedMacros().
 {
-    /* Get the hash value of the macro name */
-    unsigned Hash = HashStr (Name) % MACRO_TAB_SIZE;
+   /* Get the hash value of the macro name */
+   unsigned Hash = HashStr(Name) % MACRO_TAB_SIZE;
 
-    /* Search the hash chain */
-    Macro* L = 0;
-    Macro* M = MacroTab[Hash];
-    while (M) {
-        if (strcmp (M->Name, Name) == 0) {
+   /* Search the hash chain */
+   Macro *L = 0;
+   Macro *M = MacroTab[Hash];
+   while (M) {
+      if (strcmp(M->Name, Name) == 0) {
 
-            /* Found it */
-            if (L == 0) {
-                /* First in chain */
-                MacroTab[Hash] = M->Next;
-            } else {
-                L->Next = M->Next;
-            }
+         /* Found it */
+         if (L == 0) {
+            /* First in chain */
+            MacroTab[Hash] = M->Next;
+         }
+         else {
+            L->Next = M->Next;
+         }
 
-            /* Add this macro to pending deletion list */
-            M->Next = UndefinedMacrosListHead;
-            UndefinedMacrosListHead = M;
+         /* Add this macro to pending deletion list */
+         M->Next = UndefinedMacrosListHead;
+         UndefinedMacrosListHead = M;
 
-            /* Done */
-            return M;
-        }
+         /* Done */
+         return M;
+      }
 
-        /* Next macro */
-        L = M;
-        M = M->Next;
-    }
+      /* Next macro */
+      L = M;
+      M = M->Next;
+   }
 
-    /* Not found */
-    return 0;
+   /* Not found */
+   return 0;
 }
 
-
-
-void FreeUndefinedMacros (void)
+void FreeUndefinedMacros(void)
 /* Free all undefined macros */
 {
-    Macro* Next;
+   Macro *Next;
 
-    while (UndefinedMacrosListHead != 0) {
-        Next = UndefinedMacrosListHead->Next;
+   while (UndefinedMacrosListHead != 0) {
+      Next = UndefinedMacrosListHead->Next;
 
-        /* Delete the macro */
-        FreeMacro (UndefinedMacrosListHead);
+      /* Delete the macro */
+      FreeMacro(UndefinedMacrosListHead);
 
-        UndefinedMacrosListHead = Next;
-    }
+      UndefinedMacrosListHead = Next;
+   }
 }
 
-
-
-Macro* FindMacro (const char* Name)
+Macro *FindMacro(const char *Name)
 /* Find a macro with the given name. Return the macro definition or NULL */
 {
-    /* Get the hash value of the macro name */
-    unsigned Hash = HashStr (Name) % MACRO_TAB_SIZE;
+   /* Get the hash value of the macro name */
+   unsigned Hash = HashStr(Name) % MACRO_TAB_SIZE;
 
-    /* Search the hash chain */
-    Macro* M = MacroTab[Hash];
-    while (M) {
-        if (strcmp (M->Name, Name) == 0) {
-            /* Check for some special macro names */
-            if (Name[0] == '_') {
-                HandleSpecialMacro (M, Name);
-            }
-            /* Found it */
-            return M;
-        }
+   /* Search the hash chain */
+   Macro *M = MacroTab[Hash];
+   while (M) {
+      if (strcmp(M->Name, Name) == 0) {
+         /* Check for some special macro names */
+         if (Name[0] == '_') {
+            HandleSpecialMacro(M, Name);
+         }
+         /* Found it */
+         return M;
+      }
 
-        /* Next macro */
-        M = M->Next;
-    }
+      /* Next macro */
+      M = M->Next;
+   }
 
-    /* Not found */
-    return 0;
+   /* Not found */
+   return 0;
 }
 
-
-
-int FindMacroParam (const Macro* M, const char* Param)
+int FindMacroParam(const Macro *M, const char *Param)
 // Search for a macro parameter. If found, return the index of the parameter.
 // If the parameter was not found, return -1.
 {
-    unsigned I;
-    for (I = 0; I < CollCount (&M->Params); ++I) {
-        if (strcmp (CollAtUnchecked (&M->Params, I), Param) == 0) {
-            /* Found */
-            return I;
-        }
-    }
+   unsigned I;
+   for (I = 0; I < CollCount(&M->Params); ++I) {
+      if (strcmp(CollAtUnchecked(&M->Params, I), Param) == 0) {
+         /* Found */
+         return I;
+      }
+   }
 
-    /* Not found */
-    return -1;
+   /* Not found */
+   return -1;
 }
 
-
-
-void AddMacroParam (Macro* M, const char* Param)
+void AddMacroParam(Macro *M, const char *Param)
 /* Add a macro parameter. */
 {
-    // Check if we have a duplicate macro parameter, but add it anyway.
-    // Beware: Don't use FindMacroParam here, since the actual argument array
-    // may not be initialized.
-    unsigned I;
-    for (I = 0; I < CollCount (&M->Params); ++I) {
-        if (strcmp (CollAtUnchecked (&M->Params, I), Param) == 0) {
-            /* Found */
-            PPError ("Duplicate macro parameter: '%s'", Param);
-            break;
-        }
-    }
+   // Check if we have a duplicate macro parameter, but add it anyway.
+   // Beware: Don't use FindMacroParam here, since the actual argument array
+   // may not be initialized.
+   unsigned I;
+   for (I = 0; I < CollCount(&M->Params); ++I) {
+      if (strcmp(CollAtUnchecked(&M->Params, I), Param) == 0) {
+         /* Found */
+         PPError("Duplicate macro parameter: '%s'", Param);
+         break;
+      }
+   }
 
-    /* Add the new parameter */
-    CollAppend (&M->Params, xstrdup (Param));
-    ++M->ParamCount;
+   /* Add the new parameter */
+   CollAppend(&M->Params, xstrdup(Param));
+   ++M->ParamCount;
 }
 
-
-
-int MacroCmp (const Macro* M1, const Macro* M2)
+int MacroCmp(const Macro *M1, const Macro *M2)
 /* Compare two macros and return zero if both are identical. */
 {
-    int I;
+   int I;
 
-    /* Argument count must be identical */
-    if (M1->ParamCount != M2->ParamCount) {
-        return 1;
-    }
+   /* Argument count must be identical */
+   if (M1->ParamCount != M2->ParamCount) {
+      return 1;
+   }
 
-    /* Compare the parameters */
-    for (I = 0; I < M1->ParamCount; ++I) {
-        if (strcmp (CollConstAt (&M1->Params, I),
-                    CollConstAt (&M2->Params, I)) != 0) {
-            return 1;
-        }
-    }
+   /* Compare the parameters */
+   for (I = 0; I < M1->ParamCount; ++I) {
+      if (strcmp(CollConstAt(&M1->Params, I), CollConstAt(&M2->Params, I)) !=
+          0) {
+         return 1;
+      }
+   }
 
-    /* Compare the replacement */
-    return SB_Compare (&M1->Replacement, &M2->Replacement);
+   /* Compare the replacement */
+   return SB_Compare(&M1->Replacement, &M2->Replacement);
 }
 
-
-
-void PrintMacroStats (FILE* F)
+void PrintMacroStats(FILE *F)
 /* Print macro statistics to the given text file. */
 {
-    unsigned I;
-    Macro* M;
+   unsigned I;
+   Macro *M;
 
-    fprintf (F, "\n\nMacro Hash Table Summary\n");
-    for (I = 0; I < MACRO_TAB_SIZE; ++I) {
-        fprintf (F, "%3u : ", I);
-        M = MacroTab [I];
-        if (M) {
-            while (M) {
-                fprintf (F, "%s ", M->Name);
-                M = M->Next;
-            }
-            fprintf (F, "\n");
-        } else {
-            fprintf (F, "empty\n");
-        }
-    }
+   fprintf(F, "\n\nMacro Hash Table Summary\n");
+   for (I = 0; I < MACRO_TAB_SIZE; ++I) {
+      fprintf(F, "%3u : ", I);
+      M = MacroTab[I];
+      if (M) {
+         while (M) {
+            fprintf(F, "%s ", M->Name);
+            M = M->Next;
+         }
+         fprintf(F, "\n");
+      }
+      else {
+         fprintf(F, "empty\n");
+      }
+   }
 }
 
-
-
-void OutputPredefMacros (void)
+void OutputPredefMacros(void)
 /* Output all predefined macros to the output file */
 {
-    OutputMacros (PREDEF_MACROS, FULL_DEFINITION);
+   OutputMacros(PREDEF_MACROS, FULL_DEFINITION);
 }
 
-
-
-void OutputUserMacros (void)
+void OutputUserMacros(void)
 /* Output all user defined macros to the output file */
 {
-    OutputMacros (USER_MACROS, FULL_DEFINITION);
+   OutputMacros(USER_MACROS, FULL_DEFINITION);
 }

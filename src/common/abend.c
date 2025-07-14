@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,31 +38,27 @@
 #include "cmdline.h"
 #include "abend.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void AbEnd (const char* Format, ...)
+void AbEnd(const char *Format, ...)
 // Print a message preceeded by the program name and terminate the program
 // with an error exit code.
 {
-    va_list ap;
+   va_list ap;
 
-    /* Print the program name */
-    fprintf (stderr, "%s: ", ProgName);
+   /* Print the program name */
+   fprintf(stderr, "%s: ", ProgName);
 
-    /* Format the given message and print it */
-    va_start (ap, Format);
-    vfprintf (stderr, Format, ap);
-    va_end (ap);
+   /* Format the given message and print it */
+   va_start(ap, Format);
+   vfprintf(stderr, Format, ap);
+   va_end(ap);
 
-    /* Add a newline */
-    fprintf (stderr, "\n");
+   /* Add a newline */
+   fprintf(stderr, "\n");
 
-    /* Terminate the program */
-    exit (EXIT_FAILURE);
+   /* Terminate the program */
+   exit(EXIT_FAILURE);
 }

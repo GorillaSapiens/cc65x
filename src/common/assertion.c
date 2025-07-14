@@ -31,30 +31,22 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include "assertion.h"
 #include "attrib.h"
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-int AssertAtLinkTime (AssertAction A attribute ((unused)))
+int AssertAtLinkTime(AssertAction A attribute((unused)))
 /* Return true if this assertion should be evaluated at link time */
 {
-    /* Currently all assertions are evaluated at link time */
-    return 1;
+   /* Currently all assertions are evaluated at link time */
+   return 1;
 }
 
-
-
-int AssertAtAsmTime (AssertAction A)
+int AssertAtAsmTime(AssertAction A)
 /* Return true if this assertion should be evaluated at assembly time */
 {
-    return (A & 0x02U) == 0;
+   return (A & 0x02U) == 0;
 }

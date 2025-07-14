@@ -31,26 +31,18 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef GOTO_H
 #define GOTO_H
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void GotoStatement (void);
+void GotoStatement(void);
 /* Process a goto statement. */
 
-void DoLabel (void);
+void DoLabel(void);
 /* Define a goto label. */
-
-
 
 /* End of goto.h */
 

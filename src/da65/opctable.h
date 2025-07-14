@@ -31,12 +31,8 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef OPCTABLE_H
 #define OPCTABLE_H
-
-
 
 /* common */
 #include "cpu.h"
@@ -44,29 +40,19 @@
 /* da65 */
 #include "opcdesc.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Descriptions for all opcodes */
-extern const OpcDesc* OpcTable;
-
-
+extern const OpcDesc *OpcTable;
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void SetOpcTable (cpu_t CPU);
+void SetOpcTable(cpu_t CPU);
 /* Set the correct opcode table for the given CPU */
-
-
 
 /* End of opctable.h */
 

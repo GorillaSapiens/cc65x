@@ -31,42 +31,30 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef ASSERTION_H
 #define ASSERTION_H
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Assertion actions. The second two are linker only (not evaluated by ca65) */
 typedef enum {
-    ASSERT_ACT_WARN     =   0x00U,  /* Print a warning */
-    ASSERT_ACT_ERROR    =   0x01U,  /* Print an error */
-    ASSERT_ACT_LDWARN   =   0x02U,  /* Print a warning (linker only) */
-    ASSERT_ACT_LDERROR  =   0x03U,  /* Print an error (linker only) */
+   ASSERT_ACT_WARN = 0x00U,    /* Print a warning */
+   ASSERT_ACT_ERROR = 0x01U,   /* Print an error */
+   ASSERT_ACT_LDWARN = 0x02U,  /* Print a warning (linker only) */
+   ASSERT_ACT_LDERROR = 0x03U, /* Print an error (linker only) */
 } AssertAction;
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-int AssertAtLinkTime (AssertAction A);
+int AssertAtLinkTime(AssertAction A);
 /* Return true if this assertion should be evaluated at link time */
 
-int AssertAtAsmTime (AssertAction A);
+int AssertAtAsmTime(AssertAction A);
 /* Return true if this assertion should be evaluated at assembly time */
-
-
 
 /* End of assertion.h */
 

@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -45,47 +43,42 @@
 #include "list.h"
 #include "objdata.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void ListObjFiles (int argc, char* argv [])
+void ListObjFiles(int argc, char *argv[])
 /* List modules in a library */
 {
-    unsigned I;
-    const ObjData* O;
+   unsigned I;
+   const ObjData *O;
 
-    /* Check the argument count */
-    if (argc <= 0) {
-        Error ("No library name given");
-    }
-    if (argc > 2) {
-        Error ("Too many arguments");
-    }
+   /* Check the argument count */
+   if (argc <= 0) {
+      Error("No library name given");
+   }
+   if (argc > 2) {
+      Error("Too many arguments");
+   }
 
-    /* Open the library, read the index */
-    LibOpen (argv [0], 1, 0);
+   /* Open the library, read the index */
+   LibOpen(argv[0], 1, 0);
 
-    /* List the modules */
-    for (I = 0; I < CollCount (&ObjPool); ++I) {
+   /* List the modules */
+   for (I = 0; I < CollCount(&ObjPool); ++I) {
 
-        /* Get the entry */
-        O = CollConstAt (&ObjPool, I);
+      /* Get the entry */
+      O = CollConstAt(&ObjPool, I);
 
-        /* Print the size if verbose */
-        Print (stdout, 1, "%5lu ", O->Size);
-        /* Print the name */
-        puts (O->Name);
+      /* Print the size if verbose */
+      Print(stdout, 1, "%5lu ", O->Size);
+      /* Print the name */
+      puts(O->Name);
+   }
 
-    }
+   /* Create a new library file and close the old one */
+   LibClose();
 
-    /* Create a new library file and close the old one */
-    LibClose ();
-
-    /* Successful end */
-    exit (EXIT_SUCCESS);
+   /* Successful end */
+   exit(EXIT_SUCCESS);
 }

@@ -31,66 +31,52 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef FEATURE_H
 #define FEATURE_H
 
-
-
 /* common */
 #include "strbuf.h"
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 typedef enum {
-    FEAT_UNKNOWN                = -1,
-    FEAT_DOLLAR_IS_PC,
-    FEAT_LABELS_WITHOUT_COLONS,
-    FEAT_LOOSE_STRING_TERM,
-    FEAT_LOOSE_CHAR_TERM,
-    FEAT_AT_IN_IDENTIFIERS,
-    FEAT_DOLLAR_IN_IDENTIFIERS,
-    FEAT_LEADING_DOT_IN_IDENTIFIERS,
-    FEAT_ORG_PER_SEG,
-    FEAT_PC_ASSIGNMENT,
-    FEAT_MISSING_CHAR_TERM,
-    FEAT_UBIQUITOUS_IDENTS,
-    FEAT_C_COMMENTS,
-    FEAT_FORCE_RANGE,
-    FEAT_UNDERLINE_IN_NUMBERS,
-    FEAT_ADDRSIZE,
-    FEAT_BRACKET_AS_INDIRECT,
-    FEAT_STRING_ESCAPES,
-    FEAT_LONG_JSR_JMP_RTS,
-    FEAT_LINE_CONTINUATIONS,
+   FEAT_UNKNOWN = -1,
+   FEAT_DOLLAR_IS_PC,
+   FEAT_LABELS_WITHOUT_COLONS,
+   FEAT_LOOSE_STRING_TERM,
+   FEAT_LOOSE_CHAR_TERM,
+   FEAT_AT_IN_IDENTIFIERS,
+   FEAT_DOLLAR_IN_IDENTIFIERS,
+   FEAT_LEADING_DOT_IN_IDENTIFIERS,
+   FEAT_ORG_PER_SEG,
+   FEAT_PC_ASSIGNMENT,
+   FEAT_MISSING_CHAR_TERM,
+   FEAT_UBIQUITOUS_IDENTS,
+   FEAT_C_COMMENTS,
+   FEAT_FORCE_RANGE,
+   FEAT_UNDERLINE_IN_NUMBERS,
+   FEAT_ADDRSIZE,
+   FEAT_BRACKET_AS_INDIRECT,
+   FEAT_STRING_ESCAPES,
+   FEAT_LONG_JSR_JMP_RTS,
+   FEAT_LINE_CONTINUATIONS,
 
-    /* Special value: Number of features available */
-    FEAT_COUNT
+   /* Special value: Number of features available */
+   FEAT_COUNT
 } feature_t;
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-feature_t FindFeature (const StrBuf* Key);
+feature_t FindFeature(const StrBuf *Key);
 // Find the feature in a table and return the corresponding enum value. If the
 // feature is invalid, return FEAT_UNKNOWN.
 
-void SetFeature (feature_t Feature, unsigned char On);
+void SetFeature(feature_t Feature, unsigned char On);
 // Set the corresponding feature flag if Feature is valid.
-
-
 
 /* End of feature.h */
 

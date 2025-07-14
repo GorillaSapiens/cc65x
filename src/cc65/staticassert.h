@@ -28,23 +28,15 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef STATICASSERT_H
 #define STATICASSERT_H
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void ParseStaticAssert (void);
+void ParseStaticAssert(void);
 /* Handle _Static_assert. These are a C11 feature. */
-
-
 
 /* End of staticassert.h */
 

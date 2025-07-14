@@ -31,89 +31,79 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef OUTPUT_H
 #define OUTPUT_H
 
-
-
 /* common */
 #include "attrib.h"
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void OpenOutput (const char* Name);
+void OpenOutput(const char *Name);
 /* Open the given file for output */
 
-void CloseOutput (void);
+void CloseOutput(void);
 /* Close the output file */
 
-void Output (const char* Format, ...) attribute ((format(printf, 1, 2)));
+void Output(const char *Format, ...) attribute((format(printf, 1, 2)));
 /* Write to the output file */
 
-void Indent (unsigned N);
+void Indent(unsigned N);
 /* Make sure the current line column is at position N (zero based) */
 
-void LineFeed (void);
+void LineFeed(void);
 /* Add a linefeed to the output file */
 
-void DefLabel (const char* Name);
+void DefLabel(const char *Name);
 /* Define a label with the given name */
 
-void DefForward (const char* Name, const char* Comment, unsigned Offs);
+void DefForward(const char *Name, const char *Comment, unsigned Offs);
 // Define a label as "* + x", where x is the offset relative to the
 // current PC.
 
-void DefConst (const char* Name, const char* Comment, uint32_t Addr);
+void DefConst(const char *Name, const char *Comment, uint32_t Addr);
 /* Define an address constant */
 
-void OneDataByte (void);
+void OneDataByte(void);
 /* Output a .byte line with the current code byte */
 
-void DataByteLine (uint32_t ByteCount);
+void DataByteLine(uint32_t ByteCount);
 /* Output a line with bytes */
 
-void DataDByteLine (uint32_t ByteCount);
+void DataDByteLine(uint32_t ByteCount);
 /* Output a line with dbytes */
 
-void DataWordLine (uint32_t ByteCount);
+void DataWordLine(uint32_t ByteCount);
 /* Output a line with words */
 
-void DataDWordLine (uint32_t ByteCount);
+void DataDWordLine(uint32_t ByteCount);
 /* Output a line with dwords */
 
-void SeparatorLine (void);
+void SeparatorLine(void);
 /* Print a separator line */
 
-void StartSegment (const char* Name, unsigned AddrSize);
+void StartSegment(const char *Name, unsigned AddrSize);
 /* Start a segment */
 
-void EndSegment (void);
+void EndSegment(void);
 /* End a segment */
 
-void UserComment (const char* Comment);
+void UserComment(const char *Comment);
 /* Output a comment line */
 
-void LineComment (unsigned PC, unsigned Count);
+void LineComment(unsigned PC, unsigned Count);
 /* Add a line comment with the PC and data bytes */
 
-void OutputSettings (void);
+void OutputSettings(void);
 /* Output CPU and other settings */
 
-void OutputMFlag (unsigned char enabled);
+void OutputMFlag(unsigned char enabled);
 /* Output the 65816 M-flag state */
 
-void OutputXFlag (unsigned char enabled);
+void OutputXFlag(unsigned char enabled);
 /* Output the 65816 X-flag state */
-
-
 
 /* End of output.h */
 #endif

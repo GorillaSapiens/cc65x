@@ -31,47 +31,35 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef FILEPOS_H
 #define FILEPOS_H
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Type of a file position */
 typedef struct FilePos FilePos;
 struct FilePos {
-    unsigned    Line;               /* Line */
-    unsigned    Col;                /* Column */
-    unsigned    Name;               /* File */
+   unsigned Line; /* Line */
+   unsigned Col;  /* Column */
+   unsigned Name; /* File */
 };
 
 /* Initializer for a FilePos */
-#define STATIC_FILEPOS_INITIALIZER      { 0, 0, 0 }
-
-
+#define STATIC_FILEPOS_INITIALIZER {0, 0, 0}
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void InitFilePos (FilePos* P);
+void InitFilePos(FilePos *P);
 /* Initialize the file position (set all fields to zero) */
 
-int CompareFilePos (const FilePos* P1, const FilePos* P2);
+int CompareFilePos(const FilePos *P1, const FilePos *P2);
 // Compare two file positions. Return zero if both are equal, return a value
 // > 0 if P1 is greater and P2, and a value < 0 if P1 is less than P2. The
 // compare rates file index over line over column.
-
-
 
 /* End of filepos.h */
 

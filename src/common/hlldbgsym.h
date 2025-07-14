@@ -31,47 +31,37 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 // This module contains definitions for high level language symbols passed
 // down from the C compiler. They're collected in the assembler and written to
 // the object file in binary form, then again read by the linker and finally
 // placed in the debug info file.
 
-
-
 #ifndef HLLDBGSYM_H
 #define HLLDBGSYM_H
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Flag bits that tell something about the symbol */
-#define HLL_TYPE_FUNC   0x0000U                 /* Function */
-#define HLL_TYPE_SYM    0x0001U                 /* Symbol */
-#define HLL_TYPE_MASK   0x0007U
+#define HLL_TYPE_FUNC 0x0000U /* Function */
+#define HLL_TYPE_SYM 0x0001U  /* Symbol */
+#define HLL_TYPE_MASK 0x0007U
 #define HLL_GET_TYPE(x) ((x) & HLL_TYPE_MASK)
-#define HLL_IS_FUNC(x)  (HLL_GET_TYPE(x) == HLL_TYPE_FUNC)
-#define HLL_IS_SYM(x)   (HLL_GET_TYPE(x) == HLL_TYPE_SYM)
+#define HLL_IS_FUNC(x) (HLL_GET_TYPE(x) == HLL_TYPE_FUNC)
+#define HLL_IS_SYM(x) (HLL_GET_TYPE(x) == HLL_TYPE_SYM)
 
 /* Storage class */
-#define HLL_SC_AUTO     0x0000U                 /* On stack */
-#define HLL_SC_REG      0x0008U                 /* Register */
-#define HLL_SC_STATIC   0x0010U                 /* Static linkage */
-#define HLL_SC_EXTERN   0x0018U                 /* External linkage */
-#define HLL_SC_MASK     0x0078U
-#define HLL_GET_SC(x)   ((x) & HLL_SC_MASK)
+#define HLL_SC_AUTO 0x0000U   /* On stack */
+#define HLL_SC_REG 0x0008U    /* Register */
+#define HLL_SC_STATIC 0x0010U /* Static linkage */
+#define HLL_SC_EXTERN 0x0018U /* External linkage */
+#define HLL_SC_MASK 0x0078U
+#define HLL_GET_SC(x) ((x) & HLL_SC_MASK)
 
 /* Other information */
-#define HLL_DATA_SYM    0x0080U                 /* Attached asm symbol */
-#define HLL_HAS_SYM(x)  (((x) & HLL_DATA_SYM) != 0)
-
-
+#define HLL_DATA_SYM 0x0080U /* Attached asm symbol */
+#define HLL_HAS_SYM(x) (((x) & HLL_DATA_SYM) != 0)
 
 /* End of hlldbgsyms.h */
 

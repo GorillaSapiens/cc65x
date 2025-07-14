@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <string.h>
 
 /* common */
@@ -44,125 +42,109 @@
 #include "library.h"
 #include "objdata.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Collection with object files */
-Collection       ObjPool        = STATIC_COLLECTION_INITIALIZER;
-
-
+Collection ObjPool = STATIC_COLLECTION_INITIALIZER;
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-ObjData* NewObjData (void)
+ObjData *NewObjData(void)
 /* Allocate a new structure on the heap, insert it into the list, return it */
 {
-    /* Allocate memory */
-    ObjData* O = xmalloc (sizeof (ObjData));
+   /* Allocate memory */
+   ObjData *O = xmalloc(sizeof(ObjData));
 
-    /* Initialize the data */
-    O->Name        = 0;
+   /* Initialize the data */
+   O->Name = 0;
 
-    O->Flags       = 0;
-    O->MTime       = 0;
-    O->Start       = 0;
-    O->Size        = 0;
+   O->Flags = 0;
+   O->MTime = 0;
+   O->Start = 0;
+   O->Size = 0;
 
-    O->Strings     = EmptyCollection;
-    O->Exports     = EmptyCollection;
+   O->Strings = EmptyCollection;
+   O->Exports = EmptyCollection;
 
-    /* Add it to the list */
-    CollAppend (&ObjPool, O);
+   /* Add it to the list */
+   CollAppend(&ObjPool, O);
 
-    /* Return the new entry */
-    return O;
+   /* Return the new entry */
+   return O;
 }
 
-
-
-void FreeObjData (ObjData* O)
+void FreeObjData(ObjData *O)
 /* Free a complete struct */
 {
-    unsigned I;
+   unsigned I;
 
-    xfree (O->Name);
-    for (I = 0; I < CollCount (&O->Strings); ++I) {
-        xfree (CollAt (&O->Strings, I));
-    }
-    DoneCollection (&O->Strings);
-    DoneCollection (&O->Exports);
-    xfree (O);
+   xfree(O->Name);
+   for (I = 0; I < CollCount(&O->Strings); ++I) {
+      xfree(CollAt(&O->Strings, I));
+   }
+   DoneCollection(&O->Strings);
+   DoneCollection(&O->Exports);
+   xfree(O);
 }
 
-
-
-void ClearObjData (ObjData* O)
+void ClearObjData(ObjData *O)
 /* Remove any data stored in O */
 {
-    unsigned I;
-    xfree (O->Name);
-    O->Name = 0;
-    for (I = 0; I < CollCount (&O->Strings); ++I) {
-        xfree (CollAt (&O->Strings, I));
-    }
-    CollDeleteAll (&O->Strings);
-    CollDeleteAll (&O->Exports);
+   unsigned I;
+   xfree(O->Name);
+   O->Name = 0;
+   for (I = 0; I < CollCount(&O->Strings); ++I) {
+      xfree(CollAt(&O->Strings, I));
+   }
+   CollDeleteAll(&O->Strings);
+   CollDeleteAll(&O->Exports);
 }
 
-
-
-ObjData* FindObjData (const char* Module)
+ObjData *FindObjData(const char *Module)
 // Search for the module with the given name and return it. Return NULL if the
 // module is not in the list.
 {
-    unsigned I;
+   unsigned I;
 
-    /* Hmm. Maybe we should hash the module names? */
-    for (I = 0; I < CollCount (&ObjPool); ++I) {
+   /* Hmm. Maybe we should hash the module names? */
+   for (I = 0; I < CollCount(&ObjPool); ++I) {
 
-        /* Get this object file */
-        ObjData* O = CollAtUnchecked (&ObjPool, I);
+      /* Get this object file */
+      ObjData *O = CollAtUnchecked(&ObjPool, I);
 
-        /* Did we find it? */
-        if (strcmp (O->Name, Module) == 0) {
-            return O;
-        }
-    }
-    return 0;
+      /* Did we find it? */
+      if (strcmp(O->Name, Module) == 0) {
+         return O;
+      }
+   }
+   return 0;
 }
 
-
-
-void DelObjData (const char* Module)
+void DelObjData(const char *Module)
 /* Delete the object module from the list */
 {
-    unsigned I;
-    for (I = 0; I < CollCount (&ObjPool); ++I) {
+   unsigned I;
+   for (I = 0; I < CollCount(&ObjPool); ++I) {
 
-        /* Get this object file */
-        ObjData* O = CollAtUnchecked (&ObjPool, I);
+      /* Get this object file */
+      ObjData *O = CollAtUnchecked(&ObjPool, I);
 
-        /* Did we find it? */
-        if (strcmp (O->Name, Module) == 0) {
+      /* Did we find it? */
+      if (strcmp(O->Name, Module) == 0) {
 
-            /* Free the entry */
-            CollDelete (&ObjPool, I);
-            FreeObjData (O);
+         /* Free the entry */
+         CollDelete(&ObjPool, I);
+         FreeObjData(O);
 
-            /* Done */
-            return;
-        }
-    }
+         /* Done */
+         return;
+      }
+   }
 
-    /* Not found! */
-    Warning ("Module '%s' not found in library '%s'", Module, LibName);
+   /* Not found! */
+   Warning("Module '%s' not found in library '%s'", Module, LibName);
 }

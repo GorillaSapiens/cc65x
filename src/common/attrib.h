@@ -31,31 +31,25 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef ATTRIB_H
 #define ATTRIB_H
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
 #ifdef __clang__
-#  define attribute(a)      __attribute__(a)
-#  define ATTR_UNUSED(x)    __attribute__((__unused__)) x
-#  define ATTR_NORETURN     __attribute__((analyzer_noreturn))
+#define attribute(a) __attribute__(a)
+#define ATTR_UNUSED(x) __attribute__((__unused__)) x
+#define ATTR_NORETURN __attribute__((analyzer_noreturn))
 #elif defined(__GNUC__)
-#  define attribute(a)      __attribute__(a)
-#  define ATTR_UNUSED(x)    __attribute__((__unused__)) x
-#  define ATTR_NORETURN     __attribute__((noreturn))
+#define attribute(a) __attribute__(a)
+#define ATTR_UNUSED(x) __attribute__((__unused__)) x
+#define ATTR_NORETURN __attribute__((noreturn))
 #else
-#  define attribute(a)
-#  define ATTR_UNUSED(x)    x
-#  define ATTR_NORETURN
+#define attribute(a)
+#define ATTR_UNUSED(x) x
+#define ATTR_NORETURN
 #endif
 
 /* End of attrib.h */

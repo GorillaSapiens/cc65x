@@ -31,23 +31,15 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef EXTRACT_H
 #define EXTRACT_H
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void ExtractObjFiles (int argc, char* argv []);
+void ExtractObjFiles(int argc, char *argv[]);
 /* Extract object files from a library */
-
-
 
 /* End of extract.h */
 

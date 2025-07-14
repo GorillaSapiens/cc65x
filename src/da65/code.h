@@ -31,64 +31,50 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef CODE_H
 #define CODE_H
 
-
-
 #include <stdint.h>
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
-extern uint8_t CodeBuf[0x10000];        /* Code buffer */
-extern uint32_t CodeStart;              /* Start address */
-extern uint32_t CodeEnd;                /* End address */
-extern uint32_t PC;                     /* Current PC */
-
-
+extern uint8_t CodeBuf[0x10000]; /* Code buffer */
+extern uint32_t CodeStart;       /* Start address */
+extern uint32_t CodeEnd;         /* End address */
+extern uint32_t PC;              /* Current PC */
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void LoadCode (void);
+void LoadCode(void);
 /* Load the code from the given file */
 
-uint8_t GetCodeByte (uint32_t Addr);
+uint8_t GetCodeByte(uint32_t Addr);
 /* Get a byte from the given address */
 
-uint16_t GetCodeDByte (uint32_t Addr);
+uint16_t GetCodeDByte(uint32_t Addr);
 /* Get a dbyte from the given address */
 
-uint16_t GetCodeWord (uint32_t Addr);
+uint16_t GetCodeWord(uint32_t Addr);
 /* Get a word from the given address */
 
-uint32_t GetCodeDWord (uint32_t Addr);
+uint32_t GetCodeDWord(uint32_t Addr);
 /* Get a dword from the given address */
 
-uint32_t GetCodeLongAddr (uint32_t Addr);
+uint32_t GetCodeLongAddr(uint32_t Addr);
 /* Get a 24-bit address from the given address */
 
-uint32_t GetRemainingBytes (void);
+uint32_t GetRemainingBytes(void);
 /* Return the number of remaining code bytes */
 
-int CodeLeft (void);
+int CodeLeft(void);
 /* Return true if there are code bytes left */
 
-void ResetCode (void);
+void ResetCode(void);
 /* Reset the code input to start over for the next pass */
-
-
 
 /* End of code.h */
 

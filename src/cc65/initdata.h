@@ -31,29 +31,19 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef INITDATA_H
 #define INITDATA_H
 
-
-
 /* cc65 */
 #include "datatype.h"
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-unsigned ParseInit (Type* T);
+unsigned ParseInit(Type *T);
 // Parse initialization of variables. Return the number of initialized data
 // bytes.
-
-
 
 /* End of initdata.h */
 

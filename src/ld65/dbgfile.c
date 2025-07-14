@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -50,120 +48,106 @@
 #include "span.h"
 #include "tpool.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-static void AssignIds (void)
+static void AssignIds(void)
 // Assign the base ids for debug info output. Within each module, many of the
 // items are addressed by ids which are actually the indices of the items in
 // the collections. To make them unique, we must assign a unique base to each
 // range.
 {
-    /* Walk over all modules */
-    unsigned I;
-    unsigned HLLSymBaseId = 0;
-    unsigned ScopeBaseId  = 0;
-    unsigned SpanBaseId   = 0;
-    unsigned SymBaseId    = 0;
-    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+   /* Walk over all modules */
+   unsigned I;
+   unsigned HLLSymBaseId = 0;
+   unsigned ScopeBaseId = 0;
+   unsigned SpanBaseId = 0;
+   unsigned SymBaseId = 0;
+   for (I = 0; I < CollCount(&ObjDataList); ++I) {
 
-        /* Get this module */
-        ObjData* O = CollAt (&ObjDataList, I);
+      /* Get this module */
+      ObjData *O = CollAt(&ObjDataList, I);
 
-        /* Assign the module id */
-        O->Id = I;
+      /* Assign the module id */
+      O->Id = I;
 
-        /* Assign base ids */
-        O->HLLSymBaseId = HLLSymBaseId;
-        O->ScopeBaseId  = ScopeBaseId;
-        O->SpanBaseId   = SpanBaseId;
-        O->SymBaseId    = SymBaseId;
+      /* Assign base ids */
+      O->HLLSymBaseId = HLLSymBaseId;
+      O->ScopeBaseId = ScopeBaseId;
+      O->SpanBaseId = SpanBaseId;
+      O->SymBaseId = SymBaseId;
 
-        /* Bump the base ids */
-        HLLSymBaseId  += CollCount (&O->HLLDbgSyms);
-        ScopeBaseId   += CollCount (&O->Scopes);
-        SpanBaseId    += CollCount (&O->Spans);
-        SymBaseId     += CollCount (&O->DbgSyms);
-    }
+      /* Bump the base ids */
+      HLLSymBaseId += CollCount(&O->HLLDbgSyms);
+      ScopeBaseId += CollCount(&O->Scopes);
+      SpanBaseId += CollCount(&O->Spans);
+      SymBaseId += CollCount(&O->DbgSyms);
+   }
 
-    /* Assign the ids to the file infos */
-    AssignFileInfoIds ();
+   /* Assign the ids to the file infos */
+   AssignFileInfoIds();
 
-    /* Assign the ids to line infos */
-    AssignLineInfoIds ();
+   /* Assign the ids to line infos */
+   AssignLineInfoIds();
 }
 
-
-
-void CreateDbgFile (void)
+void CreateDbgFile(void)
 /* Create a debug info file */
 {
-    /* Open the debug info file */
-    FILE* F = fopen (DbgFileName, "w");
-    if (F == 0) {
-        Error ("Cannot create debug file '%s': %s", DbgFileName, strerror (errno));
-    }
+   /* Open the debug info file */
+   FILE *F = fopen(DbgFileName, "w");
+   if (F == 0) {
+      Error("Cannot create debug file '%s': %s", DbgFileName, strerror(errno));
+   }
 
-    /* Output version information */
-    fprintf (F, "version\tmajor=2,minor=0\n");
+   /* Output version information */
+   fprintf(F, "version\tmajor=2,minor=0\n");
 
-    // Output a line with the item numbers so the debug info module is able
-    // to preallocate the required memory.
-    fprintf (
-        F,
-        "info\tcsym=%u,file=%u,lib=%u,line=%u,mod=%u,scope=%u,seg=%u,span=%u,sym=%u,type=%u\n",
-        HLLDbgSymCount (),
-        FileInfoCount (),
-        LibraryCount (),
-        LineInfoCount (),
-        ObjDataCount (),
-        ScopeCount (),
-        SegmentCount (),
-        SpanCount (),
-        DbgSymCount (),
-        TypeCount ()
-    );
+   // Output a line with the item numbers so the debug info module is able
+   // to preallocate the required memory.
+   fprintf(F,
+           "info\tcsym=%u,file=%u,lib=%u,line=%u,mod=%u,scope=%u,seg=%u,span=%"
+           "u,sym=%u,type=%u\n",
+           HLLDbgSymCount(), FileInfoCount(), LibraryCount(), LineInfoCount(),
+           ObjDataCount(), ScopeCount(), SegmentCount(), SpanCount(),
+           DbgSymCount(), TypeCount());
 
-    /* Assign the ids to the items */
-    AssignIds ();
+   /* Assign the ids to the items */
+   AssignIds();
 
-    /* Output high level language symbols */
-    PrintHLLDbgSyms (F);
+   /* Output high level language symbols */
+   PrintHLLDbgSyms(F);
 
-    /* Output files */
-    PrintDbgFileInfo (F);
+   /* Output files */
+   PrintDbgFileInfo(F);
 
-    /* Output libraries */
-    PrintDbgLibraries (F);
+   /* Output libraries */
+   PrintDbgLibraries(F);
 
-    /* Output line info */
-    PrintDbgLineInfo (F);
+   /* Output line info */
+   PrintDbgLineInfo(F);
 
-    /* Output modules */
-    PrintDbgModules (F);
+   /* Output modules */
+   PrintDbgModules(F);
 
-    /* Output the segment info */
-    PrintDbgSegments (F);
+   /* Output the segment info */
+   PrintDbgSegments(F);
 
-    /* Output spans */
-    PrintDbgSpans (F);
+   /* Output spans */
+   PrintDbgSpans(F);
 
-    /* Output scopes */
-    PrintDbgScopes (F);
+   /* Output scopes */
+   PrintDbgScopes(F);
 
-    /* Output symbols */
-    PrintDbgSyms (F);
+   /* Output symbols */
+   PrintDbgSyms(F);
 
-    /* Output types */
-    PrintDbgTypes (F);
+   /* Output types */
+   PrintDbgTypes(F);
 
-    /* Close the file */
-    if (fclose (F) != 0) {
-        Error ("Error closing debug file '%s': %s", DbgFileName, strerror (errno));
-    }
+   /* Close the file */
+   if (fclose(F) != 0) {
+      Error("Error closing debug file '%s': %s", DbgFileName, strerror(errno));
+   }
 }

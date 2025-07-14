@@ -31,71 +31,63 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef COPTJMP_H
 #define COPTJMP_H
 
-
-
 /* cc65 */
 #include "codeseg.h"
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-unsigned OptBranchDist (CodeSeg* S);
+unsigned OptBranchDist(CodeSeg *S);
 /* Change branches for the distance needed. */
 
-unsigned OptBranchDist2 (CodeSeg* S);
+unsigned OptBranchDist2(CodeSeg *S);
 /* If BRA points to an external symbol, change it to JMP */
 
-unsigned OptRTSJumps1 (CodeSeg* S);
+unsigned OptRTSJumps1(CodeSeg *S);
 /* Replace jumps to RTS by RTS */
 
-unsigned OptRTSJumps2 (CodeSeg* S);
+unsigned OptRTSJumps2(CodeSeg *S);
 /* Replace long conditional jumps to RTS */
 
-unsigned OptDeadJumps (CodeSeg* S);
+unsigned OptDeadJumps(CodeSeg *S);
 /* Remove dead jumps (jumps to the next instruction) */
 
-unsigned OptDeadCode (CodeSeg* S);
+unsigned OptDeadCode(CodeSeg *S);
 // Remove dead code (code that follows an unconditional jump or an rts/rti
 // and has no label)
 
-unsigned OptJumpCascades (CodeSeg* S);
+unsigned OptJumpCascades(CodeSeg *S);
 // Optimize jump cascades (jumps to jumps). In such a case, the jump is
 // replaced by a jump to the final location. This will in some cases produce
 // worse code, because some jump targets are no longer reachable by short
 // branches, but this is quite rare, so there are more advantages than
 // disadvantages.
 
-unsigned OptRTS (CodeSeg* S);
+unsigned OptRTS(CodeSeg *S);
 // Optimize subroutine calls followed by an RTS. The subroutine call will get
 // replaced by a jump. Don't bother to delete the RTS if it does not have a
 // label, the dead code elimination should take care of it.
 
-unsigned OptJumpTarget1 (CodeSeg* S);
+unsigned OptJumpTarget1(CodeSeg *S);
 // If the instruction preceeding an unconditional branch is the same as the
 // instruction preceeding the jump target, the jump target may be moved
 // one entry back. This is a size optimization, since the instruction before
 // the branch gets removed.
 
-unsigned OptJumpTarget2 (CodeSeg* S);
+unsigned OptJumpTarget2(CodeSeg *S);
 // If a bcs jumps to a sec insn or a bcc jumps to clc, skip this insn, since
 // it's job is already done.
 
-unsigned OptJumpTarget3 (CodeSeg* S);
+unsigned OptJumpTarget3(CodeSeg *S);
 // Jumps to load instructions of a register, that do already have the matching
 // register contents may skip the load instruction, since it's job is already
 // done.
 
-unsigned OptCondBranch1 (CodeSeg* S);
+unsigned OptCondBranch1(CodeSeg *S);
 // Performs some optimization steps:
 // - If an immediate load of a register is followed by a conditional jump that
 // is never taken because the load of the register sets the flags in such a
@@ -103,20 +95,18 @@ unsigned OptCondBranch1 (CodeSeg* S);
 // - If the conditional branch is always taken because of the register load,
 // replace it by a jmp.
 
-unsigned OptCondBranch2 (CodeSeg* S);
+unsigned OptCondBranch2(CodeSeg *S);
 // If a conditional branch jumps around an unconditional branch, remove the
 // conditional branch and make the jump a conditional branch with the inverse
 // condition of the first one.
 
-unsigned OptCondBranch3 (CodeSeg* S);
+unsigned OptCondBranch3(CodeSeg *S);
 // If the conditional branch is always taken because it follows an inverse
 // conditional branch, replace it by a jmp.
 
-unsigned OptCondBranchC (CodeSeg* S);
+unsigned OptCondBranchC(CodeSeg *S);
 // If on entry to a "rol a" instruction the accu is zero, and a beq/bne follows,
 // we can remove the rol and branch on the state of the carry.
-
-
 
 /* End of coptjmp.h */
 

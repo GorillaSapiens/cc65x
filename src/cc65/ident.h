@@ -31,38 +31,26 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef IDENT_H
 #define IDENT_H
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Maximum length of an identifier and the corresponding char array */
-#define MAX_IDENTLEN    64
-#define IDENTSIZE       (MAX_IDENTLEN+1)
+#define MAX_IDENTLEN 64
+#define IDENTSIZE (MAX_IDENTLEN + 1)
 
 /* Variable that holds an identifer */
-typedef char ident [IDENTSIZE];
-
-
+typedef char ident[IDENTSIZE];
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-int IsIdent (char c);
+int IsIdent(char c);
 /* Return true if the given char may start an identifier */
-
-
 
 /* End of ident.h */
 

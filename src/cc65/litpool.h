@@ -31,25 +31,17 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef LITPOOL_H
 #define LITPOOL_H
-
-
 
 #include <stdio.h>
 
 /* common */
 #include "strbuf.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
-
-
 
 /* Forward for struct SymEntry */
 struct SymEntry;
@@ -60,73 +52,63 @@ typedef struct Literal Literal;
 /* Forward for a literal pool */
 typedef struct LiteralPool LiteralPool;
 
-
-
 /*****************************************************************************/
 /*                              struct Literal                               */
 /*****************************************************************************/
 
-
-
-Literal* UseLiteral (Literal* L);
+Literal *UseLiteral(Literal *L);
 /* Increase the reference counter for the literal and return it */
 
-void ReleaseLiteral (Literal* L);
+void ReleaseLiteral(Literal *L);
 /* Decrement the reference counter for the literal */
 
-void TranslateLiteral (Literal* L);
+void TranslateLiteral(Literal *L);
 /* Translate a literal into the target charset */
 
-void ConcatLiteral (Literal* L, const Literal* Appended);
+void ConcatLiteral(Literal *L, const Literal *Appended);
 /* Concatenate string literals */
 
-unsigned GetLiteralLabel (const Literal* L);
+unsigned GetLiteralLabel(const Literal *L);
 /* Return the asm label for a literal */
 
-const char* GetLiteralStr (const Literal* L);
+const char *GetLiteralStr(const Literal *L);
 /* Return the data for a literal as pointer to char */
 
-const StrBuf* GetLiteralStrBuf (const Literal* L);
+const StrBuf *GetLiteralStrBuf(const Literal *L);
 /* Return the data for a literal as pointer to the string buffer */
 
-unsigned GetLiteralSize (const Literal* L);
+unsigned GetLiteralSize(const Literal *L);
 /* Get the size of a literal string */
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void InitLiteralPool (void);
+void InitLiteralPool(void);
 /* Initialize the literal pool */
 
-void PushLiteralPool (struct SymEntry* Func);
+void PushLiteralPool(struct SymEntry *Func);
 /* Push the current literal pool onto the stack and create a new one */
 
-LiteralPool* PopLiteralPool (void);
+LiteralPool *PopLiteralPool(void);
 // Pop the last literal pool from TOS and activate it. Return the old
 // literal pool.
 
-void MoveLiteralPool (LiteralPool* LocalPool);
+void MoveLiteralPool(LiteralPool *LocalPool);
 // Move all referenced literals in LocalPool to the global literal pool. This
 // function will free LocalPool after moving the used string literals.
 
-void OutputLocalLiteralPool (LiteralPool* Pool);
+void OutputLocalLiteralPool(LiteralPool *Pool);
 /* Output the local literal pool */
 
-void OutputGlobalLiteralPool (void);
+void OutputGlobalLiteralPool(void);
 /* Output the global literal pool */
 
-Literal* AddLiteral (const char* S);
+Literal *AddLiteral(const char *S);
 /* Add a literal string to the literal pool. Return the literal. */
 
-Literal* AddLiteralStr (const StrBuf* S);
+Literal *AddLiteralStr(const StrBuf *S);
 /* Add a literal string to the literal pool. Return the literal. */
-
-
 
 /* End of litpool.h */
 

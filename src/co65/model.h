@@ -31,51 +31,37 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef MODEL_H
 #define MODEL_H
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Supported models */
 typedef enum {
-    O65_MODEL_INVALID = -1,     /* Invalid model */
-    O65_MODEL_NONE,             /* No model given */
-    O65_MODEL_OSA65,            /* Not implemented */
-    O65_MODEL_LUNIX,            /* Not implemented */
-    O65_MODEL_CC65_MODULE,
+   O65_MODEL_INVALID = -1, /* Invalid model */
+   O65_MODEL_NONE,         /* No model given */
+   O65_MODEL_OSA65,        /* Not implemented */
+   O65_MODEL_LUNIX,        /* Not implemented */
+   O65_MODEL_CC65_MODULE,
 
-    O65_MODEL_COUNT             /* Number of available models */
+   O65_MODEL_COUNT /* Number of available models */
 } O65Model;
-
-
 
 /* Current model */
 extern O65Model Model;
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-const char* GetModelName (O65Model M);
+const char *GetModelName(O65Model M);
 /* Map the model to its name. */
 
-O65Model FindModel (const char* ModelName);
+O65Model FindModel(const char *ModelName);
 // Map a model name to its identifier. Return O65_MODEL_INVALID if the name
 // could not be found. Case is ignored when comparing names.
-
-
 
 /* End of model.h */
 

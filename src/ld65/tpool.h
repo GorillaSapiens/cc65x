@@ -31,77 +31,63 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef TPOOL_H
 #define TPOOL_H
-
-
 
 #include <stdio.h>
 
 /* common */
 #include "strpool.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* An invalid type */
-#define INVALID_TYPE_ID   (~0U)
+#define INVALID_TYPE_ID (~0U)
 
 /* The string pool we're using */
-extern StringPool* TypePool;
-
-
+extern StringPool *TypePool;
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
 #if defined(HAVE_INLINE)
-INLINE unsigned GetTypeId (const StrBuf* Type)
+INLINE unsigned GetTypeId(const StrBuf *Type)
 /* Return the id of the given generic type */
 {
-    return SP_Add (TypePool, Type);
+   return SP_Add(TypePool, Type);
 }
 #else
-#  define GetTypeId(Type)       SP_Add (TypePool, (Type))
+#define GetTypeId(Type) SP_Add(TypePool, (Type))
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE const StrBuf* GetType (unsigned Index)
+INLINE const StrBuf *GetType(unsigned Index)
 /* Convert a type index into a type string */
 {
-    return SP_Get (TypePool, Index);
+   return SP_Get(TypePool, Index);
 }
 #else
-#  define GetType(Index)        SP_Get (TypePool, (Index))
+#define GetType(Index) SP_Get(TypePool, (Index))
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE unsigned TypeCount (void)
+INLINE unsigned TypeCount(void)
 /* Return the number of types in the pool */
 {
-    return SP_GetCount (TypePool);
+   return SP_GetCount(TypePool);
 }
 #else
-#  define TypeCount()   SP_GetCount (TypePool)
+#define TypeCount() SP_GetCount(TypePool)
 #endif
 
-void PrintDbgTypes (FILE* F);
+void PrintDbgTypes(FILE *F);
 /* Output the types to a debug info file */
 
-void InitTypePool (void);
+void InitTypePool(void);
 /* Initialize the type pool */
-
-
 
 /* End of tpool.h */
 

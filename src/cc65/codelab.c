@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* common */
 #include "check.h"
 #include "xmalloc.h"
@@ -42,97 +40,85 @@
 #include "codelab.h"
 #include "output.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-CodeLabel* NewCodeLabel (const char* Name, unsigned Hash)
+CodeLabel *NewCodeLabel(const char *Name, unsigned Hash)
 /* Create a new code label, initialize and return it */
 {
-    /* Allocate memory */
-    CodeLabel* L = xmalloc (sizeof (CodeLabel));
+   /* Allocate memory */
+   CodeLabel *L = xmalloc(sizeof(CodeLabel));
 
-    /* Initialize the fields */
-    L->Next  = 0;
-    L->Name  = xstrdup (Name);
-    L->Hash  = Hash;
-    L->Owner = 0;
-    InitCollection (&L->JumpFrom);
+   /* Initialize the fields */
+   L->Next = 0;
+   L->Name = xstrdup(Name);
+   L->Hash = Hash;
+   L->Owner = 0;
+   InitCollection(&L->JumpFrom);
 
-    /* Return the new label */
-    return L;
+   /* Return the new label */
+   return L;
 }
 
-
-
-void FreeCodeLabel (CodeLabel* L)
+void FreeCodeLabel(CodeLabel *L)
 /* Free the given code label */
 {
-    /* Free the name */
-    xfree (L->Name);
+   /* Free the name */
+   xfree(L->Name);
 
-    /* Free the collection */
-    DoneCollection (&L->JumpFrom);
+   /* Free the collection */
+   DoneCollection(&L->JumpFrom);
 
-    /* Delete the struct */
-    xfree (L);
+   /* Delete the struct */
+   xfree(L);
 }
 
-
-
-void CL_AddRef (CodeLabel* L, struct CodeEntry* E)
+void CL_AddRef(CodeLabel *L, struct CodeEntry *E)
 /* Let the CodeEntry E reference the label L */
 {
-    /* The insn at E jumps to this label */
-    E->JumpTo = L;
+   /* The insn at E jumps to this label */
+   E->JumpTo = L;
 
-    if (CE_HasArgBase (E)) {
-        /* Replace the code entry argument base with the name of the new label */
-        CE_SetArgBase (E, L->Name);
-    } else {
-        CE_SetArgBaseAndOff (E, L->Name, 0);
-    }
+   if (CE_HasArgBase(E)) {
+      /* Replace the code entry argument base with the name of the new label */
+      CE_SetArgBase(E, L->Name);
+   }
+   else {
+      CE_SetArgBaseAndOff(E, L->Name, 0);
+   }
 
-    /* Remember that in the label */
-    CollAppend (&L->JumpFrom, E);
+   /* Remember that in the label */
+   CollAppend(&L->JumpFrom, E);
 }
 
-
-
-void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel)
+void CL_MoveRefs(CodeLabel *OldLabel, CodeLabel *NewLabel)
 // Move all references to OldLabel to point to NewLabel. OldLabel will have no
 // more references on return.
 {
-    /* Walk through all instructions referencing the old label */
-    unsigned Count = CL_GetRefCount (OldLabel);
-    while (Count--) {
+   /* Walk through all instructions referencing the old label */
+   unsigned Count = CL_GetRefCount(OldLabel);
+   while (Count--) {
 
-        /* Get the instruction that references the old label */
-        CodeEntry* E = CL_GetRef (OldLabel, Count);
+      /* Get the instruction that references the old label */
+      CodeEntry *E = CL_GetRef(OldLabel, Count);
 
-        /* Change the reference to the new label */
-        CHECK (E->JumpTo != NULL);
-        CHECK (E->JumpTo == OldLabel);
-        CL_AddRef (NewLabel, E);
+      /* Change the reference to the new label */
+      CHECK(E->JumpTo != NULL);
+      CHECK(E->JumpTo == OldLabel);
+      CL_AddRef(NewLabel, E);
+   }
 
-    }
-
-    /* There are no more references to the old label */
-    CollDeleteAll (&OldLabel->JumpFrom);
+   /* There are no more references to the old label */
+   CollDeleteAll(&OldLabel->JumpFrom);
 }
 
-
-
-void CL_Output (const CodeLabel* L)
+void CL_Output(const CodeLabel *L)
 /* Output the code label to the output file */
 {
-    WriteOutput ("%s:", L->Name);
-    if (strlen (L->Name) > 6) {
-        /* Label is too long, add a linefeed */
-        WriteOutput ("\n");
-    }
+   WriteOutput("%s:", L->Name);
+   if (strlen(L->Name) > 6) {
+      /* Label is too long, add a linefeed */
+      WriteOutput("\n");
+   }
 }

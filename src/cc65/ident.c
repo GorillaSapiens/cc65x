@@ -31,24 +31,18 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* common */
 #include "chartype.h"
 
 /* cc65 */
 #include "ident.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-int IsIdent (char c)
+int IsIdent(char c)
 /* Return true if the given char may start an identifier */
 {
-    return (IsAlpha (c) || c == '_');
+   return (IsAlpha(c) || c == '_');
 }

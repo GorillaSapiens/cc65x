@@ -31,26 +31,18 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef COMPILE_H
 #define COMPILE_H
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void Compile (const char* FileName);
+void Compile(const char *FileName);
 /* Top level compile routine. Will setup things and call the parser. */
 
-void FinishCompile (void);
+void FinishCompile(void);
 /* Emit literals, debug info, do cleanup and optimizations */
-
-
 
 /* End of compile.h */
 

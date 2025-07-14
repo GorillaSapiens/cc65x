@@ -31,37 +31,31 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <string.h>
 
 /* common */
 #include "chartype.h"
 #include "segnames.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-int ValidSegName (const char* Name)
+int ValidSegName(const char *Name)
 /* Return true if the given segment name is valid, return false otherwise */
 {
-    /* Must start with '_' or a letter */
-    if ((*Name != '_' && !IsAlpha(*Name)) || strlen(Name) > 80) {
-        return 0;
-    }
+   /* Must start with '_' or a letter */
+   if ((*Name != '_' && !IsAlpha(*Name)) || strlen(Name) > 80) {
+      return 0;
+   }
 
-    /* Can have letters, digits or the underline */
-    while (*++Name) {
-        if (*Name != '_' && !IsAlNum(*Name)) {
-            return 0;
-        }
-    }
+   /* Can have letters, digits or the underline */
+   while (*++Name) {
+      if (*Name != '_' && !IsAlNum(*Name)) {
+         return 0;
+      }
+   }
 
-    /* Name is ok */
-    return 1;
+   /* Name is ok */
+   return 1;
 }

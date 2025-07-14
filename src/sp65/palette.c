@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <string.h>
 
 /* common */
@@ -42,99 +40,82 @@
 /* sp65 */
 #include "palette.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-Palette* NewPalette (unsigned Entries)
+Palette *NewPalette(unsigned Entries)
 /* Create a new palette with the given number of entries */
 {
-    Palette* P;
+   Palette *P;
 
-    /* Some safety checks */
-    PRECONDITION (Entries > 0 && Entries <= 256);
+   /* Some safety checks */
+   PRECONDITION(Entries > 0 && Entries <= 256);
 
-    /* Allocate memory */
-    P = xmalloc (sizeof (*P) + (Entries - 1) * sizeof (P->Entries[0]));
+   /* Allocate memory */
+   P = xmalloc(sizeof(*P) + (Entries - 1) * sizeof(P->Entries[0]));
 
-    /* Initialize the struct, then return it */
-    P->Count = Entries;
-    return P;
+   /* Initialize the struct, then return it */
+   P->Count = Entries;
+   return P;
 }
 
-
-
-Palette* NewMonochromePalette (void)
+Palette *NewMonochromePalette(void)
 /* Create and return a palette with two entries (black and white) */
 {
-    /* Create a new palette */
-    Palette* P = NewPalette (2);
+   /* Create a new palette */
+   Palette *P = NewPalette(2);
 
-    /* Set the two colors */
-    P->Entries[0] = RGBA (0x00, 0x00, 0x00, 0x00);
-    P->Entries[1] = RGBA (0xFF, 0xFF, 0xFF, 0x00);
+   /* Set the two colors */
+   P->Entries[0] = RGBA(0x00, 0x00, 0x00, 0x00);
+   P->Entries[1] = RGBA(0xFF, 0xFF, 0xFF, 0x00);
 
-    /* Return the new palette */
-    return P;
+   /* Return the new palette */
+   return P;
 }
 
-
-
-Palette* DupPalette (const Palette* P)
+Palette *DupPalette(const Palette *P)
 /* Create a copy of a palette */
 {
-    Palette* N;
+   Palette *N;
 
+   /* Allow to pass a NULL palette */
+   if (P == 0) {
+      return 0;
+   }
 
-    /* Allow to pass a NULL palette */
-    if (P == 0) {
-        return 0;
-    }
+   /* Create a new palette */
+   N = NewPalette(P->Count);
 
-    /* Create a new palette */
-    N = NewPalette (P->Count);
+   /* Copy the palette data */
+   memcpy(N->Entries, P->Entries, P->Count * sizeof(P->Entries[0]));
 
-    /* Copy the palette data */
-    memcpy (N->Entries, P->Entries, P->Count * sizeof (P->Entries[0]));
-
-    /* Return the copy */
-    return N;
+   /* Return the copy */
+   return N;
 }
 
-
-
-void FreePalette (Palette* P)
+void FreePalette(Palette *P)
 /* Free a dynamically allocated palette */
 {
-    xfree (P);
+   xfree(P);
 }
 
-
-
-void DumpPalette (FILE* F, const Palette* P)
+void DumpPalette(FILE *F, const Palette *P)
 /* Dump the palette in readable form to the given file */
 {
-    unsigned I;
+   unsigned I;
 
-    fputs ("Entry     R      G      B      A     Combined\n", F);
-    fputs ("----------------------------------------------\n", F);
-    for (I = 0; I < P->Count; ++I) {
+   fputs("Entry     R      G      B      A     Combined\n", F);
+   fputs("----------------------------------------------\n", F);
+   for (I = 0; I < P->Count; ++I) {
 
-        /* Get the color entry */
-        const Color* C = P->Entries + I;
+      /* Get the color entry */
+      const Color *C = P->Entries + I;
 
-        /* Output it */
-        fprintf (F,
-                 " %3u    %3u    %3u    %3u    %3u    #%08lX\n",
-                 I,
-                 C->R, C->G, C->B, C->A,
-                 (((unsigned long) C->A) << 24) |
-                 (((unsigned long) C->B) << 16) |
-                 (((unsigned long) C->G) <<  8) |
-                 (((unsigned long) C->R) <<  0));
-    }
+      /* Output it */
+      fprintf(F, " %3u    %3u    %3u    %3u    %3u    #%08lX\n", I, C->R, C->G,
+              C->B, C->A,
+              (((unsigned long)C->A) << 24) | (((unsigned long)C->B) << 16) |
+                  (((unsigned long)C->G) << 8) | (((unsigned long)C->R) << 0));
+   }
 }

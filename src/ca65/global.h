@@ -31,66 +31,56 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-
-
 /* common */
 #include "strbuf.h"
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* File names */
-extern const char*      InFile;             /* Name of input file */
-extern const char*      OutFile;            /* Name of output file */
-extern StrBuf           ListingName;        /* Name of listing file */
-extern StrBuf           DepName;            /* Name of dependencies file */
-extern StrBuf           FullDepName;        /* Name of full dependencies file */
+extern const char *InFile;  /* Name of input file */
+extern const char *OutFile; /* Name of output file */
+extern StrBuf ListingName;  /* Name of listing file */
+extern StrBuf DepName;      /* Name of dependencies file */
+extern StrBuf FullDepName;  /* Name of full dependencies file */
 
 /* Default extensions */
-extern const char       ObjExt[];           /* Default object extension */
+extern const char ObjExt[]; /* Default object extension */
 
-extern char             LocalStart;         /* This char starts local symbols */
+extern char LocalStart; /* This char starts local symbols */
 
-extern unsigned char    IgnoreCase;         /* Ignore case on identifiers? */
-extern unsigned char    AutoImport;         /* Mark unresolveds as import */
-extern unsigned char    SmartMode;          /* Smart mode */
-extern unsigned char    DbgSyms;            /* Add debug symbols */
-extern unsigned char    LineCont;           /* Allow line continuation */
-extern unsigned char    LargeAlignment;     /* Don't warn about large alignments */
-extern unsigned char    RelaxChecks;        /* Relax a few assembler checks */
-extern unsigned char    StringEscapes;      /* Allow C-style escapes in strings */
-extern unsigned char    LongJsrJmpRts;      /* Allow JSR/JMP/RTS as alias for JSL/JML/RTL */
-extern unsigned char    WarningsAsErrors;   /* Error if any warnings */
+extern unsigned char IgnoreCase;     /* Ignore case on identifiers? */
+extern unsigned char AutoImport;     /* Mark unresolveds as import */
+extern unsigned char SmartMode;      /* Smart mode */
+extern unsigned char DbgSyms;        /* Add debug symbols */
+extern unsigned char LineCont;       /* Allow line continuation */
+extern unsigned char LargeAlignment; /* Don't warn about large alignments */
+extern unsigned char RelaxChecks;    /* Relax a few assembler checks */
+extern unsigned char StringEscapes;  /* Allow C-style escapes in strings */
+extern unsigned char
+    LongJsrJmpRts; /* Allow JSR/JMP/RTS as alias for JSL/JML/RTL */
+extern unsigned char WarningsAsErrors; /* Error if any warnings */
 
 /* Emulation features */
-extern unsigned char    DollarIsPC;         /* Allow the $ symbol as current PC */
-extern unsigned char    NoColonLabels;      /* Allow labels without a colon */
-extern unsigned char    LooseStringTerm;    /* Allow ' as string terminator */
-extern unsigned char    LooseCharTerm;      /* Allow " for char constants */
-extern unsigned char    AtInIdents;         /* Allow '@' in identifiers */
-extern unsigned char    DollarInIdents;     /* Allow '$' in identifiers */
-extern unsigned char    LeadingDotInIdents; /* Allow '.' to start an identifier */
-extern unsigned char    PCAssignment;       /* Allow "* = $XXX" or "$ = $XXX" */
-extern unsigned char    MissingCharTerm;    /* Allow lda #'a (no closing term) */
-extern unsigned char    UbiquitousIdents;   /* Allow ubiquitous identifiers */
-extern unsigned char    OrgPerSeg;          /* Make .org local to current seg */
-extern unsigned char    CComments;          /* Allow C like comments */
-extern unsigned char    ForceRange;         /* Force values into expected range */
-extern unsigned char    UnderlineInNumbers; /* Allow underlines in numbers */
-extern unsigned char    BracketAsIndirect;  /* Use '[]' not '()' for indirection */
-
-
-
+extern unsigned char DollarIsPC;         /* Allow the $ symbol as current PC */
+extern unsigned char NoColonLabels;      /* Allow labels without a colon */
+extern unsigned char LooseStringTerm;    /* Allow ' as string terminator */
+extern unsigned char LooseCharTerm;      /* Allow " for char constants */
+extern unsigned char AtInIdents;         /* Allow '@' in identifiers */
+extern unsigned char DollarInIdents;     /* Allow '$' in identifiers */
+extern unsigned char LeadingDotInIdents; /* Allow '.' to start an identifier */
+extern unsigned char PCAssignment;       /* Allow "* = $XXX" or "$ = $XXX" */
+extern unsigned char MissingCharTerm;    /* Allow lda #'a (no closing term) */
+extern unsigned char UbiquitousIdents;   /* Allow ubiquitous identifiers */
+extern unsigned char OrgPerSeg;          /* Make .org local to current seg */
+extern unsigned char CComments;          /* Allow C like comments */
+extern unsigned char ForceRange;         /* Force values into expected range */
+extern unsigned char UnderlineInNumbers; /* Allow underlines in numbers */
+extern unsigned char BracketAsIndirect;  /* Use '[]' not '()' for indirection */
 
 /* End of global.h */
 

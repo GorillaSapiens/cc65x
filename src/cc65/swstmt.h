@@ -31,29 +31,21 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef SWSTMT_H
 #define SWSTMT_H
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void SwitchStatement (void);
+void SwitchStatement(void);
 /* Handle a 'switch' statement */
 
-void CaseLabel (void);
+void CaseLabel(void);
 /* Handle a case label */
 
-void DefaultLabel (void);
+void DefaultLabel(void);
 /* Handle a default label */
-
-
 
 /* End of swstmt.h */
 

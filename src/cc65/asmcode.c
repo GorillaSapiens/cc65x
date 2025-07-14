@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* common */
 #include "check.h"
 
@@ -44,105 +42,92 @@
 #include "stackptr.h"
 #include "symtab.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void GetCodePos (CodeMark* M)
+void GetCodePos(CodeMark *M)
 /* Get a marker pointing to the current output position */
 {
-    M->Pos = CS_GetEntryCount (CS->Code);
-    M->SP  = StackPtr;
+   M->Pos = CS_GetEntryCount(CS->Code);
+   M->SP = StackPtr;
 }
 
-
-
-void RemoveCodeRange (const CodeMark* Start, const CodeMark* End)
+void RemoveCodeRange(const CodeMark *Start, const CodeMark *End)
 /* Remove all code between two code markers */
 {
-    /* Nothing to do if the range is empty */
-    if (Start->Pos == End->Pos) {
-        return;
-    }
+   /* Nothing to do if the range is empty */
+   if (Start->Pos == End->Pos) {
+      return;
+   }
 
-    /* Delete the range */
-    CS_DelCodeRange (CS->Code, Start->Pos, End->Pos-1);
+   /* Delete the range */
+   CS_DelCodeRange(CS->Code, Start->Pos, End->Pos - 1);
 }
 
-
-
-void RemoveCode (const CodeMark* M)
+void RemoveCode(const CodeMark *M)
 /* Remove all code after the given code marker */
 {
-    CS_DelCodeAfter (CS->Code, M->Pos);
-    StackPtr = M->SP;
+   CS_DelCodeAfter(CS->Code, M->Pos);
+   StackPtr = M->SP;
 }
 
-
-
-void ErrorOnNonDefinition (const CodeMark* Start, const CodeMark* End)
+void ErrorOnNonDefinition(const CodeMark *Start, const CodeMark *End)
 /* Error on an non definition between the given code markers */
 {
-    /* Nothing to do if the range is empty */
-    if (Start->Pos == End->Pos) {
-        return;
-    }
+   /* Nothing to do if the range is empty */
+   if (Start->Pos == End->Pos) {
+      return;
+   }
 
-    /* Delete the range */
-    CS_ErrorOnNonDefinition (CS->Code, Start->Pos, End->Pos-1);
+   /* Delete the range */
+   CS_ErrorOnNonDefinition(CS->Code, Start->Pos, End->Pos - 1);
 }
 
-void CleanupSwitch (const CodeMark* location) {
-    CS_CleanupSwitch(CS->Code, location->Pos);
+void CleanupSwitch(const CodeMark *location) {
+   CS_CleanupSwitch(CS->Code, location->Pos);
 }
 
-
-void MoveCode (const CodeMark* Start, const CodeMark* End, const CodeMark* Target)
+void MoveCode(const CodeMark *Start, const CodeMark *End,
+              const CodeMark *Target)
 // Move the code between Start (inclusive) and End (exclusive) to
 // (before) Target. The code marks aren't updated.
 {
-    CS_MoveEntries (CS->Code, Start->Pos, End->Pos - Start->Pos, Target->Pos);
+   CS_MoveEntries(CS->Code, Start->Pos, End->Pos - Start->Pos, Target->Pos);
 }
 
-
-
-int CodeRangeIsEmpty (const CodeMark* Start, const CodeMark* End)
-/* Return true if the given code range is empty (no code between Start and End) */
+int CodeRangeIsEmpty(const CodeMark *Start, const CodeMark *End)
+/* Return true if the given code range is empty (no code between Start and End)
+ */
 {
-    int Empty;
-    PRECONDITION (Start->Pos <= End->Pos);
-    Empty = (Start->Pos == End->Pos);
-    if (Empty) {
-        /* Safety */
-        CHECK (Start->SP == End->SP);
-    }
-    return Empty;
+   int Empty;
+   PRECONDITION(Start->Pos <= End->Pos);
+   Empty = (Start->Pos == End->Pos);
+   if (Empty) {
+      /* Safety */
+      CHECK(Start->SP == End->SP);
+   }
+   return Empty;
 }
 
-
-
-void WriteAsmOutput (void)
+void WriteAsmOutput(void)
 /* Write the final assembler output to the output file */
 {
-    SymTable* SymTab;
-    SymEntry* Entry;
+   SymTable *SymTab;
+   SymEntry *Entry;
 
-    /* Output the global data segment */
-    CHECK (!HaveGlobalCode ());
-    OutputSegments (CS);
+   /* Output the global data segment */
+   CHECK(!HaveGlobalCode());
+   OutputSegments(CS);
 
-    /* Output all global or referenced functions */
-    SymTab = GetGlobalSymTab ();
-    Entry  = SymTab->SymHead;
-    while (Entry) {
-        if (SymIsOutputFunc (Entry)) {
-            /* Function which is defined and referenced or extern */
-            OutputSegments (Entry->V.F.Seg);
-        }
-        Entry = Entry->NextSym;
-    }
+   /* Output all global or referenced functions */
+   SymTab = GetGlobalSymTab();
+   Entry = SymTab->SymHead;
+   while (Entry) {
+      if (SymIsOutputFunc(Entry)) {
+         /* Function which is defined and referenced or extern */
+         OutputSegments(Entry->V.F.Seg);
+      }
+      Entry = Entry->NextSym;
+   }
 }

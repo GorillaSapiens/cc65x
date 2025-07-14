@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* da65 */
 #include "error.h"
 #include "opc4510.h"
@@ -49,41 +47,58 @@
 #include "opcm740.h"
 #include "opctable.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Descriptions for all opcodes */
-const OpcDesc* OpcTable = OpcTable_6502;
-
-
+const OpcDesc *OpcTable = OpcTable_6502;
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void SetOpcTable (cpu_t CPU)
+void SetOpcTable(cpu_t CPU)
 /* Set the correct opcode table for the given CPU */
 {
-    switch (CPU) {
-        case CPU_6502:    OpcTable = OpcTable_6502;     break;
-        case CPU_6502X:   OpcTable = OpcTable_6502X;    break;
-        case CPU_6502DTV: OpcTable = OpcTable_6502DTV;  break;
-        case CPU_65SC02:  OpcTable = OpcTable_65SC02;   break;
-        case CPU_65C02:   OpcTable = OpcTable_65C02;    break;
-        case CPU_W65C02:  OpcTable = OpcTable_W65C02;   break;
-        case CPU_65CE02:  OpcTable = OpcTable_65CE02;   break;
-        case CPU_65816:   OpcTable = OpcTable_65816;    break;
-        case CPU_HUC6280: OpcTable = OpcTable_HuC6280;  break;
-        case CPU_M740:    OpcTable = OpcTable_M740;     break;
-        case CPU_4510:    OpcTable = OpcTable_4510;     break;
-        case CPU_45GS02:  OpcTable = OpcTable_45GS02;   break;
-        default:          Error ("Unsupported CPU");
-    }
+   switch (CPU) {
+      case CPU_6502:
+         OpcTable = OpcTable_6502;
+         break;
+      case CPU_6502X:
+         OpcTable = OpcTable_6502X;
+         break;
+      case CPU_6502DTV:
+         OpcTable = OpcTable_6502DTV;
+         break;
+      case CPU_65SC02:
+         OpcTable = OpcTable_65SC02;
+         break;
+      case CPU_65C02:
+         OpcTable = OpcTable_65C02;
+         break;
+      case CPU_W65C02:
+         OpcTable = OpcTable_W65C02;
+         break;
+      case CPU_65CE02:
+         OpcTable = OpcTable_65CE02;
+         break;
+      case CPU_65816:
+         OpcTable = OpcTable_65816;
+         break;
+      case CPU_HUC6280:
+         OpcTable = OpcTable_HuC6280;
+         break;
+      case CPU_M740:
+         OpcTable = OpcTable_M740;
+         break;
+      case CPU_4510:
+         OpcTable = OpcTable_4510;
+         break;
+      case CPU_45GS02:
+         OpcTable = OpcTable_45GS02;
+         break;
+      default:
+         Error("Unsupported CPU");
+   }
 }

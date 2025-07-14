@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* common */
 #include "target.h"
 
@@ -40,52 +38,43 @@
 #include "error.h"
 #include "binfmt.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Default format (depends on target system) */
-unsigned char DefaultBinFmt     = BINFMT_BINARY;
-
-
+unsigned char DefaultBinFmt = BINFMT_BINARY;
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-int RelocatableBinFmt (unsigned Format)
+int RelocatableBinFmt(unsigned Format)
 /* Return true if this is a relocatable format, return false otherwise */
 {
-    int Reloc = 0;
+   int Reloc = 0;
 
-    /* Resolve the default format */
-    if (Format == BINFMT_DEFAULT) {
-        Format = DefaultBinFmt;
-    }
+   /* Resolve the default format */
+   if (Format == BINFMT_DEFAULT) {
+      Format = DefaultBinFmt;
+   }
 
-    /* Check the type */
-    switch (Format) {
+   /* Check the type */
+   switch (Format) {
 
-        case BINFMT_BINARY:
-        case BINFMT_ATARIEXE:
-            Reloc = 0;
-            break;
+      case BINFMT_BINARY:
+      case BINFMT_ATARIEXE:
+         Reloc = 0;
+         break;
 
-        case BINFMT_O65:
-            Reloc = 1;
-            break;
+      case BINFMT_O65:
+         Reloc = 1;
+         break;
 
-        default:
-            Internal ("Invalid format specifier: %u", Format);
+      default:
+         Internal("Invalid format specifier: %u", Format);
+   }
 
-    }
-
-    /* Return the flag */
-    return Reloc;
+   /* Return the flag */
+   return Reloc;
 }

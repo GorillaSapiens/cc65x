@@ -31,37 +31,31 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* common */
 #include "xmalloc.h"
 
 /* ca65 */
 #include "fragment.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-Fragment* NewFragment (unsigned char Type, unsigned short Len)
+Fragment *NewFragment(unsigned char Type, unsigned short Len)
 // Create, initialize and return a new fragment. The fragment will be inserted
 // into the current segment.
 {
-    /* Create a new fragment */
-    Fragment* F = xmalloc (sizeof (*F));
+   /* Create a new fragment */
+   Fragment *F = xmalloc(sizeof(*F));
 
-    /* Initialize it */
-    F->Next     = 0;
-    F->LineList = 0;
-    F->LI       = EmptyCollection;
-    GetFullLineInfo (&F->LI);
-    F->Len      = Len;
-    F->Type     = Type;
+   /* Initialize it */
+   F->Next = 0;
+   F->LineList = 0;
+   F->LI = EmptyCollection;
+   GetFullLineInfo(&F->LI);
+   F->Len = Len;
+   F->Type = Type;
 
-    /* And return it */
-    return F;
+   /* And return it */
+   return F;
 }

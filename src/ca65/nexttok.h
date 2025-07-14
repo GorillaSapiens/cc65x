@@ -31,59 +31,49 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef NEXTTOK_H
 #define NEXTTOK_H
 
-
-
 #include "scanner.h"
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void NextTok (void);
+void NextTok(void);
 /* Get next token and handle token level functions */
 
-void Consume (token_t Expected, const char* ErrMsg);
+void Consume(token_t Expected, const char *ErrMsg);
 /* Consume Token, print an error if we don't find it */
 
-void ConsumeSep (void);
+void ConsumeSep(void);
 /* Consume a separator token */
 
-void ConsumeLParen (void);
+void ConsumeLParen(void);
 /* Consume a left paren */
 
-void ConsumeRParen (void);
+void ConsumeRParen(void);
 /* Consume a right paren */
 
-void ConsumeComma (void);
+void ConsumeComma(void);
 /* Consume a comma */
 
-void SkipUntilSep (void);
+void SkipUntilSep(void);
 /* Skip tokens until we reach a line separator or end of file */
 
-void ExpectSep (void);
+void ExpectSep(void);
 // Check if we've reached a line separator, and output an error if not. Do
 // not skip the line separator.
 
-void EnterRawTokenMode (void);
+void EnterRawTokenMode(void);
 // Enter raw token mode. In raw mode, token handling functions are not
 // executed, but the function tokens are passed untouched to the upper
 // layer. Raw token mode is used when storing macro tokens for later
 // use.
 // Calls to EnterRawTokenMode and LeaveRawTokenMode may be nested.
 
-void LeaveRawTokenMode (void);
+void LeaveRawTokenMode(void);
 /* Leave raw token mode. */
-
-
 
 /* End of nexttok.h */
 

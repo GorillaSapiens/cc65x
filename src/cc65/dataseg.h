@@ -31,12 +31,8 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef DATASEG_H
 #define DATASEG_H
-
-
 
 #include <stdarg.h>
 
@@ -47,45 +43,37 @@
 /* cc65 */
 #include "symentry.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 typedef struct DataSeg DataSeg;
 struct DataSeg {
-    char*               SegName;        /* Segment name */
-    SymEntry*           Func;           /* Owner function */
-    Collection          Lines;          /* List of code lines */
+   char *SegName;    /* Segment name */
+   SymEntry *Func;   /* Owner function */
+   Collection Lines; /* List of code lines */
 };
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-DataSeg* NewDataSeg (const char* SegName, SymEntry* Func);
+DataSeg *NewDataSeg(const char *SegName, SymEntry *Func);
 /* Create a new data segment, initialize and return it */
 
-void DS_Append (DataSeg* Target, const DataSeg* Source);
+void DS_Append(DataSeg *Target, const DataSeg *Source);
 /* Append the data from Source to Target. */
 
-void DS_AddVLine (DataSeg* S, const char* Format, va_list ap) attribute ((format(printf,2,0)));
+void DS_AddVLine(DataSeg *S, const char *Format, va_list ap)
+    attribute((format(printf, 2, 0)));
 /* Add a line to the given data segment */
 
-void DS_AddLine (DataSeg* S, const char* Format, ...) attribute ((format(printf,2,3)));
+void DS_AddLine(DataSeg *S, const char *Format, ...)
+    attribute((format(printf, 2, 3)));
 /* Add a line to the given data segment */
 
-void DS_Output (const DataSeg* S);
+void DS_Output(const DataSeg *S);
 /* Output the data segment data to the output file */
-
-
 
 /* End of dataseg.h */
 

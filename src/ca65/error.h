@@ -31,31 +31,21 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef ERROR_H
 #define ERROR_H
 
-
-
-#if defined( __MINGW32__)
-#  pragma GCC diagnostic ignored "-Wformat"
+#if defined(__MINGW32__)
+#pragma GCC diagnostic ignored "-Wformat"
 #endif
-
-
 
 /* common */
 #include "attrib.h"
 #include "coll.h"
 #include "filepos.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
-
-
 
 /* Warning levels */
 extern unsigned WarnLevel;
@@ -64,42 +54,42 @@ extern unsigned WarnLevel;
 extern unsigned ErrorCount;
 extern unsigned WarningCount;
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void Warning (unsigned Level, const char* Format, ...) attribute ((format (printf, 2, 3)));
+void Warning(unsigned Level, const char *Format, ...)
+    attribute((format(printf, 2, 3)));
 /* Print warning message. */
 
-void PWarning (const FilePos* Pos, unsigned Level, const char* Format, ...) attribute ((format (printf, 3, 4)));
+void PWarning(const FilePos *Pos, unsigned Level, const char *Format, ...)
+    attribute((format(printf, 3, 4)));
 /* Print warning message giving an explicit file and position. */
 
-void LIWarning (const Collection* LineInfos, unsigned Level, const char* Format, ...) attribute ((format (printf, 3, 4)));
+void LIWarning(const Collection *LineInfos, unsigned Level, const char *Format,
+               ...) attribute((format(printf, 3, 4)));
 /* Print warning message using the given line infos */
 
-void Error (const char* Format, ...) attribute ((format (printf, 1, 2)));
+void Error(const char *Format, ...) attribute((format(printf, 1, 2)));
 /* Print an error message */
 
-void PError (const FilePos* Pos, const char* Format, ...) attribute ((format (printf, 2, 3)));
+void PError(const FilePos *Pos, const char *Format, ...)
+    attribute((format(printf, 2, 3)));
 /* Print an error message giving an explicit file and position. */
 
-void LIError (const Collection* LineInfos, const char* Format, ...) attribute ((format (printf, 2, 3)));
+void LIError(const Collection *LineInfos, const char *Format, ...)
+    attribute((format(printf, 2, 3)));
 /* Print an error message using the given line infos. */
 
-void ErrorSkip (const char* Format, ...) attribute ((format (printf, 1, 2)));
+void ErrorSkip(const char *Format, ...) attribute((format(printf, 1, 2)));
 /* Print an error message and skip the rest of the line */
 
-void Fatal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
+void Fatal(const char *Format, ...) attribute((noreturn, format(printf, 1, 2)));
 /* Print a message about a fatal error and die */
 
-void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
+void Internal(const char *Format, ...)
+    attribute((noreturn, format(printf, 1, 2)));
 /* Print a message about an internal assembler error and die. */
-
-
 
 /* End of error.h */
 

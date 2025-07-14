@@ -31,24 +31,18 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <string.h>
 
 /* ca65 */
 #include "global.h"
 #include "feature.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Names of the features */
-static const char* const FeatureKeys[FEAT_COUNT] = {
+static const char *const FeatureKeys[FEAT_COUNT] = {
     "dollar_is_pc",
     "labels_without_colons",
     "loose_string_term",
@@ -70,57 +64,88 @@ static const char* const FeatureKeys[FEAT_COUNT] = {
     "line_continuations",
 };
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-feature_t FindFeature (const StrBuf* Key)
+feature_t FindFeature(const StrBuf *Key)
 // Find the feature in a table and return the corresponding enum value. If the
 // feature is invalid, return FEAT_UNKNOWN.
 {
-    feature_t F;
+   feature_t F;
 
-    /* This is not time critical, so do a linear search */
-    for (F = (feature_t) 0; F < FEAT_COUNT; ++F) {
-        if (SB_CompareStr (Key, FeatureKeys[F]) == 0) {
-            /* Found, index is enum value */
-            return F;
-        }
-    }
+   /* This is not time critical, so do a linear search */
+   for (F = (feature_t)0; F < FEAT_COUNT; ++F) {
+      if (SB_CompareStr(Key, FeatureKeys[F]) == 0) {
+         /* Found, index is enum value */
+         return F;
+      }
+   }
 
-    /* Not found */
-    return FEAT_UNKNOWN;
+   /* Not found */
+   return FEAT_UNKNOWN;
 }
 
-
-
-void SetFeature (feature_t Feature, unsigned char On)
+void SetFeature(feature_t Feature, unsigned char On)
 // Set the corresponding feature flag if Feature is valid.
 {
-    /* Set the flags */
-    switch (Feature) {
-        case FEAT_DOLLAR_IS_PC:               DollarIsPC        = On;    break;
-        case FEAT_LABELS_WITHOUT_COLONS:      NoColonLabels     = On;    break;
-        case FEAT_LOOSE_STRING_TERM:          LooseStringTerm   = On;    break;
-        case FEAT_LOOSE_CHAR_TERM:            LooseCharTerm     = On;    break;
-        case FEAT_AT_IN_IDENTIFIERS:          AtInIdents        = On;    break;
-        case FEAT_DOLLAR_IN_IDENTIFIERS:      DollarInIdents    = On;    break;
-        case FEAT_LEADING_DOT_IN_IDENTIFIERS: LeadingDotInIdents= On;    break;
-        case FEAT_ORG_PER_SEG:                OrgPerSeg         = On;    break;
-        case FEAT_PC_ASSIGNMENT:              PCAssignment      = On;    break;
-        case FEAT_MISSING_CHAR_TERM:          MissingCharTerm   = On;    break;
-        case FEAT_UBIQUITOUS_IDENTS:          UbiquitousIdents  = On;    break;
-        case FEAT_C_COMMENTS:                 CComments         = On;    break;
-        case FEAT_FORCE_RANGE:                ForceRange        = On;    break;
-        case FEAT_UNDERLINE_IN_NUMBERS:       UnderlineInNumbers= On;    break;
-        case FEAT_BRACKET_AS_INDIRECT:        BracketAsIndirect = On;    break;
-        case FEAT_STRING_ESCAPES:             StringEscapes     = On;    break;
-        case FEAT_LONG_JSR_JMP_RTS:           LongJsrJmpRts     = On;    break;
-        case FEAT_LINE_CONTINUATIONS:         LineCont          = On;    break;
-        default:                                                         break;
-    }
+   /* Set the flags */
+   switch (Feature) {
+      case FEAT_DOLLAR_IS_PC:
+         DollarIsPC = On;
+         break;
+      case FEAT_LABELS_WITHOUT_COLONS:
+         NoColonLabels = On;
+         break;
+      case FEAT_LOOSE_STRING_TERM:
+         LooseStringTerm = On;
+         break;
+      case FEAT_LOOSE_CHAR_TERM:
+         LooseCharTerm = On;
+         break;
+      case FEAT_AT_IN_IDENTIFIERS:
+         AtInIdents = On;
+         break;
+      case FEAT_DOLLAR_IN_IDENTIFIERS:
+         DollarInIdents = On;
+         break;
+      case FEAT_LEADING_DOT_IN_IDENTIFIERS:
+         LeadingDotInIdents = On;
+         break;
+      case FEAT_ORG_PER_SEG:
+         OrgPerSeg = On;
+         break;
+      case FEAT_PC_ASSIGNMENT:
+         PCAssignment = On;
+         break;
+      case FEAT_MISSING_CHAR_TERM:
+         MissingCharTerm = On;
+         break;
+      case FEAT_UBIQUITOUS_IDENTS:
+         UbiquitousIdents = On;
+         break;
+      case FEAT_C_COMMENTS:
+         CComments = On;
+         break;
+      case FEAT_FORCE_RANGE:
+         ForceRange = On;
+         break;
+      case FEAT_UNDERLINE_IN_NUMBERS:
+         UnderlineInNumbers = On;
+         break;
+      case FEAT_BRACKET_AS_INDIRECT:
+         BracketAsIndirect = On;
+         break;
+      case FEAT_STRING_ESCAPES:
+         StringEscapes = On;
+         break;
+      case FEAT_LONG_JSR_JMP_RTS:
+         LongJsrJmpRts = On;
+         break;
+      case FEAT_LINE_CONTINUATIONS:
+         LineCont = On;
+         break;
+      default:
+         break;
+   }
 }

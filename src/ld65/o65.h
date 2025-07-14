@@ -31,95 +31,82 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef O65_H
 #define O65_H
-
-
 
 #include <stdio.h>
 
 #include "extsyms.h"
 #include "config.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
-
-
 
 /* Structure describing the format */
 typedef struct O65Desc O65Desc;
 
 /* Option tags */
-#define O65OPT_FILENAME         0
-#define O65OPT_OS               1
-#define O65OPT_ASM              2
-#define O65OPT_AUTHOR           3
-#define O65OPT_TIMESTAMP        4
+#define O65OPT_FILENAME 0
+#define O65OPT_OS 1
+#define O65OPT_ASM 2
+#define O65OPT_AUTHOR 3
+#define O65OPT_TIMESTAMP 4
 
 /* Operating system codes for O65OPT_OS */
-#define O65OS_MIN               1
-#define O65OS_OSA65             1
-#define O65OS_LUNIX             2
-#define O65OS_CC65              3
-#define O65OS_OPENCBM           4
-#define O65OS_MAX               255
-
-
+#define O65OS_MIN 1
+#define O65OS_OSA65 1
+#define O65OS_LUNIX 2
+#define O65OS_CC65 3
+#define O65OS_OPENCBM 4
+#define O65OS_MAX 255
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-O65Desc* NewO65Desc (void);
+O65Desc *NewO65Desc(void);
 /* Create, initialize and return a new O65 descriptor struct */
 
-void FreeO65Desc (O65Desc* D);
+void FreeO65Desc(O65Desc *D);
 /* Delete the descriptor struct with cleanup */
 
-void O65Set6502 (O65Desc* D);
+void O65Set6502(O65Desc *D);
 /* Enable 6502 mode */
 
-void O65Set65816 (O65Desc* D);
+void O65Set65816(O65Desc *D);
 /* Enable 816 mode */
 
-void O65SetSmallModel (O65Desc* D);
+void O65SetSmallModel(O65Desc *D);
 /* Enable a small memory model executable */
 
-void O65SetLargeModel (O65Desc* D);
+void O65SetLargeModel(O65Desc *D);
 /* Enable a large memory model executable */
 
-void O65SetAlignment (O65Desc* D, unsigned Align);
+void O65SetAlignment(O65Desc *D, unsigned Align);
 /* Set the executable alignment */
 
-void O65SetOption (O65Desc* D, unsigned Type, const void* Data, unsigned DataLen);
+void O65SetOption(O65Desc *D, unsigned Type, const void *Data,
+                  unsigned DataLen);
 /* Set an o65 header option */
 
-void O65SetOS (O65Desc* D, unsigned OS, unsigned Version, unsigned Id);
+void O65SetOS(O65Desc *D, unsigned OS, unsigned Version, unsigned Id);
 /* Set an option describing the target operating system */
 
-ExtSym* O65GetImport (O65Desc* D, unsigned Ident);
+ExtSym *O65GetImport(O65Desc *D, unsigned Ident);
 /* Return the imported symbol or NULL if not found */
 
-void O65SetImport (O65Desc* D, unsigned Ident);
+void O65SetImport(O65Desc *D, unsigned Ident);
 /* Set an imported identifier */
 
-ExtSym* O65GetExport (O65Desc* D, unsigned Ident);
+ExtSym *O65GetExport(O65Desc *D, unsigned Ident);
 /* Return the exported symbol or NULL if not found */
 
-void O65SetExport (O65Desc* D, unsigned Ident);
+void O65SetExport(O65Desc *D, unsigned Ident);
 /* Set an exported identifier */
 
-void O65WriteTarget (O65Desc* D, File* F);
+void O65WriteTarget(O65Desc *D, File *F);
 /* Write an o65 output file */
-
-
 
 /* End of o65.h */
 

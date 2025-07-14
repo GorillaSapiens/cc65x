@@ -28,22 +28,20 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
 #ifndef TRACE_H
 #define TRACE_H
 
-
 #include <stdint.h>
-
 
 #include "6502.h"
 
 // The trace mode is a bitfield that determines how trace lines are displayed.
-// 
+//
 // The value zero indicates that tracing is disabled (the default).
-// 
-// In case TraceMode is not equal to zero, the value is interpreted as a bitfield:
-// 
+//
+// In case TraceMode is not equal to zero, the value is interpreted as a
+// bitfield:
+//
 // Bit    Bit value     Enables
 // ---    -----------   -------------------------------
 // 6      0x40 ( 64)   Print the instruction counter.
@@ -53,23 +51,23 @@
 // 2      0x04 (  4)   Print the instruction assembly.
 // 1      0x02 (  2)   Print the CPU registers.
 // 0      0x01 (  1)   Print the CC65 stack pointer.
-// 
+//
 
-#define TRACE_FIELD_INSTR_COUNTER   0x40
-#define TRACE_FIELD_CLOCK_COUNTER   0x20
-#define TRACE_FIELD_PC              0x10
-#define TRACE_FIELD_INSTR_BYTES     0x08
-#define TRACE_FIELD_INSTR_ASSEMBLY  0x04
-#define TRACE_FIELD_CPU_REGISTERS   0x02
-#define TRACE_FIELD_CC65_SP         0x01
+#define TRACE_FIELD_INSTR_COUNTER 0x40
+#define TRACE_FIELD_CLOCK_COUNTER 0x20
+#define TRACE_FIELD_PC 0x10
+#define TRACE_FIELD_INSTR_BYTES 0x08
+#define TRACE_FIELD_INSTR_ASSEMBLY 0x04
+#define TRACE_FIELD_CPU_REGISTERS 0x02
+#define TRACE_FIELD_CC65_SP 0x01
 
-#define TRACE_DISABLED              0x00
-#define TRACE_ENABLE_FULL           0x7f
+#define TRACE_DISABLED 0x00
+#define TRACE_ENABLE_FULL 0x7f
 
 /* Currently active tracing mode. */
 extern uint8_t TraceMode;
 
-void TraceInit (uint8_t SPAddr);
+void TraceInit(uint8_t SPAddr);
 /* Initialize the trace subsystem. */
 
 void PrintTraceNMI(void);
@@ -78,10 +76,8 @@ void PrintTraceNMI(void);
 void PrintTraceIRQ(void);
 /* Print trace line for an IRQ interrupt. */
 
-void PrintTraceInstruction (void);
+void PrintTraceInstruction(void);
 /* Print trace line for the instruction at the currrent program counter. */
-
-
 
 /* End of trace.h */
 

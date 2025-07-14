@@ -31,12 +31,8 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef INPUT_H
 #define INPUT_H
-
-
 
 /* common */
 #include "coll.h"
@@ -44,20 +40,14 @@
 /* sp65 */
 #include "bitmap.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-Bitmap* ReadInputFile (const Collection* A);
+Bitmap *ReadInputFile(const Collection *A);
 // Read a bitmap from a file and return it. Format, file name etc. must be
 // given as attributes in A. If no format is given, the function tries to
 // autodetect it by using the extension of the file name.
-
-
 
 /* End of input.h */
 

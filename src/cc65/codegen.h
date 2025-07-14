@@ -31,11 +31,8 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef CODEGEN_H
 #define CODEGEN_H
-
 
 #include <inttypes.h>
 
@@ -45,472 +42,400 @@
 /* cc65 */
 #include "segments.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
-
-
 
 // Code generator flags.
 // Note: The type flags are designed so that a smaller type may override a
 // larger one by or'ing it into the existing one.
 // Note^2: The actual type including the sign flag is in the lower bits, so
 // we can mask the information and use them as a table index.
-#define CF_NONE         0x0000  /* No special flags */
+#define CF_NONE 0x0000 /* No special flags */
 
 /* Values for the actual type */
-#define CF_CHAR         0x0007  /* Operation on characters */
-#define CF_INT          0x0003  /* Operation on ints */
-#define CF_SHORT        CF_INT  /* Alias */
-#define CF_PTR          CF_INT  /* Alias for readability */
-#define CF_LONG         0x0001  /* Operation on longs */
-#define CF_FLOAT        0x0010  /* Operation on a float */
+#define CF_CHAR 0x0007  /* Operation on characters */
+#define CF_INT 0x0003   /* Operation on ints */
+#define CF_SHORT CF_INT /* Alias */
+#define CF_PTR CF_INT   /* Alias for readability */
+#define CF_LONG 0x0001  /* Operation on longs */
+#define CF_FLOAT 0x0010 /* Operation on a float */
 
 /* Signedness */
-#define CF_UNSIGNED     0x0008  /* Value is unsigned */
+#define CF_UNSIGNED 0x0008 /* Value is unsigned */
 
 /* Masks for retrieving type information */
-#define CF_TYPEMASK     0x0017  /* Type information */
-#define CF_STYPEMASK    0x001F  /* Includes signedness */
+#define CF_TYPEMASK 0x0017  /* Type information */
+#define CF_STYPEMASK 0x001F /* Includes signedness */
 
-#define CF_CONST        0x0040  /* Constant value available */
-#define CF_TEST         0x0080  /* Test value */
-#define CF_FIXARGC      0x0100  /* Function has fixed arg count */
-#define CF_FORCECHAR    0x0200  /* Handle chars as chars, not ints */
-#define CF_NOKEEP       0x0400  /* Value may get destroyed when storing */
+#define CF_CONST 0x0040     /* Constant value available */
+#define CF_TEST 0x0080      /* Test value */
+#define CF_FIXARGC 0x0100   /* Function has fixed arg count */
+#define CF_FORCECHAR 0x0200 /* Handle chars as chars, not ints */
+#define CF_NOKEEP 0x0400    /* Value may get destroyed when storing */
 
 /* Type of address */
-#define CF_ADDRMASK     0xF000  /* Bit mask of address type */
-#define CF_IMM          0x0000  /* Value is pure rvalue and has no storage */
-#define CF_ABSOLUTE     0x1000  /* Numeric absolute address */
-#define CF_EXTERNAL     0x2000  /* External */
-#define CF_REGVAR       0x4000  /* Register variable */
-#define CF_LITERAL      0x7000  /* Literal */
-#define CF_PRIMARY      0x8000  /* Value is in primary register */
-#define CF_EXPR         0x9000  /* Value is addressed by primary register */
-#define CF_STATIC       0xA000  /* Local static */
-#define CF_CODE         0xB000  /* C code label location */
-#define CF_STACK        0xC000  /* Function-local auto on stack */
-
-
+#define CF_ADDRMASK 0xF000 /* Bit mask of address type */
+#define CF_IMM 0x0000      /* Value is pure rvalue and has no storage */
+#define CF_ABSOLUTE 0x1000 /* Numeric absolute address */
+#define CF_EXTERNAL 0x2000 /* External */
+#define CF_REGVAR 0x4000   /* Register variable */
+#define CF_LITERAL 0x7000  /* Literal */
+#define CF_PRIMARY 0x8000  /* Value is in primary register */
+#define CF_EXPR 0x9000     /* Value is addressed by primary register */
+#define CF_STATIC 0xA000   /* Local static */
+#define CF_CODE 0xB000     /* C code label location */
+#define CF_STACK 0xC000    /* Function-local auto on stack */
 
 /* Forward */
 struct StrBuf;
-
-
 
 /*****************************************************************************/
 /*                         Files, pre- and postamble                         */
 /*****************************************************************************/
 
-
-
-void g_preamble (void);
+void g_preamble(void);
 /* Generate the assembler code preamble */
 
-void g_fileinfo (const char* Name, unsigned long Size, unsigned long MTime);
+void g_fileinfo(const char *Name, unsigned long Size, unsigned long MTime);
 /* If debug info is enabled, place a file info into the source */
-
-
 
 /*****************************************************************************/
 /*                              Segment support                              */
 /*****************************************************************************/
 
-
-
-void g_userodata (void);
+void g_userodata(void);
 /* Switch to the read only data segment */
 
-void g_usedata (void);
+void g_usedata(void);
 /* Switch to the data segment */
 
-void g_usebss (void);
+void g_usebss(void);
 /* Switch to the bss segment */
 
-void g_segname (segment_t Seg);
+void g_segname(segment_t Seg);
 /* Emit the name of a segment if necessary */
-
-
 
 /*****************************************************************************/
 /*                      Functions handling local labels                      */
 /*****************************************************************************/
 
-
-
-void g_defcodelabel (unsigned label);
+void g_defcodelabel(unsigned label);
 /* Define a local code label */
 
-void g_defdatalabel (unsigned label);
+void g_defdatalabel(unsigned label);
 /* Define a local data label */
-
-
 
 /*****************************************************************************/
 /*                     Functions handling global labels                      */
 /*****************************************************************************/
 
-
-
-void g_defgloblabel (const char* Name);
+void g_defgloblabel(const char *Name);
 /* Define a global label with the given name */
 
-void g_defliterallabel (unsigned label);
+void g_defliterallabel(unsigned label);
 /* Define a literal data label */
 
-void g_aliasliterallabel (unsigned label, unsigned baselabel, long offs);
+void g_aliasliterallabel(unsigned label, unsigned baselabel, long offs);
 /* Define label as an alias for baselabel+offs */
 
-void g_defexport (const char* Name, int ZP);
+void g_defexport(const char *Name, int ZP);
 /* Export the given label */
 
-void g_defimport (const char* Name, int ZP);
+void g_defimport(const char *Name, int ZP);
 /* Import the given label */
 
-void g_importstartup (void);
+void g_importstartup(void);
 /* Forced import of the startup segment */
 
-void g_importmainargs (void);
+void g_importmainargs(void);
 /* Forced import of a special symbol that handles arguments to main */
-
-
 
 /*****************************************************************************/
 /*                                   stack                                   */
 /*****************************************************************************/
 
-
-
-int pop (unsigned flags);
+int pop(unsigned flags);
 /* Pop an argument of the given size */
 
-int push (unsigned flags);
+int push(unsigned flags);
 /* Push an argument of the given size */
 
-unsigned sizeofarg (unsigned flags);
+unsigned sizeofarg(unsigned flags);
 /* Return the size of a function argument type that is encoded in flags */
-
-
 
 /*****************************************************************************/
 /*                    type conversion and similiar stuff                     */
 /*****************************************************************************/
 
-
-
-void g_toslong (unsigned flags);
+void g_toslong(unsigned flags);
 /* Make sure, the value on TOS is a long. Convert if necessary */
 
-void g_tosint (unsigned flags);
+void g_tosint(unsigned flags);
 /* Make sure, the value on TOS is an int. Convert if necessary */
 
-void g_regint (unsigned from);
+void g_regint(unsigned from);
 // Convert the value in the primary register to an int (whose representation
 // is irrelevent of signedness).
 
-void g_reglong (unsigned from);
+void g_reglong(unsigned from);
 // Convert the value in the primary register to a long (whose representation
 // is irrelevent of signedness).
 
-unsigned g_typeadjust (unsigned lhs, unsigned rhs);
+unsigned g_typeadjust(unsigned lhs, unsigned rhs);
 // Adjust the integer operands before doing a binary operation. lhs is a flags
 // value, that corresponds to the value on TOS, rhs corresponds to the value
 // in (e)ax. The return value is the flags value for the resulting type.
 
-unsigned g_typecast (unsigned to, unsigned from);
+unsigned g_typecast(unsigned to, unsigned from);
 // Cast the value in the primary register to the specified operand size and
 // signedness. Return the result flags.
 
-void g_scale (unsigned flags, long val);
-// Scale the value in the primary register by the given value. If val is positive,
-// scale up, is val is negative, scale down. This function is used to scale
-// the operands or results of pointer arithmetic by the size of the type, the
-// pointer points to.
-
-
+void g_scale(unsigned flags, long val);
+// Scale the value in the primary register by the given value. If val is
+// positive, scale up, is val is negative, scale down. This function is used to
+// scale the operands or results of pointer arithmetic by the size of the type,
+// the pointer points to.
 
 /*****************************************************************************/
 /*                          Function entry and exit                          */
 /*****************************************************************************/
 
-
-
-void g_enter (unsigned flags, unsigned argsize);
+void g_enter(unsigned flags, unsigned argsize);
 /* Function prologue */
 
-void g_leave (int DoCleanup);
+void g_leave(int DoCleanup);
 /* Function epilogue */
-
-
 
 /*****************************************************************************/
 /*                            Register variables                             */
 /*****************************************************************************/
 
-
-
-void g_swap_regvars (int StackOffs, int RegOffs, unsigned Bytes);
+void g_swap_regvars(int StackOffs, int RegOffs, unsigned Bytes);
 /* Swap a register variable with a location on the stack */
 
-void g_save_regvars (int RegOffs, unsigned Bytes);
+void g_save_regvars(int RegOffs, unsigned Bytes);
 /* Save register variables */
 
-void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes);
+void g_restore_regvars(int StackOffs, int RegOffs, unsigned Bytes);
 /* Restore register variables */
-
-
 
 /*****************************************************************************/
 /*                           Fetching memory cells                           */
 /*****************************************************************************/
 
-
-
-void g_getimmed (unsigned Flags, uintptr_t Val, long Offs);
+void g_getimmed(unsigned Flags, uintptr_t Val, long Offs);
 /* Load a constant into the primary register */
 
-void g_getstatic (unsigned Flags, uintptr_t Label, long Offs);
+void g_getstatic(unsigned Flags, uintptr_t Label, long Offs);
 /* Fetch an static memory cell into the primary register */
 
-void g_getlocal (unsigned Flags, int Offs);
+void g_getlocal(unsigned Flags, int Offs);
 /* Fetch specified local object (local var). */
 
-void g_getind (unsigned Flags, unsigned Offs);
+void g_getind(unsigned Flags, unsigned Offs);
 // Fetch the specified object type indirect through the primary register
 // into the primary register
 
-void g_leasp (int Offs);
+void g_leasp(int Offs);
 /* Fetch the address of the specified symbol into the primary register */
 
-void g_leavariadic (int Offs);
+void g_leavariadic(int Offs);
 // Fetch the address of a parameter in a variadic function into the primary
 // register
-
-
 
 /*****************************************************************************/
 /*                             Store into memory                             */
 /*****************************************************************************/
 
-
-
-void g_putstatic (unsigned flags, uintptr_t label, long offs);
+void g_putstatic(unsigned flags, uintptr_t label, long offs);
 /* Store the primary register into the specified static memory cell */
 
-void g_putlocal (unsigned Flags, int Offs, long Val);
+void g_putlocal(unsigned Flags, int Offs, long Val);
 /* Put data into local object. */
 
-void g_putind (unsigned flags, unsigned offs);
+void g_putind(unsigned flags, unsigned offs);
 // Store the specified object type in the primary register at the address
 // on the top of the stack
-
-
 
 /*****************************************************************************/
 /*              Adds and subs of variables fix a fixed address               */
 /*****************************************************************************/
 
-
-
-void g_addlocal (unsigned flags, int offs);
+void g_addlocal(unsigned flags, int offs);
 /* Add a local variable to ax */
 
-void g_addstatic (unsigned flags, uintptr_t label, long offs);
+void g_addstatic(unsigned flags, uintptr_t label, long offs);
 /* Add a static variable to ax */
-
-
 
 /*****************************************************************************/
 /*                           Special op= functions                           */
 /*****************************************************************************/
 
-
-
-void g_addeqstatic (unsigned flags, uintptr_t label, long offs,
-                    unsigned long val);
+void g_addeqstatic(unsigned flags, uintptr_t label, long offs,
+                   unsigned long val);
 /* Emit += for a static variable */
 
-void g_addeqlocal (unsigned flags, int offs, unsigned long val);
+void g_addeqlocal(unsigned flags, int offs, unsigned long val);
 /* Emit += for a local variable */
 
-void g_addeqind (unsigned flags, unsigned offs, unsigned long val);
+void g_addeqind(unsigned flags, unsigned offs, unsigned long val);
 /* Emit += for the location with address in ax */
 
-void g_subeqstatic (unsigned flags, uintptr_t label, long offs,
-                    unsigned long val);
+void g_subeqstatic(unsigned flags, uintptr_t label, long offs,
+                   unsigned long val);
 /* Emit -= for a static variable */
 
-void g_subeqlocal (unsigned flags, int offs, unsigned long val);
+void g_subeqlocal(unsigned flags, int offs, unsigned long val);
 /* Emit -= for a local variable */
 
-void g_subeqind (unsigned flags, unsigned offs, unsigned long val);
+void g_subeqind(unsigned flags, unsigned offs, unsigned long val);
 /* Emit -= for the location with address in ax */
-
-
 
 /*****************************************************************************/
 /*                 Add a variable address to the value in ax                 */
 /*****************************************************************************/
 
-
-
-void g_addaddr_local (unsigned flags, int offs);
+void g_addaddr_local(unsigned flags, int offs);
 /* Add the address of a local variable to ax */
 
-void g_addaddr_static (unsigned flags, uintptr_t label, long offs);
+void g_addaddr_static(unsigned flags, uintptr_t label, long offs);
 /* Add the address of a static variable to ax */
-
-
 
 /*****************************************************************************/
 /*                                                                           */
 /*****************************************************************************/
 
-
-
-void g_save (unsigned flags);
+void g_save(unsigned flags);
 /* Copy primary register to hold register. */
 
-void g_restore (unsigned flags);
+void g_restore(unsigned flags);
 /* Copy hold register to primary. */
 
-void g_cmp (unsigned flags, unsigned long val);
+void g_cmp(unsigned flags, unsigned long val);
 // Immediate compare. The primary register will not be changed, Z flag
 // will be set.
 
-void g_test (unsigned flags);
+void g_test(unsigned flags);
 /* Test the value in the primary and set the condition codes */
 
-void g_push (unsigned flags, unsigned long val);
+void g_push(unsigned flags, unsigned long val);
 /* Push the primary register or a constant value onto the stack */
 
-void g_swap (unsigned flags);
+void g_swap(unsigned flags);
 // Swap the primary register and the top of the stack. flags give the type
 // of *both* values (must have same size).
 
-void g_call (unsigned Flags, const char* Label, unsigned ArgSize);
+void g_call(unsigned Flags, const char *Label, unsigned ArgSize);
 /* Call the specified subroutine name */
 
-void g_callind (unsigned Flags, unsigned ArgSize, int Offs);
+void g_callind(unsigned Flags, unsigned ArgSize, int Offs);
 /* Call subroutine indirect */
 
-void g_jump (unsigned Label);
+void g_jump(unsigned Label);
 /* Jump to specified internal label number */
 
-void g_truejump (unsigned flags, unsigned label);
+void g_truejump(unsigned flags, unsigned label);
 /* Jump to label if zero flag clear */
 
-void g_falsejump (unsigned flags, unsigned label);
+void g_falsejump(unsigned flags, unsigned label);
 /* Jump to label if zero flag set */
 
-void g_branch (unsigned Label);
+void g_branch(unsigned Label);
 // Branch unconditionally to Label if the CPU has the BRA instruction.
 // Otherwise, jump to Label.
 // Use this function, instead of g_jump(), only where it is certain that
 // the label cannot be farther away from the branch than -128/+127 bytes.
 
-void g_lateadjustSP (unsigned label);
+void g_lateadjustSP(unsigned label);
 /* Adjust stack based on non-immediate data */
 
-void g_drop (unsigned Space);
+void g_drop(unsigned Space);
 /* Drop space allocated on the stack */
 
-void g_space (int space);
+void g_space(int space);
 /* Create or drop space on the stack */
 
-void g_cstackcheck (void);
+void g_cstackcheck(void);
 /* Check for a C stack overflow */
 
-void g_stackcheck (void);
+void g_stackcheck(void);
 /* Check for a stack overflow */
 
-void g_add (unsigned flags, unsigned long val);
-void g_sub (unsigned flags, unsigned long val);
-void g_rsub (unsigned flags, unsigned long val);
-void g_mul (unsigned flags, unsigned long val);
-void g_div (unsigned flags, unsigned long val);
-void g_mod (unsigned flags, unsigned long val);
-void g_or (unsigned flags, unsigned long val);
-void g_xor (unsigned flags, unsigned long val);
-void g_and (unsigned flags, unsigned long val);
-void g_asr (unsigned flags, unsigned long val);
-void g_asl (unsigned flags, unsigned long val);
-void g_neg (unsigned flags);
-void g_bneg (unsigned flags);
-void g_com (unsigned flags);
-void g_inc (unsigned flags, unsigned long n);
-void g_dec (unsigned flags, unsigned long n);
-void g_eq (unsigned flags, unsigned long val);
-void g_ne (unsigned flags, unsigned long val);
-void g_lt (unsigned flags, unsigned long val);
-void g_le (unsigned flags, unsigned long val);
-void g_gt (unsigned flags, unsigned long val);
-void g_ge (unsigned flags, unsigned long val);
+void g_add(unsigned flags, unsigned long val);
+void g_sub(unsigned flags, unsigned long val);
+void g_rsub(unsigned flags, unsigned long val);
+void g_mul(unsigned flags, unsigned long val);
+void g_div(unsigned flags, unsigned long val);
+void g_mod(unsigned flags, unsigned long val);
+void g_or(unsigned flags, unsigned long val);
+void g_xor(unsigned flags, unsigned long val);
+void g_and(unsigned flags, unsigned long val);
+void g_asr(unsigned flags, unsigned long val);
+void g_asl(unsigned flags, unsigned long val);
+void g_neg(unsigned flags);
+void g_bneg(unsigned flags);
+void g_com(unsigned flags);
+void g_inc(unsigned flags, unsigned long n);
+void g_dec(unsigned flags, unsigned long n);
+void g_eq(unsigned flags, unsigned long val);
+void g_ne(unsigned flags, unsigned long val);
+void g_lt(unsigned flags, unsigned long val);
+void g_le(unsigned flags, unsigned long val);
+void g_gt(unsigned flags, unsigned long val);
+void g_ge(unsigned flags, unsigned long val);
 
-void g_res (unsigned n);
+void g_res(unsigned n);
 /* Reserve static storage, n bytes */
 
-void g_defdata (unsigned flags, uintptr_t val, long offs);
+void g_defdata(unsigned flags, uintptr_t val, long offs);
 /* Define data with the size given in flags */
 
-void g_defbytes (const void* bytes, unsigned count);
+void g_defbytes(const void *bytes, unsigned count);
 /* Output a row of bytes as a constant */
 
-void g_zerobytes (unsigned Count);
+void g_zerobytes(unsigned Count);
 /* Output Count bytes of data initialized with zero */
 
-void g_initregister (unsigned Label, unsigned Reg, unsigned Size);
+void g_initregister(unsigned Label, unsigned Reg, unsigned Size);
 /* Initialize a register variable from static initialization data */
 
-void g_initauto (unsigned Label, unsigned Size);
+void g_initauto(unsigned Label, unsigned Size);
 /* Initialize a local variable at stack offset zero from static data */
 
-void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size);
+void g_initstatic(unsigned InitLabel, unsigned VarLabel, unsigned Size);
 /* Initialize a static local variable from static initialization data */
-
-
 
 /*****************************************************************************/
 /*                                Bit-fields                                 */
 /*****************************************************************************/
 
-void g_testbitfield (unsigned Flags, unsigned BitOffs, unsigned BitWidth);
+void g_testbitfield(unsigned Flags, unsigned BitOffs, unsigned BitWidth);
 /* Test bit-field in primary. */
 
-void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
-                        unsigned BitOffs, unsigned BitWidth);
+void g_extractbitfield(unsigned Flags, unsigned FullWidthFlags, int IsSigned,
+                       unsigned BitOffs, unsigned BitWidth);
 /* Extract bits from bit-field in primary. */
 
 /*****************************************************************************/
 /*                             Switch statement                              */
 /*****************************************************************************/
 
-
-
-void g_switchsave (unsigned Depth);
+void g_switchsave(unsigned Depth);
 /* Generate save code for a switch statement */
 
-void g_switchrest (unsigned Depth);
+void g_switchrest(unsigned Depth);
 /* Generate restore code for a switch statement */
 
-void g_switch (Collection* Nodes, unsigned DefaultLabel, unsigned Depth);
+void g_switch(Collection *Nodes, unsigned DefaultLabel, unsigned Depth);
 /* Generate code for a switch statement */
-
-
 
 /*****************************************************************************/
 /*                       User supplied assembler code                        */
 /*****************************************************************************/
 
-
-
-void g_asmcode (struct StrBuf* B);
+void g_asmcode(struct StrBuf *B);
 /* Output one line of assembler code. */
-
-
 
 /* End of codegen.h */
 

@@ -31,95 +31,79 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include "bitops.h"
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-unsigned BitFind (unsigned long Val)
+unsigned BitFind(unsigned long Val)
 /* Find the first bit that is set in Val. Val must *not* be zero */
 {
-    unsigned long Mask;
-    unsigned Bit;
+   unsigned long Mask;
+   unsigned Bit;
 
-    /* Search for the bits */
-    Mask = 1;
-    Bit  = 0;
-    while (1) {
-        if (Val & Mask) {
-            return Bit;
-        }
-        Mask <<= 1;
-        ++Bit;
-    }
+   /* Search for the bits */
+   Mask = 1;
+   Bit = 0;
+   while (1) {
+      if (Val & Mask) {
+         return Bit;
+      }
+      Mask <<= 1;
+      ++Bit;
+   }
 }
 
-
-
-void BitSet (void* Data, unsigned Bit)
+void BitSet(void *Data, unsigned Bit)
 /* Set a bit in a char array */
 {
-    /* Make a char pointer */
-    unsigned char* D = Data;
+   /* Make a char pointer */
+   unsigned char *D = Data;
 
-    /* Set the bit */
-    D [Bit / 8] |= 0x01 << (Bit % 8);
+   /* Set the bit */
+   D[Bit / 8] |= 0x01 << (Bit % 8);
 }
 
-
-
-void BitReset (void* Data, unsigned Bit)
+void BitReset(void *Data, unsigned Bit)
 /* Reset a bit in a char array */
 {
-    /* Make a char pointer */
-    unsigned char* D = Data;
+   /* Make a char pointer */
+   unsigned char *D = Data;
 
-    /* Set the bit */
-    D [Bit / 8] &= ~(0x01 << (Bit % 8));
+   /* Set the bit */
+   D[Bit / 8] &= ~(0x01 << (Bit % 8));
 }
 
-
-
-int BitIsSet (void* Data, unsigned Bit)
+int BitIsSet(void *Data, unsigned Bit)
 /* Check if a bit is set in a char array */
 {
-    /* Make a char pointer */
-    unsigned char* D = Data;
+   /* Make a char pointer */
+   unsigned char *D = Data;
 
-    /* Check the bit state */
-    return (D [Bit / 8] & (0x01 << (Bit % 8))) != 0;
+   /* Check the bit state */
+   return (D[Bit / 8] & (0x01 << (Bit % 8))) != 0;
 }
 
-
-
-int BitIsReset (void* Data, unsigned Bit)
+int BitIsReset(void *Data, unsigned Bit)
 /* Check if a bit is reset in a char array */
 {
-    /* Make a char pointer */
-    unsigned char* D = Data;
+   /* Make a char pointer */
+   unsigned char *D = Data;
 
-    /* Check the bit state */
-    return (D [Bit / 8] & (0x01 << (Bit % 8))) == 0;
+   /* Check the bit state */
+   return (D[Bit / 8] & (0x01 << (Bit % 8))) == 0;
 }
 
-
-
-void BitMerge (void* Target, const void* Source, unsigned Size)
+void BitMerge(void *Target, const void *Source, unsigned Size)
 /* Merge the bits of two char arrays (that is, do an or for the full array) */
 {
-    /* Make char arrays */
-    unsigned char*       T = Target;
-    const unsigned char* S = Source;
+   /* Make char arrays */
+   unsigned char *T = Target;
+   const unsigned char *S = Source;
 
-    /* Merge the arrays */
-    while (Size--) {
-        *T++ |= *S++;
-    }
+   /* Merge the arrays */
+   while (Size--) {
+      *T++ |= *S++;
+   }
 }

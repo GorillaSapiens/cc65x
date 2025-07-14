@@ -31,30 +31,25 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* common */
 #include "xsprintf.h"
 #include "searchpath.h"
 #include "version.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
+#define VER_MAJOR 2U
+#define VER_MINOR 19U
 
-
-#define VER_MAJOR       2U
-#define VER_MINOR       19U
-
-// 
-// Note: until 2.19 the __CC65__ macro was defined as (VER_MAJOR * 0x100) + VER_MINOR * 0x10
-// which resulted in broken values starting at version 2.16 of the compiler:
-// 
+//
+// Note: until 2.19 the __CC65__ macro was defined as (VER_MAJOR * 0x100) +
+// VER_MINOR * 0x10 which resulted in broken values starting at version 2.16 of
+// the compiler:
+//
 // version  __CC65__    identifies as
-// 
+//
 // 2.0      0x0200      2.0
 // 2.1      0x0210      2.16
 // 2.2      0x0220      2.32
@@ -76,44 +71,40 @@
 // 2.18     0x0320      3.32
 // 2.19     0x0330      3.48
 // 2.19-git 0x0213      2.19
-// 
+//
 // to keep damage low(er), we should do the following:
-// 
+//
 // - bump to 3.1 (skip 3.0) before 2.32
 // - bump to 4.0 before 3.16
-// 
+//
 // That way at least each value is unique, and checking compiler version(s) can
 // still work to some degree, should it really be necessary.
-// 
+//
 // Some preprocessor kludges can be used to still check for greater or lesser
 // versions - see the checkversion program in the samples directory.
-// 
+//
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-const char* GetVersionAsString (void)
+const char *GetVersionAsString(void)
 /* Returns the version number as a string in a static buffer */
 {
-    static char Buf[256];
+   static char Buf[256];
 #if defined(BUILD_ID)
-    xsnprintf (Buf, sizeof (Buf), "%u.%u - %s", VER_MAJOR, VER_MINOR, BUILD_ID);
+   xsnprintf(Buf, sizeof(Buf), "%u.%u - %s", VER_MAJOR, VER_MINOR, BUILD_ID);
 #else
-    xsnprintf (Buf, sizeof (Buf), "%u.%u", VER_MAJOR, VER_MINOR);
+   xsnprintf(Buf, sizeof(Buf), "%u.%u", VER_MAJOR, VER_MINOR);
 #endif
-    return Buf;
+   return Buf;
 }
 
-
-
-unsigned GetVersionAsNumber (void)
+unsigned GetVersionAsNumber(void)
 /* Returns the version number as a combined unsigned for use in a #define */
 {
 #if VER_MINOR >= 0x100
 #error "VER_MINOR must be smaller than 0x100 - time to bump the major version!"
 #endif
-    return ((VER_MAJOR * 0x100) + VER_MINOR);
+   return ((VER_MAJOR * 0x100) + VER_MINOR);
 }

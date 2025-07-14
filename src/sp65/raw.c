@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* common */
 #include "attrib.h"
 #include "print.h"
@@ -42,44 +40,39 @@
 #include "error.h"
 #include "raw.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-StrBuf* GenRaw (const Bitmap* B, const Collection* A attribute ((unused)))
+StrBuf *GenRaw(const Bitmap *B, const Collection *A attribute((unused)))
 // Generate binary output in raw format. The output is stored in a string
 // buffer (which is actually a dynamic char array) and returned.
 {
-    StrBuf* D;
-    unsigned X, Y;
+   StrBuf *D;
+   unsigned X, Y;
 
+   /* Output the image properties */
+   Print(stdout, 1, "Image is %ux%u with %u colors%s\n", GetBitmapWidth(B),
+         GetBitmapHeight(B), GetBitmapColors(B),
+         BitmapIsIndexed(B) ? " (indexed)" : "");
 
-    /* Output the image properties */
-    Print (stdout, 1, "Image is %ux%u with %u colors%s\n",
-           GetBitmapWidth (B), GetBitmapHeight (B), GetBitmapColors (B),
-           BitmapIsIndexed (B)? " (indexed)" : "");
+   /* Check the bitmap properties */
+   if (!BitmapIsIndexed(B)) {
+      Error("The raw format needs an input bitmap in indexed format");
+   }
 
-    /* Check the bitmap properties */
-    if (!BitmapIsIndexed (B)) {
-        Error ("The raw format needs an input bitmap in indexed format");
-    }
+   /* Create the output buffer and resize it to the required size. */
+   D = NewStrBuf();
+   SB_Realloc(D, GetBitmapWidth(B) * GetBitmapHeight(B));
 
-    /* Create the output buffer and resize it to the required size. */
-    D = NewStrBuf ();
-    SB_Realloc (D, GetBitmapWidth (B) * GetBitmapHeight (B));
+   /* Convert the image */
+   for (Y = 0; Y < GetBitmapHeight(B); ++Y) {
+      for (X = 0; X < GetBitmapWidth(B); ++X) {
+         /* Place one pixel into the buffer */
+         SB_AppendChar(D, (unsigned char)GetPixel(B, X, Y).Index);
+      }
+   }
 
-    /* Convert the image */
-    for (Y = 0; Y < GetBitmapHeight (B); ++Y) {
-        for (X = 0; X < GetBitmapWidth (B); ++X) {
-            /* Place one pixel into the buffer */
-            SB_AppendChar (D, (unsigned char) GetPixel (B, X, Y).Index);
-        }
-    }
-
-    /* Return the converted bitmap */
-    return D;
+   /* Return the converted bitmap */
+   return D;
 }

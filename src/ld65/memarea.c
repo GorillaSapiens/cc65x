@@ -31,45 +31,39 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* common */
 #include "xmalloc.h"
 
 /* ld65 */
 #include "memarea.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-MemoryArea* NewMemoryArea (const FilePos* Pos, unsigned Name)
+MemoryArea *NewMemoryArea(const FilePos *Pos, unsigned Name)
 /* Create a new memory area and insert it into the list */
 {
-    /* Allocate memory */
-    MemoryArea* M = xmalloc (sizeof (MemoryArea));
+   /* Allocate memory */
+   MemoryArea *M = xmalloc(sizeof(MemoryArea));
 
-    /* Initialize the fields ... */
-    M->LI          = GenLineInfo (Pos);
-    M->Name        = Name;
-    M->Attr        = 0;
-    M->Flags       = 0;
-    M->FileOffs    = ~0UL;
-    M->StartExpr   = 0;
-    M->Start       = 0;
-    M->SizeExpr    = 0;
-    M->Size        = 0;
-    M->BankExpr    = 0;
-    M->FillLevel   = 0;
-    M->FillVal     = 0;
-    M->Relocatable = 0;
-    M->SegList     = EmptyCollection;
-    M->F           = 0;
+   /* Initialize the fields ... */
+   M->LI = GenLineInfo(Pos);
+   M->Name = Name;
+   M->Attr = 0;
+   M->Flags = 0;
+   M->FileOffs = ~0UL;
+   M->StartExpr = 0;
+   M->Start = 0;
+   M->SizeExpr = 0;
+   M->Size = 0;
+   M->BankExpr = 0;
+   M->FillLevel = 0;
+   M->FillVal = 0;
+   M->Relocatable = 0;
+   M->SegList = EmptyCollection;
+   M->F = 0;
 
-    /* ...and return it */
-    return M;
+   /* ...and return it */
+   return M;
 }

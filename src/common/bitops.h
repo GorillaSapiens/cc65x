@@ -31,42 +31,32 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef BITOPS_H
 #define BITOPS_H
 
-
-
 #include "attrib.h"
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-unsigned BitFind (unsigned long Val) attribute ((const));
+unsigned BitFind(unsigned long Val) attribute((const));
 /* Find the first bit that is set in Val. Val must *not* be zero */
 
-void BitSet (void* Data, unsigned Bit);
+void BitSet(void *Data, unsigned Bit);
 /* Set a bit in a char array */
 
-void BitReset (void* Data, unsigned Bit);
+void BitReset(void *Data, unsigned Bit);
 /* Reset a bit in a char array */
 
-int BitIsSet (void* Data, unsigned Bit) attribute ((const));
+int BitIsSet(void *Data, unsigned Bit) attribute((const));
 /* Check if a bit is set in a char array */
 
-int BitIsReset (void* Data, unsigned Bit) attribute ((const));
+int BitIsReset(void *Data, unsigned Bit) attribute((const));
 /* Check if a bit is reset in a char array */
 
-void BitMerge (void* Target, const void* Source, unsigned Size);
+void BitMerge(void *Target, const void *Source, unsigned Size);
 /* Merge the bits of two char arrays (that is, do an or for the full array) */
-
-
 
 /* End of bitops.h */
 

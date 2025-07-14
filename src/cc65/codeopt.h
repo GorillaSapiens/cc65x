@@ -31,37 +31,27 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef CODEOPT_H
 #define CODEOPT_H
 
-
-
 /* cc65 */
 #include "codeseg.h"
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void DisableOpt (const char* Name);
+void DisableOpt(const char *Name);
 /* Disable the optimization with the given name */
 
-void EnableOpt (const char* Name);
+void EnableOpt(const char *Name);
 /* Enable the optimization with the given name */
 
-void ListOptSteps (FILE* F);
+void ListOptSteps(FILE *F);
 /* List all optimization steps */
 
-void RunOpt (CodeSeg* S);
+void RunOpt(CodeSeg *S);
 /* Run the optimizer */
-
-
 
 /* End of codeopt.h */
 

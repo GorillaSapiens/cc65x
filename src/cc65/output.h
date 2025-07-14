@@ -31,61 +31,48 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef OUTPUT_H
 #define OUTPUT_H
-
-
 
 #include <stdio.h>
 
 /* common */
 #include "attrib.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Name of the output file. Dynamically allocated and read only. */
-extern const char* OutputFilename;
+extern const char *OutputFilename;
 
 /* Output file handle. Use WriteOutput if possible. Read only. */
-extern FILE* OutputFile;
-
-
+extern FILE *OutputFile;
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void SetOutputName (const char* Name);
+void SetOutputName(const char *Name);
 /* Sets the name of the output file. */
 
-void MakeDefaultOutputName (const char* InputFilename);
+void MakeDefaultOutputName(const char *InputFilename);
 // If the name of the output file is empty or NULL, the name of the output
 // file is derived from the input file by adjusting the file name extension.
 
-void OpenOutputFile ();
+void OpenOutputFile();
 /* Open the output file. Will call Fatal() in case of failures. */
 
-void OpenDebugOutputFile (const char* Name);
+void OpenDebugOutputFile(const char *Name);
 // Open an output file for debugging purposes. Will call Fatal() in case of
 // failures.
 
-void CloseOutputFile ();
+void CloseOutputFile();
 /* Close the output file. Will call Fatal() in case of failures. */
 
-int WriteOutput (const char* Format, ...) attribute ((format (printf, 1, 2)));
+int WriteOutput(const char *Format, ...) attribute((format(printf, 1, 2)));
 // Write to the output file using printf like formatting. Returns the number
 // of chars written.
-
 
 /* End of output.h */
 

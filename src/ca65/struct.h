@@ -31,39 +31,27 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef STRUCT_H
 #define STRUCT_H
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 struct SymTable;
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-long GetStructSize (struct SymTable* Struct);
+long GetStructSize(struct SymTable *Struct);
 /* Get the size of a struct */
 
-void DoStruct (void);
+void DoStruct(void);
 /* Handle the .STRUCT command */
 
-void DoUnion (void);
+void DoUnion(void);
 /* Handle the .UNION command */
-
-
 
 /* End of struct.h */
 

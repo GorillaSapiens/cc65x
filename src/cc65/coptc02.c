@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <string.h>
 
 /* cc65 */
@@ -41,174 +39,155 @@
 #include "error.h"
 #include "coptc02.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
-
-
 
 /*****************************************************************************/
 /*                             Helper functions                              */
 /*****************************************************************************/
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-unsigned Opt65C02Ind (CodeSeg* S)
+unsigned Opt65C02Ind(CodeSeg *S)
 /* Try to use the indirect addressing mode where possible */
 {
-    unsigned Changes = 0;
-    unsigned I;
+   unsigned Changes = 0;
+   unsigned I;
 
-    /* Walk over the entries */
-    I = 0;
-    while (I < CS_GetEntryCount (S)) {
+   /* Walk over the entries */
+   I = 0;
+   while (I < CS_GetEntryCount(S)) {
 
-        /* Get next entry */
-        CodeEntry* E = CS_GetEntry (S, I);
+      /* Get next entry */
+      CodeEntry *E = CS_GetEntry(S, I);
 
-        // Check for addressing mode indirect indexed Y where Y is zero.
-        // Note: All opcodes that are available as (zp),y are also available
-        // as (zp), so we can ignore the actual opcode here.
-        if (E->AM == AM65_ZP_INDY && E->RI->In.RegY == 0) {
+      // Check for addressing mode indirect indexed Y where Y is zero.
+      // Note: All opcodes that are available as (zp),y are also available
+      // as (zp), so we can ignore the actual opcode here.
+      if (E->AM == AM65_ZP_INDY && E->RI->In.RegY == 0) {
 
-            /* Replace it by indirect addressing mode */
-            CodeEntry* X = NewCodeEntry (E->OPC, AM65_ZP_IND, E->Arg, 0, E->LI);
-            CS_InsertEntry (S, X, I+1);
-            CS_DelEntry (S, I);
+         /* Replace it by indirect addressing mode */
+         CodeEntry *X = NewCodeEntry(E->OPC, AM65_ZP_IND, E->Arg, 0, E->LI);
+         CS_InsertEntry(S, X, I + 1);
+         CS_DelEntry(S, I);
 
-            /* We had changes */
-            ++Changes;
+         /* We had changes */
+         ++Changes;
+      }
 
-        }
+      /* Next entry */
+      ++I;
+   }
 
-        /* Next entry */
-        ++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
+   /* Return the number of changes made */
+   return Changes;
 }
 
-
-
-unsigned Opt65C02BitOps (CodeSeg* S)
+unsigned Opt65C02BitOps(CodeSeg *S)
 /* Use special bit op instructions of the C02 */
 {
-    unsigned Changes = 0;
-    unsigned I;
+   unsigned Changes = 0;
+   unsigned I;
 
-    /* Walk over the entries */
-    I = 0;
-    while (I < CS_GetEntryCount (S)) {
+   /* Walk over the entries */
+   I = 0;
+   while (I < CS_GetEntryCount(S)) {
 
-        CodeEntry* L[3];
+      CodeEntry *L[3];
 
-        /* Get next entry */
-        L[0] = CS_GetEntry (S, I);
+      /* Get next entry */
+      L[0] = CS_GetEntry(S, I);
 
-        /* Check for the sequence */
-        if (L[0]->OPC == OP65_LDA                               &&
-            (L[0]->AM == AM65_ZP || L[0]->AM == AM65_ABS)       &&
-            !CS_RangeHasLabel (S, I+1, 2)                       &&
-            CS_GetEntries (S, L+1, I+1, 2)                      &&
-            (L[1]->OPC == OP65_AND || L[1]->OPC == OP65_ORA)    &&
-            CE_IsConstImm (L[1])                                &&
-            L[2]->OPC == OP65_STA                               &&
-            L[2]->AM == L[0]->AM                                &&
-            strcmp (L[2]->Arg, L[0]->Arg) == 0                  &&
-            !RegAUsed (S, I+3)) {
+      /* Check for the sequence */
+      if (L[0]->OPC == OP65_LDA &&
+          (L[0]->AM == AM65_ZP || L[0]->AM == AM65_ABS) &&
+          !CS_RangeHasLabel(S, I + 1, 2) && CS_GetEntries(S, L + 1, I + 1, 2) &&
+          (L[1]->OPC == OP65_AND || L[1]->OPC == OP65_ORA) &&
+          CE_IsConstImm(L[1]) && L[2]->OPC == OP65_STA &&
+          L[2]->AM == L[0]->AM && strcmp(L[2]->Arg, L[0]->Arg) == 0 &&
+          !RegAUsed(S, I + 3)) {
 
-            char Buf[32];
-            CodeEntry* X;
+         char Buf[32];
+         CodeEntry *X;
 
-            /* Use TRB for AND and TSB for ORA */
-            if (L[1]->OPC == OP65_AND) {
+         /* Use TRB for AND and TSB for ORA */
+         if (L[1]->OPC == OP65_AND) {
 
-                /* LDA #XX */
-                sprintf (Buf, "$%02X", (int) ((~L[1]->Num) & 0xFF));
-                X = NewCodeEntry (OP65_LDA, AM65_IMM, Buf, 0, L[1]->LI);
-                CS_InsertEntry (S, X, I+3);
+            /* LDA #XX */
+            sprintf(Buf, "$%02X", (int)((~L[1]->Num) & 0xFF));
+            X = NewCodeEntry(OP65_LDA, AM65_IMM, Buf, 0, L[1]->LI);
+            CS_InsertEntry(S, X, I + 3);
 
-                /* TRB */
-                X = NewCodeEntry (OP65_TRB, L[0]->AM, L[0]->Arg, 0, L[0]->LI);
-                CS_InsertEntry (S, X, I+4);
+            /* TRB */
+            X = NewCodeEntry(OP65_TRB, L[0]->AM, L[0]->Arg, 0, L[0]->LI);
+            CS_InsertEntry(S, X, I + 4);
+         }
+         else {
 
-            } else {
+            /* LDA #XX */
+            sprintf(Buf, "$%02X", (int)L[1]->Num);
+            X = NewCodeEntry(OP65_LDA, AM65_IMM, Buf, 0, L[1]->LI);
+            CS_InsertEntry(S, X, I + 3);
 
-                /* LDA #XX */
-                sprintf (Buf, "$%02X", (int) L[1]->Num);
-                X = NewCodeEntry (OP65_LDA, AM65_IMM, Buf, 0, L[1]->LI);
-                CS_InsertEntry (S, X, I+3);
+            /* TSB */
+            X = NewCodeEntry(OP65_TSB, L[0]->AM, L[0]->Arg, 0, L[0]->LI);
+            CS_InsertEntry(S, X, I + 4);
+         }
 
-                /* TSB */
-                X = NewCodeEntry (OP65_TSB, L[0]->AM, L[0]->Arg, 0, L[0]->LI);
-                CS_InsertEntry (S, X, I+4);
-            }
+         /* Delete the old stuff */
+         CS_DelEntries(S, I, 3);
 
-            /* Delete the old stuff */
-            CS_DelEntries (S, I, 3);
+         /* We had changes */
+         ++Changes;
+      }
 
-            /* We had changes */
-            ++Changes;
-        }
+      /* Next entry */
+      ++I;
+   }
 
-        /* Next entry */
-        ++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
+   /* Return the number of changes made */
+   return Changes;
 }
 
-
-
-unsigned Opt65C02Stores (CodeSeg* S)
+unsigned Opt65C02Stores(CodeSeg *S)
 /* Use STZ where possible */
 {
-    unsigned Changes = 0;
-    unsigned I;
+   unsigned Changes = 0;
+   unsigned I;
 
-    /* Walk over the entries */
-    I = 0;
-    while (I < CS_GetEntryCount (S)) {
+   /* Walk over the entries */
+   I = 0;
+   while (I < CS_GetEntryCount(S)) {
 
-        /* Get next entry */
-        CodeEntry* E = CS_GetEntry (S, I);
+      /* Get next entry */
+      CodeEntry *E = CS_GetEntry(S, I);
 
-        // Check for a store with a register value of zero and an addressing
-        // mode available with STZ.
-        if (((E->OPC == OP65_STA && E->RI->In.RegA == 0) ||
-             (E->OPC == OP65_STX && E->RI->In.RegX == 0) ||
-             (E->OPC == OP65_STY && E->RI->In.RegY == 0))       &&
-            (E->AM == AM65_ZP  || E->AM == AM65_ABS ||
-             E->AM == AM65_ZPX || E->AM == AM65_ABSX)) {
+      // Check for a store with a register value of zero and an addressing
+      // mode available with STZ.
+      if (((E->OPC == OP65_STA && E->RI->In.RegA == 0) ||
+           (E->OPC == OP65_STX && E->RI->In.RegX == 0) ||
+           (E->OPC == OP65_STY && E->RI->In.RegY == 0)) &&
+          (E->AM == AM65_ZP || E->AM == AM65_ABS || E->AM == AM65_ZPX ||
+           E->AM == AM65_ABSX)) {
 
-            /* Replace by STZ */
-            CodeEntry* X = NewCodeEntry (OP65_STZ, E->AM, E->Arg, 0, E->LI);
-            CS_InsertEntry (S, X, I+1);
+         /* Replace by STZ */
+         CodeEntry *X = NewCodeEntry(OP65_STZ, E->AM, E->Arg, 0, E->LI);
+         CS_InsertEntry(S, X, I + 1);
 
-            /* Delete the old stuff */
-            CS_DelEntry (S, I);
+         /* Delete the old stuff */
+         CS_DelEntry(S, I);
 
-            /* We had changes */
-            ++Changes;
-        }
+         /* We had changes */
+         ++Changes;
+      }
 
-        /* Next entry */
-        ++I;
+      /* Next entry */
+      ++I;
+   }
 
-    }
-
-    /* Return the number of changes made */
-    return Changes;
+   /* Return the number of changes made */
+   return Changes;
 }

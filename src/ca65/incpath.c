@@ -31,54 +31,42 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* ca65 */
 #include "incpath.h"
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
-SearchPaths*    IncSearchPath;          /* Standard include path */
-SearchPaths*    BinSearchPath;          /* Binary include path */
-
-
+SearchPaths *IncSearchPath; /* Standard include path */
+SearchPaths *BinSearchPath; /* Binary include path */
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void InitIncludePaths (void)
+void InitIncludePaths(void)
 /* Initialize the include path search list */
 {
-    /* Create the search path lists */
-    IncSearchPath = NewSearchPath ();
-    BinSearchPath = NewSearchPath ();
+   /* Create the search path lists */
+   IncSearchPath = NewSearchPath();
+   BinSearchPath = NewSearchPath();
 }
 
-
-
-void FinishIncludePaths (void)
+void FinishIncludePaths(void)
 /* Finish creating the include path search list. */
 {
-    /* Add specific paths from the environment */
-    AddSearchPathFromEnv (IncSearchPath, "CA65_INC");
+   /* Add specific paths from the environment */
+   AddSearchPathFromEnv(IncSearchPath, "CA65_INC");
 
-    /* Add paths relative to a main directory defined in an env. var. */
-    AddSubSearchPathFromEnv (IncSearchPath, "CC65_HOME", "asminc");
+   /* Add paths relative to a main directory defined in an env. var. */
+   AddSubSearchPathFromEnv(IncSearchPath, "CC65_HOME", "asminc");
 
-    /* Add some compiled-in search paths if defined at compile time. */
+   /* Add some compiled-in search paths if defined at compile time. */
 #if defined(CA65_INC) && !defined(_WIN32) && !defined(_AMIGA)
-    AddSearchPath (IncSearchPath, CA65_INC);
+   AddSearchPath(IncSearchPath, CA65_INC);
 #endif
 
-    /* Add paths relative to the parent directory of the Windows binary. */
-    AddSubSearchPathFromBin (IncSearchPath, "asminc");
+   /* Add paths relative to the parent directory of the Windows binary. */
+   AddSubSearchPathFromBin(IncSearchPath, "asminc");
 }

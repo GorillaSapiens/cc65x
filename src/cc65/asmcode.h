@@ -31,65 +31,53 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef ASMCODE_H
 #define ASMCODE_H
-
-
 
 #include <stdio.h>
 
 /* common */
 #include "attrib.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Marker for an assembler code position */
 typedef struct {
-    unsigned    Pos;            /* Code position */
-    int         SP;             /* Stack pointer at this position */
+   unsigned Pos; /* Code position */
+   int SP;       /* Stack pointer at this position */
 } CodeMark;
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void GetCodePos (CodeMark* M);
+void GetCodePos(CodeMark *M);
 /* Get a marker pointing to the current output position */
 
-void RemoveCodeRange (const CodeMark* Start, const CodeMark* End);
+void RemoveCodeRange(const CodeMark *Start, const CodeMark *End);
 /* Remove all code between two code markers */
 
-void RemoveCode (const CodeMark* M);
+void RemoveCode(const CodeMark *M);
 /* Remove all code after the given code marker */
 
-void ErrorOnNonDefinition (const CodeMark* Start, const CodeMark* End);
+void ErrorOnNonDefinition(const CodeMark *Start, const CodeMark *End);
 /* Error on an non definition between the given code markers */
 
-void CleanupSwitch (const CodeMark* location);
+void CleanupSwitch(const CodeMark *location);
 
-void MoveCode (const CodeMark* Start, const CodeMark* End, const CodeMark* Target);
+void MoveCode(const CodeMark *Start, const CodeMark *End,
+              const CodeMark *Target);
 // Move the code between Start (inclusive) and End (exclusive) to
 // (before) Target. The code marks aren't updated.
 
-int CodeRangeIsEmpty (const CodeMark* Start, const CodeMark* End);
-/* Return true if the given code range is empty (no code between Start and End) */
+int CodeRangeIsEmpty(const CodeMark *Start, const CodeMark *End);
+/* Return true if the given code range is empty (no code between Start and End)
+ */
 
-void WriteAsmOutput (void);
+void WriteAsmOutput(void);
 /* Write the final assembler output to the output file */
-
-
 
 /* End of asmcode.h */
 

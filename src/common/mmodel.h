@@ -31,26 +31,20 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef MMODEL_H
 #define MMODEL_H
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Memory models */
 typedef enum {
-    MMODEL_UNKNOWN  = -1,
-    MMODEL_NEAR,                /* Code: near, data: near */
-    MMODEL_FAR,                 /* Code: far, data: near */
-    MMODEL_HUGE,                /* Code: far, data: far */
-    MMODEL_COUNT                /* Number of memory models */
+   MMODEL_UNKNOWN = -1,
+   MMODEL_NEAR, /* Code: near, data: near */
+   MMODEL_FAR,  /* Code: far, data: near */
+   MMODEL_HUGE, /* Code: far, data: far */
+   MMODEL_COUNT /* Number of memory models */
 } mmodel_t;
 
 /* Memory model in use */
@@ -61,22 +55,16 @@ extern unsigned char CodeAddrSize;
 extern unsigned char DataAddrSize;
 extern unsigned char ZpAddrSize;
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-mmodel_t FindMemoryModel (const char* Name);
+mmodel_t FindMemoryModel(const char *Name);
 /* Find a memory model by name. Return MMODEL_UNKNOWN for an unknown name. */
 
-void SetMemoryModel (mmodel_t Model);
+void SetMemoryModel(mmodel_t Model);
 // Set the memory model updating the MemoryModel variables and the address
 // sizes for the segments.
-
-
 
 /* End of mmodel.h */
 

@@ -31,35 +31,25 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef COPTSIZE_H
 #define COPTSIZE_H
 
-
-
 /* cc65 */
 #include "codeseg.h"
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-unsigned OptSize1 (CodeSeg* S);
+unsigned OptSize1(CodeSeg *S);
 // Do size optimization by calling special subroutines that preload registers.
 // This routine does not work standalone, it needs a following register load
 // removal pass.
 
-unsigned OptSize2 (CodeSeg* S);
+unsigned OptSize2(CodeSeg *S);
 // Do size optimization by using shorter code sequences, even if this
 // introduces relations between instructions. This step must be one of the
 // last steps, because it makes further work much more difficult.
-
-
 
 /* End of coptsize.h */
 

@@ -31,49 +31,39 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* common */
 #include "xmalloc.h"
 
 /* ca65 */
 #include "segdef.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-SegDef* NewSegDef (const char* Name, unsigned char AddrSize)
+SegDef *NewSegDef(const char *Name, unsigned char AddrSize)
 /* Create a new segment definition and return it */
 {
-    /* Allocate memory */
-    SegDef* D = xmalloc (sizeof (SegDef));
+   /* Allocate memory */
+   SegDef *D = xmalloc(sizeof(SegDef));
 
-    /* Initialize it */
-    D->Name     = xstrdup (Name);
-    D->AddrSize = AddrSize;
+   /* Initialize it */
+   D->Name = xstrdup(Name);
+   D->AddrSize = AddrSize;
 
-    /* Return the result */
-    return D;
+   /* Return the result */
+   return D;
 }
 
-
-
-void FreeSegDef (SegDef* D)
+void FreeSegDef(SegDef *D)
 /* Free a segment definition */
 {
-    xfree (D->Name);
-    xfree (D);
+   xfree(D->Name);
+   xfree(D);
 }
 
-
-
-SegDef* DupSegDef (const SegDef* Def)
+SegDef *DupSegDef(const SegDef *Def)
 /* Duplicate a segment definition and return it */
 {
-    return NewSegDef (Def->Name, Def->AddrSize);
+   return NewSegDef(Def->Name, Def->AddrSize);
 }

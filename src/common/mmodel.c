@@ -31,27 +31,21 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <string.h>
 
 /* common */
 #include "addrsize.h"
 #include "mmodel.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
-
-
 
 /* Memory model in use */
 mmodel_t MemoryModel = MMODEL_UNKNOWN;
 
 /* Table with memory model names */
-static const char* MemoryModelNames[MMODEL_COUNT] = {
+static const char *MemoryModelNames[MMODEL_COUNT] = {
     "near",
     "far",
     "huge",
@@ -60,66 +54,60 @@ static const char* MemoryModelNames[MMODEL_COUNT] = {
 /* Address sizes for the segments */
 unsigned char CodeAddrSize = ADDR_SIZE_ABS;
 unsigned char DataAddrSize = ADDR_SIZE_ABS;
-unsigned char ZpAddrSize   = ADDR_SIZE_ZP;
-
-
+unsigned char ZpAddrSize = ADDR_SIZE_ZP;
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-mmodel_t FindMemoryModel (const char* Name)
+mmodel_t FindMemoryModel(const char *Name)
 /* Find a memory model by name. Return MMODEL_UNKNOWN for an unknown name. */
 {
-    unsigned I;
+   unsigned I;
 
-    /* Check all CPU names */
-    for (I = 0; I < MMODEL_COUNT; ++I) {
-        if (strcmp (MemoryModelNames[I], Name) == 0) {
-            return (mmodel_t)I;
-        }
-    }
+   /* Check all CPU names */
+   for (I = 0; I < MMODEL_COUNT; ++I) {
+      if (strcmp(MemoryModelNames[I], Name) == 0) {
+         return (mmodel_t)I;
+      }
+   }
 
-    /* Not found */
-    return MMODEL_UNKNOWN;
+   /* Not found */
+   return MMODEL_UNKNOWN;
 }
 
-
-
-void SetMemoryModel (mmodel_t Model)
+void SetMemoryModel(mmodel_t Model)
 // Set the memory model updating the MemoryModel variables and the address
 // sizes for the segments.
 {
-    /* Remember the memory model */
-    MemoryModel = Model;
+   /* Remember the memory model */
+   MemoryModel = Model;
 
-    /* Set the address sizes for the segments */
-    switch (MemoryModel) {
+   /* Set the address sizes for the segments */
+   switch (MemoryModel) {
 
-        case MMODEL_NEAR:
-            /* Code: near, data: near */
-            CodeAddrSize = ADDR_SIZE_ABS;
-            DataAddrSize = ADDR_SIZE_ABS;
-            break;
+      case MMODEL_NEAR:
+         /* Code: near, data: near */
+         CodeAddrSize = ADDR_SIZE_ABS;
+         DataAddrSize = ADDR_SIZE_ABS;
+         break;
 
-        case MMODEL_FAR:
-            /* Code: far, data: near */
-            CodeAddrSize = ADDR_SIZE_FAR;
-            DataAddrSize = ADDR_SIZE_ABS;
-            break;
+      case MMODEL_FAR:
+         /* Code: far, data: near */
+         CodeAddrSize = ADDR_SIZE_FAR;
+         DataAddrSize = ADDR_SIZE_ABS;
+         break;
 
-        case MMODEL_HUGE:
-            /* Code: far, data: far */
-            CodeAddrSize = ADDR_SIZE_FAR;
-            DataAddrSize = ADDR_SIZE_FAR;
-            break;
+      case MMODEL_HUGE:
+         /* Code: far, data: far */
+         CodeAddrSize = ADDR_SIZE_FAR;
+         DataAddrSize = ADDR_SIZE_FAR;
+         break;
 
-        default:
-            break;
-    }
+      default:
+         break;
+   }
 
-    /* Zeropage is always zeropage */
-    ZpAddrSize = ADDR_SIZE_ZP;
+   /* Zeropage is always zeropage */
+   ZpAddrSize = ADDR_SIZE_ZP;
 }

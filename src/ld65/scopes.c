@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* common */
 #include "xmalloc.h"
 
@@ -43,131 +41,127 @@
 #include "span.h"
 #include "spool.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-static Scope* NewScope (ObjData* Obj, unsigned Id)
+static Scope *NewScope(ObjData *Obj, unsigned Id)
 /* Create a new Scope and return it */
 {
-    /* Allocate memory */
-    Scope* S     = xmalloc (sizeof (Scope));
+   /* Allocate memory */
+   Scope *S = xmalloc(sizeof(Scope));
 
-    /* Initialize the fields where necessary */
-    S->Id       = Id;
-    S->Obj      = Obj;
-    S->Size     = 0;
-    S->LabelId  = ~0U;
-    S->Spans    = 0;
+   /* Initialize the fields where necessary */
+   S->Id = Id;
+   S->Obj = Obj;
+   S->Size = 0;
+   S->LabelId = ~0U;
+   S->Spans = 0;
 
-    /* Return the new entry */
-    return S;
+   /* Return the new entry */
+   return S;
 }
 
-
-
-Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id)
+Scope *ReadScope(FILE *F, ObjData *Obj, unsigned Id)
 /* Read a scope from a file and return it */
 {
-    /* Create a new scope */
-    Scope* S = NewScope (Obj, Id);
+   /* Create a new scope */
+   Scope *S = NewScope(Obj, Id);
 
-    /* Read the data from file */
-    S->ParentId     = ReadVar (F);
-    S->LexicalLevel = ReadVar (F);
-    S->Flags        = ReadVar (F);
-    S->Type         = ReadVar (F);
-    S->Name         = MakeGlobalStringId (Obj, ReadVar (F));
-    if (SCOPE_HAS_SIZE (S->Flags)) {
-        S->Size     = ReadVar (F);
-    }
-    if (SCOPE_HAS_LABEL (S->Flags)) {
-        S->LabelId  = ReadVar (F);
-    }
-    S->Spans        = ReadSpanList (F);
+   /* Read the data from file */
+   S->ParentId = ReadVar(F);
+   S->LexicalLevel = ReadVar(F);
+   S->Flags = ReadVar(F);
+   S->Type = ReadVar(F);
+   S->Name = MakeGlobalStringId(Obj, ReadVar(F));
+   if (SCOPE_HAS_SIZE(S->Flags)) {
+      S->Size = ReadVar(F);
+   }
+   if (SCOPE_HAS_LABEL(S->Flags)) {
+      S->LabelId = ReadVar(F);
+   }
+   S->Spans = ReadSpanList(F);
 
-    /* Return the new Scope */
-    return S;
+   /* Return the new Scope */
+   return S;
 }
 
-
-
-unsigned ScopeCount (void)
+unsigned ScopeCount(void)
 /* Return the total number of scopes */
 {
 
-    /* Count scopes from all modules we have linked into the output file */
-    unsigned I;
-    unsigned Count = 0;
-    for (I = 0; I < CollCount (&ObjDataList); ++I) {
-        /* Get the object file */
-        const ObjData* O = CollAtUnchecked (&ObjDataList, I);
+   /* Count scopes from all modules we have linked into the output file */
+   unsigned I;
+   unsigned Count = 0;
+   for (I = 0; I < CollCount(&ObjDataList); ++I) {
+      /* Get the object file */
+      const ObjData *O = CollAtUnchecked(&ObjDataList, I);
 
-        /* Account for the scopes in this file */
-        Count += CollCount (&O->Scopes);
-    }
-    return Count;
+      /* Account for the scopes in this file */
+      Count += CollCount(&O->Scopes);
+   }
+   return Count;
 }
 
-
-
-void PrintDbgScopes (FILE* F)
+void PrintDbgScopes(FILE *F)
 /* Output the scopes to a debug info file */
 {
-    unsigned I, J;
+   unsigned I, J;
 
-    /* Print scopes from all modules we have linked into the output file */
-    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+   /* Print scopes from all modules we have linked into the output file */
+   for (I = 0; I < CollCount(&ObjDataList); ++I) {
 
-        /* Get the object file */
-        ObjData* O = CollAtUnchecked (&ObjDataList, I);
+      /* Get the object file */
+      ObjData *O = CollAtUnchecked(&ObjDataList, I);
 
-        /* Output the scopes for this object file */
-        for (J = 0; J < CollCount (&O->Scopes); ++J) {
-            const Scope* S = CollConstAt (&O->Scopes, J);
+      /* Output the scopes for this object file */
+      for (J = 0; J < CollCount(&O->Scopes); ++J) {
+         const Scope *S = CollConstAt(&O->Scopes, J);
 
-            /* Output the first chunk of data */
-            fprintf (F,
-                     "scope\tid=%u,name=\"%s\",mod=%u",
-                     O->ScopeBaseId + S->Id,
-                     GetString (S->Name),
-                     I);
+         /* Output the first chunk of data */
+         fprintf(F, "scope\tid=%u,name=\"%s\",mod=%u", O->ScopeBaseId + S->Id,
+                 GetString(S->Name), I);
 
-            /* Print the type if not module */
-            switch (S->Type) {
+         /* Print the type if not module */
+         switch (S->Type) {
 
-                case SCOPE_GLOBAL:      fputs (",type=global", F);      break;
-                case SCOPE_FILE:        /* default */                   break;
-                case SCOPE_SCOPE:       fputs (",type=scope", F);       break;
-                case SCOPE_STRUCT:      fputs (",type=struct", F);      break;
-                case SCOPE_ENUM:        fputs (",type=enum", F);        break;
+            case SCOPE_GLOBAL:
+               fputs(",type=global", F);
+               break;
+            case SCOPE_FILE: /* default */
+               break;
+            case SCOPE_SCOPE:
+               fputs(",type=scope", F);
+               break;
+            case SCOPE_STRUCT:
+               fputs(",type=struct", F);
+               break;
+            case SCOPE_ENUM:
+               fputs(",type=enum", F);
+               break;
 
-                default:
-                    Error ("Module '%s': Unknown scope type %u",
-                           GetObjFileName (O), S->Type);
-            }
+            default:
+               Error("Module '%s': Unknown scope type %u", GetObjFileName(O),
+                     S->Type);
+         }
 
-            /* Print the size if available */
-            if (S->Size != 0) {
-                fprintf (F, ",size=%lu", S->Size);
-            }
-            /* Print parent if available */
-            if (S->Id != S->ParentId) {
-                fprintf (F, ",parent=%u", O->ScopeBaseId + S->ParentId);
-            }
-            /* Print the label id if the scope is labeled */
-            if (SCOPE_HAS_LABEL (S->Flags)) {
-                fprintf (F, ",sym=%u", O->SymBaseId + S->LabelId);
-            }
-            /* Print the list of spans for this scope */
-            PrintDbgSpanList (F, O, S->Spans);
+         /* Print the size if available */
+         if (S->Size != 0) {
+            fprintf(F, ",size=%lu", S->Size);
+         }
+         /* Print parent if available */
+         if (S->Id != S->ParentId) {
+            fprintf(F, ",parent=%u", O->ScopeBaseId + S->ParentId);
+         }
+         /* Print the label id if the scope is labeled */
+         if (SCOPE_HAS_LABEL(S->Flags)) {
+            fprintf(F, ",sym=%u", O->SymBaseId + S->LabelId);
+         }
+         /* Print the list of spans for this scope */
+         PrintDbgSpanList(F, O, S->Spans);
 
-            /* Terminate the output line */
-            fputc ('\n', F);
-        }
-    }
+         /* Terminate the output line */
+         fputc('\n', F);
+      }
+   }
 }

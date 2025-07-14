@@ -31,20 +31,14 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* common */
 #include "hashfunc.h"
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-unsigned HashInt (unsigned V)
+unsigned HashInt(unsigned V)
 // Return a hash value for the given integer. The function uses Robert
 // Jenkins' 32 bit integer hash function taken from
 // http://www.concentric.net/~ttwang/tech/inthash.htm
@@ -59,32 +53,28 @@ unsigned HashInt (unsigned V)
    return V;
 }
 
-
-
-unsigned HashStr (const char* S)
+unsigned HashStr(const char *S)
 /* Return a hash value for the given string */
 {
-    unsigned L, H;
+   unsigned L, H;
 
-    /* Do the hash */
-    H = L = 0;
-    while (*S) {
-        H = ((H << 3) ^ ((unsigned char) *S++)) + L++;
-    }
-    return H;
+   /* Do the hash */
+   H = L = 0;
+   while (*S) {
+      H = ((H << 3) ^ ((unsigned char)*S++)) + L++;
+   }
+   return H;
 }
 
-
-
-unsigned HashBuf (const StrBuf* S)
+unsigned HashBuf(const StrBuf *S)
 /* Return a hash value for the given string buffer */
 {
-    unsigned I, L, H;
+   unsigned I, L, H;
 
-    /* Do the hash */
-    H = L = 0;
-    for (I = 0; I < SB_GetLen (S); ++I) {
-        H = ((H << 3) ^ ((unsigned char) SB_AtUnchecked (S, I))) + L++;
-    }
-    return H;
+   /* Do the hash */
+   H = L = 0;
+   for (I = 0; I < SB_GetLen(S); ++I) {
+      H = ((H << 3) ^ ((unsigned char)SB_AtUnchecked(S, I))) + L++;
+   }
+   return H;
 }

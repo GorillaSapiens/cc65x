@@ -31,99 +31,85 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef CASENODE_H
 #define CASENODE_H
 
-
-
 /* common */
 #include "coll.h"
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 typedef struct CaseNode CaseNode;
 struct CaseNode {
-    unsigned char Value;
-    unsigned      Label;
-    Collection*   Nodes;
+   unsigned char Value;
+   unsigned Label;
+   Collection *Nodes;
 };
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-CaseNode* NewCaseNode (unsigned char Value);
+CaseNode *NewCaseNode(unsigned char Value);
 /* Create and initialize a new CaseNode */
 
-void FreeCaseNode (CaseNode* N);
+void FreeCaseNode(CaseNode *N);
 /* Delete a case node plus all sub nodes */
 
 #if defined(HAVE_INLINE)
-INLINE CaseNode* CN_GetSubNode (CaseNode* N, unsigned Index)
+INLINE CaseNode *CN_GetSubNode(CaseNode *N, unsigned Index)
 /* Get a sub node of the given node */
 {
-    return CollAt (N->Nodes, Index);
+   return CollAt(N->Nodes, Index);
 }
 #else
-#  define CN_GetSubNode(N, Index) CollAt (&(N)->Nodes, Index)
+#define CN_GetSubNode(N, Index) CollAt(&(N)->Nodes, Index)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE unsigned char CN_GetValue (const CaseNode* N)
+INLINE unsigned char CN_GetValue(const CaseNode *N)
 /* Return the value for a case node */
 {
-    return N->Value;
+   return N->Value;
 }
 #else
-#  define CN_GetValue(N)  ((N)->Value)
+#define CN_GetValue(N) ((N)->Value)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE unsigned CN_GetLabel (const CaseNode* N)
+INLINE unsigned CN_GetLabel(const CaseNode *N)
 /* Return the label for a case node */
 {
-    return N->Label;
+   return N->Label;
 }
 #else
-#  define CN_GetLabel(N)  ((N)->Label)
+#define CN_GetLabel(N) ((N)->Label)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE int CN_IsLeafNode (const CaseNode* N)
+INLINE int CN_IsLeafNode(const CaseNode *N)
 /* Return true if this is a leaf node */
 {
-    return (N->Nodes == 0);
+   return (N->Nodes == 0);
 }
 #else
-#  define CN_IsLeafNode(N)  ((N)->Nodes == 0)
+#define CN_IsLeafNode(N) ((N)->Nodes == 0)
 #endif
 
-void FreeCaseNodeColl (Collection* Nodes);
+void FreeCaseNodeColl(Collection *Nodes);
 /* Free a collection of case nodes */
 
-int SearchCaseNode (const Collection* Nodes, unsigned char Key, int* Index);
+int SearchCaseNode(const Collection *Nodes, unsigned char Key, int *Index);
 // Search for a node in the given collection. If the node has been found,
 // set Index to the index of the node and return true. If the node was not
 // found, set Index to the insertion position of the node and return
 // false.
 
-unsigned InsertCaseValue (Collection* Nodes, unsigned long Val, unsigned Depth);
+unsigned InsertCaseValue(Collection *Nodes, unsigned long Val, unsigned Depth);
 // Insert a new case value into a CaseNode tree with the given depth. Return
 // the code label for the value.
-
-
 
 /* End of casenode.h */
 

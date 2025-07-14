@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 // The compiler must use the same floating point arithmetic as the target
 // platform, otherwise expressions will yield a different result when
 // evaluated in the compiler or on the target platform. Since writing a target
@@ -40,100 +38,85 @@
 // hooks here, and define functions for a plug in library that may be added
 // at a later time. Currently we use the builtin data types of the compiler
 // that translates cc65.
-// 
+//
 // BEWARE: This code will currently only work on little endian systems!
-
-
 
 #ifndef FP_H
 #define FP_H
 
-
-
 #include <stddef.h>
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
 typedef union Float Float;
 union Float {
-    float         V;
+   float V;
 };
-
-
 
 typedef union Double Double;
 union Double {
-    double        V;
+   double V;
 };
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-size_t FP_F_Size (void);
+size_t FP_F_Size(void);
 /* Return the size of the data type float */
 
-unsigned char* FP_F_Data (Float Val);
+unsigned char *FP_F_Data(Float Val);
 /* Return the raw data of a float in a malloc'ed buffer. Free after use. */
 
-Float FP_F_Make (float Val);
+Float FP_F_Make(float Val);
 /* Make a floating point variable from a float value */
 
-Float FP_F_FromInt (long Val);
+Float FP_F_FromInt(long Val);
 /* Convert an integer into a floating point variable */
 
-float FP_F_ToFloat (Float Val);
+float FP_F_ToFloat(Float Val);
 /* Convert a Float into a native float */
 
-Float FP_F_Add (Float Left, Float Right);
+Float FP_F_Add(Float Left, Float Right);
 /* Add two floats */
 
-Float FP_F_Sub (Float Left, Float Right);
+Float FP_F_Sub(Float Left, Float Right);
 /* Subtract two floats */
 
-Float FP_F_Mul (Float Left, Float Right);
+Float FP_F_Mul(Float Left, Float Right);
 /* Multiply two floats */
 
-Float FP_F_Div (Float Left, Float Right);
+Float FP_F_Div(Float Left, Float Right);
 /* Divide two floats */
 
-size_t FP_D_Size (void);
+size_t FP_D_Size(void);
 /* Return the size of the data type double */
 
-unsigned char* FP_D_Data (Double Val);
+unsigned char *FP_D_Data(Double Val);
 /* Return the raw data of a double in a malloc'ed buffer. Free after use. */
 
-Double FP_D_Make (double Val);
+Double FP_D_Make(double Val);
 /* Make a floating point variable from a float value */
 
-Double FP_D_FromInt (long Val);
+Double FP_D_FromInt(long Val);
 /* Convert an integer into a floating point variable */
 
-double FP_D_ToFloat (Double Val);
+double FP_D_ToFloat(Double Val);
 /* Convert a Double into a native double */
 
-Double FP_D_Add (Double Left, Double Right);
+Double FP_D_Add(Double Left, Double Right);
 /* Add two floats */
 
-Double FP_D_Sub (Double Left, Double Right);
+Double FP_D_Sub(Double Left, Double Right);
 /* Subtract two floats */
 
-Double FP_D_Mul (Double Left, Double Right);
+Double FP_D_Mul(Double Left, Double Right);
 /* Multiply two floats */
 
-Double FP_D_Div (Double Left, Double Right);
+Double FP_D_Div(Double Left, Double Right);
 /* Divide two floats */
-
-
 
 /* End of fp.h */
 

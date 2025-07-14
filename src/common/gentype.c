@@ -31,91 +31,81 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* common */
 #include "check.h"
 #include "gentype.h"
 #include "strbuf.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void GT_AddArray (StrBuf* Type, unsigned ArraySize)
+void GT_AddArray(StrBuf *Type, unsigned ArraySize)
 // Add an array with the given size to the type string in Type. This will
 // NOT add the element type!
 {
-    unsigned SizeBytes;
+   unsigned SizeBytes;
 
-    /* Remember the current position */
-    unsigned Pos = SB_GetLen (Type);
+   /* Remember the current position */
+   unsigned Pos = SB_GetLen(Type);
 
-    /* Add a dummy array token */
-    SB_AppendChar (Type, GT_TYPE_ARRAY);
+   /* Add a dummy array token */
+   SB_AppendChar(Type, GT_TYPE_ARRAY);
 
-    /* Add the size. */
-    SizeBytes = 0;
-    do {
-        SB_AppendChar (Type, ArraySize & 0xFF);
-        ArraySize >>= 8;
-        ++SizeBytes;
-    } while (ArraySize);
+   /* Add the size. */
+   SizeBytes = 0;
+   do {
+      SB_AppendChar(Type, ArraySize & 0xFF);
+      ArraySize >>= 8;
+      ++SizeBytes;
+   } while (ArraySize);
 
-    /* Write the correct array token */
-    SB_GetBuf (Type)[Pos] = GT_ARRAY (SizeBytes);
+   /* Write the correct array token */
+   SB_GetBuf(Type)[Pos] = GT_ARRAY(SizeBytes);
 }
 
-
-
-unsigned GT_GetElementCount (StrBuf* Type)
+unsigned GT_GetElementCount(StrBuf *Type)
 // Retrieve the element count of an array stored in Type at the current index
 // position. Note: Index must point to the array token itself, since the size
 // of the element count is encoded there. The index position will get moved
 // past the array.
 {
-    /* Get the number of bytes for the element count */
-    unsigned SizeBytes = GT_GET_SIZE (SB_Get (Type));
+   /* Get the number of bytes for the element count */
+   unsigned SizeBytes = GT_GET_SIZE(SB_Get(Type));
 
-    /* Read the size */
-    unsigned Size = 0;
-    const char* Buf = SB_GetConstBuf (Type) + SB_GetLen (Type);
-    while (SizeBytes--) {
-        Size <<= 8;
-        Size |= Buf[SizeBytes];
-    }
+   /* Read the size */
+   unsigned Size = 0;
+   const char *Buf = SB_GetConstBuf(Type) + SB_GetLen(Type);
+   while (SizeBytes--) {
+      Size <<= 8;
+      Size |= Buf[SizeBytes];
+   }
 
-    /* Return it */
-    return Size;
+   /* Return it */
+   return Size;
 }
 
-
-
-const char* GT_AsString (const StrBuf* Type, StrBuf* String)
+const char *GT_AsString(const StrBuf *Type, StrBuf *String)
 // Convert the type into a readable representation. The target string buffer
 // will be zero terminated and a pointer to the contents are returned.
 {
-    static const char HexTab[16] = "0123456789ABCDEF";
-    unsigned I;
+   static const char HexTab[16] = "0123456789ABCDEF";
+   unsigned I;
 
-    // Convert Type into readable hex. String will have twice then length
-    // plus a terminator.
-    SB_Realloc (String, 2 * SB_GetLen (Type) + 1);
-    SB_Clear (String);
+   // Convert Type into readable hex. String will have twice then length
+   // plus a terminator.
+   SB_Realloc(String, 2 * SB_GetLen(Type) + 1);
+   SB_Clear(String);
 
-    for (I = 0; I < SB_GetLen (Type); ++I) {
-        unsigned char C = SB_AtUnchecked (Type, I);
-        SB_AppendChar (String, HexTab[(C & 0xF0) >> 4]);
-        SB_AppendChar (String, HexTab[(C & 0x0F) >> 0]);
-    }
+   for (I = 0; I < SB_GetLen(Type); ++I) {
+      unsigned char C = SB_AtUnchecked(Type, I);
+      SB_AppendChar(String, HexTab[(C & 0xF0) >> 4]);
+      SB_AppendChar(String, HexTab[(C & 0x0F) >> 0]);
+   }
 
-    /* Terminate the string so it can be used with string functions */
-    SB_Terminate (String);
+   /* Terminate the string so it can be used with string functions */
+   SB_Terminate(String);
 
-    /* Return the contents of String */
-    return SB_GetConstBuf (String);
+   /* Return the contents of String */
+   return SB_GetConstBuf(String);
 }

@@ -31,41 +31,26 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef MAPFILE_H
 #define MAPFILE_H
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Constants that may be used as arguments for CreateMapFile */
-enum {
-    LONG_MAPFILE,
-    SHORT_MAPFILE
-};
-
-
+enum { LONG_MAPFILE, SHORT_MAPFILE };
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void CreateMapFile (int ShortMap);
+void CreateMapFile(int ShortMap);
 // Create a map file. If ShortMap is true, only the segment lists are
 // generated, not the import/export lists.
 
-void CreateLabelFile (void);
+void CreateLabelFile(void);
 /* Create a label file */
-
-
 
 /* End of mapfile.h */
 

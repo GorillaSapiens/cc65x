@@ -31,49 +31,39 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef COPTPUSH_H
 #define COPTPUSH_H
 
-
-
 /* cc65 */
 #include "codeseg.h"
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-unsigned OptPush1 (CodeSeg* S);
+unsigned OptPush1(CodeSeg *S);
 // Given a sequence
-// 
+//
 // jsr     ldaxysp
 // jsr     pushax
-// 
+//
 // If a/x are not used later, and Y is known, replace that by
-// 
+//
 // ldy     #xx+2
 // jsr     pushwysp
 // ldy     #$00     ; present if later code expects Y = 0
-// 
+//
 // saving several cycles.
 
-unsigned OptPush2 (CodeSeg* S);
+unsigned OptPush2(CodeSeg *S);
 // A sequence
-// 
+//
 // jsr     ldaxidx
 // jsr     pushax
-// 
+//
 // may get replaced by
-// 
+//
 // jsr     pushwidx
-
-
 
 /* End of coptpush.h */
 

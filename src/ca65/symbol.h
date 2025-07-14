@@ -31,35 +31,23 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef SYMBOL_H
 #define SYMBOL_H
 
-
-
 /* cc65 */
 #include "symtab.h"
-
-
 
 /*****************************************************************************/
 /*                                 Forwards                                  */
 /*****************************************************************************/
 
-
-
 struct StrBuf;
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-struct SymTable* ParseScopedIdent (struct StrBuf* Name, struct StrBuf* FullName);
+struct SymTable *ParseScopedIdent(struct StrBuf *Name, struct StrBuf *FullName);
 // Parse a (possibly scoped) identifer. The scope of the name must exist and
 // is returned as function result, while the last part (the identifier) which
 // may be either a symbol or a scope depending on the context is returned in
@@ -67,19 +55,17 @@ struct SymTable* ParseScopedIdent (struct StrBuf* Name, struct StrBuf* FullName)
 // the identifier including the scope. It is used internally and may be used
 // by the caller for error messages or similar.
 
-struct SymEntry* ParseScopedSymName (SymFindAction Action);
+struct SymEntry *ParseScopedSymName(SymFindAction Action);
 // Parse a (possibly scoped) symbol name, search for it in the symbol table
 // and return the symbol table entry.
 
-struct SymTable* ParseScopedSymTable (void);
+struct SymTable *ParseScopedSymTable(void);
 // Parse a (possibly scoped) symbol table (scope) name, search for it in the
 // symbol space and return the symbol table struct.
 
-struct SymEntry* ParseAnySymName (SymFindAction Action);
+struct SymEntry *ParseAnySymName(SymFindAction Action);
 // Parse a cheap local symbol or a a (possibly scoped) symbol name, search
 // for it in the symbol table and return the symbol table entry.
-
-
 
 /* End of symbol.h */
 

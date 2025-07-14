@@ -31,89 +31,75 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef INTSTACK_H
 #define INTSTACK_H
 
-
-
 #include "inline.h"
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 typedef struct IntStack IntStack;
 struct IntStack {
-    unsigned    Count;
-    long        Stack[8];
+   unsigned Count;
+   long Stack[8];
 };
 
 /* An initializer for an empty int stack */
-#define STATIC_INTSTACK_INITIALIZER     { 0, { 0, 0, 0, 0, 0, 0, 0, 0 } }
+#define STATIC_INTSTACK_INITIALIZER {0, {0, 0, 0, 0, 0, 0, 0, 0}}
 
 /* Declare an int stack with the given value as first element */
-#define INTSTACK(Val)   { 1, { Val, 0, 0, 0, 0, 0, 0, 0 } }
-
-
+#define INTSTACK(Val) {1, {Val, 0, 0, 0, 0, 0, 0, 0}}
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
 #if defined(HAVE_INLINE)
-INLINE int IS_IsFull (const IntStack* S)
+INLINE int IS_IsFull(const IntStack *S)
 /* Return true if there is no space left on the given int stack */
 {
-    return (S->Count >= sizeof (S->Stack) / sizeof (S->Stack[0]));
+   return (S->Count >= sizeof(S->Stack) / sizeof(S->Stack[0]));
 }
 #else
-#  define IS_IsFull(S)  ((S)->Count >= sizeof ((S)->Stack) / sizeof ((S)->Stack[0]))
+#define IS_IsFull(S) ((S)->Count >= sizeof((S)->Stack) / sizeof((S)->Stack[0]))
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE int IS_IsEmpty (const IntStack* S)
+INLINE int IS_IsEmpty(const IntStack *S)
 /* Return true if there are no values on the given int stack */
 {
-    return (S->Count == 0);
+   return (S->Count == 0);
 }
 #else
-#  define IS_IsEmpty(S)  ((S)->Count == 0)
+#define IS_IsEmpty(S) ((S)->Count == 0)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE unsigned IS_GetCount (const IntStack* S)
+INLINE unsigned IS_GetCount(const IntStack *S)
 /* Return the number of elements on the given int stack */
 {
-    return S->Count;
+   return S->Count;
 }
 #else
-#  define IS_GetCount(S)        (S)->Count
+#define IS_GetCount(S) (S)->Count
 #endif
 
-long IS_Get (const IntStack* S);
+long IS_Get(const IntStack *S);
 /* Get the value on top of an int stack */
 
-void IS_Set (IntStack* S, long Val);
+void IS_Set(IntStack *S, long Val);
 /* Set the value on top of an int stack */
 
-void IS_Drop (IntStack* S);
+void IS_Drop(IntStack *S);
 /* Drop a value from an int stack */
 
-void IS_Push (IntStack* S, long Val);
+void IS_Push(IntStack *S, long Val);
 /* Push a value onto an int stack */
 
-long IS_Pop (IntStack* S);
+long IS_Pop(IntStack *S);
 /* Pop a value from an int stack */
-
-
 
 /* End of intstack.h */
 

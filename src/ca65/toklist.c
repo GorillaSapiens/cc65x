@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <string.h>
 
 /* common */
@@ -47,234 +45,212 @@
 #include "scanner.h"
 #include "toklist.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Number of currently pushed token lists */
 static unsigned PushCounter = 0;
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-TokNode* NewTokNode (void)
+TokNode *NewTokNode(void)
 /* Create and return a token node with the current token value */
 {
 
-    /* Allocate memory */
-    TokNode* N = xmalloc (sizeof (TokNode));
+   /* Allocate memory */
+   TokNode *N = xmalloc(sizeof(TokNode));
 
-    /* Initialize the token contents */
-    N->Next     = 0;
-    SB_Init (&N->T.SVal);
-    CopyToken (&N->T, &CurTok);
+   /* Initialize the token contents */
+   N->Next = 0;
+   SB_Init(&N->T.SVal);
+   CopyToken(&N->T, &CurTok);
 
-    /* Return the node */
-    return N;
+   /* Return the node */
+   return N;
 }
 
-
-
-void FreeTokNode (TokNode* N)
+void FreeTokNode(TokNode *N)
 /* Free the given token node */
 {
-    SB_Done (&N->T.SVal);
-    xfree (N);
+   SB_Done(&N->T.SVal);
+   xfree(N);
 }
 
-
-
-void TokSet (TokNode* N)
+void TokSet(TokNode *N)
 /* Set the scanner token from the given token node. */
 {
-    /* Set the values */
-    CopyToken (&CurTok, &N->T);
-    SB_Terminate (&CurTok.SVal);
+   /* Set the values */
+   CopyToken(&CurTok, &N->T);
+   SB_Terminate(&CurTok.SVal);
 }
 
-
-
-enum TC TokCmp (const TokNode* N)
+enum TC TokCmp(const TokNode *N)
 /* Compare the token given as parameter against the current token */
 {
-    if (N->T.Tok != CurTok.Tok) {
-        /* Different token */
-        return tcDifferent;
-    }
+   if (N->T.Tok != CurTok.Tok) {
+      /* Different token */
+      return tcDifferent;
+   }
 
-    /* If the token has string attribute, check it */
-    if (TokHasSVal (N->T.Tok)) {
-        if (SB_Compare (&CurTok.SVal, &N->T.SVal) != 0) {
-            return tcSameToken;
-        }
-    } else if (TokHasIVal (N->T.Tok)) {
-        if (N->T.IVal != CurTok.IVal) {
-            return tcSameToken;
-        }
-    }
+   /* If the token has string attribute, check it */
+   if (TokHasSVal(N->T.Tok)) {
+      if (SB_Compare(&CurTok.SVal, &N->T.SVal) != 0) {
+         return tcSameToken;
+      }
+   }
+   else if (TokHasIVal(N->T.Tok)) {
+      if (N->T.IVal != CurTok.IVal) {
+         return tcSameToken;
+      }
+   }
 
-    /* Tokens are identical */
-    return tcIdentical;
+   /* Tokens are identical */
+   return tcIdentical;
 }
 
-
-
-TokList* NewTokList (void)
+TokList *NewTokList(void)
 /* Create a new, empty token list */
 {
-    /* Allocate memory for the list structure */
-    TokList* T = xmalloc (sizeof (TokList));
+   /* Allocate memory for the list structure */
+   TokList *T = xmalloc(sizeof(TokList));
 
-    /* Initialize the fields */
-    T->Next     = 0;
-    T->Root     = 0;
-    T->Last     = 0;
-    T->RepCount = 0;
-    T->RepMax   = 1;
-    T->Count    = 0;
-    T->Check    = 0;
-    T->Data     = 0;
-    T->LI       = 0;
+   /* Initialize the fields */
+   T->Next = 0;
+   T->Root = 0;
+   T->Last = 0;
+   T->RepCount = 0;
+   T->RepMax = 1;
+   T->Count = 0;
+   T->Check = 0;
+   T->Data = 0;
+   T->LI = 0;
 
-    /* Return the new list */
-    return T;
+   /* Return the new list */
+   return T;
 }
 
-
-
-void FreeTokList (TokList* List)
+void FreeTokList(TokList *List)
 /* Delete the token list including all token nodes */
 {
-    /* Free the token list */
-    TokNode* T = List->Root;
-    while (T) {
-        TokNode* Tmp = T;
-        T = T->Next;
-        FreeTokNode (Tmp);
-    }
+   /* Free the token list */
+   TokNode *T = List->Root;
+   while (T) {
+      TokNode *Tmp = T;
+      T = T->Next;
+      FreeTokNode(Tmp);
+   }
 
-    /* Free associated line info */
-    if (List->LI) {
-        EndLine (List->LI);
-    }
+   /* Free associated line info */
+   if (List->LI) {
+      EndLine(List->LI);
+   }
 
-    /* If we have associated data, free it */
-    if (List->Data) {
-        xfree (List->Data);
-    }
+   /* If we have associated data, free it */
+   if (List->Data) {
+      xfree(List->Data);
+   }
 
-    /* Free the list structure itself */
-    xfree (List);
+   /* Free the list structure itself */
+   xfree(List);
 }
 
-
-
-enum token_t GetTokListTerm (enum token_t Term)
+enum token_t GetTokListTerm(enum token_t Term)
 // Determine if the following token list is enclosed in curly braces. This is
 // the case if the next token is the opening brace. If so, skip it and return
 // a closing brace, otherwise return Term.
 {
-    if (CurTok.Tok == TOK_LCURLY) {
-        NextTok ();
-        return TOK_RCURLY;
-    } else {
-        return Term;
-    }
+   if (CurTok.Tok == TOK_LCURLY) {
+      NextTok();
+      return TOK_RCURLY;
+   }
+   else {
+      return Term;
+   }
 }
 
-
-
-void AddCurTok (TokList* List)
+void AddCurTok(TokList *List)
 /* Add the current token to the token list */
 {
-    /* Create a token node with the current token value */
-    TokNode* T = NewTokNode ();
+   /* Create a token node with the current token value */
+   TokNode *T = NewTokNode();
 
-    /* Insert the node into the list */
-    if (List->Root == 0) {
-        List->Root = T;
-    } else {
-        List->Last->Next = T;
-    }
-    List->Last = T;
+   /* Insert the node into the list */
+   if (List->Root == 0) {
+      List->Root = T;
+   }
+   else {
+      List->Last->Next = T;
+   }
+   List->Last = T;
 
-    /* Count nodes */
-    List->Count++;
+   /* Count nodes */
+   List->Count++;
 }
 
-
-
-static int ReplayTokList (void* List)
+static int ReplayTokList(void *List)
 // Function that gets the next token from a token list and sets it. This
 // function may be used together with the PushInput function from the istack
 // module.
 {
-    /* Cast the generic pointer to an actual list */
-    TokList* L = List;
+   /* Cast the generic pointer to an actual list */
+   TokList *L = List;
 
-    // If there are no more tokens, decrement the repeat counter. If it goes
-    // zero, delete the list and remove the function from the stack.
-    if (L->Last == 0) {
-        if (++L->RepCount >= L->RepMax) {
-            /* Done with this list */
-            FreeTokList (L);
-            --PushCounter;
-            PopInput ();
-            return 0;
-        } else {
-            /* Replay one more time */
-            L->Last = L->Root;
-        }
-    }
+   // If there are no more tokens, decrement the repeat counter. If it goes
+   // zero, delete the list and remove the function from the stack.
+   if (L->Last == 0) {
+      if (++L->RepCount >= L->RepMax) {
+         /* Done with this list */
+         FreeTokList(L);
+         --PushCounter;
+         PopInput();
+         return 0;
+      }
+      else {
+         /* Replay one more time */
+         L->Last = L->Root;
+      }
+   }
 
-    /* Set the next token from the list */
-    TokSet (L->Last);
+   /* Set the next token from the list */
+   TokSet(L->Last);
 
-    /* Set the line info for the new token */
-    if (L->LI) {
-        EndLine (L->LI);
-    }
-    L->LI = StartLine (&CurTok.Pos, LI_TYPE_ASM, PushCounter);
+   /* Set the line info for the new token */
+   if (L->LI) {
+      EndLine(L->LI);
+   }
+   L->LI = StartLine(&CurTok.Pos, LI_TYPE_ASM, PushCounter);
 
-    // If a check function is defined, call it, so it may look at the token
-    // just set and changed it as apropriate.
-    if (L->Check) {
-        L->Check (L);
-    }
+   // If a check function is defined, call it, so it may look at the token
+   // just set and changed it as apropriate.
+   if (L->Check) {
+      L->Check(L);
+   }
 
-    /* Set the pointer to the next token */
-    L->Last = L->Last->Next;
+   /* Set the pointer to the next token */
+   L->Last = L->Last->Next;
 
-    /* We have a token */
-    return 1;
+   /* We have a token */
+   return 1;
 }
 
-
-
-void PushTokList (TokList* List, const char* Desc)
+void PushTokList(TokList *List, const char *Desc)
 // Push a token list to be used as input for InputFromStack. This includes
 // several initializations needed in the token list structure, so don't use
 // PushInput directly.
 {
-    /* If the list is empty, just delete it and bail out */
-    if (List->Count == 0) {
-        FreeTokList (List);
-        return;
-    }
+   /* If the list is empty, just delete it and bail out */
+   if (List->Count == 0) {
+      FreeTokList(List);
+      return;
+   }
 
-    /* Reset the last pointer to the first element */
-    List->Last = List->Root;
+   /* Reset the last pointer to the first element */
+   List->Last = List->Root;
 
-    /* Insert the list specifying our input function */
-    ++PushCounter;
-    PushInput (ReplayTokList, List, Desc);
+   /* Insert the list specifying our input function */
+   ++PushCounter;
+   PushInput(ReplayTokList, List, Desc);
 }

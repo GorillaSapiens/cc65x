@@ -31,38 +31,28 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef LIBDEFS_H
 #define LIBDEFS_H
-
-
 
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Defines for magic and version */
-#define LIB_MAGIC       0x7A55616E
-#define LIB_VERSION     0x000D
+#define LIB_MAGIC 0x7A55616E
+#define LIB_VERSION 0x000D
 
 /* Size of an library file header */
-#define LIB_HDR_SIZE    12
-
-
+#define LIB_HDR_SIZE 12
 
 /* Header structure for the library */
 typedef struct LibHeader LibHeader;
 struct LibHeader {
-    unsigned long       Magic;          /* 32: Magic number */
-    unsigned            Version;        /* 16: Version number */
-    unsigned            Flags;          /* 16: flags */
-    unsigned long       IndexOffs;      /* 32: Offset to directory */
+   unsigned long Magic;     /* 32: Magic number */
+   unsigned Version;        /* 16: Version number */
+   unsigned Flags;          /* 16: flags */
+   unsigned long IndexOffs; /* 32: Offset to directory */
 };
-
-
 
 /* End of libdefs.h */
 

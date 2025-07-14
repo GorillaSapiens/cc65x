@@ -31,88 +31,78 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef FILEIO_H
 #define FILEIO_H
-
-
 
 #include <stdio.h>
 
 /* common */
 #include "filepos.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-void FileSetPos (FILE* F, unsigned long Pos);
+void FileSetPos(FILE *F, unsigned long Pos);
 /* Seek to the given absolute position, fail on errors */
 
-unsigned long FileGetPos (FILE* F);
+unsigned long FileGetPos(FILE *F);
 /* Return the current file position, fail on errors */
 
-void Write8 (FILE* F, unsigned Val);
+void Write8(FILE *F, unsigned Val);
 /* Write an 8 bit value to the file */
 
-void Write16 (FILE* F, unsigned Val);
+void Write16(FILE *F, unsigned Val);
 /* Write a 16 bit value to the file */
 
-void Write24 (FILE* F, unsigned long Val);
+void Write24(FILE *F, unsigned long Val);
 /* Write a 24 bit value to the file */
 
-void Write32 (FILE* F, unsigned long Val);
+void Write32(FILE *F, unsigned long Val);
 /* Write a 32 bit value to the file */
 
-void WriteVal (FILE* F, unsigned long Val, unsigned Size);
+void WriteVal(FILE *F, unsigned long Val, unsigned Size);
 /* Write a value of the given size to the output file */
 
-void WriteVar (FILE* F, unsigned long V);
+void WriteVar(FILE *F, unsigned long V);
 /* Write a variable sized value to the file in special encoding */
 
-void WriteStr (FILE* F, const char* S);
+void WriteStr(FILE *F, const char *S);
 /* Write a string to the file */
 
-void WriteData (FILE* F, const void* Data, unsigned Size);
+void WriteData(FILE *F, const void *Data, unsigned Size);
 /* Write data to the file */
 
-void WriteMult (FILE* F, unsigned char Val, unsigned long Count);
+void WriteMult(FILE *F, unsigned char Val, unsigned long Count);
 /* Write one byte several times to the file */
 
-unsigned Read8 (FILE* F);
+unsigned Read8(FILE *F);
 /* Read an 8 bit value from the file */
 
-unsigned Read16 (FILE* F);
+unsigned Read16(FILE *F);
 /* Read a 16 bit value from the file */
 
-unsigned long Read24 (FILE* F);
+unsigned long Read24(FILE *F);
 /* Read a 24 bit value from the file */
 
-unsigned long Read32 (FILE* F);
+unsigned long Read32(FILE *F);
 /* Read a 32 bit value from the file */
 
-long Read32Signed (FILE* F);
+long Read32Signed(FILE *F);
 /* Read a 32 bit value from the file. Sign extend the value. */
 
-unsigned long ReadVar (FILE* F);
+unsigned long ReadVar(FILE *F);
 /* Read a variable size value from the file */
 
-unsigned ReadStr (FILE* F);
+unsigned ReadStr(FILE *F);
 // Read a string from the file, place it into the global string pool, and
 // return its string id.
 
-FilePos* ReadFilePos (FILE* F, FilePos* Pos);
+FilePos *ReadFilePos(FILE *F, FilePos *Pos);
 /* Read a file position from the file */
 
-void* ReadData (FILE* F, void* Data, unsigned Size);
+void *ReadData(FILE *F, void *Data, unsigned Size);
 /* Read data from the file */
-
-
 
 /* End of fileio.h */
 

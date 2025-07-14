@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 /* common */
 #include "strutil.h"
 
@@ -40,53 +38,39 @@
 #include "error.h"
 #include "model.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
-
-
 
 /* Current model */
 O65Model Model = O65_MODEL_NONE;
 
 /* Name table */
-static const char* const NameTable[O65_MODEL_COUNT] = {
-    "none",
-    "os/a65",
-    "lunix",
-    "cc65-module"
-};
-
-
+static const char *const NameTable[O65_MODEL_COUNT] = {"none", "os/a65",
+                                                       "lunix", "cc65-module"};
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-const char* GetModelName (O65Model M)
+const char *GetModelName(O65Model M)
 /* Map the model to its name. */
 {
-    if (M < 0 || M >= O65_MODEL_COUNT) {
-        Internal ("O65 Model %d not found", M);
-    }
-    return NameTable[M];
+   if (M < 0 || M >= O65_MODEL_COUNT) {
+      Internal("O65 Model %d not found", M);
+   }
+   return NameTable[M];
 }
 
-
-
-O65Model FindModel (const char* ModelName)
+O65Model FindModel(const char *ModelName)
 // Map a model name to its identifier. Return O65_MODEL_INVALID if the name
 // could not be found. Case is ignored when comparing names.
 {
-    O65Model M;
-    for (M = O65_MODEL_NONE; M < O65_MODEL_COUNT; ++M) {
-        if (StrCaseCmp (ModelName, NameTable[M]) == 0) {
-            return M;
-        }
-    }
-    return O65_MODEL_INVALID;
+   O65Model M;
+   for (M = O65_MODEL_NONE; M < O65_MODEL_COUNT; ++M) {
+      if (StrCaseCmp(ModelName, NameTable[M]) == 0) {
+         return M;
+      }
+   }
+   return O65_MODEL_INVALID;
 }

@@ -31,49 +31,35 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <stdlib.h>
 
 #include "abend.h"
 #include "check.h"
 
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
-
 /* Predefined messages */
-const char* MsgInternalError    = "Internal error: ";
-const char* MsgPrecondition     = "Precondition violated: ";
-const char* MsgCheckFailed      = "Check failed: ";
-const char* MsgProgramAborted   = "Program aborted: ";
+const char *MsgInternalError = "Internal error: ";
+const char *MsgPrecondition = "Precondition violated: ";
+const char *MsgCheckFailed = "Check failed: ";
+const char *MsgProgramAborted = "Program aborted: ";
 
+static void DefaultCheckFailed(const char *msg, const char *cond,
+                               const char *file, unsigned line)
+    attribute((noreturn));
 
-
-static void DefaultCheckFailed (const char* msg, const char* cond,
-                                const char* file, unsigned line)
-                                attribute ((noreturn));
-
-void (*CheckFailed) (const char* Msg, const char* Cond,
-                     const char* File, unsigned Line) attribute ((noreturn))
-                = DefaultCheckFailed;
+void (*CheckFailed)(const char *Msg, const char *Cond, const char *File,
+                    unsigned Line) attribute((noreturn)) = DefaultCheckFailed;
 /* Function pointer that is called from check if the condition code is true. */
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-static void DefaultCheckFailed (const char* Msg, const char* Cond,
-                                const char* File, unsigned Line)
-{
-    /* Output a diagnostic and abort */
-    AbEnd ("%s%s, file '%s', line %u", Msg, Cond, File, Line);
+static void DefaultCheckFailed(const char *Msg, const char *Cond,
+                               const char *File, unsigned Line) {
+   /* Output a diagnostic and abort */
+   AbEnd("%s%s, file '%s', line %u", Msg, Cond, File, Line);
 }

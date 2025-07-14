@@ -31,27 +31,19 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef COPTMISC_H
 #define COPTMISC_H
 
-
-
 /* cc65 */
 #include "codeseg.h"
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-unsigned OptDecouple (CodeSeg* S);
+unsigned OptDecouple(CodeSeg *S);
 // Decouple operations, that is, do the following replacements:
-// 
+//
 // dex        -> ldx #imm
 // inx        -> ldx #imm
 // dey        -> ldy #imm
@@ -63,57 +55,55 @@ unsigned OptDecouple (CodeSeg* S);
 // lda zp     -> lda #imm
 // ldx zp     -> ldx #imm
 // ldy zp     -> ldy #imm
-// 
+//
 // Provided that the register values are known of course.
 
-unsigned OptIndLoads1 (CodeSeg* S);
+unsigned OptIndLoads1(CodeSeg *S);
 // Change
-// 
+//
 // lda      (zp),y
-// 
+//
 // into
-// 
+//
 // lda      (zp,x)
-// 
+//
 // provided that x and y are both zero.
 
-unsigned OptIndLoads2 (CodeSeg* S);
+unsigned OptIndLoads2(CodeSeg *S);
 // Change
-// 
+//
 // lda      (zp,x)
-// 
+//
 // into
-// 
+//
 // lda      (zp),y
-// 
+//
 // provided that x and y are both zero.
 
-unsigned OptStackPtrOps (CodeSeg* S);
+unsigned OptStackPtrOps(CodeSeg *S);
 // Merge adjacent calls to decsp into one. NOTE: This function won't merge all
 // known cases!
 
-unsigned OptGotoSPAdj (CodeSeg* S);
+unsigned OptGotoSPAdj(CodeSeg *S);
 /* Optimize SP adjustment for forward 'goto' */
 
-unsigned OptLoadStore2 (CodeSeg* S);
+unsigned OptLoadStore2(CodeSeg *S);
 /* Remove 16 bit stack loads followed by a store into the same location. */
 
-unsigned OptLoad1 (CodeSeg* S);
+unsigned OptLoad1(CodeSeg *S);
 // Search for a call to ldaxysp where X is not used later and replace it by
 // a load of just the A register.
 
-unsigned OptLoad2 (CodeSeg* S);
+unsigned OptLoad2(CodeSeg *S);
 /* Replace calls to ldaxysp by inline code */
 
-unsigned OptBinOps1 (CodeSeg* S);
+unsigned OptBinOps1(CodeSeg *S);
 // Search for an AND/EOR/ORA where the value of A or the operand is known and
 // replace it by something simpler.
 
-unsigned OptBinOps2 (CodeSeg* S);
+unsigned OptBinOps2(CodeSeg *S);
 // Search for an AND/EOR/ORA for identical memory locations and replace it
 // by something simpler.
-
-
 
 /* End of coptmisc.h */
 

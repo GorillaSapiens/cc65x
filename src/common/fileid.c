@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -40,36 +38,30 @@
 #include "fileid.h"
 #include "fname.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-int CompareFileId (const void* Key, const void* Id)
+int CompareFileId(const void *Key, const void *Id)
 /* Compare function used when calling bsearch with a table of FileIds */
 {
-    return strcmp (Key, ((const FileId*) Id)->Ext);
+   return strcmp(Key, ((const FileId *)Id)->Ext);
 }
 
-
-
-const FileId* GetFileId (const char* Name, const FileId* Table, unsigned Count)
+const FileId *GetFileId(const char *Name, const FileId *Table, unsigned Count)
 // Determine the id of the given file by looking at file extension of the name.
 // The table passed to the function must be sorted alphabetically. If the
 // extension is found, a pointer to the matching table entry is returned. If
 // no matching table entry was found, the function returns NULL.
 {
-    /* Determine the file type by the extension */
-    const char* Ext = FindExt (Name);
+   /* Determine the file type by the extension */
+   const char *Ext = FindExt(Name);
 
-    /* Do we have an extension? */
-    if (Ext == 0) {
-        return 0;
-    }
+   /* Do we have an extension? */
+   if (Ext == 0) {
+      return 0;
+   }
 
-    /* Search for a table entry and return it */
-    return bsearch (Ext+1, Table, Count, sizeof (FileId), CompareFileId);
+   /* Search for a table entry and return it */
+   return bsearch(Ext + 1, Table, Count, sizeof(FileId), CompareFileId);
 }

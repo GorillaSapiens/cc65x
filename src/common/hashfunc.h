@@ -31,35 +31,25 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef HASHFUNC_H
 #define HASHFUNC_H
-
-
 
 /* common */
 #include "attrib.h"
 #include "strbuf.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-unsigned HashInt (unsigned V) attribute ((const));
+unsigned HashInt(unsigned V) attribute((const));
 /* Return a hash value for the given integer. */
 
-unsigned HashStr (const char* S) attribute ((const));
+unsigned HashStr(const char *S) attribute((const));
 /* Return a hash value for the given string */
 
-unsigned HashBuf (const StrBuf* S) attribute ((const));
+unsigned HashBuf(const StrBuf *S) attribute((const));
 /* Return a hash value for the given string buffer */
-
-
 
 /* End of hashfunc.h */
 

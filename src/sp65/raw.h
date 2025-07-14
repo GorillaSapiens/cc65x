@@ -31,12 +31,8 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #ifndef RAW_H
 #define RAW_H
-
-
 
 /* common */
 #include "coll.h"
@@ -45,19 +41,13 @@
 /* sp65 */
 #include "bitmap.h"
 
-
-
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
-
-StrBuf* GenRaw (const Bitmap* B, const Collection* A);
+StrBuf *GenRaw(const Bitmap *B, const Collection *A);
 // Generate binary output in raw format. The output is stored in a string
 // buffer (which is actually a dynamic char array) and returned.
-
-
 
 /* End of raw.h */
 
